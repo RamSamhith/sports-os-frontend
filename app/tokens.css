@@ -1,0 +1,152 @@
+/* SportsOS Design Tokens — single source of truth */
+
+:root {
+  /* Spacing — 8px scale (with 4px half-step) */
+  --space-0: 0;
+  --space-1: 0.25rem; /* 4 */
+  --space-2: 0.5rem;  /* 8 */
+  --space-3: 0.75rem; /* 12 */
+  --space-4: 1rem;    /* 16 */
+  --space-5: 1.25rem; /* 20 */
+  --space-6: 1.5rem;  /* 24 */
+  --space-8: 2rem;    /* 32 */
+  --space-10: 2.5rem; /* 40 */
+  --space-12: 3rem;   /* 48 */
+  --space-16: 4rem;   /* 64 */
+  --space-20: 5rem;   /* 80 */
+  --space-24: 6rem;   /* 96 */
+
+  /* Radius */
+  --radius-xs: 0.25rem;
+  --radius-sm: 0.375rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+  --radius-2xl: 1.25rem;
+  --radius-3xl: 1.5rem;
+  --radius-pill: 9999px;
+
+  /* Typography */
+  --font-sans: 'Inter', 'Geist', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --font-display: 'Geist', 'Inter', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'Geist Mono', ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace;
+
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.25rem;
+  --text-2xl: 1.5rem;
+  --text-3xl: 1.875rem;
+  --text-4xl: 2.25rem;
+  --text-5xl: 3rem;
+  --text-6xl: 3.75rem;
+  --text-7xl: 4.5rem;
+
+  /* Leading */
+  --leading-tight: 1.15;
+  --leading-snug: 1.3;
+  --leading-normal: 1.5;
+  --leading-relaxed: 1.625;
+
+  /* Tracking */
+  --tracking-tighter: -0.04em;
+  --tracking-tight: -0.02em;
+  --tracking-normal: 0;
+  --tracking-wide: 0.02em;
+  --tracking-wider: 0.05em;
+
+  /* Motion */
+  --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+  --ease-emphasized: cubic-bezier(0.3, 0, 0, 1);
+  --ease-decelerate: cubic-bezier(0, 0, 0, 1);
+  --ease-accelerate: cubic-bezier(0.3, 0, 1, 1);
+
+  --duration-micro: 120ms;
+  --duration-fast: 180ms;
+  --duration-standard: 240ms;
+  --duration-slow: 360ms;
+  --duration-page: 480ms;
+
+  /* Shadows */
+  --shadow-xs: 0 1px 2px 0 hsl(0 0% 0% / 0.2);
+  --shadow-sm: 0 1px 3px 0 hsl(0 0% 0% / 0.25), 0 1px 2px -1px hsl(0 0% 0% / 0.25);
+  --shadow-md: 0 4px 6px -1px hsl(0 0% 0% / 0.3), 0 2px 4px -2px hsl(0 0% 0% / 0.3);
+  --shadow-lg: 0 10px 15px -3px hsl(0 0% 0% / 0.35), 0 4px 6px -4px hsl(0 0% 0% / 0.3);
+  --shadow-xl: 0 20px 25px -5px hsl(0 0% 0% / 0.4), 0 8px 10px -6px hsl(0 0% 0% / 0.35);
+  --shadow-glow: 0 0 40px hsl(var(--primary) / 0.25);
+
+  /* Z-index */
+  --z-base: 0;
+  --z-raised: 10;
+  --z-sticky: 100;
+  --z-overlay: 200;
+  --z-drawer: 300;
+  --z-modal: 400;
+  --z-toast: 500;
+  --z-tooltip: 600;
+
+  /* Layout */
+  --content-max: 1440px;
+  --content-narrow: 960px;
+  --content-prose: 720px;
+  --navbar-height: 64px;
+  --section-y: 6rem;
+}
+
+/* Dark theme — primary */
+.dark {
+  --background: 0 0% 5%;
+  --foreground: 0 0% 98%;
+
+  --card: 0 0% 7%;
+  --card-foreground: 0 0% 98%;
+
+  --popover: 0 0% 8%;
+  --popover-foreground: 0 0% 98%;
+
+  --primary: 199 89% 56%;          /* Electric blue / cyan */
+  --primary-foreground: 0 0% 5%;
+
+  --secondary: 0 0% 12%;
+  --secondary-foreground: 0 0% 98%;
+
+  --muted: 0 0% 12%;
+  --muted-foreground: 0 0% 64%;
+
+  --accent: 199 89% 60%;
+  --accent-foreground: 0 0% 5%;
+
+  --destructive: 0 72% 50%;
+  --destructive-foreground: 0 0% 98%;
+
+  --border: 0 0% 14%;
+  --input: 0 0% 14%;
+  --ring: 199 89% 56%;
+
+  --radius: 0.75rem;
+}
+
+/* Light theme — future-ready */
+.light {
+  --background: 0 0% 100%;
+  --foreground: 0 0% 5%;
+  --card: 0 0% 100%;
+  --card-foreground: 0 0% 5%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 0 0% 5%;
+  --primary: 199 89% 42%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 0 0% 96%;
+  --secondary-foreground: 0 0% 9%;
+  --muted: 0 0% 96%;
+  --muted-foreground: 0 0% 45%;
+  --accent: 199 89% 92%;
+  --accent-foreground: 0 0% 9%;
+  --destructive: 0 72% 50%;
+  --destructive-foreground: 0 0% 98%;
+  --border: 0 0% 90%;
+  --input: 0 0% 90%;
+  --ring: 199 89% 42%;
+  --radius: 0.75rem;
+}
