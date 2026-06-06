@@ -13,7 +13,9 @@ export function formatRating(value: number, fractionDigits = 1): string {
 }
 
 export function formatRelativeTime(input: string | Date): string {
+  if (!input) return '';
   const date = typeof input === 'string' ? new Date(input) : input;
+  if (Number.isNaN(date.getTime())) return '';
   const diffMs = date.getTime() - Date.now();
   const diffSec = Math.round(diffMs / 1000);
   const formatter = new Intl.RelativeTimeFormat('en', { numeric: 'auto' });

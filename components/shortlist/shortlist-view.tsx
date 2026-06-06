@@ -30,6 +30,22 @@ export function ShortlistView({ entityType }: ShortlistViewProps) {
     .filter((it) => it.itemType === entityType)
     .map((it) => it.itemId);
 
+  // Drop persisted ids that no longer match a fixture. This cleans up
+  // localStorage when fixtures are removed or renamed.
+  React.useEffect(() => {
+    if (!mounted) return;
+    const valid = new Set<string>();
+    if (entityType === 'academy') for (const a of academies) valid.add(a.id);
+    if (entityType === 'coach') for (const c of coaches) valid.add(c.id);
+    if (entityType === 'sport') for (const s of sports) valid.add(s.id);
+    for (const it of items) {
+      if (it.itemType === entityType && !valid.has(it.itemId)) {
+        remove(it.itemType, it.itemId);
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mounted, entityType]);
+
   if (!mounted) {
     // Render a placeholder grid that matches the eventual layout to avoid CLS.
     return (

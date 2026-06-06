@@ -39,6 +39,22 @@ export function CompareView() {
   const [mounted, setMounted] = React.useState(false);
   React.useEffect(() => setMounted(true), []);
 
+  // Drop persisted ids that no longer match a fixture.
+  React.useEffect(() => {
+    if (!mounted) return;
+    const valid = new Set<string>();
+    for (const a of academies) valid.add(`academy:${a.id}`);
+    for (const c of coaches) valid.add(`coach:${c.id}`);
+    for (const s of sports) valid.add(`sport:${s.id}`);
+    for (const it of items) {
+      const key = `${it.entityType}:${it.id}`;
+      if (!valid.has(key)) {
+        remove(it.entityType, it.id);
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mounted]);
+
   if (!mounted) {
     return (
       <div className="bg-muted/30 h-40 animate-pulse rounded-xl border border-dashed" aria-hidden />
