@@ -12,6 +12,7 @@ import { Container } from '@/components/layout/container';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { Separator } from '@/components/ui/separator';
 import { useCommandPalette } from '@/components/command/command-palette-provider';
+import { ThemeToggle } from '@/components/theme/theme-toggle';
 
 export function Navbar() {
   const pathname = usePathname();
@@ -61,36 +62,50 @@ export function Navbar() {
           </nav>
 
           <div className="flex items-center gap-1">
-            <div className="hidden items-center gap-1 sm:flex">
-              <Button
-                variant="ghost"
-                size="icon-sm"
-                aria-label="Open search (Cmd+K)"
-                aria-keyshortcuts="Control+K Meta+K"
-                onClick={commandPalette.open}
-              >
-                <Search className="h-4 w-4" />
-              </Button>
-              <Button variant="ghost" size="icon-sm" aria-label="Location">
-                <MapPin className="h-4 w-4" />
-              </Button>
-              <Button variant="ghost" size="icon-sm" aria-label="Shortlist" asChild>
-                <Link href="/shortlist">
-                  <Bookmark className="h-4 w-4" />
-                </Link>
-              </Button>
-              <Button variant="ghost" size="icon-sm" aria-label="Profile" asChild>
-                <Link href="/profile">
-                  <User2 className="h-4 w-4" />
-                </Link>
-              </Button>
+            <div className="hidden items-center sm:flex">
+              {/* Bump touch targets in the navbar to ≥44px without changing the global icon-sm. */}
+              <div className="grid h-11 w-11 place-items-center">
+                <Button
+                  variant="ghost"
+                  size="icon-sm"
+                  aria-label="Open search (Cmd+K)"
+                  aria-keyshortcuts="Control+K Meta+K"
+                  onClick={commandPalette.open}
+                >
+                  <Search className="h-4 w-4" />
+                </Button>
+              </div>
+              <div className="grid h-11 w-11 place-items-center">
+                <Button variant="ghost" size="icon-sm" aria-label="Location">
+                  <MapPin className="h-4 w-4" />
+                </Button>
+              </div>
+              <div className="grid h-11 w-11 place-items-center">
+                <Button variant="ghost" size="icon-sm" aria-label="Shortlist" asChild>
+                  <Link href="/shortlist">
+                    <Bookmark className="h-4 w-4" />
+                  </Link>
+                </Button>
+              </div>
+              <div className="grid h-11 w-11 place-items-center">
+                <ThemeToggle />
+              </div>
+              <div className="grid h-11 w-11 place-items-center">
+                <Button variant="ghost" size="icon-sm" aria-label="Profile" asChild>
+                  <Link href="/profile">
+                    <User2 className="h-4 w-4" />
+                  </Link>
+                </Button>
+              </div>
             </div>
 
             <Sheet open={open} onOpenChange={setOpen}>
               <SheetTrigger asChild>
-                <Button variant="ghost" size="icon-sm" aria-label="Open menu">
-                  <Menu className="h-4 w-4" />
-                </Button>
+                <div className="grid h-11 w-11 place-items-center">
+                  <Button variant="ghost" size="icon-sm" aria-label="Open menu">
+                    <Menu className="h-4 w-4" />
+                  </Button>
+                </div>
               </SheetTrigger>
               <SheetContent side="right" className="w-72 p-0">
                 <div className="flex flex-col gap-1 p-4 pb-safe">
@@ -115,9 +130,12 @@ export function Navbar() {
                     );
                   })}
                   <Separator className="my-2" />
-                  <p className="text-muted-foreground mb-2 text-xs font-semibold tracking-widest uppercase">
-                    Account
-                  </p>
+                  <div className="flex items-center justify-between">
+                    <p className="text-muted-foreground text-xs font-semibold tracking-widest uppercase">
+                      Account
+                    </p>
+                    <ThemeToggle align="start" />
+                  </div>
                   <Link
                     href="/shortlist"
                     onClick={() => setOpen(false)}

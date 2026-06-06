@@ -173,7 +173,7 @@ function CompareCard({ slot, onRemove }: { slot: Entity; onRemove: () => void })
         </p>
         {kind === 'academy' ? (
           <div className="flex items-center gap-1 text-xs">
-            <Star aria-hidden className="h-3.5 w-3.5 fill-amber-400 text-amber-400" />
+            <Star aria-hidden className="fill-rating text-rating h-3.5 w-3.5" />
             <span className="font-semibold">{(entity as Academy).rating.average.toFixed(1)}</span>
             <span className="text-muted-foreground">({(entity as Academy).rating.count})</span>
           </div>

@@ -18,10 +18,14 @@
   body {
     @apply bg-background text-foreground antialiased;
     font-feature-settings: 'rlig' 1, 'calt' 1, 'ss01' 1;
+    /* Theme changes are O(1) — only token values change, layout does not. */
+    transition: background-color var(--duration-standard) var(--ease-standard),
+                color var(--duration-standard) var(--ease-standard);
   }
 
   ::selection {
-    @apply bg-primary/20 text-foreground;
+    background: var(--selection-bg);
+    color: hsl(var(--foreground));
   }
 
   :focus-visible {
@@ -96,5 +100,40 @@
     opacity: 0.03;
     mix-blend-mode: overlay;
     background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+  }
+
+  /* -----------------------------------------------------------------------
+   * Sport-identity accent utilities (Arena theme only).
+   * Use only on chips / badges / small indicators — never on large surfaces.
+   * In other themes these fall back to muted-foreground, preserving
+   * cohesion while still being visible enough to identify the sport.
+   * --------------------------------------------------------------------- */
+  .sport-accent {
+    /* Default: theme-neutral muted color. */
+    color: hsl(var(--muted-foreground));
+    border-color: hsl(var(--border));
+  }
+  .arena .sport-accent,
+  .sport-accent.arena-active {
+    /* Active only inside the Arena theme. */
+    color: hsl(var(--accent-foreground));
+    border-color: transparent;
+  }
+
+  .sport-cricket {
+    background: hsl(var(--sport-cricket));
+    color: hsl(var(--primary-foreground));
+  }
+  .sport-football {
+    background: hsl(var(--sport-football));
+    color: hsl(var(--primary-foreground));
+  }
+  .sport-tennis {
+    background: hsl(var(--sport-tennis));
+    color: hsl(var(--primary-foreground));
+  }
+  .sport-swimming {
+    background: hsl(var(--sport-swimming));
+    color: hsl(var(--primary-foreground));
   }
 }

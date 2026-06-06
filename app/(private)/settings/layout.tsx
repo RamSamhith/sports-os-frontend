@@ -1,0 +1,47 @@
+import type { ReactNode } from 'react';
+import Link from 'next/link';
+import { Container } from '@/components/layout/container';
+import { Section } from '@/components/layout/section';
+import { cn } from '@/lib/utils/cn';
+
+const settingsNav: ReadonlyArray<{ label: string; href: string; description: string }> = [
+  { label: 'Theme', href: '/settings/theme', description: 'Appearance, contrast, motion' },
+  { label: 'Profile', href: '/settings/profile', description: 'Name, photo, contact details' },
+  { label: 'Notifications', href: '/settings/notifications', description: 'Email, WhatsApp, push' },
+  { label: 'Privacy', href: '/settings/privacy', description: 'Data, sharing, visibility' },
+];
+
+export default function SettingsLayout({ children }: { children: ReactNode }) {
+  return (
+    <Section>
+      <Container>
+        <div className="mb-8">
+          <h1 className="text-3xl font-semibold tracking-tight md:text-4xl">Settings</h1>
+          <p className="text-muted-foreground mt-1 text-sm text-pretty">
+            Personalise your SportsOS experience.
+          </p>
+        </div>
+        <div className="grid grid-cols-1 gap-8 md:grid-cols-[220px_1fr]">
+          <nav aria-label="Settings sections" className="flex flex-col gap-1">
+            {settingsNav.map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={cn(
+                  'hover:bg-accent/10 rounded-md px-3 py-2 text-sm transition-colors',
+                  'focus-visible:ring-ring focus-visible:ring-2 focus-visible:outline-none',
+                )}
+              >
+                <span className="text-foreground block font-medium">{item.label}</span>
+                <span className="text-muted-foreground block text-xs leading-snug">
+                  {item.description}
+                </span>
+              </Link>
+            ))}
+          </nav>
+          <div className="min-w-0">{children}</div>
+        </div>
+      </Container>
+    </Section>
+  );
+}

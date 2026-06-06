@@ -90,7 +90,7 @@ export function AcademyCardPlaceholder({ academy, priority = false }: { academy:
           </div>
           <div className="shrink-0 text-right">
             <div className="flex items-center justify-end gap-1 text-sm font-semibold">
-              <Star aria-hidden className="h-3.5 w-3.5 fill-amber-400 text-amber-400" />
+              <Star aria-hidden className="fill-rating text-rating h-3.5 w-3.5" />
               {rating.average.toFixed(1)}
             </div>
             <div className="text-muted-foreground text-[10px] tracking-widest uppercase">

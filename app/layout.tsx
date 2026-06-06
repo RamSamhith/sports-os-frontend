@@ -4,6 +4,7 @@ import { GeistSans } from 'geist/font/sans';
 import { GeistMono } from 'geist/font/mono';
 import type { ReactNode } from 'react';
 import { siteConfig } from '@/config/site';
+import { themeConfig } from '@/config/theme';
 import { ThemeProvider } from '@/components/providers/theme-provider';
 import { AuthProvider } from '@/components/providers/auth-provider';
 import { LocationProvider } from '@/components/providers/location-provider';
@@ -56,16 +57,64 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: '#0a0a0a',
-  colorScheme: 'dark',
+  // Browser chrome color follows the default theme. The active theme
+  // updates this via the ThemeMeta / settings UI if needed in a later phase.
+  themeColor: [
+    { media: '(prefers-color-scheme: light)', color: '#ffffff' },
+    { media: '(prefers-color-scheme: dark)', color: '#0d0d0d' },
+  ],
   width: 'device-width',
   initialScale: 1,
   viewportFit: 'cover',
 };
 
+/**
+ * Pre-hydration script — sets the theme class on <html> *before* first paint.
+ * Reads the value from localStorage, falls back to the OS preference, and
+ * finally to the default theme. Inline + synchronous, so it blocks paint
+ * by a few microseconds and eliminates the flash of incorrect theme.
+ */
+const themeBootstrap = `
+(function () {
+  try {
+    var storageKey = ${JSON.stringify(themeConfig.storageKey)};
+    var themes = ${JSON.stringify(themeConfig.themes)};
+    var defaultTheme = ${JSON.stringify(themeConfig.defaultTheme)};
+    var stored = localStorage.getItem(storageKey);
+    var resolved = stored;
+    if (!resolved || (resolved !== 'system' && themes.indexOf(resolved) === -1)) {
+      resolved = defaultTheme;
+    }
+    if (resolved === 'system') {
+      var prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+      resolved = prefersDark ? 'dark' : 'light';
+    }
+    var root = document.documentElement;
+    // Drop any prior theme classes, then add the resolved one.
+    var classes = root.classList;
+    for (var i = classes.length - 1; i >= 0; i--) {
+      var c = classes[i];
+      if (themes.indexOf(c) !== -1 || c === 'system') classes.remove(c);
+    }
+    classes.add(resolved);
+    root.setAttribute('data-theme', resolved);
+    root.style.colorScheme = resolved === 'light' || resolved === 'focus' ? 'light' : 'dark';
+  } catch (e) {
+    // localStorage disabled — fall back to default theme class.
+    document.documentElement.classList.add(${JSON.stringify(themeConfig.defaultTheme)});
+  }
+})();
+`;
+
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="en" className="dark" suppressHydrationWarning>
+    <html lang="en" suppressHydrationWarning>
+      <head>
+        <script
+          // eslint-disable-next-line react/no-danger
+          dangerouslySetInnerHTML={{ __html: themeBootstrap }}
+        />
+      </head>
       <body className={`${inter.variable} ${geistDisplay.variable} ${geistMono.variable} font-sans`}>
         <ThemeProvider>
           <OfflineProvider>

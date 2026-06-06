@@ -12,12 +12,12 @@ export function StatusPill({
       case 'verified':
       case 'converted':
       case 'published':
-        return 'border-emerald-500/30 bg-emerald-500/10 text-emerald-300';
+        return 'border-success/30 bg-success/10 text-success';
       case 'pending':
       case 'contacted':
       case 'qualified':
       case 'trial_scheduled':
-        return 'border-amber-500/30 bg-amber-500/10 text-amber-300';
+        return 'border-warning/30 bg-warning/10 text-warning';
       case 'rejected':
       case 'suspended':
       case 'lost':

@@ -1,7 +1,14 @@
 import type { Config } from 'tailwindcss';
+import { themeNames } from './config/theme';
 
 const config: Config = {
-  darkMode: ['class'],
+  // All four themes are switched by adding a class to <html>.
+  // next-themes writes one of: `dark`, `light`, `arena`, `focus`.
+  // Tailwind's `darkMode: ['class', 'dark']` enables the `dark:` variant
+  // and keeps the cascade predictable. The other three themes rely on
+  // direct token reads (`bg-background`, etc.) and don't need their own
+  // `arena:` / `focus:` variants.
+  darkMode: ['class', 'dark'],
   content: [
     './app/**/*.{ts,tsx}',
     './components/**/*.{ts,tsx}',
@@ -50,6 +57,28 @@ const config: Config = {
           DEFAULT: 'hsl(var(--card))',
           foreground: 'hsl(var(--card-foreground))',
         },
+        // Sport-identity accent colors (Arena theme only).
+        // Use only on chips / badges / small indicators.
+        sport: {
+          cricket: 'hsl(var(--sport-cricket))',
+          football: 'hsl(var(--sport-football))',
+          tennis: 'hsl(var(--sport-tennis))',
+          swimming: 'hsl(var(--sport-swimming))',
+        },
+        // Semantic intent colors — theme-aware.
+        success: {
+          DEFAULT: 'hsl(var(--success))',
+          foreground: 'hsl(var(--success-foreground))',
+        },
+        warning: {
+          DEFAULT: 'hsl(var(--warning))',
+          foreground: 'hsl(var(--warning-foreground))',
+        },
+        info: {
+          DEFAULT: 'hsl(var(--info))',
+          foreground: 'hsl(var(--info-foreground))',
+        },
+        rating: 'hsl(var(--rating))',
       },
       borderRadius: {
         lg: 'var(--radius)',

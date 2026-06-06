@@ -12,8 +12,8 @@ export function VerifiedBadge({ status = 'verified', className, label }: Verifie
   const text = label ?? (status === 'pending' ? 'Verification pending' : 'Verified');
   const tone =
     status === 'pending'
-      ? 'border-amber-500/30 bg-amber-500/10 text-amber-300'
-      : 'border-emerald-500/30 bg-emerald-500/10 text-emerald-300';
+      ? 'border-warning/30 bg-warning/10 text-warning'
+      : 'border-success/30 bg-success/10 text-success';
   return (
     <span
       className={cn(
