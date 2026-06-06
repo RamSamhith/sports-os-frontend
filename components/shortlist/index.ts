@@ -1,2 +1,2 @@
-export * from './shortlist-button';
-export * from './shortlist-list';
+export * from './shortlist-toggle';
+export * from './shortlist-view';

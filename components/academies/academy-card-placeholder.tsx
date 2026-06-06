@@ -3,6 +3,7 @@
 import * as React from 'react';
 import Link from 'next/link';
 import { Bookmark, BookmarkCheck, GitCompare, MapPin, Star } from 'lucide-react';
+import { toast } from 'sonner';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -11,10 +12,13 @@ import { VerifiedBadge } from '@/components/trust/verified-badge';
 import { LastUpdated } from '@/components/trust/last-updated';
 import { CertificationIndicator } from '@/components/trust/certification-indicator';
 import { fixtureImages } from '@/lib/images';
+import { useShortlist } from '@/lib/hooks/use-shortlist';
+import { useCompare } from '@/lib/hooks/use-compare';
 import type { Academy } from '@/types/domain/academy';
 
 export function AcademyCardPlaceholder({ academy }: { academy: Academy }) {
   const {
+    id,
     slug,
     name,
     location,
@@ -31,8 +35,13 @@ export function AcademyCardPlaceholder({ academy }: { academy: Academy }) {
   // Real image first; otherwise the local placeholder for this fixture; always resolves.
   const imageSrc = coverImage ?? fixtureImages.academies[academy.id];
 
-  const [saved, setSaved] = React.useState(false);
-  const [compared, setCompared] = React.useState(false);
+  // Shortlist (persisted in localStorage by provider)
+  const { has: hasShortlist, addWithMeta, remove: removeFromShortlist } = useShortlist();
+  const isSaved = hasShortlist('academy', id);
+
+  // Compare (persisted in localStorage by provider)
+  const { has: hasCompare, add: addToCompare, remove: removeFromCompare, canAdd: canAddToCompare } = useCompare();
+  const isCompared = hasCompare('academy', id);
 
   return (
     <Card className="group hover:shadow-[var(--shadow-md)] overflow-hidden transition-all duration-[var(--duration-fast)] ease-[var(--ease-standard)]">
@@ -111,19 +120,41 @@ export function AcademyCardPlaceholder({ academy }: { academy: Academy }) {
           </Button>
           <Button
             size="icon"
-            variant={saved ? 'default' : 'outline'}
-            aria-label={saved ? `Remove ${name} from shortlist` : `Save ${name} to shortlist`}
-            aria-pressed={saved}
-            onClick={() => setSaved((v) => !v)}
+            variant={isSaved ? 'default' : 'outline'}
+            aria-label={isSaved ? `Remove ${name} from shortlist` : `Save ${name} to shortlist`}
+            aria-pressed={isSaved}
+            onClick={() => {
+              if (isSaved) {
+                removeFromShortlist('academy', id);
+                toast(`Removed ${name} from shortlist`);
+              } else {
+                addWithMeta('academy', id, {
+                  label: name,
+                  sublabel: `${location.city}, ${location.state}`,
+                  href: `/academies/${slug}`,
+                });
+                toast.success(`Saved ${name} to shortlist`);
+              }
+            }}
           >
-            {saved ? <BookmarkCheck className="h-4 w-4" /> : <Bookmark className="h-4 w-4" />}
+            {isSaved ? <BookmarkCheck className="h-4 w-4" /> : <Bookmark className="h-4 w-4" />}
           </Button>
           <Button
             size="icon"
-            variant={compared ? 'default' : 'outline'}
-            aria-label={compared ? `Remove ${name} from compare` : `Add ${name} to compare`}
-            aria-pressed={compared}
-            onClick={() => setCompared((v) => !v)}
+            variant={isCompared ? 'default' : 'outline'}
+            aria-label={isCompared ? `Remove ${name} from compare` : `Add ${name} to compare`}
+            aria-pressed={isCompared}
+            onClick={() => {
+              if (isCompared) {
+                removeFromCompare('academy', id);
+                toast(`Removed ${name} from compare`);
+              } else if (canAddToCompare('academy', id)) {
+                addToCompare({ entityType: 'academy', id });
+                toast.success(`Added ${name} to compare`);
+              } else {
+                toast.error('You can compare up to 3 academies.');
+              }
+            }}
           >
             <GitCompare className="h-4 w-4" />
           </Button>

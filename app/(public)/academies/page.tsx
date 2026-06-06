@@ -1,25 +1,26 @@
 import { Container } from '@/components/layout/container';
 import { Section } from '@/components/layout/section';
-import { AcademyGrid } from '@/components/academies/academy-grid';
-import { AcademyFilters } from '@/components/academies/academy-filters';
 import { Breadcrumbs } from '@/components/seo/breadcrumbs';
-import { academies } from '@/data/academies';
+import { Suspense } from 'react';
+import { AcademyListing } from '@/components/academies/academy-listing';
+
+export const metadata = {
+  title: 'Academies',
+  description: 'Find sports academies across India on SportsOS. Search by sport, city, or facility.',
+};
 
 export default function AcademiesPage() {
   return (
     <Section>
       <Container>
         <Breadcrumbs items={[{ label: 'Home', href: '/' }, { label: 'Academies' }]} className="mb-4" />
-        <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
-          <div>
-            <h1 className="text-3xl font-semibold tracking-tight md:text-4xl">Academies</h1>
-            <p className="text-muted-foreground mt-1 text-sm">
-              {academies.length} academies across India.
-            </p>
-          </div>
-          <AcademyFilters />
+        <div className="mb-6">
+          <h1 className="text-3xl font-semibold tracking-tight md:text-4xl">Academies</h1>
+          <p className="text-muted-foreground mt-1 text-sm">Find the right academy for your sport.</p>
         </div>
-        <AcademyGrid academies={academies} />
+        <Suspense fallback={null}>
+          <AcademyListing />
+        </Suspense>
       </Container>
     </Section>
   );

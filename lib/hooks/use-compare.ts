@@ -2,7 +2,7 @@
 
 import { createContext, useContext } from 'react';
 
-export type CompareEntityType = 'academy' | 'coach';
+export type CompareEntityType = 'academy' | 'coach' | 'sport';
 
 export interface CompareItem {
   entityType: CompareEntityType;
@@ -17,6 +17,12 @@ export interface CompareContextValue {
   remove: (entityType: CompareEntityType, id: string) => void;
   clear: () => void;
   maxItems: number;
+  extras: Record<string, { label: string; sublabel?: string; href: string }>;
+  addWithMeta: (
+    entityType: CompareEntityType,
+    id: string,
+    meta: { label: string; sublabel?: string; href: string },
+  ) => boolean;
 }
 
 export const CompareContext = createContext<CompareContextValue | null>(null);
