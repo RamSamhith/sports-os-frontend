@@ -3,6 +3,7 @@ import { Section } from '@/components/layout/section';
 import { CoachGrid } from '@/components/coaches/coach-grid';
 import { CoachFilters } from '@/components/coaches/coach-filters';
 import { Breadcrumbs } from '@/components/seo/breadcrumbs';
+import { coaches } from '@/data/coaches';
 
 export default function CoachesPage() {
   return (
@@ -12,11 +13,13 @@ export default function CoachesPage() {
         <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
           <div>
             <h1 className="text-3xl font-semibold tracking-tight md:text-4xl">Coaches</h1>
-            <p className="text-muted-foreground mt-1 text-sm">Discover verified coaches across India.</p>
+            <p className="text-muted-foreground mt-1 text-sm">
+              {coaches.length} verified coaches across India.
+            </p>
           </div>
           <CoachFilters />
         </div>
-        <CoachGrid count={9} />
+        <CoachGrid coaches={coaches} />
       </Container>
     </Section>
   );

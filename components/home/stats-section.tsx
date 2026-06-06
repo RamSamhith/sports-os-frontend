@@ -1,11 +1,22 @@
 import { Container } from '@/components/layout/container';
 import { Section } from '@/components/layout/section';
+import { academies } from '@/data/academies';
+import { coaches } from '@/data/coaches';
+import { sports } from '@/data/sports';
+
+const verifiedAcademies = academies.filter((a) => a.verificationStatus === 'verified').length;
+const verifiedCoaches = coaches.filter((c) => c.verificationStatus === 'verified').length;
+const cities = new Set(academies.map((a) => a.location.city)).size;
+
+function formatCount(n: number) {
+  return new Intl.NumberFormat('en-IN').format(n);
+}
 
 const stats = [
-  { label: 'Academies', value: '1,200+' },
-  { label: 'Verified coaches', value: '850+' },
-  { label: 'Sports covered', value: '30+' },
-  { label: 'Cities', value: '75+' },
+  { label: 'Academies', value: formatCount(academies.length) },
+  { label: 'Verified coaches', value: formatCount(verifiedCoaches) },
+  { label: 'Sports covered', value: formatCount(sports.length) },
+  { label: 'Cities', value: formatCount(cities) },
 ];
 
 export function StatsSection() {
