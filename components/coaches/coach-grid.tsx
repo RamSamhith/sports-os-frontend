@@ -10,9 +10,18 @@ interface CoachGridProps {
   loading?: boolean;
   error?: { message: string } | null;
   onRetry?: () => void;
+  onClear?: () => void;
+  clearLabel?: string;
 }
 
-export function CoachGrid({ coaches, loading, error, onRetry }: CoachGridProps) {
+export function CoachGrid({
+  coaches,
+  loading,
+  error,
+  onRetry,
+  onClear,
+  clearLabel = 'Clear search',
+}: CoachGridProps) {
   if (loading) {
     return (
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
@@ -37,7 +46,18 @@ export function CoachGrid({ coaches, loading, error, onRetry }: CoachGridProps) 
       <EmptyState
         icon={<Inbox className="h-5 w-5" />}
         title="No coaches found"
-        description="Try clearing filters or searching a different city."
+        description="Try a different name, city, or sport."
+        action={
+          onClear ? (
+            <button
+              type="button"
+              onClick={onClear}
+              className="bg-primary text-primary-foreground hover:bg-primary/90 inline-flex items-center justify-center rounded-md px-4 py-2 text-sm font-medium transition-colors"
+            >
+              {clearLabel}
+            </button>
+          ) : null
+        }
       />
     );
   }

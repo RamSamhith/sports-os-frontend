@@ -23,21 +23,8 @@ export function CompareTray() {
   const [mounted, setMounted] = React.useState(false);
   React.useEffect(() => setMounted(true), []);
 
-  // Drop persisted ids that no longer match a fixture.
-  React.useEffect(() => {
-    if (!mounted) return;
-    const valid = new Set<string>();
-    for (const a of academies) valid.add(`academy:${a.id}`);
-    for (const c of coaches) valid.add(`coach:${c.id}`);
-    for (const s of sports) valid.add(`sport:${s.id}`);
-    for (const it of items) {
-      const key = `${it.entityType}:${it.id}`;
-      if (!valid.has(key)) {
-        remove(it.entityType, it.id);
-      }
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [mounted]);
+  // Stale-id cleanup is performed by the CompareProvider on hydration
+  // and on every storage event, so we don't need to do it here.
 
   if (!mounted) return null;
   if (items.length === 0) return null;
@@ -50,7 +37,7 @@ export function CompareTray() {
         exit={{ y: 24, opacity: 0 }}
         transition={{ duration: 0.24, ease: [0.2, 0, 0, 1] }}
         className={cn(
-          'border-border/60 bg-card/90 fixed inset-x-3 bottom-3 z-[var(--z-sticky)] mx-auto flex max-w-3xl items-center gap-3 rounded-2xl border p-3 shadow-xl backdrop-blur',
+          'border-border/60 bg-card/90 fixed inset-x-3 bottom-safe mb-3 z-[var(--z-sticky)] mx-auto flex max-w-3xl items-center gap-3 rounded-2xl border p-3 shadow-xl backdrop-blur',
         )}
         role="region"
         aria-label="Compare tray"

@@ -137,25 +137,45 @@ export function AcademyListing() {
     });
   }, [debouncedQuery, sports, facilities, levels, statuses]);
 
-  const chips: Array<{ key: string; label: string; onRemove: () => void }> = [];
+  const chips: Array<{ key: string; label: string; layoutId?: string; onRemove: () => void }> = [];
   if (debouncedQuery) {
     chips.push({ key: 'q', label: `“${debouncedQuery}”`, onRemove: removeQueryChip });
   }
   for (const s of sports) {
     const opt = sportOptions.find((o) => o.value === s);
-    chips.push({ key: `sport-${s}`, label: opt?.label ?? s, onRemove: () => removeSport(s) });
+    chips.push({
+      key: `sport-${s}`,
+      label: opt?.label ?? s,
+      layoutId: `filter-sport-${s}`,
+      onRemove: () => removeSport(s),
+    });
   }
   for (const s of facilities) {
     const opt = facilityOptions.find((o) => o.value === s);
-    chips.push({ key: `facility-${s}`, label: opt?.label ?? s, onRemove: () => removeFacility(s) });
+    chips.push({
+      key: `facility-${s}`,
+      label: opt?.label ?? s,
+      layoutId: `filter-facility-${s}`,
+      onRemove: () => removeFacility(s),
+    });
   }
   for (const s of levels) {
     const opt = levelOptions.find((o) => o.value === s);
-    chips.push({ key: `level-${s}`, label: opt?.label ?? s, onRemove: () => removeLevel(s) });
+    chips.push({
+      key: `level-${s}`,
+      label: opt?.label ?? s,
+      layoutId: `filter-level-${s}`,
+      onRemove: () => removeLevel(s),
+    });
   }
   for (const s of statuses) {
     const opt = statusOptions.find((o) => o.value === s);
-    chips.push({ key: `status-${s}`, label: opt?.label ?? s, onRemove: () => removeStatus(s) });
+    chips.push({
+      key: `status-${s}`,
+      label: opt?.label ?? s,
+      layoutId: `filter-status-${s}`,
+      onRemove: () => removeStatus(s),
+    });
   }
 
   return (
@@ -170,7 +190,7 @@ export function AcademyListing() {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Search academies by name, city, or sport…"
-            className="h-11 pl-10 text-sm"
+            className="h-11 pl-10 text-base text-sm md:text-sm"
             aria-label="Search academies"
           />
           {query ? (
@@ -193,20 +213,50 @@ export function AcademyListing() {
             setStatuses([]);
           }}
         >
-          <FilterGroup title="Sport" options={sportOptions} selected={sports} onChange={setSports} maxHeight="200px" />
+          <FilterGroup
+            title="Sport"
+            options={sportOptions}
+            selected={sports}
+            onChange={setSports}
+            maxHeight="200px"
+            layoutIdPrefix="filter-sport"
+          />
           <Separator />
-          <FilterGroup title="Facility" options={facilityOptions} selected={facilities} onChange={setFacilities} />
+          <FilterGroup
+            title="Facility"
+            options={facilityOptions}
+            selected={facilities}
+            onChange={setFacilities}
+            layoutIdPrefix="filter-facility"
+          />
           <Separator />
-          <FilterGroup title="Training level" options={levelOptions} selected={levels} onChange={setLevels} />
+          <FilterGroup
+            title="Training level"
+            options={levelOptions}
+            selected={levels}
+            onChange={setLevels}
+            layoutIdPrefix="filter-level"
+          />
           <Separator />
-          <FilterGroup title="Verification" options={statusOptions} selected={statuses} onChange={setStatuses} />
+          <FilterGroup
+            title="Verification"
+            options={statusOptions}
+            selected={statuses}
+            onChange={setStatuses}
+            layoutIdPrefix="filter-status"
+          />
         </FilterDrawer>
       </div>
 
       {chips.length > 0 ? (
         <div className="flex flex-wrap items-center gap-2">
           {chips.map((c) => (
-            <Badge key={c.key} variant="secondary" className="gap-1 pr-1">
+            <Badge
+              key={c.key}
+              variant="secondary"
+              className="gap-1 pr-1"
+              data-layout-id={c.layoutId}
+            >
               {c.label}
               <button
                 onClick={c.onRemove}
@@ -229,7 +279,16 @@ export function AcademyListing() {
         {filtered.length} of {academies.length} academies
       </p>
 
-      <AcademyGrid academies={filtered} />
+      <AcademyGrid
+        academies={filtered}
+        onClear={() => {
+          setQuery('');
+          setSports([]);
+          setFacilities([]);
+          setLevels([]);
+          setStatuses([]);
+        }}
+      />
     </div>
   );
 }

@@ -8,3 +8,4 @@ export * from './use-location';
 export * from './use-media-query';
 export * from './use-reduced-motion';
 export * from './use-shortlist';
+export * from './use-storage-sync';

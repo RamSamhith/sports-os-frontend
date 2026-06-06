@@ -2,6 +2,10 @@
 
 import * as React from 'react';
 import { CompareContext, type CompareContextValue, type CompareItem } from '@/lib/hooks/use-compare';
+import { useStorageSync } from '@/lib/hooks/use-storage-sync';
+import { academies } from '@/data/academies';
+import { coaches } from '@/data/coaches';
+import { sports } from '@/data/sports';
 
 const STORAGE_KEY = 'sportsos:compare';
 const MAX_ITEMS = 3;
@@ -13,23 +17,51 @@ interface PersistedItem extends CompareItem {
   addedAt: string;
 }
 
-function readPersisted(): PersistedItem[] {
-  if (typeof window === 'undefined') return [];
-  try {
-    const raw = window.localStorage.getItem(STORAGE_KEY);
-    if (!raw) return [];
-    const parsed = JSON.parse(raw) as PersistedItem[];
-    if (!Array.isArray(parsed)) return [];
-    return parsed.filter(
-      (i) =>
-        i &&
-        typeof i.id === 'string' &&
-        typeof i.entityType === 'string' &&
-        typeof i.label === 'string',
-    );
-  } catch {
-    return [];
+function buildValidKeys(): Set<string> {
+  const keys = new Set<string>();
+  for (const a of academies) keys.add(`academy:${a.id}`);
+  for (const c of coaches) keys.add(`coach:${c.id}`);
+  for (const s of sports) keys.add(`sport:${s.id}`);
+  return keys;
+}
+
+function applyFromRaw(
+  raw: string | null,
+  setItems: (items: CompareItem[]) => void,
+  setExtras: (m: Record<string, { label: string; sublabel?: string; href: string }>) => void,
+): void {
+  if (raw == null) {
+    setItems([]);
+    setExtras({});
+    return;
   }
+  let parsed: PersistedItem[] = [];
+  try {
+    const data = JSON.parse(raw) as PersistedItem[];
+    parsed = Array.isArray(data) ? data : [];
+  } catch {
+    parsed = [];
+  }
+  parsed = parsed.filter(
+    (i) =>
+      i &&
+      typeof i.id === 'string' &&
+      typeof i.entityType === 'string' &&
+      typeof i.label === 'string',
+  );
+  // Provider-level cleanup: drop ids that no longer match a fixture.
+  const valid = buildValidKeys();
+  parsed = parsed.filter((p) => valid.has(`${p.entityType}:${p.id}`));
+  setItems(parsed.map(({ id, entityType }) => ({ id, entityType })));
+  const extrasMap: Record<string, { label: string; sublabel?: string; href: string }> = {};
+  for (const p of parsed) {
+    extrasMap[`${p.entityType}:${p.id}`] = {
+      label: p.label,
+      sublabel: p.sublabel,
+      href: p.href,
+    };
+  }
+  setExtras(extrasMap);
 }
 
 function writePersisted(items: PersistedItem[]) {
@@ -47,18 +79,7 @@ export function CompareProvider({ children }: { children: React.ReactNode }) {
   const [hydrated, setHydrated] = React.useState(false);
 
   React.useEffect(() => {
-    const persisted = readPersisted();
-    const itemsOnly: CompareItem[] = persisted.map(({ id, entityType }) => ({ id, entityType }));
-    const extrasMap: Record<string, { label: string; sublabel?: string; href: string }> = {};
-    for (const p of persisted) {
-      extrasMap[`${p.entityType}:${p.id}`] = {
-        label: p.label,
-        sublabel: p.sublabel,
-        href: p.href,
-      };
-    }
-    setItems(itemsOnly);
-    setExtras(extrasMap);
+    applyFromRaw(window.localStorage.getItem(STORAGE_KEY), setItems, setExtras);
     setHydrated(true);
   }, []);
 
@@ -76,6 +97,11 @@ export function CompareProvider({ children }: { children: React.ReactNode }) {
     });
     writePersisted(persisted);
   }, [items, extras, hydrated]);
+
+  // Multi-tab sync.
+  useStorageSync(STORAGE_KEY, (raw) => {
+    applyFromRaw(raw, setItems, setExtras);
+  });
 
   const canAdd = React.useCallback(
     (entityType: CompareItem['entityType'], id: string) =>

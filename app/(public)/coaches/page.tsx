@@ -1,8 +1,7 @@
 import { Container } from '@/components/layout/container';
 import { Section } from '@/components/layout/section';
-import { CoachGrid } from '@/components/coaches/coach-grid';
 import { Breadcrumbs } from '@/components/seo/breadcrumbs';
-import { coaches } from '@/data/coaches';
+import { CoachesListing } from '@/components/coaches/coaches-listing';
 
 export const metadata = {
   title: 'Coaches',
@@ -17,10 +16,10 @@ export default function CoachesPage() {
         <div className="mb-6">
           <h1 className="text-3xl font-semibold tracking-tight md:text-4xl">Coaches</h1>
           <p className="text-muted-foreground mt-1 text-sm">
-            {coaches.length} verified coaches across India.
+            Verified coaches across India.
           </p>
         </div>
-        <CoachGrid coaches={coaches} />
+        <CoachesListing />
       </Container>
     </Section>
   );

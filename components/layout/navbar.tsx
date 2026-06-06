@@ -11,17 +11,19 @@ import { Button } from '@/components/ui/button';
 import { Container } from '@/components/layout/container';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { Separator } from '@/components/ui/separator';
+import { useCommandPalette } from '@/components/command/command-palette-provider';
 
 export function Navbar() {
   const pathname = usePathname();
   const [open, setOpen] = React.useState(false);
+  const commandPalette = useCommandPalette();
 
   return (
     <motion.header
       initial={{ y: -16, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.24, ease: [0.2, 0, 0, 1] }}
-      className="border-border/40 bg-background/70 supports-[backdrop-filter]:bg-background/50 sticky top-0 z-[var(--z-sticky)] border-b backdrop-blur-xl"
+      className="border-border/40 bg-background/70 supports-[backdrop-filter]:bg-background/50 sticky top-safe z-[var(--z-sticky)] border-b backdrop-blur-xl"
     >
       <Container>
         <div className="flex h-16 items-center justify-between gap-4">
@@ -60,7 +62,13 @@ export function Navbar() {
 
           <div className="flex items-center gap-1">
             <div className="hidden items-center gap-1 sm:flex">
-              <Button variant="ghost" size="icon-sm" aria-label="Search">
+              <Button
+                variant="ghost"
+                size="icon-sm"
+                aria-label="Open search (Cmd+K)"
+                aria-keyshortcuts="Control+K Meta+K"
+                onClick={commandPalette.open}
+              >
                 <Search className="h-4 w-4" />
               </Button>
               <Button variant="ghost" size="icon-sm" aria-label="Location">
@@ -85,7 +93,7 @@ export function Navbar() {
                 </Button>
               </SheetTrigger>
               <SheetContent side="right" className="w-72 p-0">
-                <div className="flex flex-col gap-1 p-4">
+                <div className="flex flex-col gap-1 p-4 pb-safe">
                   <p className="text-muted-foreground mb-2 text-xs font-semibold tracking-widest uppercase">
                     Menu
                   </p>

@@ -1,6 +1,7 @@
 'use client';
 
 import * as React from 'react';
+import { motion } from 'framer-motion';
 import { Checkbox } from '@/components/ui/checkbox';
 import { cn } from '@/lib/utils/cn';
 
@@ -17,6 +18,8 @@ export interface FilterGroupProps {
   onChange: (next: string[]) => void;
   layout?: 'grid' | 'list';
   maxHeight?: string;
+  /** Prefix used to build a `layoutId` for shared-layout transitions with FilterChips. */
+  layoutIdPrefix?: string;
 }
 
 export function FilterGroup({
@@ -26,6 +29,7 @@ export function FilterGroup({
   onChange,
   layout = 'grid',
   maxHeight,
+  layoutIdPrefix,
 }: FilterGroupProps) {
   const toggle = (value: string, checked: boolean) => {
     onChange(checked ? [...selected, value] : selected.filter((v) => v !== value));
@@ -59,7 +63,18 @@ export function FilterGroup({
                 onCheckedChange={(c) => toggle(opt.value, c === true)}
                 aria-describedby={opt.count !== undefined ? `${id}-count` : undefined}
               />
-              <span className="flex-1 truncate">{opt.label}</span>
+              <span className="flex-1 truncate">
+                {layoutIdPrefix && isChecked ? (
+                  <motion.span
+                    layoutId={`${layoutIdPrefix}-${opt.value}`}
+                    className="block w-full truncate"
+                  >
+                    {opt.label}
+                  </motion.span>
+                ) : (
+                  opt.label
+                )}
+              </span>
               {opt.count !== undefined ? (
                 <span
                   id={`${id}-count`}

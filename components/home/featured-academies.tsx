@@ -22,8 +22,8 @@ export function FeaturedAcademies() {
           </Link>
         </div>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {featured.map((academy) => (
-            <AcademyCardPlaceholder key={academy.id} academy={academy} />
+          {featured.map((academy, i) => (
+            <AcademyCardPlaceholder key={academy.id} academy={academy} priority={i === 0} />
           ))}
         </div>
       </Container>

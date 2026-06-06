@@ -2,6 +2,7 @@
 
 import * as React from 'react';
 import Link from 'next/link';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Bookmark, BookmarkCheck, GitCompare, MapPin, Star } from 'lucide-react';
 import { toast } from 'sonner';
 import { Card } from '@/components/ui/card';
@@ -16,7 +17,7 @@ import { useShortlist } from '@/lib/hooks/use-shortlist';
 import { useCompare } from '@/lib/hooks/use-compare';
 import type { Academy } from '@/types/domain/academy';
 
-export function AcademyCardPlaceholder({ academy }: { academy: Academy }) {
+export function AcademyCardPlaceholder({ academy, priority = false }: { academy: Academy; priority?: boolean }) {
   const {
     id,
     slug,
@@ -55,7 +56,7 @@ export function AcademyCardPlaceholder({ academy }: { academy: Academy }) {
           alt={`${name} cover image`}
           fill
           sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-          priority={false}
+          priority={priority}
           className="object-cover transition-transform duration-500 ease-out group-hover:scale-[1.03]"
           fallback={
             <div className="flex h-full w-full flex-col items-center justify-center gap-1 p-4 text-center">
@@ -137,7 +138,22 @@ export function AcademyCardPlaceholder({ academy }: { academy: Academy }) {
               }
             }}
           >
-            {isSaved ? <BookmarkCheck className="h-4 w-4" /> : <Bookmark className="h-4 w-4" />}
+            <AnimatePresence mode="wait" initial={false}>
+              <motion.span
+                key={isSaved ? 'saved' : 'unsaved'}
+                initial={{ scale: 0.6, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.6, opacity: 0 }}
+                transition={{ duration: 0.18, ease: [0.2, 0, 0, 1] }}
+                className="inline-flex"
+              >
+                {isSaved ? (
+                  <BookmarkCheck className="h-4 w-4" />
+                ) : (
+                  <Bookmark className="h-4 w-4" />
+                )}
+              </motion.span>
+            </AnimatePresence>
           </Button>
           <Button
             size="icon"
@@ -156,7 +172,18 @@ export function AcademyCardPlaceholder({ academy }: { academy: Academy }) {
               }
             }}
           >
-            <GitCompare className="h-4 w-4" />
+            <AnimatePresence mode="wait" initial={false}>
+              <motion.span
+                key={isCompared ? 'compared' : 'uncompared'}
+                initial={{ scale: 0.6, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.6, opacity: 0 }}
+                transition={{ duration: 0.18, ease: [0.2, 0, 0, 1] }}
+                className="inline-flex"
+              >
+                <GitCompare className="h-4 w-4" />
+              </motion.span>
+            </AnimatePresence>
           </Button>
         </div>
       </div>

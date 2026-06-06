@@ -36,7 +36,7 @@ export function LocationPicker() {
       <input
         type="text"
         placeholder="Or type a city…"
-        className="border-border/60 bg-background/40 hidden h-8 rounded-md border px-2 text-xs md:inline-block"
+        className="border-border/60 bg-background/40 hidden h-8 rounded-md border px-2 text-base text-xs md:inline-block"
         onBlur={(e) => {
           const v = e.currentTarget.value.trim();
           if (v) {

@@ -49,6 +49,34 @@
     text-wrap: pretty;
   }
 
+  /* Safe-area helpers — for iOS notch / home indicator and Android edge-to-edge. */
+  .pt-safe {
+    padding-top: max(env(safe-area-inset-top), 0px);
+  }
+  .pb-safe {
+    padding-bottom: max(env(safe-area-inset-bottom), 0px);
+  }
+  .pl-safe {
+    padding-left: max(env(safe-area-inset-left), 0px);
+  }
+  .pr-safe {
+    padding-right: max(env(safe-area-inset-right), 0px);
+  }
+  .mx-safe {
+    margin-left: max(env(safe-area-inset-left), 0px);
+    margin-right: max(env(safe-area-inset-right), 0px);
+  }
+  .my-safe {
+    margin-top: max(env(safe-area-inset-top), 0px);
+    margin-bottom: max(env(safe-area-inset-bottom), 0px);
+  }
+  .top-safe {
+    top: max(env(safe-area-inset-top), 0px);
+  }
+  .bottom-safe {
+    bottom: max(env(safe-area-inset-bottom), 0px);
+  }
+
   .glass {
     @apply bg-background/60 backdrop-blur-xl backdrop-saturate-150;
   }

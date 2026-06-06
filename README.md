@@ -33,6 +33,7 @@ pnpm dev
 ## Architecture
 
 See:
+
 - [Architecture.md](./Architecture.md)
 - [Admin-Architecture.md](./Admin-Architecture.md)
 - [Analytics-Architecture.md](./Analytics-Architecture.md)

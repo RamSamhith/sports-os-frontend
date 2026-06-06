@@ -14,6 +14,8 @@ import { ConsentBanner } from '@/components/providers/consent-banner';
 import { WebVitalsReporter } from '@/lib/monitoring/web-vitals';
 import { Toaster } from '@/components/ui/toaster';
 import { MotionConfigProvider } from '@/components/motion/motion-config';
+import { OfflineProvider } from '@/components/providers/offline-provider';
+import { CommandPaletteProvider } from '@/components/command/command-palette-provider';
 import './globals.css';
 
 const inter = Inter({
@@ -58,6 +60,7 @@ export const viewport: Viewport = {
   colorScheme: 'dark',
   width: 'device-width',
   initialScale: 1,
+  viewportFit: 'cover',
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {
@@ -65,22 +68,26 @@ export default function RootLayout({ children }: { children: ReactNode }) {
     <html lang="en" className="dark" suppressHydrationWarning>
       <body className={`${inter.variable} ${geistDisplay.variable} ${geistMono.variable} font-sans`}>
         <ThemeProvider>
-          <MotionConfigProvider>
-            <AuthProvider>
-              <LocationProvider>
-                <ShortlistProvider>
-                  <CompareProvider>
-                    <AnalyticsProvider>
-                      {children}
-                      <ConsentBanner />
-                      <Toaster />
-                      <WebVitalsReporter />
-                    </AnalyticsProvider>
-                  </CompareProvider>
-                </ShortlistProvider>
-              </LocationProvider>
-            </AuthProvider>
-          </MotionConfigProvider>
+          <OfflineProvider>
+            <CommandPaletteProvider>
+              <MotionConfigProvider>
+                <AuthProvider>
+                  <LocationProvider>
+                    <ShortlistProvider>
+                      <CompareProvider>
+                        <AnalyticsProvider>
+                          {children}
+                          <ConsentBanner />
+                          <Toaster />
+                          <WebVitalsReporter />
+                        </AnalyticsProvider>
+                      </CompareProvider>
+                    </ShortlistProvider>
+                  </LocationProvider>
+                </AuthProvider>
+              </MotionConfigProvider>
+            </CommandPaletteProvider>
+          </OfflineProvider>
         </ThemeProvider>
       </body>
     </html>

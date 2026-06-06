@@ -2,6 +2,10 @@
 
 import * as React from 'react';
 import { ShortlistContext, type ShortlistContextValue } from '@/lib/hooks/use-shortlist';
+import { useStorageSync } from '@/lib/hooks/use-storage-sync';
+import { academies } from '@/data/academies';
+import { coaches } from '@/data/coaches';
+import { sports } from '@/data/sports';
 import type { ShortlistItem, ShortlistItemType } from '@/types/domain/shortlist';
 
 const STORAGE_KEY = 'sportsos:shortlist';
@@ -53,15 +57,51 @@ function toContextItem(p: PersistedItem): ShortlistItem {
   };
 }
 
-function toPersisted(item: ShortlistItem, label: string, sublabel: string | undefined, href: string): PersistedItem {
-  return {
-    itemType: item.itemType,
-    itemId: item.itemId,
-    label,
-    sublabel,
-    href,
-    addedAt: item.createdAt,
-  };
+function buildValidKeys(): Set<string> {
+  const keys = new Set<string>();
+  for (const a of academies) keys.add(`academy:${a.id}`);
+  for (const c of coaches) keys.add(`coach:${c.id}`);
+  for (const s of sports) keys.add(`sport:${s.id}`);
+  return keys;
+}
+
+function applyFromRaw(
+  raw: string | null,
+  setItems: (items: ShortlistItem[]) => void,
+  setExtras: (m: Record<string, { label: string; sublabel?: string; href: string }>) => void,
+): void {
+  if (raw == null) {
+    setItems([]);
+    setExtras({});
+    return;
+  }
+  let parsed: PersistedItem[] = [];
+  try {
+    const data = JSON.parse(raw) as PersistedItem[];
+    parsed = Array.isArray(data) ? data : [];
+  } catch {
+    parsed = [];
+  }
+  parsed = parsed.filter(
+    (i) =>
+      i &&
+      typeof i.itemId === 'string' &&
+      typeof i.itemType === 'string' &&
+      typeof i.label === 'string',
+  );
+  // Provider-level cleanup: drop ids that no longer match a fixture.
+  const valid = buildValidKeys();
+  parsed = parsed.filter((p) => valid.has(`${p.itemType}:${p.itemId}`));
+  setItems(parsed.map(toContextItem));
+  const map: Record<string, { label: string; sublabel?: string; href: string }> = {};
+  for (const p of parsed) {
+    map[`${p.itemType}:${p.itemId}`] = {
+      label: p.label,
+      sublabel: p.sublabel,
+      href: p.href,
+    };
+  }
+  setExtras(map);
 }
 
 interface ShortlistProviderProps {
@@ -75,17 +115,7 @@ export function ShortlistProvider({ children }: ShortlistProviderProps) {
   const [hydrated, setHydrated] = React.useState(false);
 
   React.useEffect(() => {
-    const persisted = readPersisted();
-    setItems(persisted.map(toContextItem));
-    const map: Record<string, { label: string; sublabel?: string; href: string }> = {};
-    for (const p of persisted) {
-      map[`${p.itemType}:${p.itemId}`] = {
-        label: p.label,
-        sublabel: p.sublabel,
-        href: p.href,
-      };
-    }
-    setExtras(map);
+    applyFromRaw(window.localStorage.getItem(STORAGE_KEY), setItems, setExtras);
     setHydrated(true);
   }, []);
 
@@ -102,6 +132,11 @@ export function ShortlistProvider({ children }: ShortlistProviderProps) {
     }));
     writePersisted(persisted);
   }, [items, extras, hydrated]);
+
+  // Multi-tab sync: when another tab writes to localStorage, re-hydrate.
+  useStorageSync(STORAGE_KEY, (raw) => {
+    applyFromRaw(raw, setItems, setExtras);
+  });
 
   const has = React.useCallback(
     (itemType: ShortlistItemType, itemId: string) =>

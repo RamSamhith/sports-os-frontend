@@ -54,7 +54,7 @@ export function FilterDrawer({
         </SheetHeader>
         <div className="flex-1 overflow-y-auto px-4 py-2">{children}</div>
         {(onApply || onClear) && (
-          <SheetFooter className="border-border/60 border-t p-4">
+          <SheetFooter className="border-border/60 border-t p-4 pb-safe">
             {onClear ? (
               <Button variant="ghost" onClick={onClear} disabled={appliedCount === 0}>
                 Clear filters

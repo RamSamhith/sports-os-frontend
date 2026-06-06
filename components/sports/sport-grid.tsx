@@ -10,9 +10,18 @@ interface SportGridProps {
   loading?: boolean;
   error?: { message: string } | null;
   onRetry?: () => void;
+  onClear?: () => void;
+  clearLabel?: string;
 }
 
-export function SportGrid({ sports, loading, error, onRetry }: SportGridProps) {
+export function SportGrid({
+  sports,
+  loading,
+  error,
+  onRetry,
+  onClear,
+  clearLabel = 'Clear search',
+}: SportGridProps) {
   if (loading) {
     return (
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
@@ -37,7 +46,18 @@ export function SportGrid({ sports, loading, error, onRetry }: SportGridProps) {
       <EmptyState
         icon={<Inbox className="h-5 w-5" />}
         title="No sports found"
-        description="Try a different filter combination."
+        description="Try a different name or category."
+        action={
+          onClear ? (
+            <button
+              type="button"
+              onClick={onClear}
+              className="bg-primary text-primary-foreground hover:bg-primary/90 inline-flex items-center justify-center rounded-md px-4 py-2 text-sm font-medium transition-colors"
+            >
+              {clearLabel}
+            </button>
+          ) : null
+        }
       />
     );
   }

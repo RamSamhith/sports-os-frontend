@@ -13,7 +13,6 @@ import { EmptyState } from '@/components/feedback/empty-state';
 import { academies } from '@/data/academies';
 import { coaches } from '@/data/coaches';
 import { sports } from '@/data/sports';
-import type { ShortlistItemType } from '@/types/domain/shortlist';
 
 type Supported = 'academy' | 'coach' | 'sport';
 
@@ -30,21 +29,8 @@ export function ShortlistView({ entityType }: ShortlistViewProps) {
     .filter((it) => it.itemType === entityType)
     .map((it) => it.itemId);
 
-  // Drop persisted ids that no longer match a fixture. This cleans up
-  // localStorage when fixtures are removed or renamed.
-  React.useEffect(() => {
-    if (!mounted) return;
-    const valid = new Set<string>();
-    if (entityType === 'academy') for (const a of academies) valid.add(a.id);
-    if (entityType === 'coach') for (const c of coaches) valid.add(c.id);
-    if (entityType === 'sport') for (const s of sports) valid.add(s.id);
-    for (const it of items) {
-      if (it.itemType === entityType && !valid.has(it.itemId)) {
-        remove(it.itemType, it.itemId);
-      }
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [mounted, entityType]);
+  // Stale-id cleanup is performed by the ShortlistProvider on hydration
+  // and on every storage event, so we don't need to do it here.
 
   if (!mounted) {
     // Render a placeholder grid that matches the eventual layout to avoid CLS.
@@ -63,11 +49,20 @@ export function ShortlistView({ entityType }: ShortlistViewProps) {
     );
   }
 
+  // Use proper plural labels (not naive `entityType + 'es'`, which would
+  // produce "academys" for `entityType === 'academy'`).
+  const pluralLabel =
+    entityType === 'sport'
+      ? 'sports'
+      : entityType === 'academy'
+        ? 'Academies'
+        : 'Coaches';
+
   if (ids.length === 0) {
     return (
       <EmptyState
         icon={<Bookmark className="h-5 w-5" />}
-        title={`No ${entityType === 'sport' ? 'sports' : `${entityType}es`} saved`}
+        title={`No ${pluralLabel.toLowerCase()} saved`}
         description="Saved items appear here. Tap the bookmark on a card to add."
         action={
           <Button asChild>
@@ -80,7 +75,7 @@ export function ShortlistView({ entityType }: ShortlistViewProps) {
                     : '/sports'
               }
             >
-              Browse {entityType === 'sport' ? 'sports' : `${entityType}es`}
+              Browse {pluralLabel}
             </Link>
           </Button>
         }
@@ -96,7 +91,7 @@ export function ShortlistView({ entityType }: ShortlistViewProps) {
       <div className="flex flex-col gap-4">
         <div className="flex items-center justify-between">
           <p className="text-muted-foreground text-sm">
-            {items.length} saved academy{items.length === 1 ? '' : 's'}
+            {items.length} saved {items.length === 1 ? 'academy' : 'Academies'}
           </p>
           <Button
             variant="ghost"
