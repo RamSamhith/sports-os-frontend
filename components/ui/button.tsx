@@ -4,19 +4,19 @@ import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '@/lib/utils/cn';
 
 const buttonVariants = cva(
-  'inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-[background,color,box-shadow,transform] duration-[var(--duration-fast)] ease-[var(--ease-standard)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 active:scale-[0.99]',
+  'inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-[background,color,box-shadow,border-color,transform] duration-[var(--duration-fast)] ease-[var(--ease-standard)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 active:scale-[0.99]',
   {
     variants: {
       variant: {
         default: 'bg-primary text-primary-foreground hover:bg-primary/90 shadow-[var(--shadow-sm)]',
         secondary: 'bg-secondary text-secondary-foreground hover:bg-secondary/80',
         outline:
-          'border border-border bg-background hover:bg-accent/10 hover:text-accent-foreground',
-        ghost: 'hover:bg-accent/10 hover:text-accent-foreground',
+          'border border-border bg-background hover:border-foreground/40 hover:bg-accent/15 hover:text-accent-foreground',
+        ghost: 'hover:bg-accent/15 hover:text-accent-foreground',
         destructive:
           'bg-destructive text-destructive-foreground hover:bg-destructive/90',
         link: 'text-primary underline-offset-4 hover:underline',
-        glass: 'glass border border-border/60 text-foreground hover:bg-accent/10',
+        glass: 'glass border border-border/60 text-foreground hover:border-foreground/30 hover:bg-accent/15',
       },
       size: {
         sm: 'h-8 px-3 text-xs',
@@ -24,6 +24,7 @@ const buttonVariants = cva(
         lg: 'h-11 px-6 text-base',
         xl: 'h-12 px-7 text-base',
         icon: 'h-10 w-10',
+        'icon-sm': 'h-8 w-8',
       },
     },
     defaultVariants: { variant: 'default', size: 'md' },

@@ -1,9 +1,8 @@
 import Link from 'next/link';
-import Image from 'next/image';
 import { Card } from '@/components/ui/card';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { ImageWithFallback } from '@/components/ui/image-with-fallback';
 import { VerifiedBadge } from '@/components/trust/verified-badge';
 import { MapPin } from 'lucide-react';
 import type { Coach } from '@/types/domain/coach';
@@ -18,21 +17,36 @@ export function CoachCardPlaceholder({ coach }: { coach: Coach }) {
     .join('');
 
   return (
-    <Card className="flex items-center gap-3 p-4">
-      <Avatar className="h-12 w-12 shrink-0">
-        {avatar ? <AvatarImage src={avatar} alt={name} /> : null}
-        <AvatarFallback>{initials}</AvatarFallback>
-      </Avatar>
+    <Card className="flex flex-wrap items-center gap-3 p-4 sm:flex-nowrap">
+      <span
+        className="bg-muted/40 relative h-12 w-12 shrink-0 overflow-hidden rounded-full"
+        aria-hidden
+      >
+        <ImageWithFallback
+          src={avatar ?? null}
+          alt={name}
+          fill
+          sizes="48px"
+          className="object-cover"
+          fallback={
+            <span className="bg-primary/15 text-foreground/80 grid h-full w-full place-items-center text-sm font-semibold uppercase">
+              {initials}
+            </span>
+          }
+        />
+      </span>
       <div className="min-w-0 flex-1">
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <Link href={`/coaches/${slug}`} className="hover:underline">
-            <h3 className="truncate text-sm font-semibold">{name}</h3>
+            <h3 className="line-clamp-1 text-sm font-semibold">{name}</h3>
           </Link>
           <VerifiedBadge status={verificationStatus} />
         </div>
         <p className="text-muted-foreground mt-0.5 flex items-center gap-1 text-xs">
-          <MapPin className="h-3 w-3" />
-          {location.city} · {experienceYears}+ yrs
+          <MapPin className="h-3 w-3 shrink-0" />
+          <span className="truncate">
+            {location.city} · {experienceYears}+ yrs
+          </span>
         </p>
         {sportsCoached.length > 0 ? (
           <div className="mt-1.5 flex flex-wrap gap-1">

@@ -38,8 +38,9 @@ export function Navbar() {
                 <Link
                   key={item.href}
                   href={item.href}
+                  aria-current={active ? 'page' : undefined}
                   className={cn(
-                    'text-muted-foreground hover:text-foreground relative rounded-md px-3 py-1.5 text-sm transition-colors',
+                    'text-muted-foreground hover:text-foreground hover:bg-accent/15 relative rounded-md px-3 py-1.5 text-sm transition-colors',
                     active && 'text-foreground',
                   )}
                 >
@@ -47,7 +48,7 @@ export function Navbar() {
                   {active && (
                     <motion.span
                       layoutId="nav-active"
-                      className="bg-foreground/10 absolute inset-0 -z-10 rounded-md"
+                      className="bg-foreground/15 absolute inset-0 -z-10 rounded-md"
                       transition={{ type: 'spring', stiffness: 380, damping: 30 }}
                     />
                   )}
@@ -57,18 +58,18 @@ export function Navbar() {
           </nav>
 
           <div className="flex items-center gap-1">
-            <Button variant="ghost" size="icon" aria-label="Search">
+            <Button variant="ghost" size="icon-sm" aria-label="Search">
               <Search className="h-4 w-4" />
             </Button>
-            <Button variant="ghost" size="icon" aria-label="Location">
+            <Button variant="ghost" size="icon-sm" aria-label="Location">
               <MapPin className="h-4 w-4" />
             </Button>
-            <Button variant="ghost" size="icon" aria-label="Shortlist" asChild>
+            <Button variant="ghost" size="icon-sm" aria-label="Shortlist" asChild>
               <Link href="/shortlist">
                 <Bookmark className="h-4 w-4" />
               </Link>
             </Button>
-            <Button variant="ghost" size="icon" aria-label="Profile" asChild>
+            <Button variant="ghost" size="icon-sm" aria-label="Profile" asChild>
               <Link href="/profile">
                 <User2 className="h-4 w-4" />
               </Link>
@@ -76,22 +77,29 @@ export function Navbar() {
 
             <Sheet open={open} onOpenChange={setOpen}>
               <SheetTrigger asChild>
-                <Button variant="ghost" size="icon" className="md:hidden" aria-label="Open menu">
+                <Button variant="ghost" size="icon-sm" className="md:hidden" aria-label="Open menu">
                   <Menu className="h-4 w-4" />
                 </Button>
               </SheetTrigger>
               <SheetContent side="right" className="w-72 p-0">
                 <div className="flex flex-col gap-1 p-4">
-                  {primaryNav.map((item) => (
-                    <Link
-                      key={item.href}
-                      href={item.href}
-                      onClick={() => setOpen(false)}
-                      className="rounded-md px-3 py-2 text-sm hover:bg-accent/10"
-                    >
-                      {item.label}
-                    </Link>
-                  ))}
+                  {primaryNav.map((item) => {
+                    const active = pathname === item.href || pathname.startsWith(`${item.href}/`);
+                    return (
+                      <Link
+                        key={item.href}
+                        href={item.href}
+                        onClick={() => setOpen(false)}
+                        aria-current={active ? 'page' : undefined}
+                        className={cn(
+                          'text-muted-foreground hover:text-foreground hover:bg-accent/15 rounded-md px-3 py-2 text-sm transition-colors',
+                          active && 'text-foreground bg-accent/10',
+                        )}
+                      >
+                        {item.label}
+                      </Link>
+                    );
+                  })}
                 </div>
               </SheetContent>
             </Sheet>

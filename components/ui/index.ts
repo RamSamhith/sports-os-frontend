@@ -6,6 +6,7 @@ export * from './checkbox';
 export * from './dialog';
 export * from './drawer';
 export * from './dropdown-menu';
+export * from './image-with-fallback';
 export * from './input';
 export * from './kbd';
 export * from './label';
