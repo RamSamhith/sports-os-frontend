@@ -10,6 +10,7 @@ import { cn } from '@/lib/utils/cn';
 import { Button } from '@/components/ui/button';
 import { Container } from '@/components/layout/container';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import { Separator } from '@/components/ui/separator';
 
 export function Navbar() {
   const pathname = usePathname();
@@ -40,7 +41,7 @@ export function Navbar() {
                   href={item.href}
                   aria-current={active ? 'page' : undefined}
                   className={cn(
-                    'text-muted-foreground hover:text-foreground hover:bg-accent/15 relative rounded-md px-3 py-1.5 text-sm transition-colors',
+                    'text-muted-foreground hover:text-foreground hover:bg-accent/15 focus-visible:ring-ring relative rounded-md px-3 py-1.5 text-sm transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-background focus-visible:outline-none',
                     active && 'text-foreground',
                   )}
                 >
@@ -58,31 +59,36 @@ export function Navbar() {
           </nav>
 
           <div className="flex items-center gap-1">
-            <Button variant="ghost" size="icon-sm" aria-label="Search">
-              <Search className="h-4 w-4" />
-            </Button>
-            <Button variant="ghost" size="icon-sm" aria-label="Location">
-              <MapPin className="h-4 w-4" />
-            </Button>
-            <Button variant="ghost" size="icon-sm" aria-label="Shortlist" asChild>
-              <Link href="/shortlist">
-                <Bookmark className="h-4 w-4" />
-              </Link>
-            </Button>
-            <Button variant="ghost" size="icon-sm" aria-label="Profile" asChild>
-              <Link href="/profile">
-                <User2 className="h-4 w-4" />
-              </Link>
-            </Button>
+            <div className="hidden items-center gap-1 sm:flex">
+              <Button variant="ghost" size="icon-sm" aria-label="Search">
+                <Search className="h-4 w-4" />
+              </Button>
+              <Button variant="ghost" size="icon-sm" aria-label="Location">
+                <MapPin className="h-4 w-4" />
+              </Button>
+              <Button variant="ghost" size="icon-sm" aria-label="Shortlist" asChild>
+                <Link href="/shortlist">
+                  <Bookmark className="h-4 w-4" />
+                </Link>
+              </Button>
+              <Button variant="ghost" size="icon-sm" aria-label="Profile" asChild>
+                <Link href="/profile">
+                  <User2 className="h-4 w-4" />
+                </Link>
+              </Button>
+            </div>
 
             <Sheet open={open} onOpenChange={setOpen}>
               <SheetTrigger asChild>
-                <Button variant="ghost" size="icon-sm" className="md:hidden" aria-label="Open menu">
+                <Button variant="ghost" size="icon-sm" aria-label="Open menu">
                   <Menu className="h-4 w-4" />
                 </Button>
               </SheetTrigger>
               <SheetContent side="right" className="w-72 p-0">
                 <div className="flex flex-col gap-1 p-4">
+                  <p className="text-muted-foreground mb-2 text-xs font-semibold tracking-widest uppercase">
+                    Menu
+                  </p>
                   {primaryNav.map((item) => {
                     const active = pathname === item.href || pathname.startsWith(`${item.href}/`);
                     return (
@@ -100,6 +106,24 @@ export function Navbar() {
                       </Link>
                     );
                   })}
+                  <Separator className="my-2" />
+                  <p className="text-muted-foreground mb-2 text-xs font-semibold tracking-widest uppercase">
+                    Account
+                  </p>
+                  <Link
+                    href="/shortlist"
+                    onClick={() => setOpen(false)}
+                    className="text-muted-foreground hover:text-foreground hover:bg-accent/15 rounded-md px-3 py-2 text-sm transition-colors"
+                  >
+                    Shortlist
+                  </Link>
+                  <Link
+                    href="/profile"
+                    onClick={() => setOpen(false)}
+                    className="text-muted-foreground hover:text-foreground hover:bg-accent/15 rounded-md px-3 py-2 text-sm transition-colors"
+                  >
+                    Profile
+                  </Link>
                 </div>
               </SheetContent>
             </Sheet>

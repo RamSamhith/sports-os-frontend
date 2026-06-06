@@ -5,7 +5,7 @@ export const coaches: Coach[] = [
     id: 'co_001',
     slug: 'rahul-dravid-cricket-bengaluru',
     name: 'Rahul Dravid',
-    avatar: '/images/coaches/rahul-dravid.jpg',
+    avatar: '/images/coaches/rahul-dravid-cricket-bengaluru.svg',
     certifications: [
       { name: 'BCCI Level 3 Coach', issuer: 'BCCI', year: 2014 },
       { name: 'ICC Level 2 Coach', issuer: 'International Cricket Council', year: 2017 },
@@ -35,7 +35,7 @@ export const coaches: Coach[] = [
     id: 'co_002',
     slug: 'anil-kumble-spin-bengaluru',
     name: 'Anil Kumble',
-    avatar: '/images/coaches/anil-kumble.jpg',
+    avatar: '/images/coaches/anil-kumble-spin-bengaluru.svg',
     certifications: [
       { name: 'BCCI Level 2 Coach', issuer: 'BCCI', year: 2013 },
     ],
@@ -63,7 +63,7 @@ export const coaches: Coach[] = [
     id: 'co_003',
     slug: 'saina-nehwal-badminton-hyderabad',
     name: 'Saina Nehwal',
-    avatar: '/images/coaches/saina-nehwal.jpg',
+    avatar: '/images/coaches/saina-nehwal-badminton-hyderabad.svg',
     certifications: [
       { name: 'BWF Coach Education Level 2', issuer: 'Badminton World Federation', year: 2018 },
     ],
@@ -92,7 +92,7 @@ export const coaches: Coach[] = [
     id: 'co_004',
     slug: 'pankaj-advani-billiards-bengaluru',
     name: 'Pankaj Advani',
-    avatar: '/images/coaches/pankaj-advani.jpg',
+    avatar: '/images/coaches/pankaj-advani-billiards-bengaluru.svg',
     certifications: [
       { name: 'World Billiards Cert. Coach', issuer: 'World Billiards & Snooker Federation', year: 2019 },
     ],
@@ -120,7 +120,7 @@ export const coaches: Coach[] = [
     id: 'co_005',
     slug: 'viren-raquib-athletics-bengaluru',
     name: 'Viren Raquib',
-    avatar: '/images/coaches/viren-raquib.jpg',
+    avatar: '/images/coaches/viren-raquib-athletics-bengaluru.svg',
     certifications: [
       { name: 'IAAF Level 2 Sprints Coach', issuer: 'World Athletics', year: 2017 },
       { name: 'NSNIS Diploma in Sports Coaching', issuer: 'NSNIS Patiala', year: 2015 },
@@ -149,7 +149,7 @@ export const coaches: Coach[] = [
     id: 'co_006',
     slug: 'sushil-kumar-wrestling-delhi',
     name: 'Sushil Kumar',
-    avatar: '/images/coaches/sushil-kumar.jpg',
+    avatar: '/images/coaches/sushil-kumar-wrestling-delhi.svg',
     certifications: [
       { name: 'WFI National Coaching Cert.', issuer: 'Wrestling Federation of India', year: 2014 },
     ],
@@ -177,7 +177,7 @@ export const coaches: Coach[] = [
     id: 'co_007',
     slug: 'mary-komar-boxing-rohtak',
     name: 'Mary Kom',
-    avatar: '/images/coaches/mary-kom.jpg',
+    avatar: '/images/coaches/mary-komar-boxing-rohtak.svg',
     certifications: [
       { name: 'AIBA 3-Star Coach', issuer: 'International Boxing Association', year: 2016 },
     ],
@@ -204,7 +204,7 @@ export const coaches: Coach[] = [
     id: 'co_008',
     slug: 'arjun-jadhav-table-tennis-pune',
     name: 'Arjun Jadhav',
-    avatar: '/images/coaches/arjun-jadhav.jpg',
+    avatar: '/images/coaches/arjun-jadhav-table-tennis-pune.svg',
     certifications: [
       { name: 'ITTF Level 1 Coach', issuer: 'International Table Tennis Federation', year: 2019 },
     ],

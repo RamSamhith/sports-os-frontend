@@ -5,10 +5,12 @@ import { Button } from '@/components/ui/button';
 import { ImageWithFallback } from '@/components/ui/image-with-fallback';
 import { VerifiedBadge } from '@/components/trust/verified-badge';
 import { MapPin } from 'lucide-react';
+import { fixtureImages } from '@/lib/images';
 import type { Coach } from '@/types/domain/coach';
 
 export function CoachCardPlaceholder({ coach }: { coach: Coach }) {
-  const { slug, name, location, experienceYears, sportsCoached, verificationStatus, avatar } = coach;
+  const { slug, name, location, experienceYears, sportsCoached, verificationStatus, avatar, id } = coach;
+  const imageSrc = avatar ?? fixtureImages.coaches[id];
   const initials = name
     .split(' ')
     .map((part) => part.charAt(0))
@@ -17,13 +19,13 @@ export function CoachCardPlaceholder({ coach }: { coach: Coach }) {
     .join('');
 
   return (
-    <Card className="flex flex-wrap items-center gap-3 p-4 sm:flex-nowrap">
+    <Card className="hover:shadow-[var(--shadow-md)] flex flex-wrap items-center gap-3 p-4 transition-all duration-[var(--duration-fast)] ease-[var(--ease-standard)] sm:flex-nowrap">
       <span
         className="bg-muted/40 relative h-12 w-12 shrink-0 overflow-hidden rounded-full"
         aria-hidden
       >
         <ImageWithFallback
-          src={avatar ?? null}
+          src={imageSrc}
           alt={name}
           fill
           sizes="48px"
@@ -43,7 +45,7 @@ export function CoachCardPlaceholder({ coach }: { coach: Coach }) {
           <VerifiedBadge status={verificationStatus} />
         </div>
         <p className="text-muted-foreground mt-0.5 flex items-center gap-1 text-xs">
-          <MapPin className="h-3 w-3 shrink-0" />
+          <MapPin aria-hidden className="h-3 w-3 shrink-0" />
           <span className="truncate">
             {location.city} · {experienceYears}+ yrs
           </span>

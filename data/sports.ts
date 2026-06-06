@@ -8,7 +8,7 @@ export const sports: Sport[] = [
     description:
       'A bat-and-ball sport played between two teams of eleven. The most-followed sport in India with a deep talent pathway from school cricket to IPL.',
     icon: '/icons/sports/cricket.svg',
-    coverImage: '/images/sports/cricket.jpg',
+    coverImage: '/images/sports/cricket.svg',
     category: 'team',
     competitionPathway: {
       levels: [
@@ -33,7 +33,7 @@ export const sports: Sport[] = [
     description:
       'The world’s most popular sport, governed by AIFF in India with a growing professional ecosystem through ISL and I-League.',
     icon: '/icons/sports/football.svg',
-    coverImage: '/images/sports/football.jpg',
+    coverImage: '/images/sports/football.svg',
     category: 'team',
     competitionPathway: {
       levels: [
@@ -57,7 +57,7 @@ export const sports: Sport[] = [
     description:
       'A fast indoor racquet sport. India is a global powerhouse, with consistent Olympic and World Championship medal production.',
     icon: '/icons/sports/badminton.svg',
-    coverImage: '/images/sports/badminton.jpg',
+    coverImage: '/images/sports/badminton.svg',
     category: 'racquet',
     competitionPathway: {
       levels: [
@@ -81,7 +81,7 @@ export const sports: Sport[] = [
     description:
       'Individual and doubles racquet sport with a clear ITF junior-to-professional pathway. Growing rapidly in Indian cities.',
     icon: '/icons/sports/tennis.svg',
-    coverImage: '/images/sports/tennis.jpg',
+    coverImage: '/images/sports/tennis.svg',
     category: 'racquet',
     competitionPathway: {
       levels: [
@@ -104,7 +104,7 @@ export const sports: Sport[] = [
     description:
       'A high-speed indoor racquet sport. India has produced senior World Championship and Olympic medalists.',
     icon: '/icons/sports/table-tennis.svg',
-    coverImage: '/images/sports/table-tennis.jpg',
+    coverImage: '/images/sports/table-tennis.svg',
     category: 'racquet',
     competitionPathway: {
       levels: [
@@ -127,7 +127,7 @@ export const sports: Sport[] = [
     description:
       'Competitive pool swimming with stroke specialisation (freestyle, backstroke, breaststroke, butterfly) and open-water events.',
     icon: '/icons/sports/swimming.svg',
-    coverImage: '/images/sports/swimming.jpg',
+    coverImage: '/images/sports/swimming.svg',
     category: 'aquatic',
     competitionPathway: {
       levels: [
@@ -151,7 +151,7 @@ export const sports: Sport[] = [
     description:
       'Track and field events including sprints, middle distance, jumps, throws, and decathlon. India’s Neeraj Chopra has made it globally aspirational.',
     icon: '/icons/sports/athletics.svg',
-    coverImage: '/images/sports/athletics.jpg',
+    coverImage: '/images/sports/athletics.svg',
     category: 'athletics',
     competitionPathway: {
       levels: [
@@ -174,7 +174,7 @@ export const sports: Sport[] = [
     description:
       'Freestyle and Greco-Roman wrestling, with strongholds in Haryana, Punjab, and Maharashtra. India has produced Olympic medallists in the discipline.',
     icon: '/icons/sports/wrestling.svg',
-    coverImage: '/images/sports/wrestling.jpg',
+    coverImage: '/images/sports/wrestling.svg',
     category: 'combat',
     competitionPathway: {
       levels: [
@@ -197,7 +197,7 @@ export const sports: Sport[] = [
     description:
       'Olympic-style amateur boxing with a strong Indian tradition, especially in the North-East and Haryana.',
     icon: '/icons/sports/boxing.svg',
-    coverImage: '/images/sports/boxing.jpg',
+    coverImage: '/images/sports/boxing.svg',
     category: 'combat',
     competitionPathway: {
       levels: [
@@ -220,7 +220,7 @@ export const sports: Sport[] = [
     description:
       'Traditional striking art with kata, kumite, and WKF-aligned competition formats. Strong base in the North-East and Kerala.',
     icon: '/icons/sports/karate.svg',
-    coverImage: '/images/sports/karate.jpg',
+    coverImage: '/images/sports/karate.svg',
     category: 'combat',
     competitionPathway: {
       levels: [
@@ -243,7 +243,7 @@ export const sports: Sport[] = [
     description:
       'Olympic martial art emphasising throws, pins, and submissions. India has produced multiple continental medallists.',
     icon: '/icons/sports/judo.svg',
-    coverImage: '/images/sports/judo.jpg',
+    coverImage: '/images/sports/judo.svg',
     category: 'combat',
     competitionPathway: {
       levels: [
@@ -266,7 +266,7 @@ export const sports: Sport[] = [
     description:
       'India’s indigenous contact team sport. The Pro Kabaddi League has driven a professional revival since 2014.',
     icon: '/icons/sports/kabaddi.svg',
-    coverImage: '/images/sports/kabaddi.jpg',
+    coverImage: '/images/sports/kabaddi.svg',
     category: 'team',
     competitionPathway: {
       levels: [
@@ -289,7 +289,7 @@ export const sports: Sport[] = [
     description:
       'Field hockey. India’s most decorated Olympic team sport, with a deep talent base in Punjab, Odisha, and Karnataka.',
     icon: '/icons/sports/hockey.svg',
-    coverImage: '/images/sports/hockey.jpg',
+    coverImage: '/images/sports/hockey.svg',
     category: 'team',
     competitionPathway: {
       levels: [
@@ -312,7 +312,7 @@ export const sports: Sport[] = [
     description:
       'A 64-square strategy game with a thriving Indian professional scene, anchored by Viswanathan Anand.',
     icon: '/icons/sports/chess.svg',
-    coverImage: '/images/sports/chess.jpg',
+    coverImage: '/images/sports/chess.svg',
     category: 'individual',
     competitionPathway: {
       levels: [
@@ -336,7 +336,7 @@ export const sports: Sport[] = [
     description:
       'Inline and quad skating across speed, artistic, roller hockey, and skateboarding disciplines.',
     icon: '/icons/sports/skating.svg',
-    coverImage: '/images/sports/skating.jpg',
+    coverImage: '/images/sports/skating.svg',
     category: 'individual',
     competitionPathway: {
       levels: [
@@ -359,7 +359,7 @@ export const sports: Sport[] = [
     description:
       'Recurve and compound archery, with strongholds in Jharkhand, Manipur, and the North-East. India is a global medal contender.',
     icon: '/icons/sports/archery.svg',
-    coverImage: '/images/sports/archery.jpg',
+    coverImage: '/images/sports/archery.svg',
     category: 'individual',
     competitionPathway: {
       levels: [
@@ -382,7 +382,7 @@ export const sports: Sport[] = [
     description:
       'Rifle, pistol, and shotgun disciplines. India has produced multiple Olympic medallists in shooting.',
     icon: '/icons/sports/shooting.svg',
-    coverImage: '/images/sports/shooting.jpg',
+    coverImage: '/images/sports/shooting.svg',
     category: 'individual',
     competitionPathway: {
       levels: [
@@ -406,7 +406,7 @@ export const sports: Sport[] = [
     description:
       'A traditional Indian practice with modern application in flexibility, balance, breathwork, and competition yoga.',
     icon: '/icons/sports/yoga.svg',
-    coverImage: '/images/sports/yoga.jpg',
+    coverImage: '/images/sports/yoga.svg',
     category: 'individual',
     competitionPathway: {
       levels: [
@@ -429,7 +429,7 @@ export const sports: Sport[] = [
     description:
       'Artistic, rhythmic, and trampoline gymnastics. India has produced continental medal winners in rhythmic and trampoline.',
     icon: '/icons/sports/gymnastics.svg',
-    coverImage: '/images/sports/gymnastics.jpg',
+    coverImage: '/images/sports/gymnastics.svg',
     category: 'individual',
     competitionPathway: {
       levels: [
@@ -453,7 +453,7 @@ export const sports: Sport[] = [
     description:
       'A team sport played worldwide, with a growing Indian professional league (Basketball India League) and a strong school ecosystem.',
     icon: '/icons/sports/basketball.svg',
-    coverImage: '/images/sports/basketball.jpg',
+    coverImage: '/images/sports/basketball.svg',
     category: 'team',
     competitionPathway: {
       levels: [

@@ -1,9 +1,11 @@
 import Link from 'next/link';
 import { ImageWithFallback } from '@/components/ui/image-with-fallback';
+import { fixtureImages } from '@/lib/images';
 import type { Sport } from '@/types/domain/sport';
 
 export function SportCard({ sport }: { sport: Sport }) {
-  const { slug, name, category, coverImage, description, explorationGuidance } = sport;
+  const { slug, name, category, coverImage, description, explorationGuidance, id } = sport;
+  const imageSrc = coverImage ?? fixtureImages.sports[id];
   const initial = name.charAt(0);
   const ageRange = explorationGuidance?.ageSuitability;
   const ageText =
@@ -16,12 +18,12 @@ export function SportCard({ sport }: { sport: Sport }) {
   return (
     <Link
       href={`/sports/${slug}`}
-      className="border-border/60 bg-card/40 hover:border-primary/50 hover:bg-accent/10 group relative flex flex-col gap-3 overflow-hidden rounded-xl border p-4 transition-colors"
+      className="border-border/60 bg-card/40 hover:border-primary/50 hover:bg-accent/10 hover:shadow-[var(--shadow-md)] group relative flex flex-col gap-3 overflow-hidden rounded-xl border p-4 transition-all duration-[var(--duration-fast)] ease-[var(--ease-standard)]"
     >
       <div className="flex items-center gap-3">
         <span className="bg-muted/40 relative h-9 w-9 shrink-0 overflow-hidden rounded-md">
           <ImageWithFallback
-            src={coverImage}
+            src={imageSrc}
             alt={`${name} cover`}
             fill
             sizes="36px"

@@ -10,6 +10,7 @@ import { ImageWithFallback } from '@/components/ui/image-with-fallback';
 import { VerifiedBadge } from '@/components/trust/verified-badge';
 import { LastUpdated } from '@/components/trust/last-updated';
 import { CertificationIndicator } from '@/components/trust/certification-indicator';
+import { fixtureImages } from '@/lib/images';
 import type { Academy } from '@/types/domain/academy';
 
 export function AcademyCardPlaceholder({ academy }: { academy: Academy }) {
@@ -27,21 +28,25 @@ export function AcademyCardPlaceholder({ academy }: { academy: Academy }) {
   const sportSlugs = sportsOffered.slice(0, 3);
   const moreCount = sportsOffered.length - sportSlugs.length;
 
+  // Real image first; otherwise the local placeholder for this fixture; always resolves.
+  const imageSrc = coverImage ?? fixtureImages.academies[academy.id];
+
   const [saved, setSaved] = React.useState(false);
   const [compared, setCompared] = React.useState(false);
 
   return (
-    <Card className="group overflow-hidden">
+    <Card className="group hover:shadow-[var(--shadow-md)] overflow-hidden transition-all duration-[var(--duration-fast)] ease-[var(--ease-standard)]">
       <Link
         href={`/academies/${slug}`}
-        className="bg-muted/40 relative block aspect-[16/10] w-full overflow-hidden"
+        className="bg-muted/40 relative block aspect-[16/10] w-full overflow-hidden focus-visible:ring-ring focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
         aria-label={`${name}, ${location.city}`}
       >
         <ImageWithFallback
-          src={coverImage}
+          src={imageSrc}
           alt={`${name} cover image`}
           fill
           sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+          priority={false}
           className="object-cover transition-transform duration-500 ease-out group-hover:scale-[1.03]"
           fallback={
             <div className="flex h-full w-full flex-col items-center justify-center gap-1 p-4 text-center">
@@ -67,7 +72,7 @@ export function AcademyCardPlaceholder({ academy }: { academy: Academy }) {
               <h3 className="line-clamp-2 text-base font-semibold tracking-tight text-balance">{name}</h3>
             </Link>
             <p className="text-muted-foreground mt-0.5 flex items-center gap-1 text-xs">
-              <MapPin className="h-3 w-3 shrink-0" />
+              <MapPin aria-hidden className="h-3 w-3 shrink-0" />
               <span className="truncate">
                 {location.city}, {location.state}
               </span>
@@ -75,7 +80,7 @@ export function AcademyCardPlaceholder({ academy }: { academy: Academy }) {
           </div>
           <div className="shrink-0 text-right">
             <div className="flex items-center justify-end gap-1 text-sm font-semibold">
-              <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-400" />
+              <Star aria-hidden className="h-3.5 w-3.5 fill-amber-400 text-amber-400" />
               {rating.average.toFixed(1)}
             </div>
             <div className="text-muted-foreground text-[10px] tracking-widest uppercase">

@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 750" role="img" aria-label="#f1f5f9">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#0a2436"/>
+      <stop offset="55%" stop-color="#0a2436" stop-opacity="0.92"/>
+      <stop offset="100%" stop-color="#040e18"/>
+    </linearGradient>
+    
+  <radialGradient id="spot" cx="50%" cy="38%" r="60%">
+    <stop offset="0%" stop-color="#0ea5e9" stop-opacity="0.18"/>
+    <stop offset="100%" stop-color="#0ea5e9" stop-opacity="0"/>
+  </radialGradient>
+  </defs>
+  <rect width="1200" height="750" fill="url(#sky)"/>
+  <rect width="1200" height="750" fill="url(#spot)"/>
+  
+  <rect x="0" y="380" width="1200" height="280" fill="#0a3a5a"/>
+  <g stroke="#67e8f9" stroke-width="2" fill="none" opacity="0.4">
+    <path d="M0 460 Q200 420 400 460 T800 460 T1200 460"/>
+    <path d="M0 510 Q200 470 400 510 T800 510 T1200 510"/>
+    <path d="M0 560 Q200 520 400 560 T800 560 T1200 560"/>
+    <path d="M0 610 Q200 570 400 610 T800 610 T1200 610"/>
+  </g>
+  <g transform="translate(600 360) rotate(-8)">
+    <circle cx="0" cy="-40" r="14" fill="#f1f5f9"/>
+    <path d="M-14 -30 L0 30 L40 30" fill="none" stroke="#67e8f9" stroke-width="6" stroke-linecap="round"/>
+    <path d="M40 30 Q70 20 60 -10" fill="none" stroke="#67e8f9" stroke-width="6" stroke-linecap="round"/>
+  </g>
+  <g stroke="#f1f5f9" stroke-width="2" opacity="0.3" fill="none">
+    <line x1="100" y1="380" x2="100" y2="660"/>
+    <line x1="1100" y1="380" x2="1100" y2="660"/>
+  </g>
+
+  
+  <g transform="translate(40 700)">
+    <rect x="-8" y="-26" width="780" height="48" rx="8" fill="#000" opacity="0.55"/>
+    <text x="0" y="0" font-family="Inter, system-ui, sans-serif" font-size="22" font-weight="700" fill="#f1f5f9">#f1f5f9</text>
+    <text x="0" y="22" font-family="Inter, system-ui, sans-serif" font-size="13" fill="#cbd5e1">#67e8f9</text>
+  </g>
+</svg>
