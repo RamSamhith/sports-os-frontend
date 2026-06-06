@@ -87,7 +87,7 @@ const themeBootstrap = `
     }
     if (resolved === 'system') {
       var prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-      resolved = prefersDark ? 'dark' : 'light';
+      resolved = prefersDark ? 'midnight' : 'ivory';
     }
     var root = document.documentElement;
     // Drop any prior theme classes, then add the resolved one.
@@ -98,7 +98,7 @@ const themeBootstrap = `
     }
     classes.add(resolved);
     root.setAttribute('data-theme', resolved);
-    root.style.colorScheme = resolved === 'light' || resolved === 'focus' ? 'light' : 'dark';
+    root.style.colorScheme = resolved === 'ivory' || resolved === 'focus' ? 'light' : 'dark';
   } catch (e) {
     // localStorage disabled — fall back to default theme class.
     document.documentElement.classList.add(${JSON.stringify(themeConfig.defaultTheme)});
@@ -116,6 +116,9 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         />
       </head>
       <body className={`${inter.variable} ${geistDisplay.variable} ${geistMono.variable} font-sans`}>
+        {/* Per-theme atmospheric background. Single fixed layer; the
+            theme class on <html> picks which gradient stops to show. */}
+        <div className="atmosphere" aria-hidden />
         <ThemeProvider>
           <OfflineProvider>
             <CommandPaletteProvider>

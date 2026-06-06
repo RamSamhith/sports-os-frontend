@@ -1,9 +1,13 @@
 /* SportsOS Design Tokens — single source of truth.
  *
- * Four themes only: .dark, .light, .arena, .focus.
- * Each theme defines the same set of semantic CSS variables so that
- * components can reference them by name (e.g., `bg-background`) and
- * the cascade handles the rest.
+ * Four premium themes, each with a distinct identity:
+ *   - .midnight   Oxford blue + ice blue (default)
+ *   - .ivory      Warm ivory + soft navy (editorial)
+ *   - .arena      Emerald + championship gold (SportsOS signature)
+ *   - .focus      Warm stone + clay (calm, accessible)
+ *
+ * Every theme defines the same set of semantic CSS variables. Components
+ * reference them by name and the cascade handles the rest.
  */
 
 :root {
@@ -22,7 +26,7 @@
   --space-20: 5rem;   /* 80 */
   --space-24: 6rem;   /* 96 */
 
-  /* Radius */
+  /* Radius — slightly larger for premium feel. */
   --radius-xs: 0.25rem;
   --radius-sm: 0.375rem;
   --radius-md: 0.5rem;
@@ -67,21 +71,25 @@
   --ease-emphasized: cubic-bezier(0.3, 0, 0, 1);
   --ease-decelerate: cubic-bezier(0, 0, 0, 1);
   --ease-accelerate: cubic-bezier(0.3, 0, 1, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
 
+  --duration-instant: 80ms;
   --duration-micro: 120ms;
   --duration-fast: 180ms;
   --duration-standard: 240ms;
   --duration-slow: 360ms;
   --duration-page: 480ms;
+  --duration-atmosphere: 60s;
 
   /* Shadows — alpha is tuned per theme via the `--shadow-color` token. */
-  --shadow-color: 0 0% 0%;
+  --shadow-color: 220 30% 6%;
   --shadow-xs: 0 1px 2px 0 hsl(var(--shadow-color) / 0.06);
   --shadow-sm: 0 1px 3px 0 hsl(var(--shadow-color) / 0.10), 0 1px 2px -1px hsl(var(--shadow-color) / 0.10);
-  --shadow-md: 0 4px 6px -1px hsl(var(--shadow-color) / 0.12), 0 2px 4px -2px hsl(var(--shadow-color) / 0.10);
-  --shadow-lg: 0 10px 15px -3px hsl(var(--shadow-color) / 0.14), 0 4px 6px -4px hsl(var(--shadow-color) / 0.10);
-  --shadow-xl: 0 20px 25px -5px hsl(var(--shadow-color) / 0.18), 0 8px 10px -6px hsl(var(--shadow-color) / 0.14);
+  --shadow-md: 0 4px 6px -1px hsl(var(--shadow-color) / 0.14), 0 2px 4px -2px hsl(var(--shadow-color) / 0.12);
+  --shadow-lg: 0 10px 20px -4px hsl(var(--shadow-color) / 0.18), 0 4px 8px -4px hsl(var(--shadow-color) / 0.12);
+  --shadow-xl: 0 24px 40px -8px hsl(var(--shadow-color) / 0.22), 0 8px 16px -6px hsl(var(--shadow-color) / 0.14);
   --shadow-glow: 0 0 40px hsl(var(--primary) / 0.30);
+  --shadow-inset-hairline: inset 0 0 0 1px hsl(var(--foreground) / 0.04);
 
   /* Z-index */
   --z-base: 0;
@@ -92,6 +100,7 @@
   --z-modal: 400;
   --z-toast: 500;
   --z-tooltip: 600;
+  --z-atmosphere: -1;
 
   /* Layout */
   --content-max: 1440px;
@@ -103,10 +112,7 @@
   /* Selection */
   --selection-bg: hsl(var(--primary) / 0.25);
 
-  /* Status / intent colors — semantic, theme-aware.
-   * These are the *only* hardcoded hues in the system, and they
-   * are expressed as full HSL so dark/light/focus/arena all tune
-   * the contrast appropriately. */
+  /* Status / intent — semantic, theme-aware. */
   --success: 152 60% 38%;
   --success-foreground: 0 0% 100%;
   --warning: 38 92% 50%;
@@ -116,48 +122,57 @@
 
   /* Star / rating (used on cards). */
   --rating: 38 92% 50%;
+
+  /* Surface hierarchy — semantic elevation.
+   * surface-1 sits on the background; surface-2 is a card; surface-3 is raised (popover). */
+  --surface-1: hsl(var(--background));
+  --surface-2: hsl(var(--card));
+  --surface-3: hsl(var(--popover));
+  --border-soft: hsl(var(--border) / 0.6);
+  --border-strong: hsl(var(--border));
 }
 
 /* ---------------------------------------------------------------------------
- * THEME 1 — DARK
- * Default SportsOS experience. Slightly cool tones, high contrast.
+ * THEME 1 — MIDNIGHT
+ * Oxford Blue / Ice Blue. Premium, modern, daily-use default.
+ * Inspired by Oxford Blue, Arc Browser, Linear.
  * ------------------------------------------------------------------------- */
-.dark {
-  --background: 0 0% 5%;
-  --foreground: 210 20% 96%;
+.midnight {
+  --background: 222 47% 5%;
+  --foreground: 210 30% 96%;
 
-  --card: 0 0% 7%;
-  --card-foreground: 210 20% 96%;
+  --card: 222 40% 8%;
+  --card-foreground: 210 30% 96%;
 
-  --popover: 0 0% 8%;
-  --popover-foreground: 210 20% 96%;
+  --popover: 222 36% 10%;
+  --popover-foreground: 210 30% 96%;
 
-  --primary: 199 89% 56%;            /* Electric cyan — premium */
-  --primary-foreground: 0 0% 5%;
+  --primary: 199 90% 60%;            /* Ice blue */
+  --primary-foreground: 222 47% 5%;
 
-  --secondary: 0 0% 12%;
-  --secondary-foreground: 210 20% 96%;
+  --secondary: 222 26% 14%;
+  --secondary-foreground: 210 30% 96%;
 
-  --muted: 0 0% 12%;
-  --muted-foreground: 0 0% 64%;
+  --muted: 222 26% 12%;
+  --muted-foreground: 217 14% 66%;
 
-  --accent: 199 89% 60%;
-  --accent-foreground: 0 0% 5%;
+  --accent: 217 60% 22%;             /* Oxford blue accent surface */
+  --accent-foreground: 199 90% 80%;
 
-  --destructive: 0 72% 50%;
+  --destructive: 0 72% 56%;
   --destructive-foreground: 0 0% 98%;
 
-  --border: 0 0% 14%;
-  --input: 0 0% 14%;
-  --ring: 199 89% 56%;
+  --border: 222 26% 16%;
+  --input: 222 26% 16%;
+  --ring: 199 90% 60%;
 
-  --shadow-color: 0 0% 0%;
+  --shadow-color: 222 60% 2%;
 
   --success: 152 60% 50%;
   --success-foreground: 0 0% 5%;
   --warning: 38 92% 60%;
   --warning-foreground: 0 0% 5%;
-  --info: 199 89% 60%;
+  --info: 199 90% 60%;
   --info-foreground: 0 0% 5%;
 
   --rating: 38 92% 60%;
@@ -166,151 +181,150 @@
 }
 
 /* ---------------------------------------------------------------------------
- * THEME 2 — LIGHT
- * Clean, professional, parent- and school-friendly. Excellent outdoor readability.
+ * THEME 2 — IVORY
+ * Warm ivory / sand / soft navy. Editorial, reading-friendly, professional.
  * ------------------------------------------------------------------------- */
-.light {
-  --background: 0 0% 100%;
-  --foreground: 222 22% 8%;
+.ivory {
+  --background: 40 38% 96%;          /* Warm ivory */
+  --foreground: 222 32% 14%;         /* Soft navy */
 
-  --card: 0 0% 100%;
-  --card-foreground: 222 22% 8%;
+  --card: 38 50% 98%;                /* Slightly lifted ivory */
+  --card-foreground: 222 32% 14%;
 
   --popover: 0 0% 100%;
-  --popover-foreground: 222 22% 8%;
+  --popover-foreground: 222 32% 14%;
 
-  --primary: 199 89% 38%;
-  --primary-foreground: 0 0% 100%;
+  --primary: 222 50% 28%;            /* Soft navy primary */
+  --primary-foreground: 40 38% 96%;
 
-  --secondary: 220 14% 96%;
-  --secondary-foreground: 222 22% 12%;
+  --secondary: 36 30% 90%;
+  --secondary-foreground: 222 32% 18%;
 
-  --muted: 220 14% 96%;
-  --muted-foreground: 220 9% 42%;
+  --muted: 38 28% 92%;
+  --muted-foreground: 222 14% 38%;
 
-  --accent: 199 89% 92%;
-  --accent-foreground: 222 22% 12%;
+  --accent: 36 60% 86%;              /* Sand accent */
+  --accent-foreground: 222 32% 18%;
 
-  --destructive: 0 72% 46%;
+  --destructive: 0 64% 42%;
   --destructive-foreground: 0 0% 100%;
 
-  --border: 220 13% 90%;
-  --input: 220 13% 90%;
-  --ring: 199 89% 38%;
+  --border: 36 22% 82%;
+  --input: 36 22% 82%;
+  --ring: 222 50% 28%;
 
-  --shadow-color: 220 30% 12%;
+  --shadow-color: 30 30% 30%;
 
-  --success: 152 60% 32%;
+  --success: 152 50% 32%;
   --success-foreground: 0 0% 100%;
-  --warning: 32 90% 42%;
+  --warning: 32 80% 42%;
   --warning-foreground: 0 0% 100%;
-  --info: 199 89% 38%;
+  --info: 199 70% 36%;
   --info-foreground: 0 0% 100%;
 
-  --rating: 32 90% 42%;
+  --rating: 32 80% 42%;
 
   --radius: 0.75rem;
 }
 
 /* ---------------------------------------------------------------------------
- * THEME 3 — ARENA
- * Sports-inspired premium theme. Stadium atmosphere, energetic but restrained.
- * Avoids neon / RGB / cyberpunk — feels professional, athletic, trustworthy.
+ * THEME 3 — ARENA — SportsOS signature
+ * Deep emerald / championship gold / soft cream.
+ * Premium athletic feel — never neon, never RGB.
  * ------------------------------------------------------------------------- */
 .arena {
-  --background: 222 35% 6%;
-  --foreground: 40 30% 96%;
+  --background: 222 38% 6%;
+  --foreground: 40 40% 94%;          /* Soft cream */
 
-  --card: 222 32% 9%;
-  --card-foreground: 40 30% 96%;
+  --card: 222 34% 9%;
+  --card-foreground: 40 40% 94%;
 
   --popover: 222 32% 10%;
-  --popover-foreground: 40 30% 96%;
+  --popover-foreground: 40 40% 94%;
 
-  --primary: 38 92% 56%;             /* Stadium-gold */
-  --primary-foreground: 222 35% 6%;
+  --primary: 42 90% 56%;             /* Championship gold */
+  --primary-foreground: 222 38% 6%;
 
-  --secondary: 222 24% 14%;
-  --secondary-foreground: 40 30% 96%;
+  --secondary: 222 22% 14%;
+  --secondary-foreground: 40 40% 94%;
 
-  --muted: 222 24% 14%;
-  --muted-foreground: 220 10% 68%;
+  --muted: 222 22% 13%;
+  --muted-foreground: 40 14% 70%;
 
-  --accent: 152 60% 42%;             /* Pitch-emerald */
-  --accent-foreground: 222 35% 6%;
+  --accent: 158 60% 32%;             /* Deep emerald */
+  --accent-foreground: 40 40% 94%;
 
-  --destructive: 0 72% 52%;
+  --destructive: 0 72% 56%;
   --destructive-foreground: 0 0% 98%;
 
-  --border: 222 24% 18%;
-  --input: 222 24% 18%;
-  --ring: 38 92% 56%;
+  --border: 222 22% 18%;
+  --input: 222 22% 18%;
+  --ring: 42 90% 56%;
 
   --shadow-color: 222 60% 0%;
 
-  --success: 152 60% 50%;
-  --success-foreground: 222 35% 6%;
-  --warning: 38 92% 60%;
-  --warning-foreground: 222 35% 6%;
-  --info: 199 89% 60%;
-  --info-foreground: 222 35% 6%;
+  --success: 158 60% 50%;
+  --success-foreground: 222 38% 6%;
+  --warning: 42 90% 60%;
+  --warning-foreground: 222 38% 6%;
+  --info: 199 80% 60%;
+  --info-foreground: 222 38% 6%;
 
-  --rating: 38 92% 60%;
+  --rating: 42 90% 60%;
 
   --radius: 0.75rem;
 
   /* Sport-identity accent tokens (Arena only).
-   * Use only on chips / badges / small indicators. Never on large surfaces. */
-  --sport-cricket: 217 76% 38%;      /* Deep blue */
-  --sport-football: 152 60% 38%;     /* Emerald */
-  --sport-tennis: 42 90% 50%;        /* Gold */
-  --sport-swimming: 191 85% 42%;     /* Aqua */
+   * Used only on chips / badges / small indicators. */
+  --sport-cricket: 217 76% 50%;
+  --sport-football: 158 60% 50%;
+  --sport-tennis: 42 90% 60%;
+  --sport-swimming: 191 80% 56%;
 }
 
 /* ---------------------------------------------------------------------------
  * THEME 4 — FOCUS
- * Accessibility-first. Minimal color variation, maximum readability.
- * Tuned for long reading sessions and reduced cognitive load.
+ * Warm stone / clay / soft brown. Calm, accessible, max readability.
  * ------------------------------------------------------------------------- */
 .focus {
-  --background: 40 12% 97%;
-  --foreground: 220 25% 12%;
+  --background: 36 18% 92%;          /* Warm stone */
+  --foreground: 22 30% 18%;          /* Soft brown */
 
-  --card: 0 0% 100%;
-  --card-foreground: 220 25% 12%;
+  --card: 36 22% 96%;
+  --card-foreground: 22 30% 18%;
 
   --popover: 0 0% 100%;
-  --popover-foreground: 220 25% 12%;
+  --popover-foreground: 22 30% 18%;
 
-  --primary: 217 80% 38%;            /* Steady, high-contrast blue */
-  --primary-foreground: 0 0% 100%;
+  --primary: 18 50% 32%;             /* Clay */
+  --primary-foreground: 36 18% 96%;
 
-  --secondary: 220 14% 92%;
-  --secondary-foreground: 220 25% 14%;
+  --secondary: 36 14% 88%;
+  --secondary-foreground: 22 30% 20%;
 
-  --muted: 220 14% 94%;
-  --muted-foreground: 220 12% 32%;
+  --muted: 36 14% 90%;
+  --muted-foreground: 22 18% 32%;
 
-  --accent: 217 60% 90%;
-  --accent-foreground: 220 25% 14%;
+  --accent: 18 30% 82%;
+  --accent-foreground: 22 30% 18%;
 
-  --destructive: 0 70% 38%;
+  --destructive: 0 60% 38%;
   --destructive-foreground: 0 0% 100%;
 
-  --border: 220 14% 78%;
-  --input: 220 14% 78%;
-  --ring: 217 80% 38%;
+  --border: 28 14% 72%;
+  --input: 28 14% 72%;
+  --ring: 18 50% 32%;
 
-  --shadow-color: 220 30% 12%;
+  --shadow-color: 22 30% 20%;
 
-  --success: 152 60% 30%;
+  --success: 152 50% 28%;
   --success-foreground: 0 0% 100%;
-  --warning: 32 90% 38%;
+  --warning: 32 80% 38%;
   --warning-foreground: 0 0% 100%;
-  --info: 217 80% 38%;
+  --info: 199 70% 32%;
   --info-foreground: 0 0% 100%;
 
-  --rating: 32 90% 40%;
+  --rating: 32 80% 40%;
 
   --radius: 0.5rem;
 }

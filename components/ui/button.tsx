@@ -4,17 +4,24 @@ import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '@/lib/utils/cn';
 
 const buttonVariants = cva(
-  'inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-[background,color,box-shadow,border-color,transform] duration-[var(--duration-fast)] ease-[var(--ease-standard)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 active:scale-[0.99]',
+  // Base — shared by every variant. The `.motion-premium` class supplies
+  // the transition + hover-lift + press-scale + focus ring in one place.
+  [
+    'inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background motion-premium',
+    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
+    'disabled:pointer-events-none disabled:opacity-50',
+  ].join(' '),
   {
     variants: {
       variant: {
-        default: 'bg-primary text-primary-foreground hover:bg-primary/90 shadow-[var(--shadow-sm)]',
-        secondary: 'bg-secondary text-secondary-foreground hover:bg-secondary/80',
+        default: 'bg-primary text-primary-foreground shadow-[var(--shadow-sm)] hover:bg-primary/90',
+        secondary:
+          'bg-secondary text-secondary-foreground shadow-[var(--shadow-xs)] hover:bg-secondary/80',
         outline:
           'border border-border bg-background hover:border-foreground/40 hover:bg-accent/15 hover:text-accent-foreground',
         ghost: 'hover:bg-accent/15 hover:text-accent-foreground',
         destructive:
-          'bg-destructive text-destructive-foreground hover:bg-destructive/90',
+          'bg-destructive text-destructive-foreground shadow-[var(--shadow-sm)] hover:bg-destructive/90',
         link: 'text-primary underline-offset-4 hover:underline',
         glass: 'glass border border-border/60 text-foreground hover:border-foreground/30 hover:bg-accent/15',
       },

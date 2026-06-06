@@ -16,8 +16,8 @@ export default function ThemeSettingsPage() {
       <header className="flex flex-col gap-1">
         <h2 className="text-2xl font-semibold tracking-tight">Theme</h2>
         <p className="text-muted-foreground text-sm text-pretty">
-          SportsOS supports four themes. Choose the one that fits your context, or follow your
-          device.
+          Four premium themes. Tap a card to apply, or use the single button in the navbar to cycle
+          through Midnight → Ivory → Arena → Focus.
         </p>
       </header>
 

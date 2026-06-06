@@ -45,7 +45,7 @@ export function AcademyCardPlaceholder({ academy, priority = false }: { academy:
   const isCompared = hasCompare('academy', id);
 
   return (
-    <Card className="group hover:shadow-[var(--shadow-md)] overflow-hidden transition-all duration-[var(--duration-fast)] ease-[var(--ease-standard)]">
+    <Card className="motion-premium group overflow-hidden hover:border-foreground/20">
       <Link
         href={`/academies/${slug}`}
         className="bg-muted/40 relative block aspect-[16/10] w-full overflow-hidden focus-visible:ring-ring focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"

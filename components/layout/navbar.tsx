@@ -12,7 +12,7 @@ import { Container } from '@/components/layout/container';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { Separator } from '@/components/ui/separator';
 import { useCommandPalette } from '@/components/command/command-palette-provider';
-import { ThemeToggle } from '@/components/theme/theme-toggle';
+import { ThemeCycleButton } from '@/components/theme/theme-toggle';
 
 export function Navbar() {
   const pathname = usePathname();
@@ -44,7 +44,9 @@ export function Navbar() {
                   href={item.href}
                   aria-current={active ? 'page' : undefined}
                   className={cn(
-                    'text-muted-foreground hover:text-foreground hover:bg-accent/15 focus-visible:ring-ring relative rounded-md px-3 py-1.5 text-sm transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-background focus-visible:outline-none',
+                    'text-muted-foreground hover:text-foreground hover:bg-accent/15 focus-visible:ring-ring',
+                    'motion-press relative rounded-md px-3 py-1.5 text-sm',
+                    'focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-background focus-visible:outline-none',
                     active && 'text-foreground',
                   )}
                 >
@@ -52,7 +54,7 @@ export function Navbar() {
                   {active && (
                     <motion.span
                       layoutId="nav-active"
-                      className="bg-foreground/15 absolute inset-0 -z-10 rounded-md"
+                      className="bg-foreground/10 absolute inset-0 -z-10 rounded-md shadow-[var(--shadow-inset-hairline)]"
                       transition={{ type: 'spring', stiffness: 380, damping: 30 }}
                     />
                   )}
@@ -88,7 +90,7 @@ export function Navbar() {
                 </Button>
               </div>
               <div className="grid h-11 w-11 place-items-center">
-                <ThemeToggle />
+                <ThemeCycleButton />
               </div>
               <div className="grid h-11 w-11 place-items-center">
                 <Button variant="ghost" size="icon-sm" aria-label="Profile" asChild>
@@ -121,7 +123,7 @@ export function Navbar() {
                         onClick={() => setOpen(false)}
                         aria-current={active ? 'page' : undefined}
                         className={cn(
-                          'text-muted-foreground hover:text-foreground hover:bg-accent/15 rounded-md px-3 py-2 text-sm transition-colors',
+                          'text-muted-foreground hover:text-foreground hover:bg-accent/15 motion-press rounded-md px-3 py-2 text-sm',
                           active && 'text-foreground bg-accent/10',
                         )}
                       >
@@ -132,9 +134,9 @@ export function Navbar() {
                   <Separator className="my-2" />
                   <div className="flex items-center justify-between">
                     <p className="text-muted-foreground text-xs font-semibold tracking-widest uppercase">
-                      Account
+                      Theme
                     </p>
-                    <ThemeToggle align="start" />
+                    <ThemeCycleButton />
                   </div>
                   <Link
                     href="/shortlist"

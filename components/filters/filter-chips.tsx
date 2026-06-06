@@ -4,6 +4,7 @@ import * as React from 'react';
 import { X } from 'lucide-react';
 import { cn } from '@/lib/utils/cn';
 import { motion } from 'framer-motion';
+import { useReducedMotion } from '@/lib/hooks/use-reduced-motion';
 
 export interface FilterChip {
   key: string;
@@ -13,7 +14,16 @@ export interface FilterChip {
   onRemove?: () => void;
 }
 
-export function FilterChips({ chips, onClearAll, className }: { chips: FilterChip[]; onClearAll?: () => void; className?: string }) {
+export function FilterChips({
+  chips,
+  onClearAll,
+  className,
+}: {
+  chips: FilterChip[];
+  onClearAll?: () => void;
+  className?: string;
+}) {
+  const reduced = useReducedMotion();
   if (!chips.length) return null;
   return (
     <div className={cn('flex flex-wrap items-center gap-2', className)}>
@@ -25,29 +35,32 @@ export function FilterChips({ chips, onClearAll, className }: { chips: FilterChi
               <button
                 type="button"
                 onClick={chip.onRemove}
-                className="text-muted-foreground hover:text-foreground"
                 aria-label={`Remove ${chip.label}`}
+                className="text-muted-foreground hover:text-foreground -mr-1 ml-0.5 grid h-5 w-5 place-items-center rounded-full transition-colors hover:bg-foreground/10"
               >
                 <X className="h-3 w-3" />
               </button>
             ) : null}
           </>
         );
+        const baseClass =
+          'border-border/60 bg-card/70 hover:border-foreground/30 hover:bg-card/90 motion-press inline-flex items-center gap-1 rounded-full border px-2.5 py-0.5 text-xs';
         return chip.layoutId ? (
           <motion.span
             key={chip.key}
             layoutId={chip.layoutId}
-            className="border-border/60 bg-card/60 inline-flex items-center gap-1 rounded-full border px-2.5 py-0.5 text-xs"
+            className={baseClass}
           >
             {inner}
           </motion.span>
         ) : (
           <motion.span
             key={chip.key}
-            initial={{ opacity: 0, scale: 0.96 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.18, ease: [0.2, 0, 0, 1] }}
-            className="border-border/60 bg-card/60 inline-flex items-center gap-1 rounded-full border px-2.5 py-0.5 text-xs"
+            initial={reduced ? false : { opacity: 0, scale: 0.94, y: 4 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={reduced ? { opacity: 0 } : { opacity: 0, scale: 0.94, y: 4 }}
+            transition={{ duration: 0.2, ease: [0.2, 0, 0, 1] }}
+            className={baseClass}
           >
             {inner}
           </motion.span>
@@ -57,7 +70,7 @@ export function FilterChips({ chips, onClearAll, className }: { chips: FilterChi
         <button
           type="button"
           onClick={onClearAll}
-          className="text-muted-foreground hover:text-foreground text-xs underline-offset-2 hover:underline"
+          className="text-muted-foreground hover:text-foreground text-xs underline-offset-4 hover:underline"
         >
           Clear all
         </button>

@@ -6,8 +6,8 @@ import { cn } from '@/lib/utils/cn';
 import { themeMeta, type ThemeName } from '@/config/theme';
 
 const iconFor: Record<ThemeName, React.ComponentType<{ className?: string }>> = {
-  dark: Moon,
-  light: Sun,
+  midnight: Moon,
+  ivory: Sun,
   arena: Trophy,
   focus: FocusIcon,
 };

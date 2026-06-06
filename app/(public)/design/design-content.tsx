@@ -23,7 +23,7 @@ import { Modal, ModalContent, ModalDescription, ModalFooter, ModalHeader, ModalT
 import { Drawer, DrawerContent, DrawerDescription, DrawerHeader, DrawerTitle, DrawerTrigger, DrawerPanel } from '@/components/ui/drawer';
 import { Surface } from '@/components/ui/surface';
 import { Kbd } from '@/components/ui/kbd';
-import { ThemeToggle } from '@/components/theme/theme-toggle';
+import { ThemeCycleButton } from '@/components/theme/theme-toggle';
 import { ThemeMeta } from '@/components/theme/theme-meta';
 import { HeroReveal } from '@/components/motion/hero-reveal';
 import { FadeIn } from '@/components/motion/fade-in';
@@ -74,7 +74,7 @@ export function DesignContent() {
                   everywhere. No magic numbers.
                 </Text>
                 <div className="mt-6 flex items-center gap-2">
-                  <ThemeToggle />
+                  <ThemeCycleButton />
                   <ThemeMeta />
                 </div>
               </div>
@@ -85,7 +85,7 @@ export function DesignContent() {
 
       <Section id="colors" spacing="md">
         <Container>
-          <SectionHeader title="Colors" description="HSL-driven CSS variables. Dark-first, light future-ready." />
+          <SectionHeader title="Colors" description="HSL-driven CSS variables. Four premium themes: Midnight, Ivory, Arena, Focus." />
           <Grid cols={4} gap={3} className="mt-6">
             {colorSwatches.map((c) => (
               <Surface key={c.name} padding="sm" className="flex items-center gap-3">

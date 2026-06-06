@@ -18,9 +18,11 @@
   body {
     @apply bg-background text-foreground antialiased;
     font-feature-settings: 'rlig' 1, 'calt' 1, 'ss01' 1;
-    /* Theme changes are O(1) — only token values change, layout does not. */
-    transition: background-color var(--duration-standard) var(--ease-standard),
-                color var(--duration-standard) var(--ease-standard);
+    /* Token-only transition. Background colors and shadow values change,
+     * but layout, geometry, and font rendering are untouched. */
+    transition:
+      background-color var(--duration-standard) var(--ease-standard),
+      color var(--duration-standard) var(--ease-standard);
   }
 
   ::selection {
@@ -32,7 +34,8 @@
     @apply outline-none ring-2 ring-ring ring-offset-2 ring-offset-background;
   }
 
-  /* Reduced motion */
+  /* Reduced motion — globally disables CSS animations + transitions.
+   * The atmospheric layer relies on this to pause. */
   @media (prefers-reduced-motion: reduce) {
     *,
     *::before,
@@ -54,18 +57,10 @@
   }
 
   /* Safe-area helpers — for iOS notch / home indicator and Android edge-to-edge. */
-  .pt-safe {
-    padding-top: max(env(safe-area-inset-top), 0px);
-  }
-  .pb-safe {
-    padding-bottom: max(env(safe-area-inset-bottom), 0px);
-  }
-  .pl-safe {
-    padding-left: max(env(safe-area-inset-left), 0px);
-  }
-  .pr-safe {
-    padding-right: max(env(safe-area-inset-right), 0px);
-  }
+  .pt-safe { padding-top: max(env(safe-area-inset-top), 0px); }
+  .pb-safe { padding-bottom: max(env(safe-area-inset-bottom), 0px); }
+  .pl-safe { padding-left: max(env(safe-area-inset-left), 0px); }
+  .pr-safe { padding-right: max(env(safe-area-inset-right), 0px); }
   .mx-safe {
     margin-left: max(env(safe-area-inset-left), 0px);
     margin-right: max(env(safe-area-inset-right), 0px);
@@ -74,66 +69,163 @@
     margin-top: max(env(safe-area-inset-top), 0px);
     margin-bottom: max(env(safe-area-inset-bottom), 0px);
   }
-  .top-safe {
-    top: max(env(safe-area-inset-top), 0px);
-  }
-  .bottom-safe {
-    bottom: max(env(safe-area-inset-bottom), 0px);
-  }
+  .top-safe { top: max(env(safe-area-inset-top), 0px); }
+  .bottom-safe { bottom: max(env(safe-area-inset-bottom), 0px); }
 
+  /* Glassy translucent surface — used for the navbar. */
   .glass {
     @apply bg-background/60 backdrop-blur-xl backdrop-saturate-150;
   }
 
-  .aurora-bg {
-    background:
-      radial-gradient(60% 50% at 20% 0%, hsl(var(--primary) / 0.18) 0%, transparent 60%),
-      radial-gradient(50% 50% at 80% 10%, hsl(var(--accent) / 0.14) 0%, transparent 60%),
-      radial-gradient(40% 40% at 50% 100%, hsl(var(--primary) / 0.1) 0%, transparent 60%);
+  /* -----------------------------------------------------------------------
+   * Atmospheric background.
+   * A single fixed full-viewport layer behind every page. Its colors and
+   * animation are picked from the active theme class.
+   *
+   * GPU only (transform / opacity), 60s cycle — users should only notice it
+   * after prolonged viewing. Skipped entirely in Focus.
+   * --------------------------------------------------------------------- */
+  .atmosphere {
+    position: fixed;
+    inset: 0;
+    z-index: var(--z-atmosphere);
+    pointer-events: none;
+    overflow: hidden;
   }
 
-  .grid-noise::before {
+  .atmosphere::before,
+  .atmosphere::after {
+    content: '';
+    position: absolute;
+    inset: -10%;
+    background-image: var(--atmosphere-stops, none);
+    background-size: 200% 200%;
+    background-position: 50% 50%;
+    will-change: transform, opacity;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+
+  .atmosphere::before {
+    animation:
+      atmosphere-pan var(--duration-atmosphere) var(--ease-standard) infinite alternate,
+      atmosphere-breathe 24s var(--ease-standard) infinite;
+  }
+
+  .atmosphere::after {
+    opacity: 0.6;
+    mix-blend-mode: var(--atmosphere-blend, screen);
+    animation:
+      atmosphere-pan-2 calc(var(--duration-atmosphere) * 1.4) var(--ease-standard) infinite alternate-reverse,
+      atmosphere-breathe 32s var(--ease-standard) infinite;
+  }
+
+  @keyframes atmosphere-pan {
+    0%   { transform: translate3d(-3%, -2%, 0) scale(1.02); }
+    50%  { transform: translate3d(2%,  1%, 0)  scale(1.06); }
+    100% { transform: translate3d(-1%, 3%, 0)  scale(1.04); }
+  }
+
+  @keyframes atmosphere-pan-2 {
+    0%   { transform: translate3d(3%,  2%, 0)  scale(1.05); }
+    50%  { transform: translate3d(-2%, -1%, 0) scale(1.10); }
+    100% { transform: translate3d(1%, -3%, 0)  scale(1.06); }
+  }
+
+  @keyframes atmosphere-breathe {
+    0%, 100% { opacity: 0.85; }
+    50%      { opacity: 1.0; }
+  }
+
+  /* Per-theme stops + blend. Each theme picks the colors but the
+   * animation/structure above is shared. */
+  .midnight .atmosphere {
+    --atmosphere-stops:
+      radial-gradient(60% 50% at 15% 0%,  hsl(217 60% 22% / 0.55) 0%, transparent 60%),
+      radial-gradient(50% 50% at 85% 5%,  hsl(220 70% 10% / 0.30) 0%, transparent 60%),
+      radial-gradient(40% 40% at 50% 100%, hsl(199 80% 30% / 0.18) 0%, transparent 60%);
+    --atmosphere-blend: screen;
+  }
+
+  .ivory .atmosphere {
+    --atmosphere-stops:
+      radial-gradient(60% 50% at 0% 0%,   hsl(40 55% 88% / 0.55) 0%, transparent 60%),
+      radial-gradient(50% 50% at 100% 20%, hsl(35 35% 82% / 0.40) 0%, transparent 60%),
+      radial-gradient(40% 40% at 50% 100%, hsl(220 30% 60% / 0.18) 0%, transparent 60%);
+    --atmosphere-blend: multiply;
+  }
+
+  .arena .atmosphere {
+    --atmosphere-stops:
+      radial-gradient(60% 50% at 10% 10%,  hsl(160 50% 16% / 0.55) 0%, transparent 60%),
+      radial-gradient(50% 50% at 90% 5%,   hsl(40 65% 30% / 0.30) 0%, transparent 60%),
+      radial-gradient(40% 40% at 50% 100%, hsl(40 30% 90% / 0.18) 0%, transparent 60%);
+    --atmosphere-blend: screen;
+  }
+
+  /* Focus: no atmosphere, no animation. Pure static surface. */
+  .focus .atmosphere {
+    display: none;
+  }
+
+  /* Subtle film grain — only in dark themes, very low opacity. */
+  .grain::after {
     content: '';
     position: absolute;
     inset: 0;
     pointer-events: none;
-    opacity: 0.03;
+    opacity: 0.025;
     mix-blend-mode: overlay;
     background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
   }
 
   /* -----------------------------------------------------------------------
    * Sport-identity accent utilities (Arena theme only).
-   * Use only on chips / badges / small indicators — never on large surfaces.
-   * In other themes these fall back to muted-foreground, preserving
-   * cohesion while still being visible enough to identify the sport.
+   * Use only on chips / badges / small indicators.
    * --------------------------------------------------------------------- */
-  .sport-accent {
-    /* Default: theme-neutral muted color. */
-    color: hsl(var(--muted-foreground));
-    border-color: hsl(var(--border));
+  .sport-cricket { background: hsl(var(--sport-cricket)); color: hsl(var(--primary-foreground)); }
+  .sport-football { background: hsl(var(--sport-football)); color: hsl(var(--primary-foreground)); }
+  .sport-tennis { background: hsl(var(--sport-tennis)); color: hsl(var(--primary-foreground)); }
+  .sport-swimming { background: hsl(var(--sport-swimming)); color: hsl(var(--primary-foreground)); }
+
+  /* Premium motion utilities. Use these instead of writing
+   * transition-[transform] / duration-[var(--duration-fast)] in components —
+   * they avoid Tailwind class-ambiguity warnings and keep a single source
+   * of truth for the motion language. */
+  .motion-premium {
+    transition:
+      transform var(--duration-fast) var(--ease-spring),
+      box-shadow var(--duration-fast) var(--ease-standard),
+      background-color var(--duration-fast) var(--ease-standard),
+      border-color var(--duration-fast) var(--ease-standard),
+      color var(--duration-fast) var(--ease-standard);
   }
-  .arena .sport-accent,
-  .sport-accent.arena-active {
-    /* Active only inside the Arena theme. */
-    color: hsl(var(--accent-foreground));
-    border-color: transparent;
+  .motion-premium:hover:not(:disabled):not([data-disabled]) {
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
+  }
+  .motion-premium:active:not(:disabled):not([data-disabled]) {
+    transform: translateY(0) scale(0.985);
+    transition-duration: var(--duration-instant);
+  }
+  .motion-premium:focus-visible {
+    box-shadow: 0 0 0 2px hsl(var(--background)), 0 0 0 4px hsl(var(--ring));
+    outline: none;
   }
 
-  .sport-cricket {
-    background: hsl(var(--sport-cricket));
-    color: hsl(var(--primary-foreground));
+  /* Subtle press for non-floating elements (nav items, chips). */
+  .motion-press {
+    transition:
+      background-color var(--duration-fast) var(--ease-standard),
+      color var(--duration-fast) var(--ease-standard),
+      border-color var(--duration-fast) var(--ease-standard),
+      transform var(--duration-fast) var(--ease-spring),
+      box-shadow var(--duration-fast) var(--ease-standard);
   }
-  .sport-football {
-    background: hsl(var(--sport-football));
-    color: hsl(var(--primary-foreground));
+  .motion-press:hover:not(:disabled):not([data-disabled]) {
+    transform: translateY(-1px);
   }
-  .sport-tennis {
-    background: hsl(var(--sport-tennis));
-    color: hsl(var(--primary-foreground));
-  }
-  .sport-swimming {
-    background: hsl(var(--sport-swimming));
-    color: hsl(var(--primary-foreground));
+  .motion-press:active:not(:disabled):not([data-disabled]) {
+    transform: translateY(0) scale(0.985);
+    transition-duration: var(--duration-instant);
   }
 }
