@@ -1,5 +1,7 @@
 import type { Metadata, Viewport } from 'next';
-import { Inter, Geist } from 'next/font/google';
+import { Inter } from 'next/font/google';
+import { GeistSans } from 'geist/font/sans';
+import { GeistMono } from 'geist/font/mono';
 import type { ReactNode } from 'react';
 import { siteConfig } from '@/config/site';
 import { ThemeProvider } from '@/components/providers/theme-provider';
@@ -11,6 +13,7 @@ import { AnalyticsProvider } from '@/components/providers/analytics-provider';
 import { ConsentBanner } from '@/components/providers/consent-banner';
 import { WebVitalsReporter } from '@/lib/monitoring/web-vitals';
 import { Toaster } from '@/components/ui/toaster';
+import { MotionConfigProvider } from '@/components/motion/motion-config';
 import './globals.css';
 
 const inter = Inter({
@@ -19,11 +22,8 @@ const inter = Inter({
   display: 'swap',
 });
 
-const geist = Geist({
-  subsets: ['latin'],
-  variable: '--font-display',
-  display: 'swap',
-});
+const geistDisplay = GeistSans;
+const geistMono = GeistMono;
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteConfig.url),
@@ -63,22 +63,24 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en" className="dark" suppressHydrationWarning>
-      <body className={`${inter.variable} ${geist.variable} font-sans`}>
+      <body className={`${inter.variable} ${geistDisplay.variable} ${geistMono.variable} font-sans`}>
         <ThemeProvider>
-          <AuthProvider>
-            <LocationProvider>
-              <ShortlistProvider>
-                <CompareProvider>
-                  <AnalyticsProvider>
-                    {children}
-                    <ConsentBanner />
-                    <Toaster />
-                    <WebVitalsReporter />
-                  </AnalyticsProvider>
-                </CompareProvider>
-              </ShortlistProvider>
-            </LocationProvider>
-          </AuthProvider>
+          <MotionConfigProvider>
+            <AuthProvider>
+              <LocationProvider>
+                <ShortlistProvider>
+                  <CompareProvider>
+                    <AnalyticsProvider>
+                      {children}
+                      <ConsentBanner />
+                      <Toaster />
+                      <WebVitalsReporter />
+                    </AnalyticsProvider>
+                  </CompareProvider>
+                </ShortlistProvider>
+              </LocationProvider>
+            </AuthProvider>
+          </MotionConfigProvider>
         </ThemeProvider>
       </body>
     </html>

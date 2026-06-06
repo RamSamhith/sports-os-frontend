@@ -1,7 +1,8 @@
 import Link from 'next/link';
 import { Container } from '@/components/layout/container';
 import { Separator } from '@/components/ui/separator';
-import { footerNav, siteConfig } from '@/config/nav';
+import { footerNav } from '@/config/nav';
+import { siteConfig } from '@/config/site';
 
 export function Footer() {
   return (

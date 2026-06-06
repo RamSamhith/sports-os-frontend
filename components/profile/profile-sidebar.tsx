@@ -14,13 +14,13 @@ const items = [
   { href: '/profile/settings', label: 'Settings' },
 ];
 
-export function ProfileSidebar({ children }: { children: Array<{ id: string; name: string }> }) {
+export function ProfileSidebar({ kids }: { kids: Array<{ id: string; name: string }> }) {
   const pathname = usePathname();
   return (
     <aside className="flex flex-col gap-4">
       <div className="border-border/60 bg-card/40 rounded-xl border p-3">
         <p className="text-muted-foreground mb-2 text-xs font-medium tracking-wide uppercase">Active child</p>
-        <ChildSwitcher children={children} />
+        <ChildSwitcher kids={kids} />
       </div>
       <nav aria-label="Profile" className="border-border/60 bg-card/40 rounded-xl border p-2">
         <ul className="flex flex-col">

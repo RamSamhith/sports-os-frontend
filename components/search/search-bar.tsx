@@ -5,21 +5,22 @@ import { Search } from 'lucide-react';
 import { cn } from '@/lib/utils/cn';
 import { Input } from '@/components/ui/input';
 
-export interface SearchBarProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange'> {
+export interface SearchBarProps
+  extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'onSubmit'> {
   value: string;
   onValueChange: (value: string) => void;
-  onSubmit?: (value: string) => void;
+  onSearch?: (value: string) => void;
   placeholder?: string;
   className?: string;
 }
 
-export function SearchBar({ value, onValueChange, onSubmit, placeholder, className, ...props }: SearchBarProps) {
+export function SearchBar({ value, onValueChange, onSearch, placeholder, className, ...props }: SearchBarProps) {
   return (
     <form
       role="search"
       onSubmit={(e) => {
         e.preventDefault();
-        onSubmit?.(value);
+        onSearch?.(value);
       }}
       className={cn('relative', className)}
     >

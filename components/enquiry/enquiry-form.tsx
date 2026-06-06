@@ -1,14 +1,43 @@
 'use client';
 
 import * as React from 'react';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { enquiryFormSchema, type EnquiryFormValues } from '@/lib/utils/validators';
+import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { toast } from 'sonner';
+
+type FieldErrors = Partial<Record<keyof EnquiryFormValues, string>>;
+
+interface EnquiryFormValues {
+  parentName: string;
+  parentEmail: string;
+  parentPhone: string;
+  sport: string;
+  childName?: string;
+  childAge?: string;
+  message?: string;
+}
+
+const initialValues: EnquiryFormValues = {
+  parentName: '',
+  parentEmail: '',
+  parentPhone: '',
+  sport: '',
+  childName: '',
+  childAge: '',
+  message: '',
+};
+
+function validate(values: EnquiryFormValues): FieldErrors {
+  const errors: FieldErrors = {};
+  if (values.parentName.trim().length < 2) errors.parentName = 'Please enter your name';
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(values.parentEmail)) errors.parentEmail = 'Enter a valid email';
+  if (values.parentPhone.replace(/\D/g, '').length < 10) errors.parentPhone = 'Enter a valid phone';
+  if (values.sport.trim().length === 0) errors.sport = 'Required';
+  if (values.childAge && Number.isNaN(Number(values.childAge))) errors.childAge = 'Must be a number';
+  return errors;
+}
 
 export function EnquiryForm({
   targetType,
@@ -19,48 +48,75 @@ export function EnquiryForm({
   targetId: string;
   defaultSport?: string;
 }) {
-  const form = useForm<EnquiryFormValues>({
-    resolver: zodResolver(enquiryFormSchema),
-    defaultValues: {
-      targetType,
-      targetId,
-      intent: 'contact',
-      parentName: '',
-      parentEmail: '',
-      parentPhone: '',
-      sport: defaultSport ?? '',
-    },
+  const [values, setValues] = React.useState<EnquiryFormValues>({
+    ...initialValues,
+    sport: defaultSport ?? '',
   });
+  const [errors, setErrors] = React.useState<FieldErrors>({});
+  // targetType / targetId are present for callers that need them; we keep them
+  // in the closure so future submit handlers can include them.
+  void targetType;
+  void targetId;
 
-  const onSubmit = form.handleSubmit(async (values) => {
+  const set = <K extends keyof EnquiryFormValues>(key: K, value: EnquiryFormValues[K]) => {
+    setValues((v) => ({ ...v, [key]: value }));
+  };
+
+  const onSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const nextErrors = validate(values);
+    setErrors(nextErrors);
+    if (Object.keys(nextErrors).length > 0) return;
     toast.success('Enquiry submitted');
-    form.reset();
-  });
+    setValues({ ...initialValues, sport: defaultSport ?? '' });
+  };
 
   return (
-    <form onSubmit={onSubmit} className="flex flex-col gap-4">
+    <form onSubmit={onSubmit} className="flex flex-col gap-4" noValidate>
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-        <Field label="Parent name" error={form.formState.errors.parentName?.message}>
-          <Input {...form.register('parentName')} placeholder="Your name" />
+        <Field label="Parent name" error={errors.parentName}>
+          <Input value={values.parentName} onChange={(e) => set('parentName', e.target.value)} placeholder="Your name" />
         </Field>
-        <Field label="Email" error={form.formState.errors.parentEmail?.message}>
-          <Input type="email" {...form.register('parentEmail')} placeholder="you@example.com" />
+        <Field label="Email" error={errors.parentEmail}>
+          <Input
+            type="email"
+            value={values.parentEmail}
+            onChange={(e) => set('parentEmail', e.target.value)}
+            placeholder="you@example.com"
+          />
         </Field>
-        <Field label="Phone" error={form.formState.errors.parentPhone?.message}>
-          <Input type="tel" {...form.register('parentPhone')} placeholder="+91…" />
+        <Field label="Phone" error={errors.parentPhone}>
+          <Input
+            type="tel"
+            value={values.parentPhone}
+            onChange={(e) => set('parentPhone', e.target.value)}
+            placeholder="+91…"
+          />
         </Field>
-        <Field label="Sport" error={form.formState.errors.sport?.message}>
-          <Input {...form.register('sport')} placeholder="Cricket" />
+        <Field label="Sport" error={errors.sport}>
+          <Input value={values.sport} onChange={(e) => set('sport', e.target.value)} placeholder="Cricket" />
         </Field>
         <Field label="Child name (optional)">
-          <Input {...form.register('childName')} placeholder="Optional" />
+          <Input value={values.childName ?? ''} onChange={(e) => set('childName', e.target.value)} placeholder="Optional" />
         </Field>
-        <Field label="Child age (optional)">
-          <Input type="number" min={3} max={25} {...form.register('childAge')} placeholder="Optional" />
+        <Field label="Child age (optional)" error={errors.childAge}>
+          <Input
+            type="number"
+            min={3}
+            max={25}
+            value={values.childAge ?? ''}
+            onChange={(e) => set('childAge', e.target.value)}
+            placeholder="Optional"
+          />
         </Field>
       </div>
       <Field label="Message (optional)">
-        <Textarea rows={4} {...form.register('message')} placeholder="Share anything that helps us help you." />
+        <Textarea
+          rows={4}
+          value={values.message ?? ''}
+          onChange={(e) => set('message', e.target.value)}
+          placeholder="Share anything that helps us help you."
+        />
       </Field>
       <div className="flex justify-end gap-2">
         <Button type="submit">Submit enquiry</Button>

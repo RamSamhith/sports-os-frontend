@@ -1,6 +1,6 @@
 import { siteConfig } from '@/config/site';
 
-type JsonLd = Record<string, unknown>;
+export type JsonLd = Record<string, unknown>;
 
 export function organizationJsonLd(): JsonLd {
   return {

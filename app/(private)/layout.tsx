@@ -14,7 +14,7 @@ export default function PrivateLayout({ children }: { children: ReactNode }) {
     <>
       <Navbar />
       <Container className="grid grid-cols-1 gap-6 py-10 md:grid-cols-[240px_1fr]">
-        <ProfileSidebar children={sampleChildren} />
+        <ProfileSidebar kids={sampleChildren} />
         <main className="min-w-0">{children}</main>
       </Container>
       <Footer />

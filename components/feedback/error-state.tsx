@@ -7,12 +7,14 @@ export interface ErrorStateProps extends React.HTMLAttributes<HTMLDivElement> {
   title?: string;
   description?: string;
   onRetry?: () => void;
+  icon?: React.ReactNode;
 }
 
 export function ErrorState({
   title = 'Something went wrong',
   description = 'We hit an unexpected error. Please try again.',
   onRetry,
+  icon,
   className,
   ...props
 }: ErrorStateProps) {
@@ -26,7 +28,7 @@ export function ErrorState({
       {...props}
     >
       <div className="bg-destructive/10 grid h-12 w-12 place-items-center rounded-full">
-        <AlertTriangle className="text-destructive h-5 w-5" />
+        {icon ?? <AlertTriangle className="text-destructive h-5 w-5" />}
       </div>
       <h3 className="text-base font-semibold tracking-tight">{title}</h3>
       <p className="text-muted-foreground text-sm text-pretty">{description}</p>

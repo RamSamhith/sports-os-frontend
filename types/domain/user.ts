@@ -1,3 +1,5 @@
+import type { LocationSummary, Radius } from './location';
+
 export type UserRole = 'athlete' | 'parent' | 'coach' | 'academy_rep' | 'admin';
 
 export type AdminRole = 'super_admin' | 'ops_admin' | 'lead_admin' | 'analyst' | 'support';

@@ -1,3 +1,5 @@
+'use client';
+
 import { SearchBar } from '@/components/search/search-bar';
 import { RecentSearches } from '@/components/search/recent-searches';
 import { Section } from '@/components/layout/section';
