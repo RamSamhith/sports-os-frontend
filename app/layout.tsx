@@ -59,8 +59,8 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = {
   themeColor: [
-    { media: '(prefers-color-scheme: dark)', color: '#021024' },
-    { media: '(prefers-color-scheme: light)', color: '#0A0A0A' },
+    { media: '(prefers-color-scheme: dark)', color: '#070B14' },
+    { media: '(prefers-color-scheme: light)', color: '#F7F8FA' },
   ],
   width: 'device-width',
   initialScale: 1,
@@ -86,7 +86,7 @@ const themeBootstrap = `
     }
     if (resolved === 'system') {
       var prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-      resolved = prefersDark ? 'midnight-ice' : 'monochrome-mist';
+      resolved = prefersDark ? 'midnight-ice' : 'alpine-light';
     }
     var root = document.documentElement;
     var classes = root.classList;

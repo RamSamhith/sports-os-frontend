@@ -1,22 +1,15 @@
 'use client';
 
 import * as React from 'react';
-import { Snowflake, Crown, Flame, Image as ImageIcon, Check } from 'lucide-react';
+import { Snowflake, Zap, Flame, Sun, Check } from 'lucide-react';
 import { cn } from '@/lib/utils/cn';
 import { themeMeta, type ThemeName } from '@/config/theme';
 
 const iconFor: Record<ThemeName, React.ComponentType<{ className?: string }>> = {
   'midnight-ice': Snowflake,
-  'emerald-gold': Crown,
+  'arctic-steel': Zap,
   'ember-orange': Flame,
-  'monochrome-mist': ImageIcon,
-};
-
-const atmosphereClassFor: Record<ThemeName, string> = {
-  'midnight-ice': 'atmosphere',
-  'emerald-gold': 'atmosphere',
-  'ember-orange': 'atmosphere',
-  'monochrome-mist': 'atmosphere',
+  'alpine-light': Sun,
 };
 
 /**
@@ -54,15 +47,16 @@ export function ThemePreviewCard({
       {/* Live preview — applies the theme class on a child element so it
           doesn't affect the rest of the page. Each preview also gets a
           mini-atmosphere with the same motion personality. */}
-      <div className={cn('relative h-40 w-full overflow-hidden', id)}>
-        <div className={atmosphereClassFor[id]}>
-          <div className="atmosphere__layer atmosphere__layer--1" />
-          <div className="atmosphere__layer atmosphere__layer--2" />
-          <div className="atmosphere__layer atmosphere__layer--3" />
+      <div className={cn('relative h-44 w-full overflow-hidden', id)}>
+        <div className="atmosphere" aria-hidden>
+          <div className="atmosphere__mesh" />
+          <div className="atmosphere__aurora" />
+          <div className="atmosphere__parallax" />
+          <div className="atmosphere__veil" />
         </div>
-        <div className="bg-background text-foreground relative flex h-full w-full flex-col gap-2 p-4">
+        <div className="bg-background/30 text-foreground relative flex h-full w-full flex-col gap-2 p-4 backdrop-blur-sm">
           <div className="flex items-center justify-between">
-            <div className="bg-card/70 text-card-foreground backdrop-blur-sm flex items-center gap-1.5 rounded-md border px-2 py-1 text-[10px] font-medium shadow-[var(--shadow-xs)]">
+            <div className="bg-card/70 text-card-foreground backdrop-blur-md flex items-center gap-1.5 rounded-md border px-2 py-1 text-[10px] font-medium shadow-[var(--shadow-xs)]">
               <Icon className="h-3 w-3" />
               {meta.label}
             </div>
@@ -70,7 +64,7 @@ export function ThemePreviewCard({
               Primary
             </div>
           </div>
-          <div className="bg-card/70 text-card-foreground backdrop-blur-sm flex-1 rounded-md border p-2 shadow-[var(--shadow-xs)]">
+          <div className="bg-card/70 text-card-foreground backdrop-blur-md flex-1 rounded-md border p-2 shadow-[var(--shadow-xs)]">
             <div className="text-foreground text-[11px] font-semibold">Card title</div>
             <div className="text-muted-foreground mt-0.5 text-[10px]">Subtitle in muted</div>
             <div className="mt-2 flex gap-1.5">
@@ -80,7 +74,7 @@ export function ThemePreviewCard({
               <span className="bg-accent text-accent-foreground rounded px-1.5 py-0.5 text-[9px]">
                 Accent
               </span>
-              {id === 'emerald-gold' || id === 'ember-orange' ? (
+              {id === 'ember-orange' || id === 'arctic-steel' ? (
                 <>
                   <span className="sport-cricket rounded px-1.5 py-0.5 text-[9px]">Cricket</span>
                   <span className="sport-football rounded px-1.5 py-0.5 text-[9px]">Football</span>

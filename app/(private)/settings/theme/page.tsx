@@ -18,7 +18,7 @@ export default function ThemeSettingsPage() {
         <p className="text-muted-foreground text-sm text-pretty">
           Four premium products. Each one is a different visual identity — not just a
           colour swap. Tap a card to apply, or use the single button in the navbar to cycle
-          Midnight Ice → Emerald Gold → Ember Orange → Monochrome Mist.
+          Midnight Ice → Arctic Steel → Ember Orange → Alpine Light.
         </p>
       </header>
 
@@ -76,8 +76,8 @@ export default function ThemeSettingsPage() {
             <CardTitle>Accessibility</CardTitle>
             <CardDescription>
               SportsOS follows <code className="font-mono">prefers-reduced-motion</code> automatically.
-              The <span className="text-foreground font-medium">Monochrome Mist</span> theme is tuned
-              for long reading sessions and reduced visual variation.
+              The <span className="text-foreground font-medium">Alpine Light</span> theme is tuned
+              for long reading sessions with maximum readability.
             </CardDescription>
           </CardHeader>
           <CardContent>

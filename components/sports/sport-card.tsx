@@ -18,7 +18,7 @@ export function SportCard({ sport }: { sport: Sport }) {
   return (
     <Link
       href={`/sports/${slug}`}
-      className="border-border/60 bg-card/40 hover:border-primary/50 hover:bg-accent/10 hover:shadow-[var(--shadow-md)] group relative flex flex-col gap-3 overflow-hidden rounded-xl border p-4 transition-all duration-[var(--duration-fast)] ease-[var(--ease-standard)]"
+      className="border-border/60 bg-card/40 hover:border-foreground/30 motion-card group relative flex flex-col gap-3 overflow-hidden rounded-xl border p-4 backdrop-blur-md"
     >
       <div className="flex items-center gap-3">
         <span className="bg-muted/40 relative h-9 w-9 shrink-0 overflow-hidden rounded-md">

@@ -19,7 +19,7 @@ export function CoachCardPlaceholder({ coach }: { coach: Coach }) {
     .join('');
 
   return (
-    <Card className="hover:shadow-[var(--shadow-md)] flex flex-wrap items-center gap-3 p-4 transition-all duration-[var(--duration-fast)] ease-[var(--ease-standard)] sm:flex-nowrap">
+    <Card className="motion-card flex flex-wrap items-center gap-3 p-4 sm:flex-nowrap">
       <span
         className="bg-muted/40 relative h-12 w-12 shrink-0 overflow-hidden rounded-full"
         aria-hidden

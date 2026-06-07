@@ -1,10 +1,15 @@
 /**
  * SportsOS Theme System — single source of truth.
  *
- * Four themes only. Each one is a distinct premium product, not a
- * colour swap. The UI exposes a single cycle button — no dropdown.
+ * Exactly four themes, no more. Each one is a *different product*,
+ * not a colour swap. The UI exposes a single cycle button.
  */
-export const themeNames = ['midnight-ice', 'emerald-gold', 'ember-orange', 'monochrome-mist'] as const;
+export const themeNames = [
+  'midnight-ice',
+  'arctic-steel',
+  'ember-orange',
+  'alpine-light',
+] as const;
 
 export type ThemeName = (typeof themeNames)[number];
 
@@ -12,9 +17,8 @@ export interface ThemeMeta {
   id: ThemeName;
   label: string;
   description: string;
-  icon: 'Snowflake' | 'Crown' | 'Flame' | 'Image';
+  icon: 'Snowflake' | 'Zap' | 'Flame' | 'Sun';
   accessibility: boolean;
-  /** Quick tags for the settings card. */
   tags: ReadonlyArray<string>;
 }
 
@@ -22,34 +26,34 @@ export const themeMeta: Record<ThemeName, ThemeMeta> = {
   'midnight-ice': {
     id: 'midnight-ice',
     label: 'Midnight Ice',
-    description: 'Premium sports analytics. Cold, technical, elegant.',
+    description: 'Premium flagship. Luxury, professional, modern, elite.',
     icon: 'Snowflake',
     accessibility: false,
-    tags: ['Tech', 'Cool', 'Default'],
+    tags: ['Default', 'Luxury'],
   },
-  'emerald-gold': {
-    id: 'emerald-gold',
-    label: 'Emerald Gold',
-    description: 'Elite sports academy club. Luxurious, prestigious, calm.',
-    icon: 'Crown',
+  'arctic-steel': {
+    id: 'arctic-steel',
+    label: 'Arctic Steel',
+    description: 'Performance mode. Athletic, technology, speed, competition.',
+    icon: 'Zap',
     accessibility: false,
-    tags: ['Luxury', 'Club'],
+    tags: ['Athletic', 'Speed'],
   },
   'ember-orange': {
     id: 'ember-orange',
     label: 'Ember Orange',
-    description: 'High-performance competition. Energetic, bold, powerful.',
+    description: 'Energy mode. Sports, action, competition, intensity.',
     icon: 'Flame',
     accessibility: false,
     tags: ['Energy', 'Sport'],
   },
-  'monochrome-mist': {
-    id: 'monochrome-mist',
-    label: 'Monochrome Mist',
-    description: 'Editorial sports magazine. Minimal, elegant, timeless.',
-    icon: 'Image',
+  'alpine-light': {
+    id: 'alpine-light',
+    label: 'Alpine Light',
+    description: 'Premium daylight. Apple-clean, Linear-crisp, Stripe-precise.',
+    icon: 'Sun',
     accessibility: true,
-    tags: ['Editorial', 'A11y'],
+    tags: ['Light', 'A11y'],
   },
 };
 

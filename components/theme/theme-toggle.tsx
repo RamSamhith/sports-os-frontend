@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Snowflake, Crown, Flame, Image as ImageIcon, Sparkles } from 'lucide-react';
+import { Snowflake, Zap, Flame, Sun, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { themeMeta, nextTheme, type ThemeName } from '@/config/theme';
 import { useReducedMotion } from '@/lib/hooks/use-reduced-motion';
@@ -10,17 +10,16 @@ import { useThemeSafe } from '@/lib/hooks/use-theme-safe';
 
 const iconFor: Record<ThemeName, React.ComponentType<{ className?: string }>> = {
   'midnight-ice': Snowflake,
-  'emerald-gold': Crown,
+  'arctic-steel': Zap,
   'ember-orange': Flame,
-  'monochrome-mist': ImageIcon,
+  'alpine-light': Sun,
 };
 
 /**
  * Single-cycle theme button.
  *
- * Each click advances: Midnight Ice → Emerald Gold → Ember Orange → Monochrome Mist → Midnight Ice.
- * Renders the icon for the *currently active* theme. The icon swap is
- * animated via framer-motion; reduced motion disables the animation.
+ * Cycle: Midnight Ice → Arctic Steel → Ember Orange → Alpine Light → Midnight Ice.
+ * The icon swap is animated via framer-motion; reduced motion disables it.
  */
 export function ThemeCycleButton() {
   const { mounted, activeTheme, setTheme } = useThemeSafe();

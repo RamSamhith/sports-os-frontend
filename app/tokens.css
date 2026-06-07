@@ -1,10 +1,10 @@
 /* SportsOS Design Tokens — single source of truth.
  *
- * Four premium themes, each one a *different product*, not a colour swap.
- *   - .midnight-ice    Cool tech / sports analytics
- *   - .emerald-gold    Luxury club / championship
- *   - .ember-orange    Stadium energy / competition
- *   - .monochrome-mist Editorial / photography portfolio
+ * Four premium themes, each a *different product* experience:
+ *   - .midnight-ice    Premium flagship (default). Luxury dark.
+ *   - .arctic-steel    Performance mode. Athletic blue glass.
+ *   - .ember-orange    Energy mode. Competition warmth.
+ *   - .alpine-light    Premium daylight. Apple-clean.
  *
  * Every theme defines the same set of semantic CSS variables. Components
  * reference them by name and the cascade handles the rest. Theme switches
@@ -42,18 +42,18 @@
   --font-display: 'Geist', 'Inter', ui-sans-serif, system-ui, sans-serif;
   --font-mono: 'Geist Mono', ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace;
 
-  /* Motion — premium feel, not slow */
+  /* Motion */
   --ease-standard: cubic-bezier(0.2, 0, 0, 1);
   --ease-emphasized: cubic-bezier(0.3, 0, 0, 1);
   --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
   --ease-soft: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-luxe: cubic-bezier(0.16, 1, 0.3, 1);
 
   --duration-instant: 80ms;
   --duration-fast: 180ms;
   --duration-standard: 280ms;
   --duration-slow: 420ms;
   --duration-page: 540ms;
-  --duration-atmosphere: 28s;
 
   /* Selection */
   --selection-bg: hsl(var(--primary) / 0.30);
@@ -88,240 +88,234 @@
 
 /* ---------------------------------------------------------------------------
  * THEME 1 — MIDNIGHT ICE
- * Premium sports analytics. Cold, elegant, technical.
- * Inspired by Apple, Arc Browser, luxury technology.
- * Palette: #021024 / #052659 / #5483B3 / #7DA0CA / #C1E8FF / #F7FAFC
+ * Premium flagship. Luxury, professional, modern, elite.
+ * Palette: #070B14 / #0D1422 / #121C2F / rgba(255,255,255,0.08) / #7DA0CA / #C1E8FF / #F8FAFC
  * ------------------------------------------------------------------------- */
 .midnight-ice {
-  /* Surfaces */
-  --background: 217 78% 8%;          /* #021024 */
-  --foreground: 210 33% 98%;         /* #F7FAFC */
+  --background: 222 41% 5%;           /* #070B14 */
+  --foreground: 210 30% 98%;          /* #F8FAFC */
 
-  --card: 218 80% 18%;               /* #052659 */
-  --card-foreground: 210 33% 98%;
+  --card: 222 38% 12%;                /* #121C2F */
+  --card-foreground: 210 30% 98%;
 
-  --popover: 218 80% 14%;
-  --popover-foreground: 210 33% 98%;
+  --popover: 222 35% 9%;              /* #0D1422 */
+  --popover-foreground: 210 30% 98%;
 
-  /* Primary — ice blue. */
-  --primary: 208 65% 80%;            /* #7DA0CA */
-  --primary-foreground: 217 78% 8%;
+  /* Primary — icy blue. */
+  --primary: 208 55% 76%;             /* #7DA0CA */
+  --primary-foreground: 222 41% 5%;
 
-  /* Secondary surface — lighter blue. */
-  --secondary: 211 44% 52%;          /* #5483B3 */
-  --secondary-foreground: 210 33% 98%;
+  --secondary: 208 65% 88%;           /* #C1E8FF */
+  --secondary-foreground: 222 41% 5%;
 
-  --muted: 218 50% 16%;
-  --muted-foreground: 210 28% 75%;
+  --muted: 222 28% 14%;
+  --muted-foreground: 210 22% 72%;
 
-  /* Accent — highlight ice. */
-  --accent: 207 100% 90%;            /* #C1E8FF */
-  --accent-foreground: 217 78% 8%;
+  --accent: 208 65% 88%;              /* #C1E8FF */
+  --accent-foreground: 222 41% 5%;
 
   --destructive: 0 72% 56%;
   --destructive-foreground: 0 0% 100%;
 
-  --border: 211 44% 30%;
-  --input: 211 44% 30%;
-  --ring: 208 65% 80%;
+  --border: 0 0% 100% / 0.08;         /* rgba(255,255,255,0.08) */
+  --input: 0 0% 100% / 0.10;
+  --ring: 208 55% 76%;
 
-  /* Cool shadow. */
-  --shadow-color: 217 78% 4%;
+  --shadow-color: 222 60% 2%;
 
-  /* Atmosphere — slow aurora over deep navy. */
-  --atm-color-1: 218 80% 18%;        /* surface */
-  --atm-color-2: 211 44% 52%;        /* secondary */
-  --atm-color-3: 207 100% 80%;       /* highlight ice */
+  /* Atmosphere — slow luxury drift. */
+  --atm-color-1: 222 38% 12%;
+  --atm-color-2: 208 55% 35%;
+  --atm-color-3: 208 65% 78%;
   --atm-blend: screen;
-  --atm-opacity: 0.55;
+  --atm-opacity: 0.45;
+  --atm-speed: 32s;
 
-  /* Theme-specific surface highlights — a hairline shimmer. */
   --hairline: 208 60% 60%;
 
-  /* Success / warning / info */
-  --success: 158 60% 50%;
+  --success: 152 60% 50%;
   --warning: 35 92% 60%;
-  --info: 208 65% 70%;
+  --info: 208 55% 76%;
   --rating: 35 92% 60%;
 
   --radius: 0.875rem;
 }
 
 /* ---------------------------------------------------------------------------
- * THEME 2 — EMERALD GOLD
- * Elite sports academy club. Luxurious, prestigious, calm.
- * Inspired by luxury golf clubs, premium memberships.
- * Palette: #051F20 / #0B2B26 / #163832 / #8EB69B / #DAF1DE / #F9F6EE
- * Gold: #D4AF37
+ * THEME 2 — ARCTIC STEEL
+ * Performance mode. Athletic, technology, speed, competition.
+ * Distinct from Midnight Ice: more vibrant electric blue, steel glass,
+ * stronger glow. Cooler, more "instrument" feel.
+ * Palette: #021024 / #052659 / #5483B3 / #7DA0CA / #C1E8FF
  * ------------------------------------------------------------------------- */
-.emerald-gold {
-  --background: 176 67% 7%;          /* #051F20 */
-  --foreground: 50 50% 96%;          /* #F9F6EE */
+.arctic-steel {
+  --background: 217 78% 8%;           /* #021024 */
+  --foreground: 207 100% 90%;         /* #C1E8FF */
 
-  --card: 170 50% 11%;               /* #0B2B26 */
-  --card-foreground: 50 50% 96%;
+  --card: 218 80% 18%;                /* #052659 */
+  --card-foreground: 207 100% 90%;
 
-  --popover: 174 47% 14%;
-  --popover-foreground: 50 50% 96%;
+  --popover: 218 80% 14%;
+  --popover-foreground: 207 100% 90%;
 
-  /* Primary — championship gold. */
-  --primary: 46 65% 51%;             /* #D4AF37 */
-  --primary-foreground: 176 67% 7%;
+  /* Primary — electric ice blue (more saturated than Midnight). */
+  --primary: 199 90% 65%;             /* brighter ice */
+  --primary-foreground: 217 78% 8%;
 
-  /* Secondary — soft mint accent. */
-  --secondary: 142 26% 60%;         /* #8EB69B */
-  --secondary-foreground: 176 67% 7%;
+  --secondary: 211 44% 52%;           /* #5483B3 */
+  --secondary-foreground: 207 100% 90%;
 
-  --muted: 173 38% 18%;
-  --muted-foreground: 50 30% 80%;
+  --muted: 218 60% 14%;
+  --muted-foreground: 211 44% 70%;
 
-  --accent: 132 41% 89%;             /* #DAF1DE */
-  --accent-foreground: 176 67% 7%;
+  --accent: 207 100% 90%;             /* #C1E8FF */
+  --accent-foreground: 217 78% 8%;
 
-  --destructive: 0 72% 56%;
-  --destructive-foreground: 50 50% 96%;
+  --destructive: 0 80% 60%;
+  --destructive-foreground: 0 0% 100%;
 
-  --border: 173 38% 18%;             /* #163832 */
-  --input: 173 38% 18%;
-  --ring: 46 65% 51%;
+  --border: 199 70% 60% / 0.20;       /* electric blue hairline */
+  --input: 199 70% 60% / 0.20;
+  --ring: 199 90% 65%;
 
-  --shadow-color: 176 67% 3%;
+  --shadow-color: 217 90% 3%;
 
-  /* Atmosphere — emerald + gold gradient flow. */
-  --atm-color-1: 173 38% 14%;
-  --atm-color-2: 46 60% 45%;
-  --atm-color-3: 142 26% 60%;
+  /* Atmosphere — fast, electric, athletic. */
+  --atm-color-1: 199 90% 35%;
+  --atm-color-2: 211 44% 52%;
+  --atm-color-3: 207 100% 80%;
   --atm-blend: screen;
-  --atm-opacity: 0.50;
+  --atm-opacity: 0.60;
+  --atm-speed: 20s;
 
-  --hairline: 46 65% 51%;
+  --hairline: 199 90% 65%;
 
-  --success: 142 50% 50%;
-  --warning: 46 65% 51%;
-  --info: 200 50% 55%;
-  --rating: 46 65% 51%;
+  --success: 158 70% 55%;
+  --warning: 35 95% 60%;
+  --info: 199 90% 65%;
+  --rating: 35 95% 60%;
 
   --radius: 0.75rem;
 }
 
 /* ---------------------------------------------------------------------------
  * THEME 3 — EMBER ORANGE
- * High-performance competition. Energetic, bold, powerful.
- * Inspired by stadium lighting, elite athletes, competitive environments.
- * Palette: #3B2621 / #6E473B / #A78D78 / #E1D4C2 / #F7F2EA / #FFF8F2
- * Orange: #E57A2E
+ * Energy mode. Sports, action, competition, intensity.
+ * Palette: #3B2621 / #E2762F / #F0E4CF / #E7B596
+ * Warm glows, orange highlights, energetic buttons.
  * ------------------------------------------------------------------------- */
 .ember-orange {
-  --background: 17 31% 18%;          /* #3B2621 */
-  --foreground: 30 100% 97%;         /* #FFF8F2 */
+  --background: 17 31% 18%;           /* #3B2621 */
+  --foreground: 32 50% 89%;           /* #F0E4CF */
 
-  --card: 21 32% 33%;                /* #6E473B */
-  --card-foreground: 30 100% 97%;
+  --card: 18 32% 24%;
+  --card-foreground: 32 50% 89%;
 
-  --popover: 22 33% 22%;
-  --popover-foreground: 30 100% 97%;
+  --popover: 17 31% 16%;
+  --popover-foreground: 32 50% 89%;
 
   /* Primary — competition orange. */
-  --primary: 23 80% 54%;             /* #E57A2E */
-  --primary-foreground: 30 100% 97%;
+  --primary: 22 76% 53%;              /* #E2762F */
+  --primary-foreground: 17 31% 18%;
 
-  /* Secondary — warm taupe. */
-  --secondary: 27 22% 57%;           /* #A78D78 */
-  --secondary-foreground: 30 100% 97%;
+  --secondary: 19 50% 71%;            /* #E7B596 */
+  --secondary-foreground: 17 31% 18%;
 
-  --muted: 21 32% 26%;
-  --muted-foreground: 30 38% 84%;
+  --muted: 17 28% 22%;
+  --muted-foreground: 32 35% 78%;
 
-  --accent: 33 35% 85%;              /* #E1D4C2 */
+  --accent: 32 50% 89%;               /* #F0E4CF */
   --accent-foreground: 17 31% 18%;
 
   --destructive: 0 75% 55%;
-  --destructive-foreground: 30 100% 97%;
+  --destructive-foreground: 32 50% 89%;
 
-  --border: 27 22% 38%;
-  --input: 27 22% 38%;
-  --ring: 23 80% 54%;
+  --border: 22 70% 60% / 0.25;        /* warm hairline */
+  --input: 22 70% 60% / 0.25;
+  --ring: 22 76% 53%;
 
   --shadow-color: 17 60% 4%;
 
-  /* Atmosphere — stadium glow. */
-  --atm-color-1: 23 80% 40%;
-  --atm-color-2: 17 31% 18%;
-  --atm-color-3: 33 35% 75%;
+  /* Atmosphere — warm stadium glow. */
+  --atm-color-1: 22 76% 40%;
+  --atm-color-2: 19 50% 65%;
+  --atm-color-3: 32 50% 80%;
   --atm-blend: screen;
-  --atm-opacity: 0.55;
+  --atm-opacity: 0.50;
+  --atm-speed: 18s;
 
-  --hairline: 23 80% 54%;
+  --hairline: 22 76% 53%;
 
   --success: 142 50% 45%;
   --warning: 35 95% 55%;
-  --info: 23 80% 54%;
+  --info: 22 76% 53%;
   --rating: 35 95% 55%;
 
   --radius: 0.625rem;
 }
 
 /* ---------------------------------------------------------------------------
- * THEME 4 — MONOCHROME MIST
- * Premium sports editorial magazine. Minimal, elegant, timeless.
- * Inspired by Nike campaigns, luxury publications, photography portfolios.
- * Palette: #0A0A0A / #171717 / #404040 / #A3A3A3 / #E5E5E5 / #FAFAFA
+ * THEME 4 — ALPINE LIGHT
+ * Premium light mode. Apple-clean, Linear-crisp, Stripe-precise.
+ * Palette: #F7F8FA / #FFFFFF / #FFFFFF / #E5EAF1 / #0A4174 / #7BBDE8 / #0F172A
+ * NO dark cards. NO dark backgrounds. Genuinely bright and premium.
  * ------------------------------------------------------------------------- */
-.monochrome-mist {
-  --background: 0 0% 4%;             /* #0A0A0A */
-  --foreground: 0 0% 98%;            /* #FAFAFA */
+.alpine-light {
+  --background: 220 25% 98%;          /* #F7F8FA */
+  --foreground: 222 47% 12%;          /* #0F172A */
 
-  --card: 0 0% 9%;                   /* #171717 */
-  --card-foreground: 0 0% 98%;
+  --card: 0 0% 100%;                  /* #FFFFFF */
+  --card-foreground: 222 47% 12%;
 
-  --popover: 0 0% 12%;
-  --popover-foreground: 0 0% 98%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 222 47% 12%;
 
-  /* Primary — soft silver. */
-  --primary: 0 0% 90%;               /* #E5E5E5 */
-  --primary-foreground: 0 0% 4%;
+  /* Primary — deep navy. */
+  --primary: 212 86% 25%;             /* #0A4174 */
+  --primary-foreground: 0 0% 100%;
 
-  --secondary: 0 0% 64%;             /* #A3A3A3 */
-  --secondary-foreground: 0 0% 4%;
+  --secondary: 202 75% 69%;           /* #7BBDE8 */
+  --secondary-foreground: 222 47% 12%;
 
-  --muted: 0 0% 14%;
-  --muted-foreground: 0 0% 64%;
+  --muted: 220 20% 96%;
+  --muted-foreground: 222 16% 38%;
 
-  --accent: 0 0% 25%;                /* #404040 */
-  --accent-foreground: 0 0% 98%;
+  --accent: 202 75% 94%;
+  --accent-foreground: 212 86% 25%;
 
-  --destructive: 0 0% 60%;
-  --destructive-foreground: 0 0% 4%;
+  --destructive: 0 72% 46%;
+  --destructive-foreground: 0 0% 100%;
 
-  --border: 0 0% 18%;
-  --input: 0 0% 18%;
-  --ring: 0 0% 90%;
+  --border: 218 30% 91%;              /* #E5EAF1 */
+  --input: 218 30% 91%;
+  --ring: 212 86% 25%;
 
-  --shadow-color: 0 0% 0%;
+  --shadow-color: 222 30% 18%;
 
-  /* Atmosphere — very slow fog drift. */
-  --atm-color-1: 0 0% 20%;
-  --atm-color-2: 0 0% 9%;
-  --atm-color-3: 0 0% 40%;
-  --atm-blend: screen;
-  --atm-opacity: 0.30;
+  /* Atmosphere — bright subtle drift, screen blend + white veil. */
+  --atm-color-1: 202 75% 80%;
+  --atm-color-2: 212 86% 70%;
+  --atm-color-3: 220 25% 96%;
+  --atm-blend: multiply;
+  --atm-opacity: 0.18;
+  --atm-speed: 38s;
 
-  --hairline: 0 0% 64%;
+  --hairline: 218 30% 86%;
 
-  --success: 0 0% 70%;
-  --warning: 0 0% 80%;
-  --info: 0 0% 80%;
-  --rating: 0 0% 90%;
+  --success: 152 60% 32%;
+  --warning: 32 80% 42%;
+  --info: 212 86% 40%;
+  --rating: 32 80% 42%;
 
-  --radius: 0.5rem;
+  --radius: 0.625rem;
 }
 
 /* Shared shadows (depend on each theme's --shadow-color). */
 :root,
 .midnight-ice,
-.emerald-gold,
+.arctic-steel,
 .ember-orange,
-.monochrome-mist {
+.alpine-light {
   --shadow-xs: 0 1px 2px 0 hsl(var(--shadow-color) / 0.10);
   --shadow-sm: 0 1px 3px 0 hsl(var(--shadow-color) / 0.14), 0 1px 2px -1px hsl(var(--shadow-color) / 0.12);
   --shadow-md: 0 6px 12px -2px hsl(var(--shadow-color) / 0.18), 0 3px 6px -2px hsl(var(--shadow-color) / 0.14);

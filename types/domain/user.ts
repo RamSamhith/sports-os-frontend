@@ -26,7 +26,7 @@ export interface User {
   authProvider?: 'credentials' | 'google' | 'phone';
   lastLoginAt?: string;
   preferences?: UserPreferences;
-  themePreference?: 'midnight-ice' | 'emerald-gold' | 'ember-orange' | 'monochrome-mist' | 'system';
+  themePreference?: 'midnight-ice' | 'arctic-steel' | 'ember-orange' | 'alpine-light' | 'system';
   consent?: ConsentFlags;
   createdAt: string;
   updatedAt: string;

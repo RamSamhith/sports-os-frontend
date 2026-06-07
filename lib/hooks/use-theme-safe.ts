@@ -29,5 +29,6 @@ export function useThemeSafe() {
       : 'midnight-ice';
   }, [mounted, resolvedTheme, theme]);
 
+
   return { mounted, theme, resolvedTheme, setTheme, systemTheme, activeTheme };
 }
