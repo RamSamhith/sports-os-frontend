@@ -4,8 +4,6 @@ import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '@/lib/utils/cn';
 
 const buttonVariants = cva(
-  // Base — shared by every variant. The `.motion-premium` class supplies
-  // the transition + hover-lift + press-scale + focus ring in one place.
   [
     'inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background motion-premium',
     'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
@@ -14,11 +12,9 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        default: 'bg-primary text-primary-foreground shadow-[var(--shadow-sm)] hover:bg-primary/90',
-        secondary:
-          'bg-secondary text-secondary-foreground shadow-[var(--shadow-xs)] hover:bg-secondary/80',
-        outline:
-          'border border-border bg-background hover:border-foreground/40 hover:bg-accent/15 hover:text-accent-foreground',
+        default: 'btn-primary shadow-[var(--shadow-sm)]',
+        secondary: 'bg-secondary text-secondary-foreground hover:bg-secondary/80 shadow-[var(--shadow-xs)]',
+        outline: 'btn-outline',
         ghost: 'hover:bg-accent/15 hover:text-accent-foreground',
         destructive:
           'bg-destructive text-destructive-foreground shadow-[var(--shadow-sm)] hover:bg-destructive/90',

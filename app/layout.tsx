@@ -17,6 +17,7 @@ import { Toaster } from '@/components/ui/toaster';
 import { MotionConfigProvider } from '@/components/motion/motion-config';
 import { OfflineProvider } from '@/components/providers/offline-provider';
 import { CommandPaletteProvider } from '@/components/command/command-palette-provider';
+import { Atmosphere } from '@/components/theme/atmosphere';
 import './globals.css';
 
 const inter = Inter({
@@ -57,11 +58,9 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  // Browser chrome color follows the default theme. The active theme
-  // updates this via the ThemeMeta / settings UI if needed in a later phase.
   themeColor: [
-    { media: '(prefers-color-scheme: light)', color: '#ffffff' },
-    { media: '(prefers-color-scheme: dark)', color: '#0d0d0d' },
+    { media: '(prefers-color-scheme: dark)', color: '#021024' },
+    { media: '(prefers-color-scheme: light)', color: '#0A0A0A' },
   ],
   width: 'device-width',
   initialScale: 1,
@@ -87,10 +86,9 @@ const themeBootstrap = `
     }
     if (resolved === 'system') {
       var prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-      resolved = prefersDark ? 'midnight' : 'ivory';
+      resolved = prefersDark ? 'midnight-ice' : 'monochrome-mist';
     }
     var root = document.documentElement;
-    // Drop any prior theme classes, then add the resolved one.
     var classes = root.classList;
     for (var i = classes.length - 1; i >= 0; i--) {
       var c = classes[i];
@@ -98,9 +96,8 @@ const themeBootstrap = `
     }
     classes.add(resolved);
     root.setAttribute('data-theme', resolved);
-    root.style.colorScheme = resolved === 'ivory' || resolved === 'focus' ? 'light' : 'dark';
+    root.style.colorScheme = 'dark';
   } catch (e) {
-    // localStorage disabled — fall back to default theme class.
     document.documentElement.classList.add(${JSON.stringify(themeConfig.defaultTheme)});
   }
 })();
@@ -116,9 +113,10 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         />
       </head>
       <body className={`${inter.variable} ${geistDisplay.variable} ${geistMono.variable} font-sans`}>
-        {/* Per-theme atmospheric background. Single fixed layer; the
-            theme class on <html> picks which gradient stops to show. */}
-        <div className="atmosphere" aria-hidden />
+        {/* Dynamic, per-theme atmospheric background. Three layered
+            divs — each theme gives them distinct motion (ice drift,
+            gold sweep, stadium glow, mist fog). */}
+        <Atmosphere />
         <ThemeProvider>
           <OfflineProvider>
             <CommandPaletteProvider>

@@ -26,7 +26,7 @@ export function useThemeSafe() {
     const value = mounted ? (resolvedTheme ?? theme) : undefined;
     return value && (themeNames as readonly string[]).includes(value)
       ? (value as ThemeName)
-      : 'midnight';
+      : 'midnight-ice';
   }, [mounted, resolvedTheme, theme]);
 
   return { mounted, theme, resolvedTheme, setTheme, systemTheme, activeTheme };

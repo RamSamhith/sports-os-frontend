@@ -17,7 +17,7 @@ export default function GlobalError({
   }, [error]);
 
   return (
-    <html lang="en" className="midnight">
+    <html lang="en" className="midnight-ice">
       <body
         style={{
           background: '#0a0a0a',

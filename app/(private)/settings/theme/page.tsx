@@ -16,8 +16,9 @@ export default function ThemeSettingsPage() {
       <header className="flex flex-col gap-1">
         <h2 className="text-2xl font-semibold tracking-tight">Theme</h2>
         <p className="text-muted-foreground text-sm text-pretty">
-          Four premium themes. Tap a card to apply, or use the single button in the navbar to cycle
-          through Midnight → Ivory → Arena → Focus.
+          Four premium products. Each one is a different visual identity — not just a
+          colour swap. Tap a card to apply, or use the single button in the navbar to cycle
+          Midnight Ice → Emerald Gold → Ember Orange → Monochrome Mist.
         </p>
       </header>
 
@@ -47,12 +48,9 @@ export default function ThemeSettingsPage() {
             <button
               type="button"
               onClick={() => setTheme('system')}
-              className="border-border bg-card text-card-foreground hover:border-foreground/20 inline-flex items-center gap-2 rounded-md border px-3 py-2 text-sm transition-colors focus-visible:ring-ring focus-visible:ring-2 focus-visible:outline-none"
+              className="border-border bg-card text-card-foreground hover:border-foreground/20 motion-press inline-flex items-center gap-2 rounded-md border px-3 py-2 text-sm"
             >
-              <span
-                aria-hidden
-                className="bg-primary inline-block h-2.5 w-2.5 rounded-full"
-              />
+              <span aria-hidden className="bg-primary inline-block h-2.5 w-2.5 rounded-full" />
               Use system theme
             </button>
             <p className="text-muted-foreground mt-3 text-xs">
@@ -78,8 +76,8 @@ export default function ThemeSettingsPage() {
             <CardTitle>Accessibility</CardTitle>
             <CardDescription>
               SportsOS follows <code className="font-mono">prefers-reduced-motion</code> automatically.
-              The <span className="text-foreground font-medium">Focus</span> theme also increases text
-              contrast and reduces visual variation.
+              The <span className="text-foreground font-medium">Monochrome Mist</span> theme is tuned
+              for long reading sessions and reduced visual variation.
             </CardDescription>
           </CardHeader>
           <CardContent>

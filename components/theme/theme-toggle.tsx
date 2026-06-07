@@ -2,30 +2,25 @@
 
 import * as React from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Moon, Sun, Trophy, Focus as FocusIcon, Sparkles } from 'lucide-react';
+import { Snowflake, Crown, Flame, Image as ImageIcon, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { themeMeta, nextTheme, type ThemeName } from '@/config/theme';
 import { useReducedMotion } from '@/lib/hooks/use-reduced-motion';
 import { useThemeSafe } from '@/lib/hooks/use-theme-safe';
 
 const iconFor: Record<ThemeName, React.ComponentType<{ className?: string }>> = {
-  midnight: Moon,
-  ivory: Sun,
-  arena: Trophy,
-  focus: FocusIcon,
+  'midnight-ice': Snowflake,
+  'emerald-gold': Crown,
+  'ember-orange': Flame,
+  'monochrome-mist': ImageIcon,
 };
 
 /**
  * Single-cycle theme button.
  *
- * Replaces the previous dropdown with one button. Each click advances
- * to the next theme in the order: Midnight → Ivory → Arena → Focus → Midnight.
- *
- * Behaviour:
- *   - Renders the icon for the *currently active* theme.
- *   - Hover/focus shows a label "Theme: <name>".
- *   - Click instantly cycles and persists (next-themes handles storage).
- *   - Reduced-motion: no icon swap animation.
+ * Each click advances: Midnight Ice → Emerald Gold → Ember Orange → Monochrome Mist → Midnight Ice.
+ * Renders the icon for the *currently active* theme. The icon swap is
+ * animated via framer-motion; reduced motion disables the animation.
  */
 export function ThemeCycleButton() {
   const { mounted, activeTheme, setTheme } = useThemeSafe();
@@ -62,10 +57,6 @@ export function ThemeCycleButton() {
   );
 }
 
-/**
- * Standalone label companion, e.g. shown next to the icon in the mobile drawer.
- * Reads the current theme; no click handler.
- */
 export function ThemeCycleLabel() {
   const { mounted, activeTheme } = useThemeSafe();
   const meta = themeMeta[activeTheme];
