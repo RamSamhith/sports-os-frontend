@@ -29,8 +29,15 @@ export function PathwaySection({ sportSlug, sportName, competitions }: PathwaySe
 
   if (competitions.length === 0) {
     return (
-      <div className="border-border/60 bg-card/40 rounded-xl border border-dashed p-6 text-center">
-        <p className="text-muted-foreground text-sm">Pathway information coming soon.</p>
+      <div
+        className="border-border/40 bg-muted/20 rounded-xl border border-dashed p-6 text-center"
+        aria-live="polite"
+        role="status"
+      >
+        <p className="text-muted-foreground text-sm font-medium">Pathway information coming soon</p>
+        <p className="text-muted-foreground/70 mt-1 text-xs">
+          We are curating competitions and milestones for {sportName}. Check back soon.
+        </p>
       </div>
     );
   }

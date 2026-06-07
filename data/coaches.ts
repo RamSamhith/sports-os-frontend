@@ -233,5 +233,11 @@ export const coaches: Coach[] = [
 export const coachBySlug = (slug: string): Coach | undefined =>
   coaches.find((c) => c.slug === slug);
 
+export const coachesById = (id: string): Coach | undefined =>
+  coaches.find((c) => c.id === id);
+
+export const coachesBySlug = (slug: string): Coach | undefined =>
+  coaches.find((c) => c.slug === slug);
+
 export const coachById = (id: string): Coach | undefined =>
   coaches.find((c) => c.id === id);

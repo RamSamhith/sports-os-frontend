@@ -562,5 +562,11 @@ export const academies: Academy[] = [
 export const academyBySlug = (slug: string): Academy | undefined =>
   academies.find((a) => a.slug === slug);
 
+export const academiesById = (id: string): Academy | undefined =>
+  academies.find((a) => a.id === id);
+
+export const academiesBySlug = (slug: string): Academy | undefined =>
+  academies.find((a) => a.slug === slug);
+
 export const academyById = (id: string): Academy | undefined =>
   academies.find((a) => a.id === id);

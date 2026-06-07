@@ -4,17 +4,63 @@ import * as React from 'react';
 import { CompareContext, type CompareContextValue, type CompareItem } from '@/lib/hooks/use-compare';
 import { useStorageSync } from '@/lib/hooks/use-storage-sync';
 import { academies } from '@/data/academies';
+import { academiesById } from '@/data/academies';
+import { academiesBySlug } from '@/data/academies';
 import { coaches } from '@/data/coaches';
+import { coachesById } from '@/data/coaches';
+import { coachesBySlug } from '@/data/coaches';
 import { sports } from '@/data/sports';
+import { sportsById } from '@/data/sports';
+import { sportsBySlug } from '@/data/sports';
 
 const STORAGE_KEY = 'sportsos:compare';
-const MAX_ITEMS = 3;
 
-interface PersistedItem extends CompareItem {
+/** Minimum and maximum number of items a user can compare at once. */
+export const COMPARE_MIN = 2;
+export const COMPARE_MAX = 4;
+const MAX_ITEMS = COMPARE_MAX;
+
+export interface CompareItemMeta {
   label: string;
   sublabel?: string;
   href: string;
+}
+
+interface PersistedItem {
+  entityType: CompareItem['entityType'];
+  id: string;
+  label: string;
+  sublabel?: string;
+  href: string;
+  /** Original addition timestamp; preserved across writes so order is stable. */
   addedAt: string;
+}
+
+/** Resolve display metadata for an item directly from the source fixtures.
+ * Used on hydration to repair persisted state that was written before the
+ * add-with-meta path was used. */
+function resolveMeta(entityType: CompareItem['entityType'], id: string): CompareItemMeta | null {
+  if (entityType === 'academy') {
+    const a = academiesById(id) ?? academiesBySlug(id);
+    if (!a) return null;
+    return {
+      label: a.name,
+      sublabel: `${a.location.city}, ${a.location.state}`,
+      href: `/academies/${a.slug}`,
+    };
+  }
+  if (entityType === 'coach') {
+    const c = coachesById(id) ?? coachesBySlug(id);
+    if (!c) return null;
+    return {
+      label: c.name,
+      sublabel: `${c.location.city} · ${c.experienceYears}+ yrs`,
+      href: `/coaches/${c.slug}`,
+    };
+  }
+  const s = sportsById(id) ?? sportsBySlug(id);
+  if (!s) return null;
+  return { label: s.name, sublabel: s.category, href: `/sports/${s.slug}` };
 }
 
 function buildValidKeys(): Set<string> {
@@ -28,7 +74,7 @@ function buildValidKeys(): Set<string> {
 function applyFromRaw(
   raw: string | null,
   setItems: (items: CompareItem[]) => void,
-  setExtras: (m: Record<string, { label: string; sublabel?: string; href: string }>) => void,
+  setExtras: (m: Record<string, CompareItemMeta>) => void,
 ): void {
   if (raw == null) {
     setItems([]);
@@ -52,10 +98,14 @@ function applyFromRaw(
   // Provider-level cleanup: drop ids that no longer match a fixture.
   const valid = buildValidKeys();
   parsed = parsed.filter((p) => valid.has(`${p.entityType}:${p.id}`));
-  setItems(parsed.map(({ id, entityType }) => ({ id, entityType })));
-  const extrasMap: Record<string, { label: string; sublabel?: string; href: string }> = {};
+
+  setItems(parsed.map(({ entityType, id }) => ({ entityType, id })));
+  const extrasMap: Record<string, CompareItemMeta> = {};
   for (const p of parsed) {
-    extrasMap[`${p.entityType}:${p.id}`] = {
+    // Always prefer the freshest metadata from the source fixtures so the
+    // tray never shows a stale label after a refresh.
+    const fresh = resolveMeta(p.entityType, p.id);
+    extrasMap[`${p.entityType}:${p.id}`] = fresh ?? {
       label: p.label,
       sublabel: p.sublabel,
       href: p.href,
@@ -69,13 +119,13 @@ function writePersisted(items: PersistedItem[]) {
   try {
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
   } catch {
-    /* ignore */
+    /* ignore quota / disabled storage */
   }
 }
 
 export function CompareProvider({ children }: { children: React.ReactNode }) {
   const [items, setItems] = React.useState<CompareItem[]>([]);
-  const [extras, setExtras] = React.useState<Record<string, { label: string; sublabel?: string; href: string }>>({});
+  const [extras, setExtras] = React.useState<Record<string, CompareItemMeta>>({});
   const [hydrated, setHydrated] = React.useState(false);
 
   React.useEffect(() => {
@@ -83,18 +133,40 @@ export function CompareProvider({ children }: { children: React.ReactNode }) {
     setHydrated(true);
   }, []);
 
+  // Persist on every change once hydrated. We refresh `addedAt` for items
+  // that have never been persisted, but keep the original timestamp for
+  // items that already have one — so the user-visible order is stable.
   React.useEffect(() => {
     if (!hydrated) return;
-    const persisted: PersistedItem[] = items.map((it) => {
-      const meta = extras[`${it.entityType}:${it.id}`];
-      return {
-        ...it,
-        label: meta?.label ?? it.id,
-        sublabel: meta?.sublabel,
-        href: meta?.href ?? '#',
-        addedAt: new Date().toISOString(),
-      };
-    });
+    let persisted: PersistedItem[];
+    try {
+      const raw = window.localStorage.getItem(STORAGE_KEY);
+      const existing: PersistedItem[] = raw ? (JSON.parse(raw) as PersistedItem[]) : [];
+      persisted = items.map((it) => {
+        const meta = extras[`${it.entityType}:${it.id}`];
+        const prior = existing.find((e) => e.entityType === it.entityType && e.id === it.id);
+        return {
+          entityType: it.entityType,
+          id: it.id,
+          label: meta?.label ?? it.id,
+          sublabel: meta?.sublabel,
+          href: meta?.href ?? '#',
+          addedAt: prior?.addedAt ?? new Date().toISOString(),
+        };
+      });
+    } catch {
+      persisted = items.map((it) => {
+        const meta = extras[`${it.entityType}:${it.id}`];
+        return {
+          entityType: it.entityType,
+          id: it.id,
+          label: meta?.label ?? it.id,
+          sublabel: meta?.sublabel,
+          href: meta?.href ?? '#',
+          addedAt: new Date().toISOString(),
+        };
+      });
+    }
     writePersisted(persisted);
   }, [items, extras, hydrated]);
 
@@ -117,18 +189,23 @@ export function CompareProvider({ children }: { children: React.ReactNode }) {
 
   const add = React.useCallback<CompareContextValue['add']>(
     (item) => {
-      setItems((prev) => (canAdd(item.entityType, item.id) ? [...prev, item] : prev));
+      setItems((prev) => {
+        if (prev.length >= MAX_ITEMS) return prev;
+        if (prev.some((i) => i.entityType === item.entityType && i.id === item.id)) return prev;
+        return [...prev, item];
+      });
+      // Repair metadata from source fixtures immediately so the tray shows
+      // the right label even if no meta was passed in.
+      const fresh = resolveMeta(item.entityType, item.id);
+      if (fresh) {
+        setExtras((prev) => ({ ...prev, [`${item.entityType}:${item.id}`]: fresh }));
+      }
     },
-    [canAdd],
+    [],
   );
 
-  // Adds with display metadata. Returns true if added.
-  const addWithMeta = React.useCallback(
-    (
-      entityType: CompareItem['entityType'],
-      id: string,
-      meta: { label: string; sublabel?: string; href: string },
-    ) => {
+  const addWithMeta = React.useCallback<CompareContextValue['addWithMeta']>(
+    (entityType, id, meta) => {
       let added = false;
       setItems((prev) => {
         if (prev.length >= MAX_ITEMS) return prev;
@@ -137,7 +214,13 @@ export function CompareProvider({ children }: { children: React.ReactNode }) {
         return [...prev, { entityType, id }];
       });
       if (added) {
-        setExtras((prev) => ({ ...prev, [`${entityType}:${id}`]: meta }));
+        // Prefer fresh metadata from the source fixtures; only fall back
+        // to the caller-supplied meta if the entity is unknown.
+        const fresh = resolveMeta(entityType, id);
+        setExtras((prev) => ({
+          ...prev,
+          [`${entityType}:${id}`]: fresh ?? meta,
+        }));
       }
       return added;
     },
@@ -162,8 +245,19 @@ export function CompareProvider({ children }: { children: React.ReactNode }) {
     extras: typeof extras;
     addWithMeta: typeof addWithMeta;
   }>(
-    () => ({ items, canAdd, has, add, remove, clear, maxItems: MAX_ITEMS, extras, addWithMeta }),
-    [items, canAdd, has, add, remove, clear, extras, addWithMeta],
+    () => ({
+      items,
+      canAdd,
+      has,
+      add,
+      addWithMeta,
+      remove,
+      clear,
+      maxItems: MAX_ITEMS,
+      minItems: COMPARE_MIN,
+      extras,
+    }),
+    [items, canAdd, has, add, addWithMeta, remove, clear, extras],
   );
 
   return <CompareContext.Provider value={value}>{children}</CompareContext.Provider>;

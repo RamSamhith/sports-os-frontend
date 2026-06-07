@@ -4,7 +4,7 @@ import { Breadcrumbs } from '@/components/seo/breadcrumbs';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { ShortlistToggle } from '@/components/shortlist/shortlist-toggle';
-import { CompareButton } from '@/components/compare/compare-button';
+import { CompareButton } from '@/components/academies/compare-button';
 import { VerifiedBadge } from '@/components/trust/verified-badge';
 import { LastUpdated } from '@/components/trust/last-updated';
 import { CertificationIndicator } from '@/components/trust/certification-indicator';

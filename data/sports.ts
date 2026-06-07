@@ -474,5 +474,11 @@ export const sports: Sport[] = [
 export const sportBySlug = (slug: string): Sport | undefined =>
   sports.find((s) => s.slug === slug);
 
+export const sportsById = (id: string): Sport | undefined =>
+  sports.find((s) => s.id === id);
+
+export const sportsBySlug = (slug: string): Sport | undefined =>
+  sports.find((s) => s.slug === slug);
+
 export const sportById = (id: string): Sport | undefined =>
   sports.find((s) => s.id === id);

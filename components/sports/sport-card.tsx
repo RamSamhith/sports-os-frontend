@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { ImageWithFallback } from '@/components/ui/image-with-fallback';
+import { CompareButton } from '@/components/academies/compare-button';
 import { fixtureImages } from '@/lib/images';
 import type { Sport } from '@/types/domain/sport';
 
@@ -16,10 +17,7 @@ export function SportCard({ sport }: { sport: Sport }) {
         : null;
 
   return (
-    <Link
-      href={`/sports/${slug}`}
-      className="border-border/60 bg-card/40 hover:border-foreground/30 motion-card group relative flex flex-col gap-3 overflow-hidden rounded-xl border p-4 backdrop-blur-md"
-    >
+    <div className="border-border/60 bg-card/40 hover:border-foreground/30 motion-card group relative flex flex-col gap-3 overflow-hidden rounded-xl border p-4 backdrop-blur-md">
       <div className="flex items-center gap-3">
         <span className="bg-muted/40 relative h-9 w-9 shrink-0 overflow-hidden rounded-md">
           <ImageWithFallback
@@ -36,16 +34,32 @@ export function SportCard({ sport }: { sport: Sport }) {
           />
         </span>
         <div className="min-w-0 flex-1">
-          <div className="line-clamp-1 font-medium">{name}</div>
+          <Link href={`/sports/${slug}`} className="hover:underline">
+            <div className="line-clamp-1 font-medium">{name}</div>
+          </Link>
           <div className="text-muted-foreground text-xs capitalize">{category}</div>
         </div>
+        <CompareButton
+          entityType="sport"
+          id={id}
+          label={name}
+          sublabel={category}
+          href={`/sports/${slug}`}
+        />
       </div>
       {description ? (
-        <p className="text-muted-foreground line-clamp-2 text-xs text-pretty">{description}</p>
+        <Link
+          href={`/sports/${slug}`}
+          className="text-muted-foreground line-clamp-2 text-xs text-pretty hover:text-foreground/80"
+        >
+          {description}
+        </Link>
       ) : null}
       {ageText ? (
-        <span className="text-muted-foreground text-[10px] tracking-widest uppercase">{ageText}</span>
+        <span className="text-muted-foreground text-[10px] tracking-widest uppercase">
+          {ageText}
+        </span>
       ) : null}
-    </Link>
+    </div>
   );
 }

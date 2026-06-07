@@ -4,6 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { ImageWithFallback } from '@/components/ui/image-with-fallback';
 import { VerifiedBadge } from '@/components/trust/verified-badge';
+import { CompareButton } from '@/components/academies/compare-button';
 import { MapPin } from 'lucide-react';
 import { fixtureImages } from '@/lib/images';
 import type { Coach } from '@/types/domain/coach';
@@ -60,9 +61,18 @@ export function CoachCardPlaceholder({ coach }: { coach: Coach }) {
           </div>
         ) : null}
       </div>
-      <Button size="sm" variant="outline" asChild>
-        <Link href={`/coaches/${slug}`}>View</Link>
-      </Button>
+      <div className="flex items-center gap-1.5">
+        <CompareButton
+          entityType="coach"
+          id={id}
+          label={name}
+          sublabel={`${location.city} · ${experienceYears}+ yrs`}
+          href={`/coaches/${slug}`}
+        />
+        <Button size="sm" variant="outline" asChild>
+          <Link href={`/coaches/${slug}`}>View</Link>
+        </Button>
+      </div>
     </Card>
   );
 }

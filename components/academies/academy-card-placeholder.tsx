@@ -41,7 +41,13 @@ export function AcademyCardPlaceholder({ academy, priority = false }: { academy:
   const isSaved = hasShortlist('academy', id);
 
   // Compare (persisted in localStorage by provider)
-  const { has: hasCompare, add: addToCompare, remove: removeFromCompare, canAdd: canAddToCompare } = useCompare();
+  const {
+    has: hasCompare,
+    addWithMeta: addToCompare,
+    remove: removeFromCompare,
+    canAdd: canAddToCompare,
+    maxItems,
+  } = useCompare();
   const isCompared = hasCompare('academy', id);
 
   return (
@@ -165,10 +171,14 @@ export function AcademyCardPlaceholder({ academy, priority = false }: { academy:
                 removeFromCompare('academy', id);
                 toast(`Removed ${name} from compare`);
               } else if (canAddToCompare('academy', id)) {
-                addToCompare({ entityType: 'academy', id });
+                addToCompare('academy', id, {
+                  label: name,
+                  sublabel: `${location.city}, ${location.state}`,
+                  href: `/academies/${slug}`,
+                });
                 toast.success(`Added ${name} to compare`);
               } else {
-                toast.error('You can compare up to 3 academies.');
+                toast.error(`You can compare up to ${maxItems} items.`);
               }
             }}
           >

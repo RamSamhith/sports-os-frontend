@@ -9,20 +9,30 @@ export interface CompareItem {
   id: string;
 }
 
+export interface CompareItemMeta {
+  label: string;
+  sublabel?: string;
+  href: string;
+}
+
 export interface CompareContextValue {
   items: CompareItem[];
   canAdd: (entityType: CompareEntityType, id: string) => boolean;
   has: (entityType: CompareEntityType, id: string) => boolean;
   add: (item: CompareItem) => void;
-  remove: (entityType: CompareEntityType, id: string) => void;
-  clear: () => void;
-  maxItems: number;
-  extras: Record<string, { label: string; sublabel?: string; href: string }>;
   addWithMeta: (
     entityType: CompareEntityType,
     id: string,
-    meta: { label: string; sublabel?: string; href: string },
+    meta: CompareItemMeta,
   ) => boolean;
+  remove: (entityType: CompareEntityType, id: string) => void;
+  clear: () => void;
+  /** Maximum number of items a user can compare. */
+  maxItems: number;
+  /** Minimum number of items required to render the comparison table. */
+  minItems: number;
+  /** Per-item display metadata, keyed by `${entityType}:${id}`. */
+  extras: Record<string, CompareItemMeta>;
 }
 
 export const CompareContext = createContext<CompareContextValue | null>(null);
