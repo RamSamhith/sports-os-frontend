@@ -1,14 +1,14 @@
 'use client';
 
 import * as React from 'react';
-import { Snowflake, Zap, Flame, Sun, Check } from 'lucide-react';
+import { Snowflake, Flame, Gem, Sun, Check } from 'lucide-react';
 import { cn } from '@/lib/utils/cn';
 import { themeMeta, type ThemeName } from '@/config/theme';
 
 const iconFor: Record<ThemeName, React.ComponentType<{ className?: string }>> = {
   'midnight-ice': Snowflake,
-  'arctic-steel': Zap,
   'ember-orange': Flame,
+  'graphite-titanium': Gem,
   'alpine-light': Sun,
 };
 
@@ -74,7 +74,7 @@ export function ThemePreviewCard({
               <span className="bg-accent text-accent-foreground rounded px-1.5 py-0.5 text-[9px]">
                 Accent
               </span>
-              {id === 'ember-orange' || id === 'arctic-steel' ? (
+              {id === 'ember-orange' || id === 'midnight-ice' ? (
                 <>
                   <span className="sport-cricket rounded px-1.5 py-0.5 text-[9px]">Cricket</span>
                   <span className="sport-football rounded px-1.5 py-0.5 text-[9px]">Football</span>

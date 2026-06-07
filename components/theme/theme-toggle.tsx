@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Snowflake, Zap, Flame, Sun, Sparkles } from 'lucide-react';
+import { Snowflake, Flame, Gem, Sun, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { themeMeta, nextTheme, type ThemeName } from '@/config/theme';
 import { useReducedMotion } from '@/lib/hooks/use-reduced-motion';
@@ -10,15 +10,15 @@ import { useThemeSafe } from '@/lib/hooks/use-theme-safe';
 
 const iconFor: Record<ThemeName, React.ComponentType<{ className?: string }>> = {
   'midnight-ice': Snowflake,
-  'arctic-steel': Zap,
   'ember-orange': Flame,
+  'graphite-titanium': Gem,
   'alpine-light': Sun,
 };
 
 /**
  * Single-cycle theme button.
  *
- * Cycle: Midnight Ice → Arctic Steel → Ember Orange → Alpine Light → Midnight Ice.
+ * Cycle: Midnight Ice → Ember Orange → Graphite Titanium → Alpine Light → Midnight Ice.
  * The icon swap is animated via framer-motion; reduced motion disables it.
  */
 export function ThemeCycleButton() {

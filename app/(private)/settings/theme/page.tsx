@@ -18,7 +18,7 @@ export default function ThemeSettingsPage() {
         <p className="text-muted-foreground text-sm text-pretty">
           Four premium products. Each one is a different visual identity — not just a
           colour swap. Tap a card to apply, or use the single button in the navbar to cycle
-          Midnight Ice → Arctic Steel → Ember Orange → Alpine Light.
+          Midnight Ice → Ember Orange → Graphite Titanium → Alpine Light.
         </p>
       </header>
 

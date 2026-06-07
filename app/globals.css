@@ -68,7 +68,6 @@
     @apply bg-background/60 backdrop-blur-xl backdrop-saturate-150;
   }
 
-  /* Subtle film grain — extremely low opacity. */
   .grain::after {
     content: '';
     position: absolute;
@@ -86,17 +85,17 @@
   .sport-swimming { background: hsl(191 80% 56%); color: hsl(217 78% 8%); }
 
   /* ---------------------------------------------------------------------
-   * Premium background engine.
+   * Premium 4-layer background engine.
    *
-   * A 4-layer fixed full-viewport stack behind every page:
-   *   1. .atmosphere-mesh  — large animated mesh gradient (3-5s subtle motion)
-   *   2. .atmosphere-aurora — soft drifting radial glows (theme-paced)
-   *   3. .atmosphere-parallax — ultra-slow parallax layer
-   *   4. .atmosphere-veil  — soft white/dark diffusion for content contrast
+   * - .atmosphere__mesh       — animated mesh gradient (slow drift)
+   * - .atmosphere__aurora     — soft drifting radial glows
+   * - .atmosphere__parallax   — ultra-slow parallax depth
+   * - .atmosphere__veil       — diffusion for content contrast
    *
-   * Each theme gets *distinct* keyframes, blends, and motion speeds.
-   * All animation is GPU-only (transform + opacity). Respects
-   * prefers-reduced-motion.
+   * Each theme gets distinct gradient stops, blend modes, and motion
+   * speeds via the --atm-* / --mesh-* / --aurora-* / --parallax-* /
+   * --veil-* tokens. The shortest period is ~11 s so the user sees
+   * movement within the first 3–5 s.
    * ------------------------------------------------------------------- */
   .atmosphere {
     position: fixed;
@@ -121,9 +120,9 @@
     background: var(--mesh-bg, none);
     background-size: 200% 200%;
     background-position: 50% 50%;
-    opacity: var(--mesh-opacity, 0.65);
+    opacity: var(--mesh-opacity, 0.55);
     mix-blend-mode: var(--mesh-blend, screen);
-    animation: mesh-drift calc(var(--atm-speed, 28s) * 1.4) var(--ease-soft) infinite;
+    animation: mesh-drift calc(var(--atm-speed, 28s) * 1.2) var(--ease-soft) infinite;
   }
 
   .atmosphere__aurora {
@@ -137,103 +136,101 @@
   .atmosphere__parallax {
     background: var(--parallax-bg, none);
     background-size: 240% 240%;
-    opacity: var(--parallax-opacity, 0.35);
+    opacity: var(--parallax-opacity, 0.30);
     mix-blend-mode: var(--parallax-blend, screen);
-    animation: parallax-drift calc(var(--atm-speed, 28s) * 2.4) var(--ease-soft) infinite;
+    animation: parallax-drift calc(var(--atm-speed, 28s) * 2.2) var(--ease-soft) infinite;
   }
 
   .atmosphere__veil {
     background: var(--veil-bg, none);
-    opacity: var(--veil-opacity, 0.35);
-    animation: veil-breathe calc(var(--atm-speed, 28s) * 0.6) var(--ease-soft) infinite;
+    opacity: var(--veil-opacity, 0.30);
+    animation: veil-breathe calc(var(--atm-speed, 28s) * 0.4) var(--ease-soft) infinite;
   }
 
-  /* ---------------- MIDNIGHT ICE — slow luxury drift ---------------- */
+  /* ---------------- MIDNIGHT ICE — slow blue aurora ---------------- */
   .midnight-ice .atmosphere__mesh {
     --mesh-bg:
-      radial-gradient(at 22% 28%, hsl(208 55% 35% / 0.55) 0px, transparent 50%),
-      radial-gradient(at 78% 12%, hsl(222 38% 18% / 0.65) 0px, transparent 50%),
-      radial-gradient(at 12% 82%, hsl(208 65% 78% / 0.20) 0px, transparent 50%),
-      radial-gradient(at 88% 78%, hsl(222 38% 24% / 0.55) 0px, transparent 50%);
+      radial-gradient(at 22% 28%, hsl(217 91% 40% / 0.55) 0px, transparent 50%),
+      radial-gradient(at 78% 12%, hsl(222 35% 22% / 0.55) 0px, transparent 50%),
+      radial-gradient(at 12% 82%, hsl(217 91% 60% / 0.30) 0px, transparent 50%),
+      radial-gradient(at 88% 78%, hsl(222 35% 28% / 0.45) 0px, transparent 50%);
   }
   .midnight-ice .atmosphere__aurora {
     --aurora-bg:
-      radial-gradient(40% 30% at 30% 40%, hsl(208 55% 76% / 0.30) 0%, transparent 60%),
-      radial-gradient(35% 25% at 75% 60%, hsl(208 65% 88% / 0.20) 0%, transparent 60%);
+      radial-gradient(40% 30% at 30% 40%, hsl(217 91% 60% / 0.30) 0%, transparent 60%),
+      radial-gradient(35% 25% at 75% 60%, hsl(217 91% 70% / 0.20) 0%, transparent 60%);
   }
   .midnight-ice .atmosphere__parallax {
     --parallax-bg:
-      radial-gradient(60% 50% at 50% 50%, hsl(222 38% 30% / 0.30) 0%, transparent 70%);
+      radial-gradient(60% 50% at 50% 50%, hsl(217 91% 35% / 0.30) 0%, transparent 70%);
   }
   .midnight-ice .atmosphere__veil {
-    --veil-bg: linear-gradient(180deg, transparent 0%, hsl(222 41% 5% / 0.30) 100%);
-  }
-
-  /* ---------------- ARCTIC STEEL — fast electric aurora ------------- */
-  .arctic-steel .atmosphere__mesh {
-    --mesh-bg:
-      radial-gradient(at 18% 20%, hsl(199 90% 45% / 0.55) 0px, transparent 50%),
-      radial-gradient(at 82% 18%, hsl(211 44% 52% / 0.45) 0px, transparent 50%),
-      radial-gradient(at 15% 80%, hsl(207 100% 70% / 0.30) 0px, transparent 50%),
-      radial-gradient(at 85% 82%, hsl(199 90% 35% / 0.45) 0px, transparent 50%);
-  }
-  .arctic-steel .atmosphere__aurora {
-    --aurora-bg:
-      radial-gradient(45% 35% at 25% 30%, hsl(199 90% 65% / 0.40) 0%, transparent 60%),
-      radial-gradient(40% 30% at 80% 70%, hsl(207 100% 80% / 0.30) 0%, transparent 60%);
-  }
-  .arctic-steel .atmosphere__parallax {
-    --parallax-bg:
-      radial-gradient(50% 40% at 50% 50%, hsl(199 90% 60% / 0.20) 0%, transparent 70%);
-  }
-  .arctic-steel .atmosphere__veil {
-    --veil-bg: linear-gradient(180deg, transparent 0%, hsl(217 78% 4% / 0.30) 100%);
+    --veil-bg: linear-gradient(180deg, transparent 0%, hsl(222 47% 8% / 0.30) 100%);
   }
 
   /* ---------------- EMBER ORANGE — warm stadium glow --------------- */
   .ember-orange .atmosphere__mesh {
     --mesh-bg:
-      radial-gradient(at 20% 22%, hsl(22 76% 45% / 0.55) 0px, transparent 50%),
-      radial-gradient(at 80% 18%, hsl(19 50% 55% / 0.45) 0px, transparent 50%),
-      radial-gradient(at 18% 82%, hsl(32 50% 80% / 0.30) 0px, transparent 50%),
-      radial-gradient(at 82% 80%, hsl(22 76% 30% / 0.45) 0px, transparent 50%);
+      radial-gradient(at 20% 22%, hsl(20 100% 40% / 0.55) 0px, transparent 50%),
+      radial-gradient(at 80% 18%, hsl(30 100% 50% / 0.45) 0px, transparent 50%),
+      radial-gradient(at 18% 82%, hsl(30 100% 70% / 0.30) 0px, transparent 50%),
+      radial-gradient(at 82% 80%, hsl(20 100% 30% / 0.45) 0px, transparent 50%);
   }
   .ember-orange .atmosphere__aurora {
     --aurora-bg:
-      radial-gradient(45% 35% at 30% 35%, hsl(22 76% 55% / 0.40) 0%, transparent 60%),
-      radial-gradient(40% 30% at 75% 65%, hsl(19 50% 70% / 0.30) 0%, transparent 60%);
+      radial-gradient(45% 35% at 30% 35%, hsl(20 100% 55% / 0.40) 0%, transparent 60%),
+      radial-gradient(40% 30% at 75% 65%, hsl(30 100% 67% / 0.30) 0%, transparent 60%);
   }
   .ember-orange .atmosphere__parallax {
     --parallax-bg:
-      radial-gradient(50% 40% at 50% 50%, hsl(22 76% 50% / 0.20) 0%, transparent 70%);
+      radial-gradient(50% 40% at 50% 50%, hsl(20 100% 50% / 0.20) 0%, transparent 70%);
   }
   .ember-orange .atmosphere__veil {
-    --veil-bg: linear-gradient(180deg, transparent 0%, hsl(17 31% 8% / 0.30) 100%);
+    --veil-bg: linear-gradient(180deg, transparent 0%, hsl(18 31% 5% / 0.30) 100%);
   }
 
-  /* ---------------- ALPINE LIGHT — soft daylight drift ------------- */
+  /* ---------------- GRAPHITE TITANIUM — metallic sweep ------------ */
+  .graphite-titanium .atmosphere__mesh {
+    --mesh-bg:
+      radial-gradient(at 25% 25%, hsl(220 13% 50% / 0.30) 0px, transparent 50%),
+      radial-gradient(at 75% 15%, hsl(220 13% 30% / 0.20) 0px, transparent 50%),
+      radial-gradient(at 15% 80%, hsl(0 0% 35% / 0.18) 0px, transparent 50%),
+      radial-gradient(at 85% 85%, hsl(220 13% 60% / 0.18) 0px, transparent 50%);
+  }
+  .graphite-titanium .atmosphere__aurora {
+    --aurora-bg:
+      linear-gradient(115deg, transparent 35%, hsl(220 13% 80% / 0.05) 50%, transparent 65%);
+    background-size: 200% 100%;
+  }
+  .graphite-titanium .atmosphere__parallax {
+    --parallax-bg:
+      radial-gradient(60% 50% at 50% 50%, hsl(220 13% 50% / 0.10) 0%, transparent 70%);
+  }
+  .graphite-titanium .atmosphere__veil {
+    --veil-bg: linear-gradient(180deg, transparent 0%, hsl(0 0% 0% / 0.40) 100%);
+  }
+
+  /* ---------------- ALPINE LIGHT — gentle daylight drift ----------- */
   .alpine-light .atmosphere__mesh {
     --mesh-bg:
-      radial-gradient(at 22% 28%, hsl(202 75% 85% / 0.55) 0px, transparent 50%),
-      radial-gradient(at 78% 18%, hsl(212 86% 88% / 0.55) 0px, transparent 50%),
-      radial-gradient(at 18% 82%, hsl(220 25% 98% / 0.55) 0px, transparent 50%),
-      radial-gradient(at 82% 80%, hsl(202 75% 90% / 0.55) 0px, transparent 50%);
+      radial-gradient(at 22% 28%, hsl(217 60% 88% / 0.55) 0px, transparent 50%),
+      radial-gradient(at 78% 18%, hsl(217 91% 80% / 0.55) 0px, transparent 50%),
+      radial-gradient(at 18% 82%, hsl(220 14% 96% / 0.55) 0px, transparent 50%),
+      radial-gradient(at 82% 80%, hsl(217 60% 92% / 0.55) 0px, transparent 50%);
   }
   .alpine-light .atmosphere__aurora {
     --aurora-bg:
-      radial-gradient(40% 30% at 30% 40%, hsl(212 86% 92% / 0.40) 0%, transparent 60%),
-      radial-gradient(35% 25% at 75% 60%, hsl(202 75% 90% / 0.30) 0%, transparent 60%);
+      radial-gradient(40% 30% at 30% 40%, hsl(217 91% 92% / 0.45) 0%, transparent 60%),
+      radial-gradient(35% 25% at 75% 60%, hsl(217 60% 90% / 0.30) 0%, transparent 60%);
   }
   .alpine-light .atmosphere__parallax {
     --parallax-bg:
-      radial-gradient(60% 50% at 50% 50%, hsl(220 25% 96% / 0.50) 0%, transparent 70%);
+      radial-gradient(60% 50% at 50% 50%, hsl(220 14% 96% / 0.50) 0%, transparent 70%);
   }
   .alpine-light .atmosphere__veil {
     --veil-bg: linear-gradient(180deg, hsl(0 0% 100% / 0.20) 0%, transparent 100%);
   }
 
-  /* Shared keyframes — used by all themes. Theme-specific speed is
-   * controlled via the per-theme --atm-speed token. */
   @keyframes mesh-drift {
     0%   { background-position: 0% 0%;     transform: translate3d(0, 0, 0)     scale(1.0); }
     50%  { background-position: 100% 100%; transform: translate3d(2%, 1%, 0)   scale(1.04); }
@@ -250,7 +247,7 @@
     100% { transform: translate3d(3%, 2%, 0)   scale(1.04); }
   }
   @keyframes veil-breathe {
-    0%, 100% { opacity: 0.30; }
+    0%, 100% { opacity: 0.25; }
     50%      { opacity: 0.45; }
   }
 
@@ -261,108 +258,104 @@
    * and sweep.
    * ------------------------------------------------------------------- */
 
-  /* MIDNIGHT ICE — glass navy with icy blue highlights. */
+  /* MIDNIGHT ICE — glass accents + blue glow. */
   .midnight-ice .btn-primary {
-    background: linear-gradient(180deg, hsl(222 38% 18% / 0.85) 0%, hsl(218 80% 14% / 0.85) 100%);
-    color: hsl(208 55% 86%);
-    border: 1px solid hsl(208 55% 76% / 0.30);
+    background: linear-gradient(180deg, hsl(222 35% 22% / 0.85) 0%, hsl(222 47% 8% / 0.85) 100%);
+    color: hsl(217 91% 92%);
+    border: 1px solid hsl(217 91% 60% / 0.30);
     box-shadow:
       var(--shadow-sm),
-      0 0 0 1px hsl(208 55% 76% / 0.10) inset,
-      0 0 24px hsl(208 55% 76% / 0.18);
+      0 0 0 1px hsl(217 91% 60% / 0.10) inset,
+      0 0 24px hsl(217 91% 60% / 0.18);
     backdrop-filter: blur(8px);
   }
   .midnight-ice .btn-primary:hover {
-    background: linear-gradient(180deg, hsl(222 38% 22% / 0.95) 0%, hsl(218 80% 18% / 0.95) 100%);
-    box-shadow: var(--shadow-md), 0 0 36px hsl(208 55% 76% / 0.32);
+    background: linear-gradient(180deg, hsl(222 35% 26% / 0.95) 0%, hsl(222 47% 12% / 0.95) 100%);
+    box-shadow: var(--shadow-md), 0 0 36px hsl(217 91% 60% / 0.32);
   }
-
   .midnight-ice .btn-outline {
-    border: 1px solid hsl(208 60% 70% / 0.35);
-    background: hsl(222 41% 9% / 0.40);
-    color: hsl(208 55% 86%);
+    border: 1px solid hsl(217 91% 60% / 0.35);
+    background: hsl(222 47% 12% / 0.40);
+    color: hsl(217 91% 90%);
     backdrop-filter: blur(8px);
   }
   .midnight-ice .btn-outline:hover {
-    background: hsl(208 55% 76% / 0.12);
-    border-color: hsl(208 55% 76% / 0.55);
+    background: hsl(217 91% 60% / 0.12);
+    border-color: hsl(217 91% 60% / 0.60);
   }
 
-  /* ARCTIC STEEL — glass cards with electric blue glow. */
-  .arctic-steel .btn-primary {
-    background: linear-gradient(180deg, hsl(199 90% 60%) 0%, hsl(199 90% 48%) 100%);
-    color: hsl(217 78% 8%);
-    border: 1px solid hsl(199 90% 75% / 0.40);
+  /* EMBER ORANGE — warm depth, strong CTA presence. */
+  .ember-orange .btn-primary {
+    background: linear-gradient(180deg, hsl(20 100% 60%) 0%, hsl(20 100% 48%) 100%);
+    color: hsl(18 31% 5%);
+    border: 1px solid hsl(30 100% 75% / 0.40);
     box-shadow:
       var(--shadow-sm),
-      0 0 0 1px hsl(199 100% 85% / 0.20) inset,
-      0 0 32px hsl(199 90% 60% / 0.30);
-  }
-  .arctic-steel .btn-primary:hover {
-    box-shadow: var(--shadow-md), 0 0 48px hsl(199 90% 60% / 0.50);
-  }
-
-  .arctic-steel .btn-outline {
-    border: 1px solid hsl(199 90% 60% / 0.40);
-    background: hsl(218 80% 14% / 0.50);
-    color: hsl(199 90% 80%);
-    backdrop-filter: blur(8px);
-  }
-  .arctic-steel .btn-outline:hover {
-    border-color: hsl(199 90% 60% / 0.70);
-    background: hsl(199 90% 60% / 0.15);
-    box-shadow: 0 0 24px hsl(199 90% 60% / 0.20);
-  }
-
-  /* EMBER ORANGE — warm glow, energetic. */
-  .ember-orange .btn-primary {
-    background: linear-gradient(180deg, hsl(22 90% 58%) 0%, hsl(22 80% 46%) 100%);
-    color: hsl(17 31% 18%);
-    border: 1px solid hsl(22 100% 75% / 0.30);
-    box-shadow: var(--shadow-sm), 0 0 0 1px hsl(22 100% 80% / 0.25) inset;
+      0 0 0 1px hsl(30 100% 80% / 0.30) inset,
+      0 0 24px hsl(20 100% 55% / 0.30);
   }
   .ember-orange .btn-primary:hover {
-    box-shadow: var(--shadow-md), 0 0 36px hsl(22 76% 53% / 0.50);
+    box-shadow: var(--shadow-md), 0 0 40px hsl(20 100% 55% / 0.55);
   }
-
   .ember-orange .btn-outline {
-    border: 1px solid hsl(22 76% 53% / 0.40);
-    background: hsl(17 31% 14% / 0.50);
-    color: hsl(22 80% 70%);
+    border: 1px solid hsl(20 100% 55% / 0.40);
+    background: hsl(18 31% 8% / 0.50);
+    color: hsl(30 100% 70%);
     backdrop-filter: blur(8px);
   }
   .ember-orange .btn-outline:hover {
-    border-color: hsl(22 76% 53% / 0.80);
-    background: hsl(22 76% 53% / 0.15);
-    box-shadow: 0 0 24px hsl(22 76% 53% / 0.25);
+    border-color: hsl(20 100% 55% / 0.80);
+    background: hsl(20 100% 55% / 0.12);
+    box-shadow: 0 0 24px hsl(20 100% 55% / 0.25);
   }
 
-  /* ALPINE LIGHT — premium daylight, navy primary. */
+  /* GRAPHITE TITANIUM — metallic styling, luxury borders. */
+  .graphite-titanium .btn-primary {
+    background: linear-gradient(180deg, hsl(220 13% 88%) 0%, hsl(220 13% 76%) 100%);
+    color: hsl(0 0% 4%);
+    border: 1px solid hsl(220 13% 65% / 0.50);
+    box-shadow:
+      var(--shadow-sm),
+      0 0 0 1px hsl(0 0% 100% / 0.30) inset;
+  }
+  .graphite-titanium .btn-primary:hover {
+    background: linear-gradient(180deg, hsl(220 13% 95%) 0%, hsl(220 13% 82%) 100%);
+    box-shadow: var(--shadow-md), 0 0 24px hsl(220 13% 83% / 0.20);
+  }
+  .graphite-titanium .btn-outline {
+    border: 1px solid hsl(0 0% 38%);
+    background: hsl(0 0% 12% / 0.50);
+    color: hsl(220 13% 83%);
+    backdrop-filter: blur(8px);
+  }
+  .graphite-titanium .btn-outline:hover {
+    border-color: hsl(220 13% 65%);
+    background: hsl(220 13% 83% / 0.08);
+  }
+
+  /* ALPINE LIGHT — defined borders, elegant shadows. */
   .alpine-light .btn-primary {
-    background: linear-gradient(180deg, hsl(212 86% 30%) 0%, hsl(212 86% 22%) 100%);
+    background: linear-gradient(180deg, hsl(217 91% 60%) 0%, hsl(217 91% 50%) 100%);
     color: hsl(0 0% 100%);
-    border: 1px solid hsl(212 86% 40% / 0.30);
-    box-shadow: var(--shadow-sm), 0 0 0 1px hsl(212 86% 50% / 0.10) inset;
+    border: 1px solid hsl(217 91% 50% / 0.40);
+    box-shadow: var(--shadow-sm), 0 0 0 1px hsl(217 91% 70% / 0.20) inset;
   }
   .alpine-light .btn-primary:hover {
-    background: linear-gradient(180deg, hsl(212 86% 34%) 0%, hsl(212 86% 26%) 100%);
-    box-shadow: var(--shadow-md), 0 0 24px hsl(212 86% 30% / 0.20);
+    box-shadow: var(--shadow-md), 0 0 20px hsl(217 91% 60% / 0.20);
   }
-
   .alpine-light .btn-outline {
-    border: 1px solid hsl(218 30% 86%);
+    border: 1px solid hsl(0 0% 0% / 0.16);
     background: hsl(0 0% 100% / 0.80);
-    color: hsl(212 86% 30%);
+    color: hsl(220 33% 12%);
     backdrop-filter: blur(8px);
   }
   .alpine-light .btn-outline:hover {
-    border-color: hsl(212 86% 30%);
-    background: hsl(212 86% 30% / 0.06);
+    border-color: hsl(217 91% 60%);
+    background: hsl(217 91% 60% / 0.06);
   }
 
   /* ---------------------------------------------------------------------
    * Premium motion language.
-   * Single source of truth for all interactive elements.
    * ------------------------------------------------------------------- */
 
   .motion-premium {

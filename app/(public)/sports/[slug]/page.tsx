@@ -1,16 +1,17 @@
 import { Container } from '@/components/layout/container';
 import { Section } from '@/components/layout/section';
 import { Breadcrumbs } from '@/components/seo/breadcrumbs';
-import { PathwayTimeline } from '@/components/sports/pathway-timeline';
+import { PathwaySection } from '@/components/sports/pathway-section';
 import { SportDisclaimer } from '@/components/sports/sport-disclaimer';
 import { notFound } from 'next/navigation';
 import { sportBySlug } from '@/data/sports';
+import { competitionsBySport } from '@/data/competitions';
 
 export default function SportDetailPage({ params }: { params: { slug: string } }) {
   const sport = sportBySlug(params.slug);
   if (!sport) notFound();
 
-  const { slug, name, explorationGuidance, competitionPathway } = sport;
+  const { slug, name, explorationGuidance } = sport;
   const ageRange = explorationGuidance?.ageSuitability;
   const ageText =
     ageRange?.min !== undefined && ageRange?.max !== undefined
@@ -18,6 +19,7 @@ export default function SportDetailPage({ params }: { params: { slug: string } }
       : ageRange?.min !== undefined
         ? `Ages ${ageRange.min}+`
         : null;
+  const competitions = competitionsBySport(slug);
 
   return (
     <Section>
@@ -35,18 +37,17 @@ export default function SportDetailPage({ params }: { params: { slug: string } }
           <p className="text-muted-foreground mt-1 text-sm">{ageText}</p>
         ) : (
           <p className="text-muted-foreground mt-1 text-sm">
-            Overview, pathway, and exploration guidance.
+            Pathway, competitions, and exploration guidance.
           </p>
         )}
-        <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-3">
+
+        <div className="mt-8 grid grid-cols-1 gap-8 md:grid-cols-3">
           <div className="md:col-span-2">
-            {competitionPathway?.levels?.length ? (
-              <PathwayTimeline levels={competitionPathway.levels} />
-            ) : (
-              <div className="border-border/60 bg-card/40 rounded-xl border border-dashed p-6 text-center">
-                <p className="text-muted-foreground text-sm">Competition pathway is not available yet.</p>
-              </div>
-            )}
+            <PathwaySection
+              sportSlug={slug}
+              sportName={name}
+              competitions={competitions}
+            />
           </div>
           <div>
             <SportDisclaimer />

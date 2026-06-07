@@ -2,6 +2,7 @@ export * from './academy';
 export * from './analytics-event';
 export * from './audit';
 export * from './common';
+export * from './competition';
 export * from './consent';
 export * from './enquiry';
 export * from './lead';

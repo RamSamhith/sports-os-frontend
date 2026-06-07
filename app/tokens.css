@@ -1,10 +1,10 @@
 /* SportsOS Design Tokens — single source of truth.
  *
  * Four premium themes, each a *different product* experience:
- *   - .midnight-ice    Premium flagship (default). Luxury dark.
- *   - .arctic-steel    Performance mode. Athletic blue glass.
- *   - .ember-orange    Energy mode. Competition warmth.
- *   - .alpine-light    Premium daylight. Apple-clean.
+ *   - .midnight-ice        Premium sports platform (default)
+ *   - .ember-orange        Competition / performance
+ *   - .graphite-titanium   Executive / luxury software
+ *   - .alpine-light        Premium daylight
  *
  * Every theme defines the same set of semantic CSS variables. Components
  * reference them by name and the cascade handles the rest. Theme switches
@@ -88,223 +88,223 @@
 
 /* ---------------------------------------------------------------------------
  * THEME 1 — MIDNIGHT ICE
- * Premium flagship. Luxury, professional, modern, elite.
- * Palette: #070B14 / #0D1422 / #121C2F / rgba(255,255,255,0.08) / #7DA0CA / #C1E8FF / #F8FAFC
+ * Premium sports platform. Slow aurora, soft blue drift.
+ * Palette: #0B1020 / #111827 / #1B2535 / #3B82F6 / #F8FAFC
  * ------------------------------------------------------------------------- */
 .midnight-ice {
-  --background: 222 41% 5%;           /* #070B14 */
+  --background: 222 47% 8%;           /* #0B1020 */
   --foreground: 210 30% 98%;          /* #F8FAFC */
 
-  --card: 222 38% 12%;                /* #121C2F */
+  --card: 222 35% 18%;                /* #1B2535 */
   --card-foreground: 210 30% 98%;
 
-  --popover: 222 35% 9%;              /* #0D1422 */
+  --popover: 222 38% 12%;             /* #111827 */
   --popover-foreground: 210 30% 98%;
 
-  /* Primary — icy blue. */
-  --primary: 208 55% 76%;             /* #7DA0CA */
-  --primary-foreground: 222 41% 5%;
+  /* Primary — blue. */
+  --primary: 217 91% 60%;             /* #3B82F6 */
+  --primary-foreground: 0 0% 100%;
 
-  --secondary: 208 65% 88%;           /* #C1E8FF */
-  --secondary-foreground: 222 41% 5%;
+  --secondary: 217 60% 30%;
+  --secondary-foreground: 210 30% 98%;
 
   --muted: 222 28% 14%;
-  --muted-foreground: 210 22% 72%;
+  --muted-foreground: 217 18% 70%;
 
-  --accent: 208 65% 88%;              /* #C1E8FF */
-  --accent-foreground: 222 41% 5%;
+  --accent: 217 60% 28%;
+  --accent-foreground: 210 30% 98%;
 
   --destructive: 0 72% 56%;
   --destructive-foreground: 0 0% 100%;
 
-  --border: 0 0% 100% / 0.08;         /* rgba(255,255,255,0.08) */
+  --border: 0 0% 100% / 0.08;
   --input: 0 0% 100% / 0.10;
-  --ring: 208 55% 76%;
+  --ring: 217 91% 60%;
 
   --shadow-color: 222 60% 2%;
 
-  /* Atmosphere — slow luxury drift. */
-  --atm-color-1: 222 38% 12%;
-  --atm-color-2: 208 55% 35%;
-  --atm-color-3: 208 65% 78%;
+  /* Atmosphere — slow aurora. */
+  --atm-color-1: 222 35% 18%;
+  --atm-color-2: 217 91% 35%;
+  --atm-color-3: 217 91% 60%;
   --atm-blend: screen;
-  --atm-opacity: 0.45;
-  --atm-speed: 32s;
+  --atm-opacity: 0.55;
+  --atm-speed: 28s;
 
-  --hairline: 208 60% 60%;
+  --hairline: 217 91% 60%;
 
   --success: 152 60% 50%;
   --warning: 35 92% 60%;
-  --info: 208 55% 76%;
+  --info: 217 91% 60%;
   --rating: 35 92% 60%;
 
   --radius: 0.875rem;
 }
 
 /* ---------------------------------------------------------------------------
- * THEME 2 — ARCTIC STEEL
- * Performance mode. Athletic, technology, speed, competition.
- * Distinct from Midnight Ice: more vibrant electric blue, steel glass,
- * stronger glow. Cooler, more "instrument" feel.
- * Palette: #021024 / #052659 / #5483B3 / #7DA0CA / #C1E8FF
- * ------------------------------------------------------------------------- */
-.arctic-steel {
-  --background: 217 78% 8%;           /* #021024 */
-  --foreground: 207 100% 90%;         /* #C1E8FF */
-
-  --card: 218 80% 18%;                /* #052659 */
-  --card-foreground: 207 100% 90%;
-
-  --popover: 218 80% 14%;
-  --popover-foreground: 207 100% 90%;
-
-  /* Primary — electric ice blue (more saturated than Midnight). */
-  --primary: 199 90% 65%;             /* brighter ice */
-  --primary-foreground: 217 78% 8%;
-
-  --secondary: 211 44% 52%;           /* #5483B3 */
-  --secondary-foreground: 207 100% 90%;
-
-  --muted: 218 60% 14%;
-  --muted-foreground: 211 44% 70%;
-
-  --accent: 207 100% 90%;             /* #C1E8FF */
-  --accent-foreground: 217 78% 8%;
-
-  --destructive: 0 80% 60%;
-  --destructive-foreground: 0 0% 100%;
-
-  --border: 199 70% 60% / 0.20;       /* electric blue hairline */
-  --input: 199 70% 60% / 0.20;
-  --ring: 199 90% 65%;
-
-  --shadow-color: 217 90% 3%;
-
-  /* Atmosphere — fast, electric, athletic. */
-  --atm-color-1: 199 90% 35%;
-  --atm-color-2: 211 44% 52%;
-  --atm-color-3: 207 100% 80%;
-  --atm-blend: screen;
-  --atm-opacity: 0.60;
-  --atm-speed: 20s;
-
-  --hairline: 199 90% 65%;
-
-  --success: 158 70% 55%;
-  --warning: 35 95% 60%;
-  --info: 199 90% 65%;
-  --rating: 35 95% 60%;
-
-  --radius: 0.75rem;
-}
-
-/* ---------------------------------------------------------------------------
- * THEME 3 — EMBER ORANGE
- * Energy mode. Sports, action, competition, intensity.
- * Palette: #3B2621 / #E2762F / #F0E4CF / #E7B596
- * Warm glows, orange highlights, energetic buttons.
+ * THEME 2 — EMBER ORANGE
+ * Competition, performance, athlete mindset. Stadium energy.
+ * Palette: #0F0A08 / #1A120D / #241711 / #FF7A18 / #FFB457 / #FFF8F2
  * ------------------------------------------------------------------------- */
 .ember-orange {
-  --background: 17 31% 18%;           /* #3B2621 */
-  --foreground: 32 50% 89%;           /* #F0E4CF */
+  --background: 18 31% 5%;            /* #0F0A08 */
+  --foreground: 30 100% 97%;          /* #FFF8F2 */
 
-  --card: 18 32% 24%;
-  --card-foreground: 32 50% 89%;
+  --card: 22 28% 12%;                 /* #241711 */
+  --card-foreground: 30 100% 97%;
 
-  --popover: 17 31% 16%;
-  --popover-foreground: 32 50% 89%;
+  --popover: 18 28% 8%;               /* #1A120D */
+  --popover-foreground: 30 100% 97%;
 
   /* Primary — competition orange. */
-  --primary: 22 76% 53%;              /* #E2762F */
-  --primary-foreground: 17 31% 18%;
+  --primary: 20 100% 55%;             /* #FF7A18 */
+  --primary-foreground: 18 31% 5%;
 
-  --secondary: 19 50% 71%;            /* #E7B596 */
-  --secondary-foreground: 17 31% 18%;
+  --secondary: 30 100% 67%;           /* #FFB457 */
+  --secondary-foreground: 18 31% 5%;
 
-  --muted: 17 28% 22%;
-  --muted-foreground: 32 35% 78%;
+  --muted: 22 25% 12%;
+  --muted-foreground: 30 50% 78%;
 
-  --accent: 32 50% 89%;               /* #F0E4CF */
-  --accent-foreground: 17 31% 18%;
+  --accent: 30 80% 30%;
+  --accent-foreground: 30 100% 95%;
 
-  --destructive: 0 75% 55%;
-  --destructive-foreground: 32 50% 89%;
+  --destructive: 0 80% 55%;
+  --destructive-foreground: 30 100% 95%;
 
-  --border: 22 70% 60% / 0.25;        /* warm hairline */
-  --input: 22 70% 60% / 0.25;
-  --ring: 22 76% 53%;
+  --border: 30 80% 60% / 0.18;
+  --input: 30 80% 60% / 0.22;
+  --ring: 20 100% 55%;
 
-  --shadow-color: 17 60% 4%;
+  --shadow-color: 18 60% 2%;
 
   /* Atmosphere — warm stadium glow. */
-  --atm-color-1: 22 76% 40%;
-  --atm-color-2: 19 50% 65%;
-  --atm-color-3: 32 50% 80%;
+  --atm-color-1: 20 100% 35%;
+  --atm-color-2: 30 100% 50%;
+  --atm-color-3: 30 100% 70%;
   --atm-blend: screen;
-  --atm-opacity: 0.50;
-  --atm-speed: 18s;
+  --atm-opacity: 0.55;
+  --atm-speed: 22s;
 
-  --hairline: 22 76% 53%;
+  --hairline: 20 100% 55%;
 
   --success: 142 50% 45%;
-  --warning: 35 95% 55%;
-  --info: 22 76% 53%;
-  --rating: 35 95% 55%;
+  --warning: 30 100% 60%;
+  --info: 20 100% 55%;
+  --rating: 30 100% 60%;
 
   --radius: 0.625rem;
 }
 
 /* ---------------------------------------------------------------------------
+ * THEME 3 — GRAPHITE TITANIUM
+ * Executive, luxury, premium software.
+ * Inspired by Apple Space Black, Porsche dashboards, Tesla UI.
+ * Palette: #0A0A0A / #141414 / #1E1E1E / #3A3A3A / #D0D5DD / #F5F7FA
+ * Metallic light sweep. Very subtle.
+ * ------------------------------------------------------------------------- */
+.graphite-titanium {
+  --background: 0 0% 4%;              /* #0A0A0A */
+  --foreground: 220 17% 97%;          /* #F5F7FA */
+
+  --card: 0 0% 12%;                   /* #1E1E1E */
+  --card-foreground: 220 17% 97%;
+
+  --popover: 0 0% 8%;                 /* #141414 */
+  --popover-foreground: 220 17% 97%;
+
+  /* Primary — titanium silver. */
+  --primary: 220 13% 83%;             /* #D0D5DD */
+  --primary-foreground: 0 0% 4%;
+
+  --secondary: 0 0% 38%;              /* #3A3A3A as accent surface */
+  --secondary-foreground: 220 17% 97%;
+
+  --muted: 0 0% 16%;
+  --muted-foreground: 0 0% 64%;
+
+  --accent: 0 0% 23%;                 /* #3A3A3A */
+  --accent-foreground: 220 13% 83%;
+
+  --destructive: 0 60% 50%;
+  --destructive-foreground: 220 17% 97%;
+
+  --border: 0 0% 23%;                 /* #3A3A3A */
+  --input: 0 0% 23%;
+  --ring: 220 13% 83%;
+
+  --shadow-color: 0 0% 0%;
+
+  /* Atmosphere — very subtle metallic sweep. */
+  --atm-color-1: 0 0% 18%;
+  --atm-color-2: 220 13% 50%;
+  --atm-color-3: 0 0% 35%;
+  --atm-blend: screen;
+  --atm-opacity: 0.18;
+  --atm-speed: 50s;
+
+  --hairline: 0 0% 38%;
+
+  --success: 0 0% 70%;
+  --warning: 0 0% 80%;
+  --info: 0 0% 80%;
+  --rating: 0 0% 85%;
+
+  --radius: 0.5rem;
+}
+
+/* ---------------------------------------------------------------------------
  * THEME 4 — ALPINE LIGHT
- * Premium light mode. Apple-clean, Linear-crisp, Stripe-precise.
- * Palette: #F7F8FA / #FFFFFF / #FFFFFF / #E5EAF1 / #0A4174 / #7BBDE8 / #0F172A
- * NO dark cards. NO dark backgrounds. Genuinely bright and premium.
+ * Professional, premium, minimal.
+ * Palette: #FAFAFA / #FFFFFF / #FFFFFF / rgba(0,0,0,0.08) / #2563EB / #111827
+ * Genuinely bright. Not a dark theme with white cards.
  * ------------------------------------------------------------------------- */
 .alpine-light {
-  --background: 220 25% 98%;          /* #F7F8FA */
-  --foreground: 222 47% 12%;          /* #0F172A */
+  --background: 0 0% 98%;             /* #FAFAFA */
+  --foreground: 220 33% 12%;          /* #111827 */
 
   --card: 0 0% 100%;                  /* #FFFFFF */
-  --card-foreground: 222 47% 12%;
+  --card-foreground: 220 33% 12%;
 
   --popover: 0 0% 100%;
-  --popover-foreground: 222 47% 12%;
+  --popover-foreground: 220 33% 12%;
 
-  /* Primary — deep navy. */
-  --primary: 212 86% 25%;             /* #0A4174 */
+  /* Primary — Apple / Linear / Stripe blue. */
+  --primary: 217 91% 60%;             /* #2563EB */
   --primary-foreground: 0 0% 100%;
 
-  --secondary: 202 75% 69%;           /* #7BBDE8 */
-  --secondary-foreground: 222 47% 12%;
+  --secondary: 217 80% 92%;
+  --secondary-foreground: 220 33% 18%;
 
-  --muted: 220 20% 96%;
-  --muted-foreground: 222 16% 38%;
+  --muted: 220 14% 96%;
+  --muted-foreground: 220 14% 36%;
 
-  --accent: 202 75% 94%;
-  --accent-foreground: 212 86% 25%;
+  --accent: 217 60% 95%;
+  --accent-foreground: 217 91% 40%;
 
   --destructive: 0 72% 46%;
   --destructive-foreground: 0 0% 100%;
 
-  --border: 218 30% 91%;              /* #E5EAF1 */
-  --input: 218 30% 91%;
-  --ring: 212 86% 25%;
+  --border: 0 0% 0% / 0.08;           /* rgba(0,0,0,0.08) */
+  --input: 0 0% 0% / 0.10;
+  --ring: 217 91% 60%;
 
-  --shadow-color: 222 30% 18%;
+  --shadow-color: 220 30% 18%;
 
-  /* Atmosphere — bright subtle drift, screen blend + white veil. */
-  --atm-color-1: 202 75% 80%;
-  --atm-color-2: 212 86% 70%;
-  --atm-color-3: 220 25% 96%;
+  /* Atmosphere — gentle daylight drift, multiply blend so the white base
+     * isn't washed out. */
+  --atm-color-1: 217 60% 90%;
+  --atm-color-2: 217 91% 70%;
+  --atm-color-3: 220 14% 96%;
   --atm-blend: multiply;
-  --atm-opacity: 0.18;
-  --atm-speed: 38s;
+  --atm-opacity: 0.20;
+  --atm-speed: 36s;
 
-  --hairline: 218 30% 86%;
+  --hairline: 0 0% 0% / 0.10;
 
   --success: 152 60% 32%;
   --warning: 32 80% 42%;
-  --info: 212 86% 40%;
+  --info: 217 91% 50%;
   --rating: 32 80% 42%;
 
   --radius: 0.625rem;
@@ -313,8 +313,8 @@
 /* Shared shadows (depend on each theme's --shadow-color). */
 :root,
 .midnight-ice,
-.arctic-steel,
 .ember-orange,
+.graphite-titanium,
 .alpine-light {
   --shadow-xs: 0 1px 2px 0 hsl(var(--shadow-color) / 0.10);
   --shadow-sm: 0 1px 3px 0 hsl(var(--shadow-color) / 0.14), 0 1px 2px -1px hsl(var(--shadow-color) / 0.12);

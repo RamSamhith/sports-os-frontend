@@ -1,13 +1,13 @@
 /**
  * SportsOS Theme System — single source of truth.
  *
- * Exactly four themes, no more. Each one is a *different product*,
- * not a colour swap. The UI exposes a single cycle button.
+ * Four themes only. Each one is a *different product*, not a colour swap.
+ * Cycle: Midnight Ice → Ember Orange → Graphite Titanium → Alpine Light.
  */
 export const themeNames = [
   'midnight-ice',
-  'arctic-steel',
   'ember-orange',
+  'graphite-titanium',
   'alpine-light',
 ] as const;
 
@@ -17,7 +17,7 @@ export interface ThemeMeta {
   id: ThemeName;
   label: string;
   description: string;
-  icon: 'Snowflake' | 'Zap' | 'Flame' | 'Sun';
+  icon: 'Snowflake' | 'Flame' | 'Gem' | 'Sun';
   accessibility: boolean;
   tags: ReadonlyArray<string>;
 }
@@ -26,31 +26,31 @@ export const themeMeta: Record<ThemeName, ThemeMeta> = {
   'midnight-ice': {
     id: 'midnight-ice',
     label: 'Midnight Ice',
-    description: 'Premium flagship. Luxury, professional, modern, elite.',
+    description: 'Premium sports platform. Slow aurora, soft blue drift.',
     icon: 'Snowflake',
     accessibility: false,
-    tags: ['Default', 'Luxury'],
-  },
-  'arctic-steel': {
-    id: 'arctic-steel',
-    label: 'Arctic Steel',
-    description: 'Performance mode. Athletic, technology, speed, competition.',
-    icon: 'Zap',
-    accessibility: false,
-    tags: ['Athletic', 'Speed'],
+    tags: ['Default', 'Tech'],
   },
   'ember-orange': {
     id: 'ember-orange',
     label: 'Ember Orange',
-    description: 'Energy mode. Sports, action, competition, intensity.',
+    description: 'Competition, performance, athlete mindset. Stadium energy.',
     icon: 'Flame',
     accessibility: false,
-    tags: ['Energy', 'Sport'],
+    tags: ['Sport', 'Energy'],
+  },
+  'graphite-titanium': {
+    id: 'graphite-titanium',
+    label: 'Graphite Titanium',
+    description: 'Executive, luxury, premium software. Metallic sweep.',
+    icon: 'Gem',
+    accessibility: false,
+    tags: ['Luxury', 'Metallic'],
   },
   'alpine-light': {
     id: 'alpine-light',
     label: 'Alpine Light',
-    description: 'Premium daylight. Apple-clean, Linear-crisp, Stripe-precise.',
+    description: 'Professional, premium, minimal. Genuinely bright daylight.',
     icon: 'Sun',
     accessibility: true,
     tags: ['Light', 'A11y'],
