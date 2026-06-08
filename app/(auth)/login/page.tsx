@@ -7,8 +7,15 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { SharedLayout } from '@/components/motion/shared-layout';
-import { cn } from '@/lib/utils/cn';
+import { useAuth } from '@/lib/hooks/use-auth';
+import { Loader2 } from 'lucide-react';
+
+interface FieldErrors {
+  email?: string;
+  password?: string;
+}
 
 const formVariants = {
   hidden: { opacity: 0, y: 16 },
@@ -22,12 +29,96 @@ const fieldVariants = {
 
 export default function LoginPage() {
   const reduced = useReducedMotion();
+  const router = useRouter();
+  const { setAuth } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [errors, setErrors] = useState<FieldErrors>({});
+  const [touched, setTouched] = useState<Record<string, boolean>>({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  function validate(): FieldErrors {
+    const e: FieldErrors = {};
+
+    if (!email.trim()) {
+      e.email = 'Email is required';
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      e.email = 'Enter a valid email address';
+    }
+
+    if (!password) {
+      e.password = 'Password is required';
+    } else if (password.length < 8) {
+      e.password = 'Password must be at least 8 characters';
+    }
+
+    return e;
+  }
+
+  function validateField(field: string, value: string) {
+    const e: FieldErrors = {};
+
+    if (field === 'email') {
+      if (!value.trim()) e.email = 'Email is required';
+      else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) e.email = 'Enter a valid email address';
+    } else if (field === 'password') {
+      if (!value) e.password = 'Password is required';
+      else if (value.length < 8) e.password = 'Password must be at least 8 characters';
+    }
+
+    return e;
+  }
+
+  function handleBlur(field: string, value: string) {
+    setTouched((prev) => ({ ...prev, [field]: true }));
+    const fieldErrors = validateField(field, value);
+    setErrors((prev) => {
+      const next = { ...prev };
+      if (fieldErrors[field as keyof FieldErrors]) {
+        next[field as keyof FieldErrors] = fieldErrors[field as keyof FieldErrors];
+      } else {
+        delete next[field as keyof FieldErrors];
+      }
+      return next;
+    });
+  }
+
+  function handleChange(field: string, value: string) {
+    if (field === 'email') setEmail(value);
+    else if (field === 'password') setPassword(value);
+
+    if (touched[field]) {
+      const fieldErrors = validateField(field, value);
+      setErrors((prev) => {
+        const next = { ...prev };
+        if (fieldErrors[field as keyof FieldErrors]) {
+          next[field as keyof FieldErrors] = fieldErrors[field as keyof FieldErrors];
+        } else {
+          delete next[field as keyof FieldErrors];
+        }
+        return next;
+      });
+    }
+  }
+
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-  };
+    setTouched({ email: true, password: true });
+
+    const validationErrors = validate();
+    setErrors(validationErrors);
+
+    if (Object.keys(validationErrors).length > 0) return;
+
+    setIsSubmitting(true);
+    // Placeholder: real authentication wiring lives in a later phase
+    await new Promise((r) => setTimeout(r, 1200));
+    setAuth(true);
+    setIsSubmitting(false);
+    router.push('/');
+  }
+
+  const errorId = (field: string) => `login-${field}-error`;
 
   return (
     <SharedLayout layoutId="auth-card">
@@ -36,17 +127,24 @@ export default function LoginPage() {
           <motion.div
             initial={reduced ? { opacity: 0 } : 'hidden'}
             animate={reduced ? { opacity: 1 } : 'show'}
-            variants={reduced ? undefined : { hidden: { opacity: 0, y: -8 }, show: { opacity: 1, y: 0, transition: { duration: 0.5, ease: [0.3, 0, 0, 1] } } }}
-            className="flex items-center justify-center gap-2 mb-2"
+            variants={
+              reduced
+                ? undefined
+                : {
+                    hidden: { opacity: 0, y: -8 },
+                    show: { opacity: 1, y: 0, transition: { duration: 0.5, ease: [0.3, 0, 0, 1] } },
+                  }
+            }
+            className="mb-2 flex items-center justify-center gap-2"
           >
-            <span className="relative flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10 ring-1 ring-primary/20">
+            <span className="bg-primary/10 ring-primary/30 relative flex h-8 w-8 items-center justify-center rounded-lg ring-1">
               <svg className="h-5 w-5 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <rect x="2" y="3" width="20" height="14" rx="2" />
                 <path d="M8 21h8" />
                 <path d="M12 17v4" />
               </svg>
             </span>
-            <span className="text-sm font-medium text-primary">Welcome back</span>
+            <span className="text-primary text-sm font-medium">Welcome back</span>
           </motion.div>
           <CardTitle className="text-2xl">Sign in to SportsOS</CardTitle>
           <CardDescription>
@@ -61,50 +159,88 @@ export default function LoginPage() {
             variants={reduced ? undefined : formVariants}
             transition={{ delay: 0.1 }}
             className="flex flex-col gap-4"
+            noValidate
           >
             <motion.div
               variants={reduced ? undefined : fieldVariants}
               transition={{ delay: 0.15 }}
               className="flex flex-col gap-1.5"
             >
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="login-email">Email</Label>
               <Input
-                id="email"
+                id="login-email"
                 type="email"
                 placeholder="you@example.com"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={(e) => handleChange('email', e.target.value)}
+                onBlur={(e) => handleBlur('email', e.target.value)}
                 required
                 autoComplete="email"
+                aria-invalid={!!errors.email}
+                aria-describedby={errors.email ? errorId('email') : undefined}
+                disabled={isSubmitting}
               />
+              {errors.email && (
+                <p id={errorId('email')} role="alert" className="text-destructive text-xs">
+                  {errors.email}
+                </p>
+              )}
             </motion.div>
+
             <motion.div
               variants={reduced ? undefined : fieldVariants}
               transition={{ delay: 0.2 }}
               className="flex flex-col gap-1.5"
             >
               <div className="flex items-center justify-between">
-                <Label htmlFor="password">Password</Label>
-                <Link href="/forgot-password" className="text-sm text-primary hover:underline">
+                <Label htmlFor="login-password">Password</Label>
+                <Link href="/forgot-password" className="text-primary text-sm hover:underline">
                   Forgot password?
                 </Link>
               </div>
               <Input
-                id="password"
+                id="login-password"
                 type="password"
-                placeholder="\u2022\u2022\u2022\u2022\u2022\u2022\u2022\u2022"
+                placeholder="At least 8 characters"
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                onChange={(e) => handleChange('password', e.target.value)}
+                onBlur={(e) => handleBlur('password', e.target.value)}
                 required
                 autoComplete="current-password"
+                aria-invalid={!!errors.password}
+                aria-describedby={errors.password ? errorId('password') : undefined}
+                disabled={isSubmitting}
               />
+              {errors.password && (
+                <p id={errorId('password')} role="alert" className="text-destructive text-xs">
+                  {errors.password}
+                </p>
+              )}
             </motion.div>
+
             <motion.button
               type="submit"
-              variants={reduced ? undefined : { hidden: { opacity: 0, scale: 0.98 }, show: { opacity: 1, scale: 1, transition: { duration: 0.3, ease: [0.2, 0, 0, 1], delay: 0.25 } } }}
+              variants={
+                reduced
+                  ? undefined
+                  : {
+                      hidden: { opacity: 0, scale: 0.98 },
+                      show: { opacity: 1, scale: 1, transition: { duration: 0.3, ease: [0.2, 0, 0, 1], delay: 0.25 } },
+                    }
+              }
               className="mt-2 w-full"
+              disabled={isSubmitting}
             >
-              <Button className="w-full">Sign in</Button>
+              <Button className="w-full" disabled={isSubmitting}>
+                {isSubmitting ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    Signing in…
+                  </>
+                ) : (
+                  'Sign in'
+                )}
+              </Button>
             </motion.button>
           </motion.form>
 
@@ -118,7 +254,7 @@ export default function LoginPage() {
               <span className="w-full border-t" />
             </div>
             <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-card px-2 text-muted-foreground">Or continue with</span>
+              <span className="bg-card text-muted-foreground px-2">Or continue with</span>
             </div>
           </motion.div>
 
@@ -128,7 +264,7 @@ export default function LoginPage() {
             transition={{ delay: 0.35 }}
             className="grid grid-cols-2 gap-3"
           >
-            <Link href="/signup">
+            <Link href="/register">
               <Button variant="outline" className="w-full">
                 Create Account
               </Button>
