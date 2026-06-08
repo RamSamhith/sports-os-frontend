@@ -2,6 +2,7 @@ import { CoachCardPlaceholder } from './coach-card-placeholder';
 import { CoachCardSkeleton } from '@/components/feedback/skeletons';
 import { EmptyState } from '@/components/feedback/empty-state';
 import { ErrorState } from '@/components/feedback/error-state';
+import { Button } from '@/components/ui/button';
 import { Inbox, AlertTriangle } from 'lucide-react';
 import type { Coach } from '@/types/domain/coach';
 
@@ -24,7 +25,7 @@ export function CoachGrid({
 }: CoachGridProps) {
   if (loading) {
     return (
-      <div aria-busy="true" aria-label="Loading coaches" className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+      <div aria-busy="true" aria-label="Loading coaches" className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {Array.from({ length: 6 }).map((_, i) => (
           <CoachCardSkeleton key={i} />
         ))}
@@ -49,20 +50,16 @@ export function CoachGrid({
         description="Try a different name, city, or sport."
         action={
           onClear ? (
-            <button
-              type="button"
-              onClick={onClear}
-              className="bg-primary text-primary-foreground hover:bg-primary/90 inline-flex items-center justify-center rounded-md px-4 py-2 text-sm font-medium transition-colors"
-            >
+            <Button size="sm" onClick={onClear}>
               {clearLabel}
-            </button>
+            </Button>
           ) : null
         }
       />
     );
   }
   return (
-    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
       {coaches.map((coach) => (
         <CoachCardPlaceholder key={coach.id} coach={coach} />
       ))}

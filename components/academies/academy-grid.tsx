@@ -2,6 +2,7 @@ import { AcademyCardPlaceholder } from './academy-card-placeholder';
 import { AcademyCardSkeleton } from '@/components/feedback/skeletons';
 import { EmptyState } from '@/components/feedback/empty-state';
 import { ErrorState } from '@/components/feedback/error-state';
+import { Button } from '@/components/ui/button';
 import { Inbox, AlertTriangle } from 'lucide-react';
 import type { Academy } from '@/types/domain/academy';
 
@@ -49,13 +50,9 @@ export function AcademyGrid({
         description="Try expanding your search or removing some filters."
         action={
           onClear ? (
-            <button
-              type="button"
-              onClick={onClear}
-              className="btn-primary motion-premium inline-flex items-center justify-center rounded-md px-4 py-2 text-sm font-medium"
-            >
+            <Button size="sm" onClick={onClear}>
               {clearLabel}
-            </button>
+            </Button>
           ) : null
         }
       />

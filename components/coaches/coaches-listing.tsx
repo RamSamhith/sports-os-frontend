@@ -5,6 +5,8 @@ import { X } from 'lucide-react';
 import { SearchInput } from '@/components/ui/search-input';
 import { Button } from '@/components/ui/button';
 import { CoachGrid } from '@/components/coaches/coach-grid';
+import { EmptyState } from '@/components/feedback/empty-state';
+import { Inbox } from 'lucide-react';
 import { useSearchQuery } from '@/lib/hooks/use-search-query';
 import { coaches } from '@/data/coaches';
 
@@ -45,15 +47,16 @@ export function CoachesListing() {
       </p>
 
       {filtered.length === 0 ? (
-        <div className="border-border/60 bg-card/40 mx-auto flex w-full max-w-md flex-col items-center gap-3 rounded-xl border border-dashed p-8 text-center">
-          <p className="text-sm font-semibold">No coaches found</p>
-          <p className="text-muted-foreground text-sm">
-            Try a different name, city, or sport.
-          </p>
-          <Button size="sm" variant="outline" onClick={() => setQuery('')}>
-            <X className="h-3.5 w-3.5" /> Clear search
-          </Button>
-        </div>
+        <EmptyState
+          icon={<Inbox className="h-5 w-5" />}
+          title="No coaches found"
+          description="Try a different name, city, or sport."
+          action={
+            <Button size="sm" variant="outline" onClick={() => setQuery('')}>
+              <X className="h-3.5 w-3.5" /> Clear search
+            </Button>
+          }
+        />
       ) : (
         <CoachGrid coaches={filtered} onClear={() => setQuery('')} />
       )}

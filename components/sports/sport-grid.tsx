@@ -2,6 +2,7 @@ import { SportCard } from './sport-card';
 import { SportCardSkeleton } from '@/components/feedback/skeletons';
 import { EmptyState } from '@/components/feedback/empty-state';
 import { ErrorState } from '@/components/feedback/error-state';
+import { Button } from '@/components/ui/button';
 import { Inbox, AlertTriangle } from 'lucide-react';
 import type { Sport } from '@/types/domain/sport';
 
@@ -24,7 +25,7 @@ export function SportGrid({
 }: SportGridProps) {
   if (loading) {
     return (
-      <div aria-busy="true" aria-label="Loading sports" className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
+      <div aria-busy="true" aria-label="Loading sports" className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
         {Array.from({ length: 8 }).map((_, i) => (
           <SportCardSkeleton key={i} />
         ))}
@@ -49,20 +50,16 @@ export function SportGrid({
         description="Try a different name or category."
         action={
           onClear ? (
-            <button
-              type="button"
-              onClick={onClear}
-              className="btn-primary motion-premium inline-flex items-center justify-center rounded-md px-4 py-2 text-sm font-medium"
-            >
+            <Button size="sm" onClick={onClear}>
               {clearLabel}
-            </button>
+            </Button>
           ) : null
         }
       />
     );
   }
   return (
-    <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
+    <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
       {sports.map((sport) => (
         <SportCard key={sport.id} sport={sport} />
       ))}

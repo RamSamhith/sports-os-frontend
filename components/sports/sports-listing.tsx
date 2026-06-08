@@ -5,6 +5,8 @@ import { X } from 'lucide-react';
 import { SearchInput } from '@/components/ui/search-input';
 import { Button } from '@/components/ui/button';
 import { SportGrid } from '@/components/sports/sport-grid';
+import { EmptyState } from '@/components/feedback/empty-state';
+import { Inbox } from 'lucide-react';
 import { useSearchQuery } from '@/lib/hooks/use-search-query';
 import { sports } from '@/data/sports';
 
@@ -39,13 +41,16 @@ export function SportsListing() {
       </p>
 
       {filtered.length === 0 ? (
-        <div className="border-border/60 bg-card/40 mx-auto flex w-full max-w-md flex-col items-center gap-3 rounded-xl border border-dashed p-8 text-center">
-          <p className="text-sm font-semibold">No sports found</p>
-          <p className="text-muted-foreground text-sm">Try a different name or category.</p>
-          <Button size="sm" variant="outline" onClick={() => setQuery('')}>
-            <X className="h-3.5 w-3.5" /> Clear search
-          </Button>
-        </div>
+        <EmptyState
+          icon={<Inbox className="h-5 w-5" />}
+          title="No sports found"
+          description="Try a different name or category."
+          action={
+            <Button size="sm" variant="outline" onClick={() => setQuery('')}>
+              <X className="h-3.5 w-3.5" /> Clear search
+            </Button>
+          }
+        />
       ) : (
         <SportGrid sports={filtered} onClear={() => setQuery('')} />
       )}
