@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils/cn';
-import { useRole } from '@/lib/hooks/use-role';
+import { useAuth } from '@/lib/hooks/use-auth';
 import { ChildSwitcher } from './child-switcher';
 
 const allItems = [
@@ -17,7 +17,7 @@ const allItems = [
 
 export function ProfileSidebar() {
   const pathname = usePathname();
-  const role = useRole();
+  const { role } = useAuth();
   const isParent = role === 'parent';
 
   const items = allItems.filter((it) => !it.parentOnly || isParent);

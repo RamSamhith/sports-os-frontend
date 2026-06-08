@@ -1,40 +1,14 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useAuth } from '@/lib/hooks/use-auth';
 
-export type OnboardingRole = 'athlete' | 'parent';
-
-const STORAGE_KEY = 'sportsos:onboarding-role';
-
-export function useRole(): OnboardingRole | null {
-  const [role, setRole] = useState<OnboardingRole | null>(null);
-
-  useEffect(() => {
-    try {
-      const stored = localStorage.getItem(STORAGE_KEY);
-      if (stored === 'athlete' || stored === 'parent') {
-        setRole(stored);
-      }
-    } catch {
-      // localStorage unavailable (SSR / private browsing)
-    }
-
-    function handleStorage() {
-      try {
-        const stored = localStorage.getItem(STORAGE_KEY);
-        if (stored === 'athlete' || stored === 'parent') {
-          setRole(stored);
-        } else {
-          setRole(null);
-        }
-      } catch {
-        // ignore
-      }
-    }
-
-    window.addEventListener('storage', handleStorage);
-    return () => window.removeEventListener('storage', handleStorage);
-  }, []);
-
+/**
+ * @deprecated Use `useAuth().role` from `@/lib/hooks/use-auth` instead.
+ * This wrapper exists for backward compatibility only.
+ */
+export function useRole(): 'athlete' | 'parent' | null {
+  const { role } = useAuth();
   return role;
 }
+
+export type { OnboardingRole } from '@/lib/hooks/use-auth';

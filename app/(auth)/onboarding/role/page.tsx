@@ -9,8 +9,9 @@ import { useRouter } from 'next/navigation';
 import { SharedLayout } from '@/components/motion/shared-layout';
 import { cn } from '@/lib/utils/cn';
 import { Check, ArrowRight, User, Users } from 'lucide-react';
+import { useAuth, type OnboardingRole } from '@/lib/hooks/use-auth';
 
-type Role = 'athlete' | 'parent';
+type Role = OnboardingRole;
 
 const roles: {
   id: Role;
@@ -90,6 +91,7 @@ const footerVariants = {
 export default function RoleSelectionPage() {
   const reduced = useReducedMotion();
   const router = useRouter();
+  const { setRole } = useAuth();
   const [selected, setSelected] = useState<Role | null>(null);
 
   function handleSelect(role: Role) {
@@ -105,7 +107,7 @@ export default function RoleSelectionPage() {
 
   function handleContinue() {
     if (!selected) return;
-    localStorage.setItem('sportsos:onboarding-role', selected);
+    setRole(selected);
     // Placeholder: next onboarding step will read this value
     router.push('/');
   }

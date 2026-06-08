@@ -1,34 +1,30 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { useAuth } from '@/lib/hooks/use-auth';
 import { ProfileSkeleton } from '@/components/feedback/skeletons';
-
-const AUTH_KEY = 'sportsos:auth';
 
 export function PrivateGuard({ children }: { children: React.ReactNode }) {
   const router = useRouter();
-  const [allowed, setAllowed] = useState<boolean | null>(null);
+  const { isAuthenticated, isLoading } = useAuth();
 
   useEffect(() => {
-    try {
-      const authed = localStorage.getItem(AUTH_KEY) === 'true';
-      if (authed) {
-        setAllowed(true);
-      } else {
-        router.replace('/welcome');
-      }
-    } catch {
+    if (!isLoading && !isAuthenticated) {
       router.replace('/welcome');
     }
-  }, [router]);
+  }, [isLoading, isAuthenticated, router]);
 
-  if (allowed === null) {
+  if (isLoading) {
     return (
       <div className="flex flex-col gap-6 py-10">
         <ProfileSkeleton />
       </div>
     );
+  }
+
+  if (!isAuthenticated) {
+    return null;
   }
 
   return <>{children}</>;
