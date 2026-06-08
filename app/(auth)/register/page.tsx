@@ -137,6 +137,7 @@ export default function RegisterPage() {
     setIsSubmitting(true);
     // Placeholder: real registration wiring lives in a later phase
     await new Promise((r) => setTimeout(r, 1500));
+    localStorage.setItem('sportsos:auth', 'true');
     setIsSubmitting(false);
     router.push('/onboarding/role');
   }
