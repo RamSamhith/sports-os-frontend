@@ -7,19 +7,31 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { SharedLayout } from '@/components/motion/shared-layout';
 import { Loader2, CheckCircle2, ArrowLeft, Mail } from 'lucide-react';
+import { useAuth } from '@/lib/hooks/use-auth';
 
 const FAST = { duration: 0.2, ease: [0.2, 0, 0, 1] as const };
 
 export default function ForgotPasswordPage() {
   const reduced = useReducedMotion();
+  const router = useRouter();
+  const { isAuthenticated, isLoading } = useAuth();
   const [email, setEmail] = useState('');
   const [error, setError] = useState('');
   const [touched, setTouched] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [sent, setSent] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  // Redirect authenticated users to home
+  useEffect(() => {
+    if (isLoading) return;
+    if (isAuthenticated) {
+      router.replace('/');
+    }
+  }, [isLoading, isAuthenticated, router]);
 
   // Focus input on mount and on resend
   useEffect(() => {

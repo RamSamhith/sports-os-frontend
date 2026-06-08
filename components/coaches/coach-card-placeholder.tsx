@@ -1,16 +1,24 @@
+'use client';
+
 import Link from 'next/link';
+import { Bookmark, BookmarkCheck, MapPin } from 'lucide-react';
+import { toast } from 'sonner';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { ImageWithFallback } from '@/components/ui/image-with-fallback';
 import { VerifiedBadge } from '@/components/trust/verified-badge';
 import { CompareButton } from '@/components/academies/compare-button';
-import { MapPin } from 'lucide-react';
 import { fixtureImages } from '@/lib/images';
+import { useShortlist } from '@/lib/hooks/use-shortlist';
 import type { Coach } from '@/types/domain/coach';
 
 export function CoachCardPlaceholder({ coach }: { coach: Coach }) {
   const { slug, name, location, experienceYears, sportsCoached, verificationStatus, avatar, id } = coach;
+
+  // Shortlist (persisted in localStorage by provider)
+  const { has: hasShortlist, addWithMeta, remove: removeFromShortlist } = useShortlist();
+  const isSaved = hasShortlist('coach', id);
   const imageSrc = avatar ?? fixtureImages.coaches[id];
   const initials = name
     .split(' ')
@@ -69,6 +77,31 @@ export function CoachCardPlaceholder({ coach }: { coach: Coach }) {
           sublabel={`${location.city} · ${experienceYears}+ yrs`}
           href={`/coaches/${slug}`}
         />
+        <Button
+          size="icon-touch"
+          variant={isSaved ? 'default' : 'outline'}
+          aria-label={isSaved ? `Remove ${name} from shortlist` : `Save ${name} to shortlist`}
+          aria-pressed={isSaved}
+          onClick={() => {
+            if (isSaved) {
+              removeFromShortlist('coach', id);
+              toast(`Removed ${name} from shortlist`);
+            } else {
+              addWithMeta('coach', id, {
+                label: name,
+                sublabel: `${location.city} · ${experienceYears}+ yrs`,
+                href: `/coaches/${slug}`,
+              });
+              toast.success(`Saved ${name} to shortlist`);
+            }
+          }}
+        >
+          {isSaved ? (
+            <BookmarkCheck className="h-4 w-4" />
+          ) : (
+            <Bookmark className="h-4 w-4" />
+          )}
+        </Button>
         <Button size="md" variant="outline" asChild className="h-11 px-4">
           <Link href={`/coaches/${slug}`}>View</Link>
         </Button>

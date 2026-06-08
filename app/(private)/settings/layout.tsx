@@ -1,5 +1,8 @@
+'use client';
+
 import type { ReactNode } from 'react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { Container } from '@/components/layout/container';
 import { Section } from '@/components/layout/section';
 import { cn } from '@/lib/utils/cn';
@@ -12,6 +15,8 @@ const settingsNav: ReadonlyArray<{ label: string; href: string; description: str
 ];
 
 export default function SettingsLayout({ children }: { children: ReactNode }) {
+  const pathname = usePathname();
+
   return (
     <Section>
       <Container>
@@ -23,21 +28,28 @@ export default function SettingsLayout({ children }: { children: ReactNode }) {
         </div>
         <div className="grid grid-cols-1 gap-8 md:grid-cols-[220px_1fr]">
           <nav aria-label="Settings sections" className="flex flex-col gap-1">
-            {settingsNav.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={cn(
-                  'hover:bg-accent/10 rounded-md px-3 py-2 text-sm transition-colors',
-                  'focus-visible:ring-ring focus-visible:ring-2 focus-visible:outline-none',
-                )}
-              >
-                <span className="text-foreground block font-medium">{item.label}</span>
-                <span className="text-muted-foreground block text-xs leading-snug">
-                  {item.description}
-                </span>
-              </Link>
-            ))}
+            {settingsNav.map((item) => {
+              const isActive = pathname === item.href;
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  aria-current={isActive ? 'page' : undefined}
+                  className={cn(
+                    'rounded-md px-3 py-2 text-sm transition-colors',
+                    'focus-visible:ring-ring focus-visible:ring-2 focus-visible:outline-none',
+                    isActive
+                      ? 'bg-accent text-accent-foreground font-medium'
+                      : 'text-muted-foreground hover:bg-accent/10 hover:text-foreground',
+                  )}
+                >
+                  <span className="block font-medium">{item.label}</span>
+                  <span className="text-muted-foreground block text-xs leading-snug">
+                    {item.description}
+                  </span>
+                </Link>
+              );
+            })}
           </nav>
           <div className="min-w-0">{children}</div>
         </div>
