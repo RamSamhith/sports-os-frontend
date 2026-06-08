@@ -125,7 +125,7 @@ export default function RoleSelectionPage() {
             <span className="bg-primary/10 ring-primary/30 relative flex h-8 w-8 items-center justify-center rounded-lg ring-1">
               <User className="h-4 w-4 text-primary" />
             </span>
-            <span className="text-primary text-sm font-medium">Step 1 of 2</span>
+            <span className="text-primary text-sm font-medium">Set up your profile</span>
           </motion.div>
 
           <motion.h1

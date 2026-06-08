@@ -10,14 +10,14 @@ export default function PrivateLayout({ children }: { children: ReactNode }) {
   return (
     <>
       <Navbar />
-      <Container className="grid grid-cols-1 gap-6 py-10 md:grid-cols-[240px_1fr]">
-        <ProfileSidebar />
-        <main className="min-w-0">
-          <ErrorBoundary>
-            <PrivateGuard>{children}</PrivateGuard>
-          </ErrorBoundary>
-        </main>
-      </Container>
+      <ErrorBoundary>
+        <PrivateGuard>
+          <Container className="grid grid-cols-1 gap-6 py-10 md:grid-cols-[240px_1fr]">
+            <ProfileSidebar />
+            <main className="min-w-0">{children}</main>
+          </Container>
+        </PrivateGuard>
+      </ErrorBoundary>
       <Footer />
     </>
   );

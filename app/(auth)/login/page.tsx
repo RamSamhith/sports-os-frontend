@@ -218,8 +218,7 @@ export default function LoginPage() {
               )}
             </motion.div>
 
-            <motion.button
-              type="submit"
+            <motion.div
               variants={
                 reduced
                   ? undefined
@@ -229,9 +228,8 @@ export default function LoginPage() {
                     }
               }
               className="mt-2 w-full"
-              disabled={isSubmitting}
             >
-              <Button className="w-full" disabled={isSubmitting}>
+              <Button type="submit" className="w-full" disabled={isSubmitting}>
                 {isSubmitting ? (
                   <>
                     <Loader2 className="h-4 w-4 animate-spin" />
@@ -241,7 +239,7 @@ export default function LoginPage() {
                   'Sign in'
                 )}
               </Button>
-            </motion.button>
+            </motion.div>
           </motion.form>
 
           <motion.div

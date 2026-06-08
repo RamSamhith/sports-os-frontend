@@ -9,7 +9,6 @@ import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { SharedLayout } from '@/components/motion/shared-layout';
-import { cn } from '@/lib/utils/cn';
 import { Loader2 } from 'lucide-react';
 import { useAuth } from '@/lib/hooks/use-auth';
 
@@ -290,8 +289,7 @@ export default function RegisterPage() {
               )}
             </motion.div>
 
-            <motion.button
-              type="submit"
+            <motion.div
               variants={
                 reduced
                   ? undefined
@@ -301,9 +299,8 @@ export default function RegisterPage() {
                     }
               }
               className="mt-2 w-full"
-              disabled={isSubmitting}
             >
-              <Button className="w-full" disabled={isSubmitting}>
+              <Button type="submit" className="w-full" disabled={isSubmitting}>
                 {isSubmitting ? (
                   <>
                     <Loader2 className="h-4 w-4 animate-spin" />
@@ -313,7 +310,7 @@ export default function RegisterPage() {
                   'Create account'
                 )}
               </Button>
-            </motion.button>
+            </motion.div>
           </motion.form>
 
           <motion.div

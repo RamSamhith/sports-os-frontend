@@ -110,7 +110,7 @@ export default function WelcomePage() {
             transition={{ delay: 0.3 }}
             className="mt-12 flex flex-col sm:flex-row items-center justify-center gap-4"
           >
-            <Link href="/signup">
+            <Link href="/register">
               <Button size="lg" className="w-full sm:w-auto min-w-[160px] gap-2">
                 <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                   <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />

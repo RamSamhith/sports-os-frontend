@@ -38,18 +38,6 @@ export default function SearchPage() {
     setActiveTab(tab as 'all' | 'academies' | 'coaches' | 'sports');
   };
 
-  if (activeTab === 'academies') {
-    return <AcademyListing />;
-  }
-
-  if (activeTab === 'coaches') {
-    return <CoachesListing />;
-  }
-
-  if (activeTab === 'sports') {
-    return <SportsListing />;
-  }
-
   return (
     <Section>
       <Container size="lg">

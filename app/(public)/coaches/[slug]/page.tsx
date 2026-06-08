@@ -10,6 +10,7 @@ import { ImageWithFallback } from '@/components/ui/image-with-fallback';
 import { fixtureImages } from '@/lib/images';
 import { notFound } from 'next/navigation';
 import { coachBySlug } from '@/data/coaches';
+import Link from 'next/link';
 
 export default function CoachDetailPage({ params }: { params: { slug: string } }) {
   const coach = coachBySlug(params.slug);
@@ -50,7 +51,9 @@ export default function CoachDetailPage({ params }: { params: { slug: string } }
               Specialisation: {coach.specialization.join(', ')}.
             </p>
             <div className="flex flex-wrap items-center gap-2">
-              <Button>Request callback</Button>
+              <Button asChild>
+                <Link href={`/enquiry/coach/${coach.slug}`}>Request callback</Link>
+              </Button>
               <ShortlistToggle
                 itemType="coach"
                 itemId={coach.id}

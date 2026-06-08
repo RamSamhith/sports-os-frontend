@@ -12,6 +12,7 @@ import { ImageWithFallback } from '@/components/ui/image-with-fallback';
 import { fixtureImages } from '@/lib/images';
 import { notFound } from 'next/navigation';
 import { academyBySlug } from '@/data/academies';
+import Link from 'next/link';
 
 export default function AcademyDetailPage({ params }: { params: { slug: string } }) {
   const academy = academyBySlug(params.slug);
@@ -54,7 +55,9 @@ export default function AcademyDetailPage({ params }: { params: { slug: string }
               <CertificationIndicator count={academy.certifications.length} />
             </div>
             <div className="flex flex-wrap items-center gap-2">
-              <Button>Request trial</Button>
+              <Button asChild>
+                <Link href={`/enquiry/academy/${academy.slug}`}>Request trial</Link>
+              </Button>
               <ShortlistToggle
                 itemType="academy"
                 itemId={academy.id}
