@@ -1,6 +1,5 @@
 'use client';
 
-import * as React from 'react';
 import {
   Select,
   SelectContent,
@@ -8,16 +7,26 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { useChildren } from '@/lib/hooks/use-children';
 
-export function ChildSwitcher({ kids }: { kids: Array<{ id: string; name: string }> }) {
-  const [value, setValue] = React.useState<string>(kids[0]?.id ?? '');
+export function ChildSwitcher() {
+  const { children, activeChildId, setActiveChild } = useChildren();
+
+  if (children.length === 0) {
+    return (
+      <p className="text-muted-foreground text-xs">
+        No children added yet.
+      </p>
+    );
+  }
+
   return (
-    <Select value={value} onValueChange={setValue}>
+    <Select value={activeChildId ?? ''} onValueChange={setActiveChild}>
       <SelectTrigger className="w-full">
         <SelectValue placeholder="Select a child" />
       </SelectTrigger>
       <SelectContent>
-        {kids.map((c) => (
+        {children.map((c) => (
           <SelectItem key={c.id} value={c.id}>
             {c.name}
           </SelectItem>

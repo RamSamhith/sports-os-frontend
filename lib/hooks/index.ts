@@ -1,5 +1,6 @@
 export * from './use-analytics';
 export * from './use-auth';
+export * from './use-children';
 export * from './use-compare';
 export * from './use-consent';
 export * from './use-debounce';

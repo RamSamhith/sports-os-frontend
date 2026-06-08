@@ -15,7 +15,7 @@ const allItems = [
   { href: '/profile/settings', label: 'Settings' },
 ];
 
-export function ProfileSidebar({ kids }: { kids: Array<{ id: string; name: string }> }) {
+export function ProfileSidebar() {
   const pathname = usePathname();
   const role = useRole();
   const isParent = role === 'parent';
@@ -29,7 +29,7 @@ export function ProfileSidebar({ kids }: { kids: Array<{ id: string; name: strin
           <p className="text-muted-foreground mb-2 text-xs font-medium tracking-wide uppercase">
             Active child
           </p>
-          <ChildSwitcher kids={kids} />
+          <ChildSwitcher />
         </div>
       )}
       <nav aria-label="Profile" className="border-border/60 bg-card/40 rounded-xl border p-2">
