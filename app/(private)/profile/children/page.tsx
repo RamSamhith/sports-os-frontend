@@ -1,19 +1,29 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { ChildCard } from '@/components/profile/child-card';
 import { ChildFormDialog } from '@/components/profile/child-form-dialog';
 import { ChildRemoveDialog } from '@/components/profile/child-remove-dialog';
 import { Button } from '@/components/ui/button';
 import { EmptyState } from '@/components/feedback/empty-state';
 import { useChildren, type Child } from '@/lib/hooks/use-children';
+import { useAuth } from '@/lib/hooks/use-auth';
 import { Plus, UserRoundPlus } from 'lucide-react';
 
 export default function ChildrenPage() {
+  const { role } = useAuth();
+  const router = useRouter();
   const { children, activeChildId, addChild, updateChild, removeChild } = useChildren();
   const [formOpen, setFormOpen] = useState(false);
   const [editingChild, setEditingChild] = useState<Child | null>(null);
   const [removingChild, setRemovingChild] = useState<Child | null>(null);
+
+  // Guard: redirect athletes to personal page
+  if (role === 'athlete') {
+    router.replace('/profile/personal');
+    return null;
+  }
 
   function handleAdd(data: { name: string; age: number; sport: string; skillLevel?: string }) {
     addChild(data);

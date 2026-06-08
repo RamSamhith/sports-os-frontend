@@ -1,0 +1,515 @@
+'use client';
+
+import { useState, useCallback, useEffect } from 'react';
+import { motion, useReducedMotion, AnimatePresence } from 'framer-motion';
+import { useRouter } from 'next/navigation';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Button } from '@/components/ui/button';
+import { useAuth } from '@/lib/hooks/use-auth';
+import { Loader2, ArrowLeft } from 'lucide-react';
+
+type ModalView = 'choose' | 'login' | 'register';
+
+interface FieldErrors {
+  name?: string;
+  email?: string;
+  password?: string;
+  confirmPassword?: string;
+}
+
+const overlayVariants = {
+  hidden: { opacity: 0 },
+  visible: { opacity: 1, transition: { duration: 0.2 } },
+  exit: { opacity: 0, transition: { duration: 0.15 } },
+};
+
+const cardVariants = {
+  hidden: { opacity: 0, scale: 0.95, y: 12 },
+  visible: {
+    opacity: 1,
+    scale: 1,
+    y: 0,
+    transition: { type: 'spring', stiffness: 380, damping: 30 },
+  },
+  exit: {
+    opacity: 0,
+    scale: 0.97,
+    y: 8,
+    transition: { duration: 0.15 },
+  },
+};
+
+const formFieldVariants = {
+  hidden: { opacity: 0, x: -12 },
+  visible: { opacity: 1, x: 0, transition: { duration: 0.25, ease: [0.2, 0, 0, 1] } },
+};
+
+export function AuthModal({
+  open,
+  onOpenChange,
+  defaultView = 'choose',
+}: {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  defaultView?: ModalView;
+}) {
+  const reduced = !!useReducedMotion();
+  const router = useRouter();
+  const { setAuth, setProfile } = useAuth();
+  const [view, setView] = useState<ModalView>(defaultView);
+
+  // Reset view when modal opens
+  useEffect(() => {
+    if (open) setView(defaultView);
+  }, [open, defaultView]);
+
+  const handleClose = useCallback(() => {
+    onOpenChange(false);
+  }, [onOpenChange]);
+
+  const handleGuest = useCallback(() => {
+    onOpenChange(false);
+    router.push('/');
+  }, [onOpenChange, router]);
+
+  if (!open) return null;
+
+  return (
+    <AnimatePresence>
+      {open && (
+        <motion.div
+          className="fixed inset-0 z-[var(--z-modal)] flex items-center justify-center p-4"
+          variants={reduced ? undefined : overlayVariants}
+          initial="hidden"
+          animate="visible"
+          exit="exit"
+        >
+          {/* Backdrop */}
+          <motion.div
+            className="absolute inset-0 bg-background/80 backdrop-blur-sm"
+            onClick={handleClose}
+          />
+
+          {/* Card */}
+          <motion.div
+            className="relative z-10 w-full max-w-sm"
+            variants={reduced ? undefined : cardVariants}
+            initial="hidden"
+            animate="visible"
+            exit="exit"
+          >
+            <AnimatePresence mode="wait">
+              {view === 'choose' && (
+                <ChooseView
+                  key="choose"
+                  onSelect={(v) => setView(v)}
+                  onGuest={handleGuest}
+                  reduced={reduced}
+                />
+              )}
+              {view === 'login' && (
+                <LoginView
+                  key="login"
+                  onBack={() => setView('choose')}
+                  onSwitch={() => setView('register')}
+                  onSuccess={handleClose}
+                  reduced={reduced}
+                />
+              )}
+              {view === 'register' && (
+                <RegisterView
+                  key="register"
+                  onBack={() => setView('choose')}
+                  onSwitch={() => setView('login')}
+                  onSuccess={handleClose}
+                  reduced={reduced}
+                />
+              )}
+            </AnimatePresence>
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
+}
+
+function ChooseView({
+  onSelect,
+  onGuest,
+  reduced,
+}: {
+  onSelect: (view: ModalView) => void;
+  onGuest: () => void;
+  reduced: boolean;
+}) {
+  return (
+    <Card>
+      <CardHeader className="text-center">
+        <CardTitle className="text-xl">Welcome to SportsOS</CardTitle>
+        <CardDescription>Sign in or create an account to get started</CardDescription>
+      </CardHeader>
+      <CardContent className="flex flex-col gap-3">
+        <motion.div variants={reduced ? undefined : formFieldVariants} initial="hidden" animate="visible">
+          <Button className="w-full" size="lg" onClick={() => onSelect('login')}>
+            Sign In
+          </Button>
+        </motion.div>
+        <motion.div variants={reduced ? undefined : formFieldVariants} initial="hidden" animate="visible" transition={{ delay: 0.05 }}>
+          <Button variant="outline" className="w-full" size="lg" onClick={() => onSelect('register')}>
+            Create Account
+          </Button>
+        </motion.div>
+        <div className="relative my-2">
+          <div className="absolute inset-0 flex items-center">
+            <span className="w-full border-t" />
+          </div>
+          <div className="relative flex justify-center text-xs uppercase">
+            <span className="bg-card text-muted-foreground px-2">Or</span>
+          </div>
+        </div>
+        <motion.div variants={reduced ? undefined : formFieldVariants} initial="hidden" animate="visible" transition={{ delay: 0.1 }}>
+          <Button variant="ghost" className="w-full" size="lg" onClick={onGuest}>
+            Continue as Guest
+          </Button>
+        </motion.div>
+      </CardContent>
+    </Card>
+  );
+}
+
+function LoginView({
+  onBack,
+  onSwitch,
+  onSuccess,
+  reduced,
+}: {
+  onBack: () => void;
+  onSwitch: () => void;
+  onSuccess: () => void;
+  reduced: boolean;
+}) {
+  const { setAuth } = useAuth();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [errors, setErrors] = useState<FieldErrors>({});
+  const [touched, setTouched] = useState<Record<string, boolean>>({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  function validate(): FieldErrors {
+    const e: FieldErrors = {};
+    if (!email.trim()) e.email = 'Email is required';
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) e.email = 'Enter a valid email';
+    if (!password) e.password = 'Password is required';
+    else if (password.length < 8) e.password = 'At least 8 characters';
+    return e;
+  }
+
+  function validateField(field: string, value: string) {
+    const e: FieldErrors = {};
+    if (field === 'email') {
+      if (!value.trim()) e.email = 'Email is required';
+      else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) e.email = 'Enter a valid email';
+    } else if (field === 'password') {
+      if (!value) e.password = 'Password is required';
+      else if (value.length < 8) e.password = 'At least 8 characters';
+    }
+    return e;
+  }
+
+  function handleBlur(field: string, value: string) {
+    setTouched((prev) => ({ ...prev, [field]: true }));
+    const fe = validateField(field, value);
+    setErrors((prev) => {
+      const next = { ...prev };
+      if (fe[field as keyof FieldErrors]) {
+        next[field as keyof FieldErrors] = fe[field as keyof FieldErrors];
+      } else {
+        delete next[field as keyof FieldErrors];
+      }
+      return next;
+    });
+  }
+
+  function handleChange(field: string, value: string) {
+    if (field === 'email') setEmail(value);
+    else if (field === 'password') setPassword(value);
+    if (touched[field]) {
+      const fe = validateField(field, value);
+      setErrors((prev) => {
+        const next = { ...prev };
+        if (fe[field as keyof FieldErrors]) {
+          next[field as keyof FieldErrors] = fe[field as keyof FieldErrors];
+        } else {
+          delete next[field as keyof FieldErrors];
+        }
+        return next;
+      });
+    }
+  }
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    setTouched({ email: true, password: true });
+    const ve = validate();
+    setErrors(ve);
+    if (Object.keys(ve).length > 0) return;
+    setIsSubmitting(true);
+    await new Promise((r) => setTimeout(r, 1200));
+    setAuth(true);
+    setIsSubmitting(false);
+    onSuccess();
+  }
+
+  const errorId = (f: string) => `modal-login-${f}-error`;
+
+  return (
+    <Card>
+      <CardHeader>
+        <div className="flex items-center gap-2">
+          <Button variant="ghost" size="icon-sm" onClick={onBack} aria-label="Go back">
+            <ArrowLeft className="h-4 w-4" />
+          </Button>
+          <div>
+            <CardTitle className="text-xl">Sign In</CardTitle>
+            <CardDescription className="text-xs">Welcome back to SportsOS</CardDescription>
+          </div>
+        </div>
+      </CardHeader>
+      <CardContent>
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4" noValidate>
+          <motion.div variants={reduced ? undefined : formFieldVariants} initial="hidden" animate="visible" transition={{ delay: 0.05 }} className="flex flex-col gap-1.5">
+            <Label htmlFor="modal-login-email">Email</Label>
+            <Input
+              id="modal-login-email"
+              type="email"
+              placeholder="you@example.com"
+              value={email}
+              onChange={(e) => handleChange('email', e.target.value)}
+              onBlur={(e) => handleBlur('email', e.target.value)}
+              aria-invalid={!!errors.email}
+              aria-describedby={errors.email ? errorId('email') : undefined}
+              disabled={isSubmitting}
+            />
+            {errors.email && <p id={errorId('email')} role="alert" className="text-destructive text-xs">{errors.email}</p>}
+          </motion.div>
+          <motion.div variants={reduced ? undefined : formFieldVariants} initial="hidden" animate="visible" transition={{ delay: 0.1 }} className="flex flex-col gap-1.5">
+            <Label htmlFor="modal-login-password">Password</Label>
+            <Input
+              id="modal-login-password"
+              type="password"
+              placeholder="At least 8 characters"
+              value={password}
+              onChange={(e) => handleChange('password', e.target.value)}
+              onBlur={(e) => handleBlur('password', e.target.value)}
+              aria-invalid={!!errors.password}
+              aria-describedby={errors.password ? errorId('password') : undefined}
+              disabled={isSubmitting}
+            />
+            {errors.password && <p id={errorId('password')} role="alert" className="text-destructive text-xs">{errors.password}</p>}
+          </motion.div>
+          <motion.div variants={reduced ? undefined : formFieldVariants} initial="hidden" animate="visible" transition={{ delay: 0.15 }}>
+            <Button type="submit" className="w-full" disabled={isSubmitting}>
+              {isSubmitting ? <><Loader2 className="h-4 w-4 animate-spin" /> Signing in…</> : 'Sign in'}
+            </Button>
+          </motion.div>
+        </form>
+        <p className="text-muted-foreground mt-4 text-center text-xs">
+          Don&apos;t have an account?{' '}
+          <button onClick={onSwitch} className="text-foreground font-medium hover:underline">Sign up</button>
+        </p>
+      </CardContent>
+    </Card>
+  );
+}
+
+function RegisterView({
+  onBack,
+  onSwitch,
+  onSuccess,
+  reduced,
+}: {
+  onBack: () => void;
+  onSwitch: () => void;
+  onSuccess: () => void;
+  reduced: boolean;
+}) {
+  const { setAuth, setProfile } = useAuth();
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [errors, setErrors] = useState<FieldErrors>({});
+  const [touched, setTouched] = useState<Record<string, boolean>>({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  function validate(): FieldErrors {
+    const e: FieldErrors = {};
+    if (!name.trim()) e.name = 'Name is required';
+    else if (name.trim().length < 2) e.name = 'At least 2 characters';
+    if (!email.trim()) e.email = 'Email is required';
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) e.email = 'Enter a valid email';
+    if (!password) e.password = 'Password is required';
+    else if (password.length < 8) e.password = 'At least 8 characters';
+    if (!confirmPassword) e.confirmPassword = 'Please confirm';
+    else if (confirmPassword !== password) e.confirmPassword = 'Passwords do not match';
+    return e;
+  }
+
+  function validateField(field: string, value: string) {
+    const e: FieldErrors = {};
+    if (field === 'name') {
+      if (!value.trim()) e.name = 'Name is required';
+      else if (value.trim().length < 2) e.name = 'At least 2 characters';
+    } else if (field === 'email') {
+      if (!value.trim()) e.email = 'Email is required';
+      else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) e.email = 'Enter a valid email';
+    } else if (field === 'password') {
+      if (!value) e.password = 'Password is required';
+      else if (value.length < 8) e.password = 'At least 8 characters';
+      if (confirmPassword && value !== confirmPassword) e.confirmPassword = 'Passwords do not match';
+    } else if (field === 'confirmPassword') {
+      if (!value) e.confirmPassword = 'Please confirm';
+      else if (value !== password) e.confirmPassword = 'Passwords do not match';
+    }
+    return e;
+  }
+
+  function handleBlur(field: string, value: string) {
+    setTouched((prev) => ({ ...prev, [field]: true }));
+    const fe = validateField(field, value);
+    setErrors((prev) => {
+      const next = { ...prev };
+      if (fe[field as keyof FieldErrors]) {
+        next[field as keyof FieldErrors] = fe[field as keyof FieldErrors];
+      } else {
+        delete next[field as keyof FieldErrors];
+      }
+      return next;
+    });
+  }
+
+  function handleChange(field: string, value: string) {
+    if (field === 'name') setName(value);
+    else if (field === 'email') setEmail(value);
+    else if (field === 'password') setPassword(value);
+    else if (field === 'confirmPassword') setConfirmPassword(value);
+    if (touched[field]) {
+      const fe = validateField(field, value);
+      setErrors((prev) => {
+        const next = { ...prev };
+        if (fe[field as keyof FieldErrors]) {
+          next[field as keyof FieldErrors] = fe[field as keyof FieldErrors];
+        } else {
+          delete next[field as keyof FieldErrors];
+        }
+        return next;
+      });
+    }
+  }
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    setTouched({ name: true, email: true, password: true, confirmPassword: true });
+    const ve = validate();
+    setErrors(ve);
+    if (Object.keys(ve).length > 0) return;
+    setIsSubmitting(true);
+    await new Promise((r) => setTimeout(r, 1500));
+    setProfile({ name: name.trim(), email: email.trim() });
+    setAuth(true);
+    setIsSubmitting(false);
+    onSuccess();
+  }
+
+  const errorId = (f: string) => `modal-register-${f}-error`;
+
+  return (
+    <Card>
+      <CardHeader>
+        <div className="flex items-center gap-2">
+          <Button variant="ghost" size="icon-sm" onClick={onBack} aria-label="Go back">
+            <ArrowLeft className="h-4 w-4" />
+          </Button>
+          <div>
+            <CardTitle className="text-xl">Create Account</CardTitle>
+            <CardDescription className="text-xs">Join SportsOS today</CardDescription>
+          </div>
+        </div>
+      </CardHeader>
+      <CardContent>
+        <form onSubmit={handleSubmit} className="flex flex-col gap-3" noValidate>
+          <motion.div variants={reduced ? undefined : formFieldVariants} initial="hidden" animate="visible" transition={{ delay: 0.05 }} className="flex flex-col gap-1.5">
+            <Label htmlFor="modal-reg-name">Full Name</Label>
+            <Input
+              id="modal-reg-name"
+              placeholder="Your full name"
+              value={name}
+              onChange={(e) => handleChange('name', e.target.value)}
+              onBlur={(e) => handleBlur('name', e.target.value)}
+              aria-invalid={!!errors.name}
+              aria-describedby={errors.name ? errorId('name') : undefined}
+              disabled={isSubmitting}
+            />
+            {errors.name && <p id={errorId('name')} role="alert" className="text-destructive text-xs">{errors.name}</p>}
+          </motion.div>
+          <motion.div variants={reduced ? undefined : formFieldVariants} initial="hidden" animate="visible" transition={{ delay: 0.08 }} className="flex flex-col gap-1.5">
+            <Label htmlFor="modal-reg-email">Email</Label>
+            <Input
+              id="modal-reg-email"
+              type="email"
+              placeholder="you@example.com"
+              value={email}
+              onChange={(e) => handleChange('email', e.target.value)}
+              onBlur={(e) => handleBlur('email', e.target.value)}
+              aria-invalid={!!errors.email}
+              aria-describedby={errors.email ? errorId('email') : undefined}
+              disabled={isSubmitting}
+            />
+            {errors.email && <p id={errorId('email')} role="alert" className="text-destructive text-xs">{errors.email}</p>}
+          </motion.div>
+          <motion.div variants={reduced ? undefined : formFieldVariants} initial="hidden" animate="visible" transition={{ delay: 0.11 }} className="flex flex-col gap-1.5">
+            <Label htmlFor="modal-reg-password">Password</Label>
+            <Input
+              id="modal-reg-password"
+              type="password"
+              placeholder="At least 8 characters"
+              value={password}
+              onChange={(e) => handleChange('password', e.target.value)}
+              onBlur={(e) => handleBlur('password', e.target.value)}
+              aria-invalid={!!errors.password}
+              aria-describedby={errors.password ? errorId('password') : undefined}
+              disabled={isSubmitting}
+            />
+            {errors.password && <p id={errorId('password')} role="alert" className="text-destructive text-xs">{errors.password}</p>}
+          </motion.div>
+          <motion.div variants={reduced ? undefined : formFieldVariants} initial="hidden" animate="visible" transition={{ delay: 0.14 }} className="flex flex-col gap-1.5">
+            <Label htmlFor="modal-reg-confirm">Confirm Password</Label>
+            <Input
+              id="modal-reg-confirm"
+              type="password"
+              placeholder="Re-enter password"
+              value={confirmPassword}
+              onChange={(e) => handleChange('confirmPassword', e.target.value)}
+              onBlur={(e) => handleBlur('confirmPassword', e.target.value)}
+              aria-invalid={!!errors.confirmPassword}
+              aria-describedby={errors.confirmPassword ? errorId('confirmPassword') : undefined}
+              disabled={isSubmitting}
+            />
+            {errors.confirmPassword && <p id={errorId('confirmPassword')} role="alert" className="text-destructive text-xs">{errors.confirmPassword}</p>}
+          </motion.div>
+          <motion.div variants={reduced ? undefined : formFieldVariants} initial="hidden" animate="visible" transition={{ delay: 0.17 }}>
+            <Button type="submit" className="w-full" disabled={isSubmitting}>
+              {isSubmitting ? <><Loader2 className="h-4 w-4 animate-spin" /> Creating account…</> : 'Create account'}
+            </Button>
+          </motion.div>
+        </form>
+        <p className="text-muted-foreground mt-4 text-center text-xs">
+          Already have an account?{' '}
+          <button onClick={onSwitch} className="text-foreground font-medium hover:underline">Sign in</button>
+        </p>
+      </CardContent>
+    </Card>
+  );
+}

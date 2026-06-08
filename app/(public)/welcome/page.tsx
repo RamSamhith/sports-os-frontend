@@ -1,16 +1,20 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import Link from 'next/link';
-import { cn } from '@/lib/utils/cn';
+import { AuthModal } from '@/components/auth/auth-modal';
+import { useAuth } from '@/lib/hooks/use-auth';
+import { useRouter } from 'next/navigation';
+import { Search, Users, Trophy, ArrowRightLeft } from 'lucide-react';
 
 const features = [
-  { title: 'Find Academies', description: 'Discover top-rated sports academies near you' },
-  { title: 'Discover Coaches', description: 'Connect with certified coaches across sports' },
-  { title: 'Explore Sports', description: 'Explore 20+ sports and find your passion' },
-  { title: 'Compare Options', description: 'Side-by-side comparison for confident decisions' },
+  { title: 'Find Academies', description: 'Discover top-rated sports academies near you', href: '/academies', icon: Search },
+  { title: 'Discover Coaches', description: 'Connect with certified coaches across sports', href: '/coaches', icon: Users },
+  { title: 'Explore Sports', description: 'Explore 20+ sports and find your passion', href: '/sports', icon: Trophy },
+  { title: 'Compare Options', description: 'Side-by-side comparison for confident decisions', href: '/compare', icon: ArrowRightLeft },
 ];
 
 const heroRevealVariants = {
@@ -35,6 +39,23 @@ const featureCardVariants = {
 
 export default function WelcomePage() {
   const reduced = useReducedMotion();
+  const router = useRouter();
+  const { isAuthenticated, isLoading } = useAuth();
+  const [authModalOpen, setAuthModalOpen] = useState(false);
+
+  // Auto-open auth modal after a short delay for new visitors
+  useEffect(() => {
+    if (isLoading) return;
+    // Don't auto-open if already authenticated
+    if (isAuthenticated) {
+      router.replace('/');
+      return;
+    }
+    const timer = setTimeout(() => {
+      setAuthModalOpen(true);
+    }, 800);
+    return () => clearTimeout(timer);
+  }, [isLoading, isAuthenticated, router]);
 
   return (
     <div className="relative isolate min-h-screen">
@@ -66,7 +87,7 @@ export default function WelcomePage() {
               className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-balance"
             >
               Discover Your{' '}
-              <span className="bg-gradient-to-r from-primary via-accent to-primary/80 bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-primary via-primary/80 to-primary/60 bg-clip-text text-transparent">
                 Sporting Journey
               </span>
             </motion.h1>
@@ -87,20 +108,32 @@ export default function WelcomePage() {
             transition={{ delay: 0.15 }}
             className="mt-10 grid gap-4 sm:grid-cols-2"
           >
-            {features.map((feature, index) => (
-              <motion.div
-                key={feature.title}
-                variants={reduced ? undefined : featureCardVariants}
-                className="group"
-              >
-                <Card className="h-full border-border/60 bg-background/60 backdrop-blur-xl transition-all duration-300 hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5">
-                  <CardHeader>
-                    <CardTitle className="text-lg">{feature.title}</CardTitle>
-                    <CardDescription className="text-sm">{feature.description}</CardDescription>
-                  </CardHeader>
-                </Card>
-              </motion.div>
-            ))}
+            {features.map((feature) => {
+              const Icon = feature.icon;
+              return (
+                <motion.div
+                  key={feature.title}
+                  variants={reduced ? undefined : featureCardVariants}
+                  className="group"
+                >
+                  <Link href={feature.href} className="block h-full">
+                    <Card className="h-full border-border/60 bg-background/60 backdrop-blur-xl transition-all duration-300 hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5 group-hover:-translate-y-0.5">
+                      <CardHeader>
+                        <div className="flex items-center gap-3">
+                          <div className="bg-primary/10 flex h-10 w-10 shrink-0 items-center justify-center rounded-lg">
+                            <Icon className="h-5 w-5 text-primary" />
+                          </div>
+                          <div>
+                            <CardTitle className="text-lg">{feature.title}</CardTitle>
+                            <CardDescription className="text-sm">{feature.description}</CardDescription>
+                          </div>
+                        </div>
+                      </CardHeader>
+                    </Card>
+                  </Link>
+                </motion.div>
+              );
+            })}
           </motion.div>
 
           <motion.div
@@ -110,17 +143,19 @@ export default function WelcomePage() {
             transition={{ delay: 0.3 }}
             className="mt-12 flex flex-col sm:flex-row items-center justify-center gap-4"
           >
-            <Link href="/register">
-              <Button size="lg" className="w-full sm:w-auto min-w-[160px] gap-2">
-                <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
-                  <circle cx="9" cy="7" r="4" />
-                  <line x1="20" x2="20" y1="8" y2="14" />
-                  <line x1="23" x2="17" y1="11" y2="11" />
-                </svg>
-                Sign Up
-              </Button>
-            </Link>
+            <Button
+              size="lg"
+              className="w-full sm:w-auto min-w-[160px] gap-2"
+              onClick={() => setAuthModalOpen(true)}
+            >
+              <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+                <circle cx="9" cy="7" r="4" />
+                <line x1="20" x2="20" y1="8" y2="14" />
+                <line x1="23" x2="17" y1="11" y2="11" />
+              </svg>
+              Get Started
+            </Button>
             <Link href="/login">
               <Button size="lg" variant="outline" className="w-full sm:w-auto min-w-[160px]">
                 Login
@@ -150,6 +185,12 @@ export default function WelcomePage() {
           </motion.p>
         </motion.div>
       </main>
+
+      <AuthModal
+        open={authModalOpen}
+        onOpenChange={setAuthModalOpen}
+        defaultView="choose"
+      />
     </div>
   );
 }

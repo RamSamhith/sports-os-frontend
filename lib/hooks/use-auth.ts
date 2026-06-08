@@ -4,6 +4,12 @@ import { createContext, useContext } from 'react';
 
 export type OnboardingRole = 'athlete' | 'parent';
 
+export interface UserProfile {
+  name: string;
+  email: string;
+  phone: string;
+}
+
 export interface AuthContextValue {
   /** Whether the user is authenticated (frontend flag). */
   isAuthenticated: boolean;
@@ -15,12 +21,17 @@ export interface AuthContextValue {
   /** Whether the user has completed the onboarding role selection. */
   onboardingCompleted: boolean;
 
+  /** User profile data (name, email, phone). */
+  profile: UserProfile;
+
   /** Set authenticated flag (true after register / login). */
   setAuth: (authenticated: boolean) => void;
   /** Set the user's role (called from onboarding role selection). */
   setRole: (role: OnboardingRole) => void;
   /** Mark onboarding as complete (called after role selection). */
   completeOnboarding: () => void;
+  /** Update user profile data. */
+  setProfile: (profile: Partial<UserProfile>) => void;
   /** Clear all auth state and redirect. */
   signOut: () => void;
 }

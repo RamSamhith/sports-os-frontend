@@ -1,15 +1,24 @@
 'use client';
 
 import { createContext, useCallback, useEffect, useMemo, useState, type ReactNode } from 'react';
-import { AuthContext, type AuthContextValue, type OnboardingRole } from '@/lib/hooks/use-auth';
+import { AuthContext, type AuthContextValue, type OnboardingRole, type UserProfile } from '@/lib/hooks/use-auth';
 
 const STORAGE_KEY = 'sportsos:auth-state';
+const PROFILE_KEY = 'sportsos:profile';
 
 interface PersistedAuthState {
   isAuthenticated: boolean;
   role: OnboardingRole | null;
   onboardingCompleted: boolean;
 }
+
+interface PersistedProfile {
+  name: string;
+  email: string;
+  phone: string;
+}
+
+const defaultProfile: UserProfile = { name: '', email: '', phone: '' };
 
 function readState(): PersistedAuthState {
   try {
@@ -29,6 +38,29 @@ function readState(): PersistedAuthState {
 function writeState(state: PersistedAuthState) {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  } catch {
+    // storage full or unavailable
+  }
+}
+
+function readProfile(): UserProfile {
+  try {
+    const raw = localStorage.getItem(PROFILE_KEY);
+    if (!raw) return { ...defaultProfile };
+    const parsed: PersistedProfile = JSON.parse(raw);
+    return {
+      name: typeof parsed.name === 'string' ? parsed.name : '',
+      email: typeof parsed.email === 'string' ? parsed.email : '',
+      phone: typeof parsed.phone === 'string' ? parsed.phone : '',
+    };
+  } catch {
+    return { ...defaultProfile };
+  }
+}
+
+function writeProfile(profile: UserProfile) {
+  try {
+    localStorage.setItem(PROFILE_KEY, JSON.stringify(profile));
   } catch {
     // storage full or unavailable
   }
@@ -71,6 +103,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     role: null,
     onboardingCompleted: false,
   });
+  const [profile, setProfileState] = useState<UserProfile>({ ...defaultProfile });
   const [hydrated, setHydrated] = useState(false);
 
   // Hydrate from localStorage on mount
@@ -79,15 +112,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const migrated = migrateLegacyKeys(stored);
     setState(migrated);
     writeState(migrated);
+    setProfileState(readProfile());
     setHydrated(true);
   }, []);
 
-  // Persist on every state change (after hydration)
+  // Persist auth state on every change (after hydration)
   useEffect(() => {
     if (hydrated) {
       writeState(state);
     }
   }, [state, hydrated]);
+
+  // Persist profile on every change (after hydration)
+  useEffect(() => {
+    if (hydrated) {
+      writeProfile(profile);
+    }
+  }, [profile, hydrated]);
 
   const setAuth = useCallback((authenticated: boolean) => {
     setState((prev) => ({ ...prev, isAuthenticated: authenticated }));
@@ -101,8 +142,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setState((prev) => ({ ...prev, onboardingCompleted: true }));
   }, []);
 
+  const setProfile = useCallback((updates: Partial<UserProfile>) => {
+    setProfileState((prev) => ({ ...prev, ...updates }));
+  }, []);
+
   const signOut = useCallback(() => {
     setState({ isAuthenticated: false, role: null, onboardingCompleted: false });
+    setProfileState({ ...defaultProfile });
   }, []);
 
   const value = useMemo<AuthContextValue>(
@@ -111,12 +157,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       isLoading: !hydrated,
       role: state.role,
       onboardingCompleted: state.onboardingCompleted,
+      profile,
       setAuth,
       setRole,
       completeOnboarding,
+      setProfile,
       signOut,
     }),
-    [state, hydrated, setAuth, setRole, completeOnboarding, signOut],
+    [state, hydrated, profile, setAuth, setRole, completeOnboarding, setProfile, signOut],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

@@ -8,45 +8,14 @@ import { Button } from '@/components/ui/button';
 import { useAuth } from '@/lib/hooks/use-auth';
 import { CheckCircle2 } from 'lucide-react';
 
-const STORAGE_KEY = 'sportsos:profile';
-
-interface ProfileState {
-  name: string;
-  email: string;
-  phone: string;
-}
-
 interface ProfileErrors {
   name?: string;
   email?: string;
   phone?: string;
 }
 
-function readProfile(): ProfileState {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return { name: '', email: '', phone: '' };
-    const parsed = JSON.parse(raw);
-    return {
-      name: typeof parsed.name === 'string' ? parsed.name : '',
-      email: typeof parsed.email === 'string' ? parsed.email : '',
-      phone: typeof parsed.phone === 'string' ? parsed.phone : '',
-    };
-  } catch {
-    return { name: '', email: '', phone: '' };
-  }
-}
-
-function writeProfile(state: ProfileState) {
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-  } catch {
-    // storage full or unavailable
-  }
-}
-
 export default function PersonalPage() {
-  const { role } = useAuth();
+  const { role, profile, setProfile } = useAuth();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
@@ -55,13 +24,13 @@ export default function PersonalPage() {
   const [hydrated, setHydrated] = useState(false);
   const [saved, setSaved] = useState(false);
 
+  // Hydrate from auth profile
   useEffect(() => {
-    const stored = readProfile();
-    setName(stored.name);
-    setEmail(stored.email);
-    setPhone(stored.phone);
+    setName(profile.name);
+    setEmail(profile.email);
+    setPhone(profile.phone);
     setHydrated(true);
-  }, []);
+  }, [profile.name, profile.email, profile.phone]);
 
   function validate(): ProfileErrors {
     const e: ProfileErrors = {};
@@ -146,13 +115,11 @@ export default function PersonalPage() {
 
     if (Object.keys(validationErrors).length > 0) return;
 
-    const profile: ProfileState = {
+    setProfile({
       name: name.trim(),
       email: email.trim(),
       phone: phone.trim(),
-    };
-
-    writeProfile(profile);
+    });
     setSaved(true);
   }
 
