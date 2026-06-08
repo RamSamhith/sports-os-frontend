@@ -244,9 +244,9 @@ function LoginView({
   function validate(): FieldErrors {
     const e: FieldErrors = {};
     if (!email.trim()) e.email = 'Email is required';
-    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) e.email = 'Enter a valid email';
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) e.email = 'Enter a valid email address';
     if (!password) e.password = 'Password is required';
-    else if (password.length < 8) e.password = 'At least 8 characters';
+    else if (password.length < 8) e.password = 'Password must be at least 8 characters';
     return e;
   }
 
@@ -254,10 +254,10 @@ function LoginView({
     const e: FieldErrors = {};
     if (field === 'email') {
       if (!value.trim()) e.email = 'Email is required';
-      else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) e.email = 'Enter a valid email';
+      else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) e.email = 'Enter a valid email address';
     } else if (field === 'password') {
       if (!value) e.password = 'Password is required';
-      else if (value.length < 8) e.password = 'At least 8 characters';
+      else if (value.length < 8) e.password = 'Password must be at least 8 characters';
     }
     return e;
   }
@@ -397,12 +397,12 @@ function RegisterView({
   function validate(): FieldErrors {
     const e: FieldErrors = {};
     if (!name.trim()) e.name = 'Name is required';
-    else if (name.trim().length < 2) e.name = 'At least 2 characters';
+    else if (name.trim().length < 2) e.name = 'Name must be at least 2 characters';
     if (!email.trim()) e.email = 'Email is required';
-    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) e.email = 'Enter a valid email';
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) e.email = 'Enter a valid email address';
     if (!password) e.password = 'Password is required';
-    else if (password.length < 8) e.password = 'At least 8 characters';
-    if (!confirmPassword) e.confirmPassword = 'Please confirm';
+    else if (password.length < 8) e.password = 'Password must be at least 8 characters';
+    if (!confirmPassword) e.confirmPassword = 'Please confirm your password';
     else if (confirmPassword !== password) e.confirmPassword = 'Passwords do not match';
     return e;
   }
@@ -411,13 +411,13 @@ function RegisterView({
     const e: FieldErrors = {};
     if (field === 'name') {
       if (!value.trim()) e.name = 'Name is required';
-      else if (value.trim().length < 2) e.name = 'At least 2 characters';
+      else if (value.trim().length < 2) e.name = 'Name must be at least 2 characters';
     } else if (field === 'email') {
       if (!value.trim()) e.email = 'Email is required';
-      else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) e.email = 'Enter a valid email';
+      else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) e.email = 'Enter a valid email address';
     } else if (field === 'password') {
       if (!value) e.password = 'Password is required';
-      else if (value.length < 8) e.password = 'At least 8 characters';
+      else if (value.length < 8) e.password = 'Password must be at least 8 characters';
       if (confirmPassword && value !== confirmPassword) e.confirmPassword = 'Passwords do not match';
     } else if (field === 'confirmPassword') {
       if (!value) e.confirmPassword = 'Please confirm';
@@ -490,7 +490,7 @@ function RegisterView({
         </div>
       </CardHeader>
       <CardContent>
-        <form onSubmit={handleSubmit} className="flex flex-col gap-3" noValidate>
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4" noValidate>
           <motion.div variants={reduced ? undefined : formFieldVariants} initial="hidden" animate="visible" transition={{ delay: 0.05 }} className="flex flex-col gap-1.5">
             <Label htmlFor="modal-reg-name">Full Name</Label>
             <Input

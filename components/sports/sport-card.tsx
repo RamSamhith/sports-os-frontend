@@ -45,7 +45,7 @@ export function SportCard({ sport }: { sport: Sport }) {
         </span>
         <div className="min-w-0 flex-1">
           <Link href={`/sports/${slug}`} className="hover:underline">
-            <div className="line-clamp-1 font-medium">{name}</div>
+            <h3 className="line-clamp-1 text-base font-semibold tracking-tight">{name}</h3>
           </Link>
           <div className="text-muted-foreground text-xs capitalize">{category}</div>
         </div>

@@ -232,8 +232,8 @@ export function AcademyListing() {
             </Badge>
           ))}
           {appliedCount > 1 ? (
-            <Button variant="ghost" className="min-h-[44px] min-w-[44px]" onClick={clearAll}>
-              Clear all
+            <Button size="sm" variant="outline" onClick={clearAll}>
+              <X className="h-3.5 w-3.5" /> Clear all
             </Button>
           ) : null}
         </div>

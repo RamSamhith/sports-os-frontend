@@ -58,7 +58,7 @@ export function CoachCardPlaceholder({ coach }: { coach: Coach }) {
       <div className="min-w-0 flex-1">
         <div className="flex flex-wrap items-center gap-2">
           <Link href={`/coaches/${slug}`} className="hover:underline">
-            <h3 className="line-clamp-1 text-sm font-semibold">{name}</h3>
+            <h3 className="line-clamp-1 text-base font-semibold tracking-tight">{name}</h3>
           </Link>
           <VerifiedBadge status={verificationStatus} />
         </div>
