@@ -36,19 +36,6 @@ export function SportCardSkeleton() {
   );
 }
 
-export function SearchSkeleton() {
-  return (
-    <div className="flex flex-col gap-2">
-      <Skeleton className="h-10 w-full rounded-md" />
-      <div className="flex gap-2">
-        {Array.from({ length: 4 }).map((_, i) => (
-          <Skeleton key={i} className="h-7 w-20 rounded-full" />
-        ))}
-      </div>
-    </div>
-  );
-}
-
 export function ProfileSkeleton() {
   return (
     <div className="flex flex-col gap-4">

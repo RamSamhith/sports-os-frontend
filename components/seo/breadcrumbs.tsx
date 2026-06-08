@@ -14,13 +14,13 @@ export function Breadcrumbs({ items, className }: { items: BreadcrumbItem[]; cla
         {items.map((item, i) => (
           <li key={`${item.label}-${i}`} className="flex items-center gap-1.5">
             {item.href ? (
-              <Link href={item.href} className="hover:text-foreground transition-colors">
+              <Link href={item.href} className="hover:text-foreground transition-colors focus-visible:ring-ring focus-visible:ring-2 focus-visible:outline-none rounded-sm">
                 {item.label}
               </Link>
             ) : (
               <span className="text-foreground">{item.label}</span>
             )}
-            {i < items.length - 1 ? <ChevronRight className="h-3.5 w-3.5 opacity-50" /> : null}
+            {i < items.length - 1 ? <ChevronRight aria-hidden className="h-3.5 w-3.5 opacity-50" /> : null}
           </li>
         ))}
       </ol>

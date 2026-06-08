@@ -24,7 +24,7 @@ export function SportGrid({
 }: SportGridProps) {
   if (loading) {
     return (
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
+      <div aria-busy="true" aria-label="Loading sports" className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
         {Array.from({ length: 8 }).map((_, i) => (
           <SportCardSkeleton key={i} />
         ))}

@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 import { Container } from '@/components/layout/container';
 import { AuroraBackground } from '@/components/layout/aurora-background';
+import { ErrorBoundary } from '@/components/feedback/error-boundary';
 import Link from 'next/link';
 
 export default function AuthLayout({ children }: { children: ReactNode }) {
@@ -14,7 +15,7 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
           </span>
           SportsOS
         </Link>
-        {children}
+        <ErrorBoundary label="Authentication">{children}</ErrorBoundary>
       </Container>
     </div>
   );

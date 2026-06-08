@@ -35,9 +35,11 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
                 <li key={it.href}>
                   <Link
                     href={it.href}
+                    aria-current={active ? 'page' : undefined}
                     className={cn(
-                      'block rounded-md px-3 py-2 text-sm transition-colors',
-                      active ? 'bg-accent/15 text-foreground' : 'text-muted-foreground hover:text-foreground',
+                      'rounded-md px-3 py-2 text-sm transition-colors',
+                      'focus-visible:ring-ring focus-visible:ring-2 focus-visible:outline-none',
+                      active ? 'bg-accent/15 text-foreground font-medium' : 'text-muted-foreground hover:text-foreground',
                     )}
                   >
                     {it.label}
@@ -48,7 +50,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
           </ul>
         </nav>
       </aside>
-      <section className="min-w-0">{children}</section>
+      <section id="main" className="min-w-0">{children}</section>
     </Container>
   );
 }

@@ -1,7 +1,7 @@
 'use client';
 
 import * as React from 'react';
-import { CompareContext, type CompareContextValue, type CompareItem } from '@/lib/hooks/use-compare';
+import { CompareContext, type CompareContextValue, type CompareItem, type CompareItemMeta } from '@/lib/hooks/use-compare';
 import { useStorageSync } from '@/lib/hooks/use-storage-sync';
 import { academies } from '@/data/academies';
 import { academiesById } from '@/data/academies';
@@ -19,12 +19,6 @@ const STORAGE_KEY = 'sportsos:compare';
 export const COMPARE_MIN = 2;
 export const COMPARE_MAX = 4;
 const MAX_ITEMS = COMPARE_MAX;
-
-export interface CompareItemMeta {
-  label: string;
-  sublabel?: string;
-  href: string;
-}
 
 interface PersistedItem {
   entityType: CompareItem['entityType'];

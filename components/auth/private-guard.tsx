@@ -17,7 +17,7 @@ export function PrivateGuard({ children }: { children: React.ReactNode }) {
 
   if (isLoading) {
     return (
-      <div className="flex flex-col gap-6 py-10">
+      <div aria-busy="true" aria-label="Loading profile" className="flex flex-col gap-6 py-10">
         <ProfileSkeleton />
       </div>
     );

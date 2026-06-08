@@ -1,41 +1,12 @@
 'use client';
 
 import * as React from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
 import { X } from 'lucide-react';
 import { SearchInput } from '@/components/ui/search-input';
 import { Button } from '@/components/ui/button';
 import { SportGrid } from '@/components/sports/sport-grid';
+import { useSearchQuery } from '@/lib/hooks/use-search-query';
 import { sports } from '@/data/sports';
-
-function useDebounced<T>(value: T, delay: number): T {
-  const [debounced, setDebounced] = React.useState(value);
-  React.useEffect(() => {
-    const t = setTimeout(() => setDebounced(value), delay);
-    return () => clearTimeout(t);
-  }, [value, delay]);
-  return debounced;
-}
-
-function useSearchQuery() {
-  const router = useRouter();
-  const searchParams = useSearchParams();
-
-  const [query, setQuery] = React.useState(() => searchParams.get('q') ?? '');
-  const debouncedQuery = useDebounced(query, 150);
-
-  React.useEffect(() => {
-    const current = searchParams.get('q') ?? '';
-    if ((debouncedQuery || '') === current) return;
-    const params = new URLSearchParams(searchParams.toString());
-    if (debouncedQuery) params.set('q', debouncedQuery);
-    else params.delete('q');
-    router.replace(`?${params.toString()}`, { scroll: false });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [debouncedQuery]);
-
-  return { query, setQuery, debouncedQuery };
-}
 
 export function SportsListing() {
   const { query, setQuery, debouncedQuery } = useSearchQuery();

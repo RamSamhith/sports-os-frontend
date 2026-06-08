@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 import { useRouter } from 'next/navigation';
-import { X, ArrowRight } from 'lucide-react';
+import { X } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { useCompare } from '@/lib/hooks/use-compare';
@@ -91,7 +91,7 @@ export function CompareTray() {
                   toast(`Removed ${label} from compare`);
                 }}
                 aria-label={`Remove ${label} from compare`}
-                className="text-muted-foreground hover:text-foreground grid h-11 w-11 shrink-0 place-items-center rounded-md transition-colors hover:bg-foreground/10"
+                className="text-muted-foreground hover:text-foreground focus-visible:ring-ring focus-visible:ring-2 focus-visible:outline-none grid h-11 w-11 shrink-0 place-items-center rounded-md transition-colors hover:bg-foreground/10"
               >
                 <X className="h-3.5 w-3.5" />
               </button>

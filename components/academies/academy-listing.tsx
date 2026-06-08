@@ -12,6 +12,7 @@ import { Separator } from '@/components/ui/separator';
 import { AcademyGrid } from '@/components/academies/academy-grid';
 import { academyFilterFacilities, academyFilterLevels, verificationStatuses } from '@/lib/constants/filters';
 import { sportTaxonomy } from '@/lib/constants/sport-taxonomy';
+import { useSearchQuery } from '@/lib/hooks/use-search-query';
 import { academies } from '@/data/academies';
 
 const sportOptions = sportTaxonomy.map((s) => ({
@@ -37,38 +38,6 @@ const statusOptions = verificationStatuses.map((s) => ({
   label: s.label,
   count: academies.filter((a) => a.verificationStatus === s.value).length,
 }));
-
-function useDebounced<T>(value: T, delay: number): T {
-  const [debounced, setDebounced] = React.useState(value);
-  React.useEffect(() => {
-    const t = setTimeout(() => setDebounced(value), delay);
-    return () => clearTimeout(t);
-  }, [value, delay]);
-  return debounced;
-}
-
-/** Use immediate value for local filtering, debounced only for URL sync. */
-function useSearchQuery() {
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  
-  const [query, setQuery] = React.useState(() => searchParams.get('q') ?? '');
-  // Fast debounce (150ms) for URL sync - imperceptible to user
-  const debouncedQuery = useDebounced(query, 150);
-
-  // Sync debounced query to URL (non-blocking)
-  React.useEffect(() => {
-    const current = searchParams.get('q') ?? '';
-    if ((debouncedQuery || '') === current) return;
-    const params = new URLSearchParams(searchParams.toString());
-    if (debouncedQuery) params.set('q', debouncedQuery);
-    else params.delete('q');
-    router.replace(`?${params.toString()}`, { scroll: false });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [debouncedQuery]);
-
-  return { query, setQuery, debouncedQuery };
-}
 
 function readListFromParams(params: URLSearchParams, key: string): string[] {
   return (params.get(key) ?? '')

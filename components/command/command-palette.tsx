@@ -270,6 +270,7 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
           ref={listRef}
           role="listbox"
           aria-label="Search results"
+          aria-live="polite"
           className="max-h-[60dvh] overflow-y-auto p-2"
         >
           {flat.length === 0 ? (
@@ -297,6 +298,7 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
                           onClick={() => select(r)}
                           className={cn(
                             'flex w-full items-center justify-between gap-3 rounded-md px-2 py-2 text-left text-sm transition-colors',
+                            'focus-visible:ring-ring focus-visible:ring-2 focus-visible:outline-none',
                             isActive
                               ? 'bg-accent/15 text-foreground'
                               : 'text-foreground/90 hover:bg-accent/10',

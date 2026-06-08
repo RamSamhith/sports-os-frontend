@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 import Link from 'next/link';
-import { GitCompare, X, MapPin, Star } from 'lucide-react';
+import { GitCompare, X, Star } from 'lucide-react';
 import { toast } from 'sonner';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -185,7 +185,7 @@ function CompareCard({ slot, onRemove }: { slot: Entity; onRemove: () => void })
         <button
           type="button"
           onClick={onRemove}
-          className="bg-card/90 hover:bg-card text-foreground absolute top-3 right-3 grid h-8 w-8 place-items-center rounded-full shadow"
+          className="bg-card/90 hover:bg-card text-foreground focus-visible:ring-ring focus-visible:ring-2 focus-visible:outline-none absolute top-3 right-3 grid h-8 w-8 place-items-center rounded-full shadow"
           aria-label={`Remove ${kind} from compare`}
         >
           <X className="h-3.5 w-3.5" />

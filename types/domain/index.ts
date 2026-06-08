@@ -9,7 +9,6 @@ export * from './lead';
 export * from './location';
 export * from './media';
 export * from './review';
-export * from './search';
 export * from './session';
 export * from './shortlist';
 export * from './sport';

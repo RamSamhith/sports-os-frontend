@@ -3,7 +3,7 @@ import { FullPageSkeleton } from '@/components/feedback/skeletons';
 
 export default function Loading() {
   return (
-    <Container>
+    <Container aria-busy="true" aria-label="Loading page">
       <FullPageSkeleton />
     </Container>
   );

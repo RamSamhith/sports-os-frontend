@@ -21,7 +21,7 @@ export function ChildSwitcher() {
   }
 
   return (
-    <Select value={activeChildId ?? ''} onValueChange={setActiveChild}>
+    <Select value={activeChildId ?? ''} onValueChange={setActiveChild} aria-label="Select active child">
       <SelectTrigger className="w-full">
         <SelectValue placeholder="Select a child" />
       </SelectTrigger>
