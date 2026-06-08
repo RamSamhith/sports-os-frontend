@@ -13,6 +13,7 @@ export const routes = {
   enquirySuccess: '/enquiry/success',
   login: '/login',
   register: '/register',
+  onboardingRole: '/onboarding/role',
   forgotPassword: '/forgot-password',
   profile: '/profile',
   profilePersonal: '/profile/personal',

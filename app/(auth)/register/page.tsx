@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { SharedLayout } from '@/components/motion/shared-layout';
 import { cn } from '@/lib/utils/cn';
 import { Loader2 } from 'lucide-react';
@@ -30,6 +31,7 @@ const fieldVariants = {
 
 export default function RegisterPage() {
   const reduced = useReducedMotion();
+  const router = useRouter();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -136,6 +138,7 @@ export default function RegisterPage() {
     // Placeholder: real registration wiring lives in a later phase
     await new Promise((r) => setTimeout(r, 1500));
     setIsSubmitting(false);
+    router.push('/onboarding/role');
   }
 
   const errorId = (field: string) => `register-${field}-error`;
