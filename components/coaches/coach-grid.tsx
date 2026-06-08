@@ -21,7 +21,7 @@ export function CoachGrid({
   error,
   onRetry,
   onClear,
-  clearLabel = 'Clear search',
+  clearLabel = 'Clear filters',
 }: CoachGridProps) {
   if (loading) {
     return (

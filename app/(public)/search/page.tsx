@@ -9,6 +9,7 @@ import { SportsListing } from '@/components/sports/sports-listing';
 import { Container } from '@/components/layout/container';
 import { Section } from '@/components/layout/section';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Breadcrumbs } from '@/components/seo/breadcrumbs';
 
 export default function SearchPage() {
   const router = useRouter();
@@ -41,6 +42,7 @@ export default function SearchPage() {
   return (
     <Section>
       <Container size="lg">
+        <Breadcrumbs items={[{ label: 'Home', href: '/' }, { label: 'Search' }]} className="mb-4" />
         <header className="mb-8">
           <h1 className="text-3xl font-semibold tracking-tight md:text-4xl">Search Results</h1>
           {query && (

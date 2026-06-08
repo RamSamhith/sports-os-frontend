@@ -111,7 +111,7 @@ export function CoachCardPlaceholder({ coach }: { coach: Coach }) {
             <Bookmark className="h-4 w-4" />
           )}
         </Button>
-        <Button size="md" variant="outline" asChild className="h-11 px-4">
+        <Button size="sm" variant="outline" asChild>
           <Link href={`/coaches/${slug}`}>View</Link>
         </Button>
       </div>

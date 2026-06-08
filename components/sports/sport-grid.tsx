@@ -21,7 +21,7 @@ export function SportGrid({
   error,
   onRetry,
   onClear,
-  clearLabel = 'Clear search',
+  clearLabel = 'Clear filters',
 }: SportGridProps) {
   if (loading) {
     return (

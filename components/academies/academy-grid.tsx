@@ -50,7 +50,7 @@ export function AcademyGrid({
         description="Try expanding your search or removing some filters."
         action={
           onClear ? (
-            <Button size="sm" onClick={onClear}>
+            <Button size="sm" variant="outline" onClick={onClear}>
               {clearLabel}
             </Button>
           ) : null
