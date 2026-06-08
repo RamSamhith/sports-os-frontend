@@ -444,9 +444,11 @@
       box-shadow var(--duration-standard) var(--ease-standard),
       border-color var(--duration-standard) var(--ease-standard);
   }
-  .motion-card:hover {
-    transform: translateY(-2px) scale(1.005);
-    box-shadow: var(--shadow-lg);
+  @media (hover: hover) {
+    .motion-card:hover {
+      transform: translateY(-2px) scale(1.005);
+      box-shadow: var(--shadow-lg);
+    }
   }
 
   .motion-icon {
@@ -454,7 +456,9 @@
       color var(--duration-fast) var(--ease-standard),
       transform var(--duration-fast) var(--ease-spring);
   }
-  .motion-icon:hover {
-    transform: scale(1.08);
+  @media (hover: hover) {
+    .motion-icon:hover {
+      transform: scale(1.08);
+    }
   }
 }

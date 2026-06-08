@@ -1,7 +1,5 @@
 'use client';
 
-import { useReducedMotion } from 'framer-motion';
-
 export const authPageVariants = {
   hidden: { opacity: 0 },
   show: {
@@ -58,28 +56,6 @@ export const authLinkVariants = {
     transition: { duration: 0.35, ease: [0.2, 0, 0, 1] },
   },
 };
-
-export function getAuthVariants() {
-  const reduced = useReducedMotion();
-  if (reduced) {
-    return {
-      page: { initial: { opacity: 0 }, animate: { opacity: 1 } },
-      item: { initial: { opacity: 0 }, animate: { opacity: 1, transition: { duration: 0.2 } } },
-      card: { initial: { opacity: 0 }, animate: { opacity: 1, transition: { duration: 0.2 } } },
-      field: { initial: { opacity: 0 }, animate: { opacity: 1, transition: { duration: 0.15 } } },
-      button: { initial: { opacity: 0 }, animate: { opacity: 1, transition: { duration: 0.15 } } },
-      link: { initial: { opacity: 0 }, animate: { opacity: 1, transition: { duration: 0.15 } } },
-    };
-  }
-  return {
-    page: { initial: 'hidden', animate: 'show', variants: authPageVariants },
-    item: { variants: authItemVariants },
-    card: { variants: authCardVariants },
-    field: { variants: authFieldVariants },
-    button: { variants: authButtonVariants },
-    link: { variants: authLinkVariants },
-  };
-}
 
 export const roleCardVariants = {
   hidden: { opacity: 0, y: 24, scale: 0.96 },

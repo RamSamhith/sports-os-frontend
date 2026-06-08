@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { motion, useReducedMotion } from 'framer-motion';
 import { Bookmark, BookmarkCheck, MapPin } from 'lucide-react';
 import { toast } from 'sonner';
 import { Card } from '@/components/ui/card';
@@ -11,9 +12,11 @@ import { VerifiedBadge } from '@/components/trust/verified-badge';
 import { CompareButton } from '@/components/academies/compare-button';
 import { fixtureImages } from '@/lib/images';
 import { useShortlist } from '@/lib/hooks/use-shortlist';
+import { ease, duration } from '@/components/motion/constants';
 import type { Coach } from '@/types/domain/coach';
 
 export function CoachCardPlaceholder({ coach }: { coach: Coach }) {
+  const reduced = useReducedMotion();
   const { slug, name, location, experienceYears, sportsCoached, verificationStatus, avatar, id } = coach;
 
   // Shortlist (persisted in localStorage by provider)
@@ -28,7 +31,13 @@ export function CoachCardPlaceholder({ coach }: { coach: Coach }) {
     .join('');
 
   return (
-    <Card className="motion-card flex flex-wrap items-center gap-3 p-4 sm:flex-nowrap">
+    <motion.div
+      whileHover={reduced ? undefined : { y: -3, scale: 1.005 }}
+      whileTap={reduced ? undefined : { scale: 0.995 }}
+      transition={{ duration: duration.fast, ease: ease.athletic }}
+      className="will-change-transform"
+    >
+    <Card className="flex flex-wrap items-center gap-3 p-4 sm:flex-nowrap">
       <span
         className="bg-muted/40 relative h-12 w-12 shrink-0 overflow-hidden rounded-full"
         aria-hidden
@@ -107,5 +116,6 @@ export function CoachCardPlaceholder({ coach }: { coach: Coach }) {
         </Button>
       </div>
     </Card>
+    </motion.div>
   );
 }

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useCallback, useEffect } from 'react';
-import { motion, useReducedMotion, AnimatePresence } from 'framer-motion';
+import { motion, useReducedMotion, AnimatePresence, type Variants } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -9,6 +9,7 @@ import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/lib/hooks/use-auth';
 import { Loader2, ArrowLeft } from 'lucide-react';
+import { ease, duration } from '@/components/motion/constants';
 
 type ModalView = 'choose' | 'login' | 'register';
 
@@ -21,8 +22,8 @@ interface FieldErrors {
 
 const overlayVariants = {
   hidden: { opacity: 0 },
-  visible: { opacity: 1, transition: { duration: 0.2 } },
-  exit: { opacity: 0, transition: { duration: 0.15 } },
+  visible: { opacity: 1, transition: { duration: 0.2, ease: ease.standard } },
+  exit: { opacity: 0, transition: { duration: 0.12, ease: ease.accelerate } },
 };
 
 const cardVariants = {
@@ -31,19 +32,37 @@ const cardVariants = {
     opacity: 1,
     scale: 1,
     y: 0,
-    transition: { type: 'spring', stiffness: 380, damping: 30 },
+    transition: { type: 'spring', stiffness: 420, damping: 28 },
   },
   exit: {
     opacity: 0,
     scale: 0.97,
-    y: 8,
-    transition: { duration: 0.15 },
+    y: 6,
+    transition: { duration: 0.12, ease: ease.accelerate },
   },
 };
 
+/** Directional slide for view transitions — slides right on forward, left on back. */
+const viewVariants = {
+  enter: (direction: number) => ({
+    opacity: 0,
+    x: direction > 0 ? 20 : -20,
+  }),
+  center: {
+    opacity: 1,
+    x: 0,
+    transition: { duration: duration.standard, ease: ease.athletic },
+  },
+  exit: (direction: number) => ({
+    opacity: 0,
+    x: direction > 0 ? -20 : 20,
+    transition: { duration: duration.fast, ease: ease.accelerate },
+  }),
+};
+
 const formFieldVariants = {
-  hidden: { opacity: 0, x: -12 },
-  visible: { opacity: 1, x: 0, transition: { duration: 0.25, ease: [0.2, 0, 0, 1] } },
+  hidden: { opacity: 0, x: -8 },
+  visible: { opacity: 1, x: 0, transition: { duration: 0.2, ease: ease.athletic } },
 };
 
 export function AuthModal({
@@ -59,10 +78,14 @@ export function AuthModal({
   const router = useRouter();
   const { setAuth, setProfile } = useAuth();
   const [view, setView] = useState<ModalView>(defaultView);
+  const [direction, setDirection] = useState(1);
 
   // Reset view when modal opens
   useEffect(() => {
-    if (open) setView(defaultView);
+    if (open) {
+      setView(defaultView);
+      setDirection(1);
+    }
   }, [open, defaultView]);
 
   const handleClose = useCallback(() => {
@@ -73,6 +96,11 @@ export function AuthModal({
     onOpenChange(false);
     router.push('/');
   }, [onOpenChange, router]);
+
+  const navigateView = useCallback((next: ModalView) => {
+    setDirection(next === 'choose' ? -1 : 1);
+    setView(next);
+  }, []);
 
   if (!open) return null;
 
@@ -100,11 +128,13 @@ export function AuthModal({
             animate="visible"
             exit="exit"
           >
-            <AnimatePresence mode="wait">
+            <AnimatePresence mode="wait" custom={direction}>
               {view === 'choose' && (
                 <ChooseView
                   key="choose"
-                  onSelect={(v) => setView(v)}
+                  custom={direction}
+                  variants={reduced ? undefined : viewVariants}
+                  onSelect={(v) => navigateView(v)}
                   onGuest={handleGuest}
                   reduced={reduced}
                 />
@@ -112,8 +142,10 @@ export function AuthModal({
               {view === 'login' && (
                 <LoginView
                   key="login"
-                  onBack={() => setView('choose')}
-                  onSwitch={() => setView('register')}
+                  custom={direction}
+                  variants={reduced ? undefined : viewVariants}
+                  onBack={() => navigateView('choose')}
+                  onSwitch={() => navigateView('register')}
                   onSuccess={handleClose}
                   reduced={reduced}
                 />
@@ -121,8 +153,10 @@ export function AuthModal({
               {view === 'register' && (
                 <RegisterView
                   key="register"
-                  onBack={() => setView('choose')}
-                  onSwitch={() => setView('login')}
+                  custom={direction}
+                  variants={reduced ? undefined : viewVariants}
+                  onBack={() => navigateView('choose')}
+                  onSwitch={() => navigateView('login')}
                   onSuccess={handleClose}
                   reduced={reduced}
                 />
@@ -139,12 +173,17 @@ function ChooseView({
   onSelect,
   onGuest,
   reduced,
+  custom,
+  variants,
 }: {
   onSelect: (view: ModalView) => void;
   onGuest: () => void;
   reduced: boolean;
+  custom?: number;
+  variants?: Variants;
 }) {
   return (
+    <motion.div custom={custom} variants={variants} initial="enter" animate="center" exit="exit">
     <Card>
       <CardHeader className="text-center">
         <CardTitle className="text-xl">Welcome to SportsOS</CardTitle>
@@ -176,6 +215,7 @@ function ChooseView({
         </motion.div>
       </CardContent>
     </Card>
+    </motion.div>
   );
 }
 
@@ -184,11 +224,15 @@ function LoginView({
   onSwitch,
   onSuccess,
   reduced,
+  custom,
+  variants,
 }: {
   onBack: () => void;
   onSwitch: () => void;
   onSuccess: () => void;
   reduced: boolean;
+  custom?: number;
+  variants?: Variants;
 }) {
   const { setAuth } = useAuth();
   const [email, setEmail] = useState('');
@@ -265,6 +309,7 @@ function LoginView({
   const errorId = (f: string) => `modal-login-${f}-error`;
 
   return (
+    <motion.div custom={custom} variants={variants} initial="enter" animate="center" exit="exit">
     <Card>
       <CardHeader>
         <div className="flex items-center gap-2">
@@ -321,6 +366,7 @@ function LoginView({
         </p>
       </CardContent>
     </Card>
+    </motion.div>
   );
 }
 
@@ -329,11 +375,15 @@ function RegisterView({
   onSwitch,
   onSuccess,
   reduced,
+  custom,
+  variants,
 }: {
   onBack: () => void;
   onSwitch: () => void;
   onSuccess: () => void;
   reduced: boolean;
+  custom?: number;
+  variants?: Variants;
 }) {
   const { setAuth, setProfile } = useAuth();
   const [name, setName] = useState('');
@@ -426,6 +476,7 @@ function RegisterView({
   const errorId = (f: string) => `modal-register-${f}-error`;
 
   return (
+    <motion.div custom={custom} variants={variants} initial="enter" animate="center" exit="exit">
     <Card>
       <CardHeader>
         <div className="flex items-center gap-2">
@@ -511,5 +562,6 @@ function RegisterView({
         </p>
       </CardContent>
     </Card>
+    </motion.div>
   );
 }

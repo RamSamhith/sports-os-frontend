@@ -2,6 +2,7 @@
 
 import * as React from 'react';
 import Link from 'next/link';
+import { motion, useReducedMotion } from 'framer-motion';
 import { Bookmark, BookmarkCheck, GitCompare, MapPin, Star } from 'lucide-react';
 import { toast } from 'sonner';
 import { Card } from '@/components/ui/card';
@@ -14,9 +15,11 @@ import { CertificationIndicator } from '@/components/trust/certification-indicat
 import { fixtureImages } from '@/lib/images';
 import { useShortlist } from '@/lib/hooks/use-shortlist';
 import { useCompare } from '@/lib/hooks/use-compare';
+import { ease, duration } from '@/components/motion/constants';
 import type { Academy } from '@/types/domain/academy';
 
 export function AcademyCardPlaceholder({ academy, priority = false }: { academy: Academy; priority?: boolean }) {
+  const reduced = useReducedMotion();
   const {
     id,
     slug,
@@ -50,7 +53,13 @@ export function AcademyCardPlaceholder({ academy, priority = false }: { academy:
   const isCompared = hasCompare('academy', id);
 
   return (
-    <Card className="motion-card group overflow-hidden hover:border-foreground/25">
+    <motion.div
+      whileHover={reduced ? undefined : { y: -3, scale: 1.005 }}
+      whileTap={reduced ? undefined : { scale: 0.995 }}
+      transition={{ duration: duration.fast, ease: ease.athletic }}
+      className="will-change-transform"
+    >
+    <Card className="group overflow-hidden hover:border-foreground/25">
       <Link
         href={`/academies/${slug}`}
         className="bg-muted/40 relative block aspect-[16/10] w-full overflow-hidden focus-visible:ring-ring focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
@@ -177,5 +186,6 @@ export function AcademyCardPlaceholder({ academy, priority = false }: { academy:
         </div>
       </div>
     </Card>
+    </motion.div>
   );
 }

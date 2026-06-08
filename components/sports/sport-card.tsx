@@ -1,10 +1,15 @@
+'use client';
+
 import Link from 'next/link';
+import { motion, useReducedMotion } from 'framer-motion';
 import { ImageWithFallback } from '@/components/ui/image-with-fallback';
 import { CompareButton } from '@/components/academies/compare-button';
 import { fixtureImages } from '@/lib/images';
+import { ease, duration } from '@/components/motion/constants';
 import type { Sport } from '@/types/domain/sport';
 
 export function SportCard({ sport }: { sport: Sport }) {
+  const reduced = useReducedMotion();
   const { slug, name, category, coverImage, description, explorationGuidance, id } = sport;
   const imageSrc = coverImage ?? fixtureImages.sports[id];
   const initial = name.charAt(0);
@@ -17,7 +22,12 @@ export function SportCard({ sport }: { sport: Sport }) {
         : null;
 
   return (
-    <div className="border-border/60 bg-card/40 hover:border-foreground/30 motion-card group relative flex flex-col gap-3 overflow-hidden rounded-xl border p-4 backdrop-blur-md">
+    <motion.div
+      whileHover={reduced ? undefined : { y: -3, scale: 1.005 }}
+      whileTap={reduced ? undefined : { scale: 0.995 }}
+      transition={{ duration: duration.fast, ease: ease.athletic }}
+      className="border-border/60 bg-card/40 hover:border-foreground/30 group relative flex flex-col gap-3 overflow-hidden rounded-xl border p-4 backdrop-blur-md will-change-transform"
+    >
       <div className="flex items-center gap-3">
         <span className="bg-muted/40 relative h-9 w-9 shrink-0 overflow-hidden rounded-md">
           <ImageWithFallback
@@ -60,6 +70,6 @@ export function SportCard({ sport }: { sport: Sport }) {
           {ageText}
         </span>
       ) : null}
-    </div>
+    </motion.div>
   );
 }
