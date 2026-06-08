@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import { Container } from '@/components/layout/container';
 import { Section } from '@/components/layout/section';
 import { Breadcrumbs } from '@/components/seo/breadcrumbs';
@@ -9,8 +10,40 @@ import { VerifiedBadge } from '@/components/trust/verified-badge';
 import { ImageWithFallback } from '@/components/ui/image-with-fallback';
 import { fixtureImages } from '@/lib/images';
 import { notFound } from 'next/navigation';
-import { coachBySlug } from '@/data/coaches';
+import { coachBySlug, coaches } from '@/data/coaches';
+import { siteConfig } from '@/config/site';
 import Link from 'next/link';
+
+export function generateStaticParams() {
+  return coaches.map((coach) => ({ slug: coach.slug }));
+}
+
+export function generateMetadata({ params }: { params: { slug: string } }): Metadata {
+  const coach = coachBySlug(params.slug);
+  if (!coach) return {};
+
+  const title = `${coach.name} — Sports Coach in ${coach.location.city}`;
+  const description = `${coach.specialization.join(', ')} — ${coach.experienceYears}+ years experience in ${coach.location.city}, ${coach.location.state}.`;
+  const url = `${siteConfig.url}/coaches/${coach.slug}`;
+
+  return {
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      url,
+      siteName: siteConfig.name,
+      type: 'website',
+      locale: siteConfig.locale,
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+    },
+  };
+}
 
 export default function CoachDetailPage({ params }: { params: { slug: string } }) {
   const coach = coachBySlug(params.slug);

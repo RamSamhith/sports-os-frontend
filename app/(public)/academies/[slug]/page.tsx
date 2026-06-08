@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import { Container } from '@/components/layout/container';
 import { Section } from '@/components/layout/section';
 import { Breadcrumbs } from '@/components/seo/breadcrumbs';
@@ -11,8 +12,40 @@ import { CertificationIndicator } from '@/components/trust/certification-indicat
 import { ImageWithFallback } from '@/components/ui/image-with-fallback';
 import { fixtureImages } from '@/lib/images';
 import { notFound } from 'next/navigation';
-import { academyBySlug } from '@/data/academies';
+import { academyBySlug, academies } from '@/data/academies';
+import { siteConfig } from '@/config/site';
 import Link from 'next/link';
+
+export function generateStaticParams() {
+  return academies.map((academy) => ({ slug: academy.slug }));
+}
+
+export function generateMetadata({ params }: { params: { slug: string } }): Metadata {
+  const academy = academyBySlug(params.slug);
+  if (!academy) return {};
+
+  const title = `${academy.name} — Sports Academy in ${academy.location.city}`;
+  const description = academy.description.slice(0, 155);
+  const url = `${siteConfig.url}/academies/${academy.slug}`;
+
+  return {
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      url,
+      siteName: siteConfig.name,
+      type: 'website',
+      locale: siteConfig.locale,
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+    },
+  };
+}
 
 export default function AcademyDetailPage({ params }: { params: { slug: string } }) {
   const academy = academyBySlug(params.slug);
@@ -80,4 +113,3 @@ export default function AcademyDetailPage({ params }: { params: { slug: string }
     </Section>
   );
 }
-

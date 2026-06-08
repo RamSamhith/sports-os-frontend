@@ -1,7 +1,27 @@
+import type { Metadata } from 'next';
 import { Container } from '@/components/layout/container';
 import { Section } from '@/components/layout/section';
 import Link from 'next/link';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { siteConfig } from '@/config/site';
+
+export const metadata: Metadata = {
+  title: 'Discover',
+  description: 'Explore the sports ecosystem across India — academies, coaches, and sports pathways.',
+  openGraph: {
+    title: `Discover · ${siteConfig.name}`,
+    description: 'Explore the sports ecosystem across India — academies, coaches, and sports pathways.',
+    url: `${siteConfig.url}/discover`,
+    siteName: siteConfig.name,
+    type: 'website',
+    locale: siteConfig.locale,
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: `Discover · ${siteConfig.name}`,
+    description: 'Explore the sports ecosystem across India — academies, coaches, and sports pathways.',
+  },
+};
 
 export default function DiscoverPage() {
   return (
