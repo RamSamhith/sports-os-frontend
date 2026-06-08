@@ -10,10 +10,13 @@ import { Container } from '@/components/layout/container';
 import { Section } from '@/components/layout/section';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Breadcrumbs } from '@/components/seo/breadcrumbs';
+import { RecentSearches } from '@/components/search/recent-searches';
+import { useRecentSearches } from '@/components/command/recent-searches-store';
 
 export default function SearchPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { items: recentItems } = useRecentSearches();
 
   const [query, setQuery] = React.useState(() => searchParams.get('q') ?? '');
   const [activeTab, setActiveTab] = React.useState<'all' | 'academies' | 'coaches' | 'sports'>('all');
@@ -39,6 +42,8 @@ export default function SearchPage() {
     setActiveTab(tab as 'all' | 'academies' | 'coaches' | 'sports');
   };
 
+  const recentQueries = recentItems.map((r) => r.query);
+
   return (
     <Section>
       <Container size="lg">
@@ -63,6 +68,18 @@ export default function SearchPage() {
             onClear={handleClear}
           />
         </div>
+
+        {!query && recentQueries.length > 0 && (
+          <div className="mb-6">
+            <RecentSearches
+              queries={recentQueries}
+              onSelect={(q) => {
+                setQuery(q);
+                handleSearch(q);
+              }}
+            />
+          </div>
+        )}
 
         <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
           <TabsList className="grid w-full grid-cols-4">

@@ -6,6 +6,7 @@ import { FeaturedAcademies } from '@/components/home/featured-academies';
 import { FeaturedCoaches } from '@/components/home/featured-coaches';
 import { CtaSection } from '@/components/home/cta-section';
 import { PageTransition } from '@/components/motion/page-transition';
+import { HomepageAuthModal } from '@/components/auth/homepage-auth-modal';
 
 export default function HomePage() {
   return (
@@ -17,6 +18,7 @@ export default function HomePage() {
       <FeaturedAcademies />
       <FeaturedCoaches />
       <CtaSection />
+      <HomepageAuthModal />
     </PageTransition>
   );
 }

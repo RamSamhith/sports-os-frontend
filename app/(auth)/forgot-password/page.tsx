@@ -6,13 +6,16 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
+import { OtpInput } from '@/components/ui/otp-input';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { SharedLayout } from '@/components/motion/shared-layout';
-import { Loader2, CheckCircle2, ArrowLeft, Mail } from 'lucide-react';
+import { Loader2, CheckCircle2, ArrowLeft, Mail, RotateCcw } from 'lucide-react';
 import { useAuth } from '@/lib/hooks/use-auth';
 
 const FAST = { duration: 0.2, ease: [0.2, 0, 0, 1] as const };
+
+const RESET_CODE = '123456';
 
 export default function ForgotPasswordPage() {
   const reduced = useReducedMotion();
@@ -22,23 +25,31 @@ export default function ForgotPasswordPage() {
   const [error, setError] = useState('');
   const [touched, setTouched] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [sent, setSent] = useState(false);
+  const [emailSent, setEmailSent] = useState(false);
+  const [otp, setOtp] = useState('');
+  const [isVerifying, setIsVerifying] = useState(false);
+  const [resetComplete, setResetComplete] = useState(false);
+  const [resendCooldown, setResendCooldown] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // Redirect authenticated users to home
   useEffect(() => {
     if (isLoading) return;
-    if (isAuthenticated) {
-      router.replace('/');
-    }
+    if (isAuthenticated) router.replace('/');
   }, [isLoading, isAuthenticated, router]);
 
-  // Focus input on mount and on resend
   useEffect(() => {
-    if (!sent) {
-      inputRef.current?.focus();
-    }
-  }, [sent]);
+    if (!emailSent) inputRef.current?.focus();
+  }, [emailSent]);
+
+  useEffect(() => {
+    if (resendCooldown <= 0) return;
+    const t = setTimeout(() => setResendCooldown((c) => c - 1), 1000);
+    return () => clearTimeout(t);
+  }, [resendCooldown]);
+
+  useEffect(() => {
+    if (emailSent && otp.length === 6) handleVerifyOtp(otp);
+  }, [otp, emailSent]);
 
   function validate(value: string): string {
     if (!value.trim()) return 'Email is required';
@@ -64,16 +75,27 @@ export default function ForgotPasswordPage() {
     if (v) return;
 
     setIsSubmitting(true);
-    // Placeholder: real email delivery lives in a later phase
     await new Promise((r) => setTimeout(r, 1200));
     setIsSubmitting(false);
-    setSent(true);
+    setEmailSent(true);
+  }
+
+  async function handleVerifyOtp(code: string) {
+    setIsVerifying(true);
+    setError('');
+    await new Promise((r) => setTimeout(r, 1200));
+    if (code === RESET_CODE) {
+      setResetComplete(true);
+    } else {
+      setError('Invalid code. Try 123456 for demo.');
+      setOtp('');
+    }
+    setIsVerifying(false);
   }
 
   function handleResend() {
-    setSent(false);
-    setEmail('');
-    setTouched(false);
+    setResendCooldown(30);
+    setOtp('');
     setError('');
   }
 
@@ -88,9 +110,9 @@ export default function ForgotPasswordPage() {
       <Card className="w-full max-w-sm">
         <CardContent className="pt-6">
           <AnimatePresence mode="wait" initial={false}>
-            {sent ? (
+            {resetComplete ? (
               <motion.div
-                key="success"
+                key="complete"
                 variants={screenVariants}
                 initial="enter"
                 animate="center"
@@ -106,11 +128,11 @@ export default function ForgotPasswordPage() {
                   <CheckCircle2 className="h-7 w-7 text-primary" />
                 </motion.div>
 
-                <h1 className="text-2xl font-bold tracking-tight">Check your inbox</h1>
+                <h1 className="text-2xl font-bold tracking-tight">Reset Link Sent</h1>
                 <p className="text-muted-foreground mt-2 text-sm text-pretty">
                   If an account exists for{' '}
                   <span className="text-foreground font-medium">{email}</span>, a password reset link
-                  has been sent.
+                  has been sent. Check your inbox.
                 </p>
 
                 <div className="mt-6 flex w-full flex-col gap-3">
@@ -120,12 +142,54 @@ export default function ForgotPasswordPage() {
                       Back to Login
                     </Button>
                   </Link>
-                  <Button
-                    className="w-full"
-                    variant="ghost"
-                    onClick={handleResend}
-                  >
-                    Resend Email
+                  <Button className="w-full" variant="ghost" onClick={() => { setResetComplete(false); setEmailSent(false); setOtp(''); setEmail(''); }}>
+                    Reset Another
+                  </Button>
+                </div>
+              </motion.div>
+            ) : emailSent ? (
+              <motion.div
+                key="otp"
+                variants={screenVariants}
+                initial="enter"
+                animate="center"
+                exit="exit"
+              >
+                <div className="mb-4 flex items-center justify-center gap-2">
+                  <span className="bg-primary/10 ring-primary/30 relative flex h-8 w-8 items-center justify-center rounded-lg ring-1">
+                    <Mail className="h-4 w-4 text-primary" />
+                  </span>
+                  <span className="text-primary text-sm font-medium">Verify Code</span>
+                </div>
+
+                <h1 className="text-2xl font-bold tracking-tight text-center">Enter reset code</h1>
+                <p className="text-muted-foreground mt-1 text-center text-sm">
+                  Enter the 6-digit code sent to{' '}
+                  <span className="text-foreground font-medium">{email}</span>
+                </p>
+
+                <div className="mt-6 flex justify-center">
+                  <OtpInput value={otp} onChange={setOtp} disabled={isVerifying} length={6} />
+                </div>
+
+                {error && (
+                  <p role="alert" className="text-destructive mt-3 text-center text-xs">{error}</p>
+                )}
+
+                {isVerifying && (
+                  <div className="mt-4 flex justify-center">
+                    <Loader2 className="text-primary h-5 w-5 animate-spin" />
+                  </div>
+                )}
+
+                <div className="mt-6 flex w-full flex-col gap-3">
+                  <Button className="w-full gap-2" variant="outline" disabled={isVerifying} onClick={() => { setEmailSent(false); setOtp(''); setError(''); }}>
+                    <ArrowLeft className="h-4 w-4" />
+                    Back
+                  </Button>
+                  <Button className="w-full" variant="ghost" onClick={handleResend} disabled={resendCooldown > 0 || isVerifying}>
+                    <RotateCcw className="h-4 w-4 mr-1" />
+                    {resendCooldown > 0 ? `Resend in ${resendCooldown}s` : 'Resend Code'}
                   </Button>
                 </div>
               </motion.div>
@@ -146,7 +210,7 @@ export default function ForgotPasswordPage() {
 
                 <h1 className="text-2xl font-bold tracking-tight text-center">Forgot password?</h1>
                 <p className="text-muted-foreground mt-1 text-center text-sm">
-                  Enter your email and we&apos;ll send you a reset link
+                  Enter your email and we&apos;ll send you a reset code
                 </p>
 
                 <form onSubmit={handleSubmit} className="mt-6 flex flex-col gap-4" noValidate>
@@ -179,7 +243,7 @@ export default function ForgotPasswordPage() {
                         Sending…
                       </>
                     ) : (
-                      'Send Reset Link'
+                      'Send Reset Code'
                     )}
                   </Button>
                 </form>

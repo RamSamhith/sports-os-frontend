@@ -1,10 +1,13 @@
 'use client';
 
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils/cn';
 import { useAuth } from '@/lib/hooks/use-auth';
 import { ChildSwitcher } from './child-switcher';
+import { Button } from '@/components/ui/button';
+import { LogOut } from 'lucide-react';
 
 const allItems = [
   { href: '/profile/personal', label: 'Personal' },
@@ -17,10 +20,16 @@ const allItems = [
 
 export function ProfileSidebar() {
   const pathname = usePathname();
-  const { role } = useAuth();
+  const router = useRouter();
+  const { role, signOut } = useAuth();
   const isParent = role === 'parent';
 
   const items = allItems.filter((it) => !it.parentOnly || isParent);
+
+  function handleSignOut() {
+    signOut();
+    router.push('/welcome');
+  }
 
   return (
     <aside className="flex flex-col gap-4">
@@ -54,6 +63,14 @@ export function ProfileSidebar() {
           })}
         </ul>
       </nav>
+      <Button
+        variant="ghost"
+        className="text-muted-foreground hover:text-destructive justify-start gap-2 px-3"
+        onClick={handleSignOut}
+      >
+        <LogOut className="h-4 w-4" />
+        Sign out
+      </Button>
     </aside>
   );
 }

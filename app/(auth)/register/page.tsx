@@ -15,6 +15,7 @@ import { useAuth } from '@/lib/hooks/use-auth';
 interface FieldErrors {
   name?: string;
   email?: string;
+  phone?: string;
   password?: string;
   confirmPassword?: string;
 }
@@ -35,6 +36,7 @@ export default function RegisterPage() {
   const { setAuth, setProfile, isAuthenticated, isLoading } = useAuth();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [errors, setErrors] = useState<FieldErrors>({});
@@ -64,6 +66,10 @@ export default function RegisterPage() {
       e.email = 'Enter a valid email address';
     }
 
+    if (phone.trim() && !/^\+?[0-9\s-]{7,15}$/.test(phone.trim())) {
+      e.phone = 'Enter a valid phone number';
+    }
+
     if (!password) {
       e.password = 'Password is required';
     } else if (password.length < 8) {
@@ -88,6 +94,8 @@ export default function RegisterPage() {
     } else if (field === 'email') {
       if (!value.trim()) e.email = 'Email is required';
       else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) e.email = 'Enter a valid email address';
+    } else if (field === 'phone') {
+      if (value.trim() && !/^\+?[0-9\s-]{7,15}$/.test(value.trim())) e.phone = 'Enter a valid phone number';
     } else if (field === 'password') {
       if (!value) e.password = 'Password is required';
       else if (value.length < 8) e.password = 'Password must be at least 8 characters';
@@ -117,6 +125,7 @@ export default function RegisterPage() {
   function handleChange(field: string, value: string) {
     if (field === 'name') setName(value);
     else if (field === 'email') setEmail(value);
+    else if (field === 'phone') setPhone(value);
     else if (field === 'password') setPassword(value);
     else if (field === 'confirmPassword') setConfirmPassword(value);
 
@@ -146,7 +155,7 @@ export default function RegisterPage() {
     setIsSubmitting(true);
     // Placeholder: real registration wiring lives in a later phase
     await new Promise((r) => setTimeout(r, 1500));
-    setProfile({ name: name.trim(), email: email.trim() });
+    setProfile({ name: name.trim(), email: email.trim(), phone: phone.trim() });
     setAuth(true);
     setIsSubmitting(false);
     router.push('/onboarding/role');
@@ -242,6 +251,31 @@ export default function RegisterPage() {
               {errors.email && (
                 <p id={errorId('email')} role="alert" className="text-destructive text-xs">
                   {errors.email}
+                </p>
+              )}
+            </motion.div>
+
+            <motion.div
+              variants={reduced ? undefined : fieldVariants}
+              transition={{ delay: 0.22 }}
+              className="flex flex-col gap-1.5"
+            >
+              <Label htmlFor="register-phone">Phone number (optional)</Label>
+              <Input
+                id="register-phone"
+                type="tel"
+                placeholder="+91 98765 43210"
+                value={phone}
+                onChange={(e) => handleChange('phone', e.target.value)}
+                onBlur={(e) => handleBlur('phone', e.target.value)}
+                autoComplete="tel"
+                aria-invalid={!!errors.phone}
+                aria-describedby={errors.phone ? errorId('phone') : undefined}
+                disabled={isSubmitting}
+              />
+              {errors.phone && (
+                <p id={errorId('phone')} role="alert" className="text-destructive text-xs">
+                  {errors.phone}
                 </p>
               )}
             </motion.div>

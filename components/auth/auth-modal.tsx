@@ -16,6 +16,7 @@ type ModalView = 'choose' | 'login' | 'register';
 interface FieldErrors {
   name?: string;
   email?: string;
+  phone?: string;
   password?: string;
   confirmPassword?: string;
 }
@@ -386,8 +387,10 @@ function RegisterView({
   variants?: Variants;
 }) {
   const { setAuth, setProfile } = useAuth();
+  const router = useRouter();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [errors, setErrors] = useState<FieldErrors>({});
@@ -400,6 +403,7 @@ function RegisterView({
     else if (name.trim().length < 2) e.name = 'Name must be at least 2 characters';
     if (!email.trim()) e.email = 'Email is required';
     else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) e.email = 'Enter a valid email address';
+    if (phone.trim() && !/^\+?[0-9\s-]{7,15}$/.test(phone.trim())) e.phone = 'Enter a valid phone number';
     if (!password) e.password = 'Password is required';
     else if (password.length < 8) e.password = 'Password must be at least 8 characters';
     if (!confirmPassword) e.confirmPassword = 'Please confirm your password';
@@ -415,6 +419,8 @@ function RegisterView({
     } else if (field === 'email') {
       if (!value.trim()) e.email = 'Email is required';
       else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) e.email = 'Enter a valid email address';
+    } else if (field === 'phone') {
+      if (value.trim() && !/^\+?[0-9\s-]{7,15}$/.test(value.trim())) e.phone = 'Enter a valid phone number';
     } else if (field === 'password') {
       if (!value) e.password = 'Password is required';
       else if (value.length < 8) e.password = 'Password must be at least 8 characters';
@@ -443,6 +449,7 @@ function RegisterView({
   function handleChange(field: string, value: string) {
     if (field === 'name') setName(value);
     else if (field === 'email') setEmail(value);
+    else if (field === 'phone') setPhone(value);
     else if (field === 'password') setPassword(value);
     else if (field === 'confirmPassword') setConfirmPassword(value);
     if (touched[field]) {
@@ -467,10 +474,11 @@ function RegisterView({
     if (Object.keys(ve).length > 0) return;
     setIsSubmitting(true);
     await new Promise((r) => setTimeout(r, 1500));
-    setProfile({ name: name.trim(), email: email.trim() });
+    setProfile({ name: name.trim(), email: email.trim(), phone: phone.trim() });
     setAuth(true);
     setIsSubmitting(false);
     onSuccess();
+    router.push('/onboarding/role');
   }
 
   const errorId = (f: string) => `modal-register-${f}-error`;
@@ -519,6 +527,21 @@ function RegisterView({
               disabled={isSubmitting}
             />
             {errors.email && <p id={errorId('email')} role="alert" className="text-destructive text-xs">{errors.email}</p>}
+          </motion.div>
+          <motion.div variants={reduced ? undefined : formFieldVariants} initial="hidden" animate="visible" transition={{ delay: 0.10 }} className="flex flex-col gap-1.5">
+            <Label htmlFor="modal-reg-phone">Phone number (optional)</Label>
+            <Input
+              id="modal-reg-phone"
+              type="tel"
+              placeholder="+91 98765 43210"
+              value={phone}
+              onChange={(e) => handleChange('phone', e.target.value)}
+              onBlur={(e) => handleBlur('phone', e.target.value)}
+              aria-invalid={!!errors.phone}
+              aria-describedby={errors.phone ? errorId('phone') : undefined}
+              disabled={isSubmitting}
+            />
+            {errors.phone && <p id={errorId('phone')} role="alert" className="text-destructive text-xs">{errors.phone}</p>}
           </motion.div>
           <motion.div variants={reduced ? undefined : formFieldVariants} initial="hidden" animate="visible" transition={{ delay: 0.11 }} className="flex flex-col gap-1.5">
             <Label htmlFor="modal-reg-password">Password</Label>
