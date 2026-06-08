@@ -7,6 +7,7 @@ export * from './use-intersection';
 export * from './use-location';
 export * from './use-media-query';
 export * from './use-reduced-motion';
+export * from './use-role';
 export * from './use-shortlist';
 export * from './use-storage-sync';
 export * from './use-theme-safe';
