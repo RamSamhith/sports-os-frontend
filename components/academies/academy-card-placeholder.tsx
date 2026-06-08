@@ -2,7 +2,6 @@
 
 import * as React from 'react';
 import Link from 'next/link';
-import { motion, AnimatePresence } from 'framer-motion';
 import { Bookmark, BookmarkCheck, GitCompare, MapPin, Star } from 'lucide-react';
 import { toast } from 'sonner';
 import { Card } from '@/components/ui/card';
@@ -125,8 +124,9 @@ export function AcademyCardPlaceholder({ academy, priority = false }: { academy:
           <Button size="sm" className="flex-1" asChild>
             <Link href={`/academies/${slug}`}>View details</Link>
           </Button>
+          {/* 44 × 44 touch target — the button itself is 44 × 44, no dead zone. */}
           <Button
-            size="icon"
+            size="icon-touch"
             variant={isSaved ? 'default' : 'outline'}
             aria-label={isSaved ? `Remove ${name} from shortlist` : `Save ${name} to shortlist`}
             aria-pressed={isSaved}
@@ -144,25 +144,15 @@ export function AcademyCardPlaceholder({ academy, priority = false }: { academy:
               }
             }}
           >
-            <AnimatePresence mode="wait" initial={false}>
-              <motion.span
-                key={isSaved ? 'saved' : 'unsaved'}
-                initial={{ scale: 0.6, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                exit={{ scale: 0.6, opacity: 0 }}
-                transition={{ duration: 0.18, ease: [0.2, 0, 0, 1] }}
-                className="inline-flex"
-              >
-                {isSaved ? (
-                  <BookmarkCheck className="h-4 w-4" />
-                ) : (
-                  <Bookmark className="h-4 w-4" />
-                )}
-              </motion.span>
-            </AnimatePresence>
+            {isSaved ? (
+              <BookmarkCheck className="h-4 w-4" />
+            ) : (
+              <Bookmark className="h-4 w-4" />
+            )}
           </Button>
+          {/* 44 × 44 touch target — the button itself is 44 × 44, no dead zone. */}
           <Button
-            size="icon"
+            size="icon-touch"
             variant={isCompared ? 'default' : 'outline'}
             aria-label={isCompared ? `Remove ${name} from compare` : `Add ${name} to compare`}
             aria-pressed={isCompared}
@@ -182,18 +172,7 @@ export function AcademyCardPlaceholder({ academy, priority = false }: { academy:
               }
             }}
           >
-            <AnimatePresence mode="wait" initial={false}>
-              <motion.span
-                key={isCompared ? 'compared' : 'uncompared'}
-                initial={{ scale: 0.6, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                exit={{ scale: 0.6, opacity: 0 }}
-                transition={{ duration: 0.18, ease: [0.2, 0, 0, 1] }}
-                className="inline-flex"
-              >
-                <GitCompare className="h-4 w-4" />
-              </motion.span>
-            </AnimatePresence>
+            <GitCompare aria-hidden className="h-4 w-4" />
           </Button>
         </div>
       </div>

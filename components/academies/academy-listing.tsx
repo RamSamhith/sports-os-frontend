@@ -2,9 +2,9 @@
 
 import * as React from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { Search, SlidersHorizontal, X } from 'lucide-react';
+import { SlidersHorizontal, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { SearchInput } from '@/components/ui/search-input';
 import { Badge } from '@/components/ui/badge';
 import { FilterDrawer } from '@/components/filters/filter-drawer';
 import { FilterGroup } from '@/components/filters/filter-group';
@@ -47,27 +47,16 @@ function useDebounced<T>(value: T, delay: number): T {
   return debounced;
 }
 
-function readListFromParams(params: URLSearchParams, key: string): string[] {
-  return (params.get(key) ?? '')
-    .split(',')
-    .map((s) => s.trim())
-    .filter(Boolean);
-}
-
-export function AcademyListing() {
+/** Use immediate value for local filtering, debounced only for URL sync. */
+function useSearchQuery() {
   const router = useRouter();
   const searchParams = useSearchParams();
-
-  // Initialize from URL once
+  
   const [query, setQuery] = React.useState(() => searchParams.get('q') ?? '');
-  const debouncedQuery = useDebounced(query, 250);
+  // Fast debounce (150ms) for URL sync - imperceptible to user
+  const debouncedQuery = useDebounced(query, 150);
 
-  const [sports, setSports] = React.useState<string[]>(() => readListFromParams(searchParams, 'sport'));
-  const [facilities, setFacilities] = React.useState<string[]>(() => readListFromParams(searchParams, 'facility'));
-  const [levels, setLevels] = React.useState<string[]>(() => readListFromParams(searchParams, 'level'));
-  const [statuses, setStatuses] = React.useState<string[]>(() => readListFromParams(searchParams, 'status'));
-
-  // Apply debounced query to URL (search input)
+  // Sync debounced query to URL (non-blocking)
   React.useEffect(() => {
     const current = searchParams.get('q') ?? '';
     if ((debouncedQuery || '') === current) return;
@@ -78,8 +67,28 @@ export function AcademyListing() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [debouncedQuery]);
 
+  return { query, setQuery, debouncedQuery };
+}
+
+function readListFromParams(params: URLSearchParams, key: string): string[] {
+  return (params.get(key) ?? '')
+    .split(',')
+    .map((s) => s.trim())
+    .filter(Boolean);
+}
+
+export function AcademyListing() {
+  const { query, setQuery, debouncedQuery } = useSearchQuery();
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
+  const [sports, setSports] = React.useState<string[]>(() => readListFromParams(searchParams, 'sport'));
+  const [facilities, setFacilities] = React.useState<string[]>(() => readListFromParams(searchParams, 'facility'));
+  const [levels, setLevels] = React.useState<string[]>(() => readListFromParams(searchParams, 'level'));
+  const [statuses, setStatuses] = React.useState<string[]>(() => readListFromParams(searchParams, 'status'));
+
   const appliedCount =
-    sports.length + facilities.length + levels.length + statuses.length + (debouncedQuery ? 1 : 0);
+    sports.length + facilities.length + levels.length + statuses.length + (query ? 1 : 0);
 
   const clearAll = () => {
     setQuery('');
@@ -113,9 +122,9 @@ export function AcademyListing() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sports, facilities, levels, statuses]);
 
-  // Apply filters
+  // Apply filters using IMMEDIATE query for instant feedback
   const filtered = React.useMemo(() => {
-    const q = debouncedQuery.trim().toLowerCase();
+    const q = query.trim().toLowerCase();
     return academies.filter((a) => {
       if (sports.length && !sports.some((s) => a.sportsOffered.includes(s))) return false;
       if (facilities.length && !facilities.every((f) => a.facilities.includes(f as never))) return false;
@@ -135,11 +144,11 @@ export function AcademyListing() {
       }
       return true;
     });
-  }, [debouncedQuery, sports, facilities, levels, statuses]);
+  }, [query, sports, facilities, levels, statuses]);
 
   const chips: Array<{ key: string; label: string; layoutId?: string; onRemove: () => void }> = [];
-  if (debouncedQuery) {
-    chips.push({ key: 'q', label: `“${debouncedQuery}”`, onRemove: removeQueryChip });
+  if (query) {
+    chips.push({ key: 'q', label: `“${query}”`, onRemove: removeQueryChip });
   }
   for (const s of sports) {
     const opt = sportOptions.find((o) => o.value === s);
@@ -181,31 +190,17 @@ export function AcademyListing() {
   return (
     <div className="flex flex-col gap-4">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-        <div className="relative flex-1">
-          <Search
-            aria-hidden
-            className="text-muted-foreground pointer-events-none absolute top-1/2 left-3.5 h-4 w-4 -translate-y-1/2"
-          />
-          <Input
+        <div className="flex-1">
+          <SearchInput
             value={query}
-            onChange={(e) => setQuery(e.target.value)}
+            onValueChange={setQuery}
+            label="Search academies"
             placeholder="Search academies by name, city, or sport…"
-            className="h-11 pl-10 text-base text-sm md:text-sm"
-            aria-label="Search academies"
+            size="lg"
           />
-          {query ? (
-            <button
-              type="button"
-              onClick={() => setQuery('')}
-              className="absolute top-1/2 right-3 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-              aria-label="Clear search"
-            >
-              <X className="h-4 w-4" />
-            </button>
-          ) : null}
         </div>
         <FilterDrawer
-          appliedCount={appliedCount - (debouncedQuery ? 1 : 0)}
+          appliedCount={sports.length + facilities.length + levels.length + statuses.length}
           onClear={() => {
             setSports([]);
             setFacilities([]);
@@ -268,7 +263,7 @@ export function AcademyListing() {
             </Badge>
           ))}
           {appliedCount > 1 ? (
-            <Button variant="ghost" size="sm" onClick={clearAll}>
+            <Button variant="ghost" className="min-h-[44px] min-w-[44px]" onClick={clearAll}>
               Clear all
             </Button>
           ) : null}

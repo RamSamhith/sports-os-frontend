@@ -47,11 +47,9 @@ const cardGridClassFor: Record<number, string> = {
 };
 
 export function CompareView() {
-  const { items, remove, clear, maxItems, minItems } = useCompare();
-  const [mounted, setMounted] = React.useState(false);
-  React.useEffect(() => setMounted(true), []);
+  const { items, remove, clear, maxItems, minItems, hydrated } = useCompare();
 
-  if (!mounted) {
+  if (!hydrated) {
     return (
       <div className="bg-muted/30 h-40 animate-pulse rounded-xl border border-dashed" aria-hidden />
     );
@@ -115,13 +113,14 @@ export function CompareView() {
         </p>
         <Button
           variant="ghost"
-          size="sm"
+          className="min-h-[44px] min-w-[44px]"
           onClick={() => {
             clear();
             toast('Cleared compare');
           }}
+          aria-label="Clear all compare items"
         >
-          <X className="h-3.5 w-3.5" /> Clear all
+          <X className="h-4 w-4" /> Clear all
         </Button>
       </div>
 

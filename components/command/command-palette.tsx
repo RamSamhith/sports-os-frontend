@@ -237,8 +237,16 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
           <Search aria-hidden className="text-muted-foreground h-4 w-4 shrink-0" />
           <input
             ref={inputRef}
+            type="search"
+            inputMode="search"
+            enterKeyHint="search"
+            autoComplete="off"
+            autoCorrect="off"
+            autoCapitalize="off"
+            spellCheck={false}
             value={query}
-            onChange={(e) => setQuery(e.target.value)}
+            onChange={(e) => setQuery(e.currentTarget.value)}
+            onInput={(e) => setQuery((e.currentTarget as HTMLInputElement).value)}
             onKeyDown={onKeyDown}
             placeholder="Search academies, coaches, sports, or jump to a page…"
             aria-label="Command palette search"

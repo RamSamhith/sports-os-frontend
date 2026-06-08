@@ -44,13 +44,13 @@ export function CompareButton({ entityType, id, label, sublabel, href }: Compare
 
   return (
     <Button
-      size="icon"
+      size="icon-touch"
       variant={active ? 'default' : 'outline'}
       onClick={onClick}
       aria-label={active ? 'Remove from compare' : 'Add to compare'}
       aria-pressed={active}
     >
-      <GitCompare className="h-4 w-4" />
+      <GitCompare aria-hidden className="h-4 w-4" />
     </Button>
   );
 }

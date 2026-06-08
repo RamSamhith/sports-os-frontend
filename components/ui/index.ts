@@ -13,6 +13,7 @@ export * from './label';
 export * from './modal';
 export * from './popover';
 export * from './search-bar';
+export * from './search-input';
 export * from './select';
 export * from './separator';
 export * from './sheet';

@@ -33,6 +33,8 @@ export interface CompareContextValue {
   minItems: number;
   /** Per-item display metadata, keyed by `${entityType}:${id}`. */
   extras: Record<string, CompareItemMeta>;
+  /** Whether the provider has finished hydrating from localStorage. */
+  hydrated: boolean;
 }
 
 export const CompareContext = createContext<CompareContextValue | null>(null);

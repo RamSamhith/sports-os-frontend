@@ -1,19 +1,47 @@
 'use client';
 
 import * as React from 'react';
-import { Search, X } from 'lucide-react';
-import { Input } from '@/components/ui/input';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { X } from 'lucide-react';
+import { SearchInput } from '@/components/ui/search-input';
 import { Button } from '@/components/ui/button';
 import { SportGrid } from '@/components/sports/sport-grid';
 import { sports } from '@/data/sports';
-import { useDebounce } from '@/lib/hooks/use-debounce';
+
+function useDebounced<T>(value: T, delay: number): T {
+  const [debounced, setDebounced] = React.useState(value);
+  React.useEffect(() => {
+    const t = setTimeout(() => setDebounced(value), delay);
+    return () => clearTimeout(t);
+  }, [value, delay]);
+  return debounced;
+}
+
+function useSearchQuery() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
+  const [query, setQuery] = React.useState(() => searchParams.get('q') ?? '');
+  const debouncedQuery = useDebounced(query, 150);
+
+  React.useEffect(() => {
+    const current = searchParams.get('q') ?? '';
+    if ((debouncedQuery || '') === current) return;
+    const params = new URLSearchParams(searchParams.toString());
+    if (debouncedQuery) params.set('q', debouncedQuery);
+    else params.delete('q');
+    router.replace(`?${params.toString()}`, { scroll: false });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [debouncedQuery]);
+
+  return { query, setQuery, debouncedQuery };
+}
 
 export function SportsListing() {
-  const [query, setQuery] = React.useState('');
-  const debouncedQuery = useDebounce(query, 250);
+  const { query, setQuery, debouncedQuery } = useSearchQuery();
 
   const filtered = React.useMemo(() => {
-    const q = debouncedQuery.trim().toLowerCase();
+    const q = query.trim().toLowerCase();
     if (!q) return sports;
     return sports.filter((s) => {
       const haystack = [s.name, s.category, ...(s.description ? [s.description] : [])]
@@ -21,32 +49,18 @@ export function SportsListing() {
         .toLowerCase();
       return haystack.includes(q);
     });
-  }, [debouncedQuery]);
+  }, [query]);
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="relative">
-        <Search
-          aria-hidden
-          className="text-muted-foreground pointer-events-none absolute top-1/2 left-3.5 h-4 w-4 -translate-y-1/2"
-        />
-        <Input
+      <div>
+        <SearchInput
           value={query}
-          onChange={(e) => setQuery(e.target.value)}
+          onValueChange={setQuery}
+          label="Search sports"
           placeholder="Search sports by name or category…"
-          className="h-11 pl-10 text-base text-sm md:text-sm"
-          aria-label="Search sports"
+          size="lg"
         />
-        {query ? (
-          <button
-            type="button"
-            onClick={() => setQuery('')}
-            className="absolute top-1/2 right-3 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-            aria-label="Clear search"
-          >
-            <X className="h-4 w-4" />
-          </button>
-        ) : null}
       </div>
 
       <p className="text-muted-foreground text-sm">

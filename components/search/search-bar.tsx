@@ -6,28 +6,31 @@ import { cn } from '@/lib/utils/cn';
 import { Input } from '@/components/ui/input';
 
 export interface SearchBarProps
-  extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'onSubmit'> {
-  value: string;
-  onValueChange: (value: string) => void;
+  extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'onSubmit' | 'value'> {
   onSearch?: (value: string) => void;
   placeholder?: string;
   className?: string;
+  defaultValue?: string;
 }
 
-export function SearchBar({ value, onValueChange, onSearch, placeholder, className, ...props }: SearchBarProps) {
+export function SearchBar({ onSearch, placeholder, className, defaultValue = '', ...props }: SearchBarProps) {
+  const [value, setValue] = React.useState(defaultValue);
+
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    onSearch?.(value);
+  };
+
   return (
     <form
       role="search"
-      onSubmit={(e) => {
-        e.preventDefault();
-        onSearch?.(value);
-      }}
+      onSubmit={handleSubmit}
       className={cn('relative', className)}
     >
       <Search className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
       <Input
         value={value}
-        onChange={(e) => onValueChange(e.target.value)}
+        onChange={(e) => setValue(e.target.value)}
         placeholder={placeholder ?? 'Search academies, coaches, sports…'}
         className="h-12 pl-9 text-base"
         {...props}

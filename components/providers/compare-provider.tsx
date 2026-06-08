@@ -256,8 +256,9 @@ export function CompareProvider({ children }: { children: React.ReactNode }) {
       maxItems: MAX_ITEMS,
       minItems: COMPARE_MIN,
       extras,
+      hydrated,
     }),
-    [items, canAdd, has, add, addWithMeta, remove, clear, extras],
+    [items, canAdd, has, add, addWithMeta, remove, clear, extras, hydrated],
   );
 
   return <CompareContext.Provider value={value}>{children}</CompareContext.Provider>;

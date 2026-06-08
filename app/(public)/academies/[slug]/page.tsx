@@ -63,7 +63,13 @@ export default function AcademyDetailPage({ params }: { params: { slug: string }
                 href={`/academies/${academy.slug}`}
                 labelText="Save"
               />
-              <CompareButton entityType="academy" id={academy.id} />
+              <CompareButton
+                entityType="academy"
+                id={academy.id}
+                label={academy.name}
+                sublabel={`${academy.location.city}, ${academy.location.state}`}
+                href={`/academies/${academy.slug}`}
+              />
             </div>
           </CardContent>
         </Card>

@@ -31,7 +31,7 @@ export function ThemeCycleButton() {
   return (
     <Button
       variant="ghost"
-      size="icon"
+      size="icon-touch"
       aria-label={`Theme: ${meta.label}. Click to switch.`}
       onClick={() => setTheme(nextTheme(activeTheme))}
       className="relative overflow-visible"

@@ -69,7 +69,7 @@ export function CoachCardPlaceholder({ coach }: { coach: Coach }) {
           sublabel={`${location.city} · ${experienceYears}+ yrs`}
           href={`/coaches/${slug}`}
         />
-        <Button size="sm" variant="outline" asChild>
+        <Button size="md" variant="outline" asChild className="h-11 px-4">
           <Link href={`/coaches/${slug}`}>View</Link>
         </Button>
       </div>

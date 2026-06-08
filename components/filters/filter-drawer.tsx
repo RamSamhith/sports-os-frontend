@@ -56,7 +56,12 @@ export function FilterDrawer({
         {(onApply || onClear) && (
           <SheetFooter className="border-border/60 border-t p-4 pb-safe">
             {onClear ? (
-              <Button variant="ghost" onClick={onClear} disabled={appliedCount === 0}>
+              <Button
+                variant="ghost"
+                className="min-h-[44px] min-w-[44px]"
+                onClick={onClear}
+                disabled={appliedCount === 0}
+              >
                 Clear filters
               </Button>
             ) : null}

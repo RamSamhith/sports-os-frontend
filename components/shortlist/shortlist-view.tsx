@@ -95,13 +95,14 @@ export function ShortlistView({ entityType }: ShortlistViewProps) {
           </p>
           <Button
             variant="ghost"
-            size="sm"
+            size="icon-touch"
             onClick={() => {
               for (const a of items) remove('academy', a.id);
               toast('Cleared all saved academies');
             }}
+            aria-label="Clear all saved academies"
           >
-            <Trash2 className="h-3.5 w-3.5" /> Clear all
+            <Trash2 className="h-4 w-4" />
           </Button>
         </div>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -127,13 +128,14 @@ export function ShortlistView({ entityType }: ShortlistViewProps) {
           </p>
           <Button
             variant="ghost"
-            size="sm"
+            size="icon-touch"
             onClick={() => {
               for (const c of items) remove('coach', c.id);
               toast('Cleared all saved coaches');
             }}
+            aria-label="Clear all saved coaches"
           >
-            <Trash2 className="h-3.5 w-3.5" /> Clear all
+            <Trash2 className="h-4 w-4" />
           </Button>
         </div>
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
@@ -159,13 +161,14 @@ export function ShortlistView({ entityType }: ShortlistViewProps) {
         </p>
         <Button
           variant="ghost"
-          size="sm"
+          size="icon-touch"
           onClick={() => {
             for (const s of sportItems) remove('sport', s.id);
             toast('Cleared all saved sports');
           }}
+          aria-label="Clear all saved sports"
         >
-          <Trash2 className="h-3.5 w-3.5" /> Clear all
+          <Trash2 className="h-4 w-4" />
         </Button>
       </div>
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">

@@ -28,6 +28,8 @@ const buttonVariants = cva(
         xl: 'h-12 px-7 text-base',
         icon: 'h-10 w-10',
         'icon-sm': 'h-8 w-8',
+        /** 44 × 44 icon button — minimum WCAG 2.5.5 / Apple HIG touch target. */
+        'icon-touch': 'h-11 w-11',
       },
     },
     defaultVariants: { variant: 'default', size: 'md' },

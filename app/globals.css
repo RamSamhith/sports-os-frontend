@@ -15,6 +15,16 @@
     text-rendering: optimizeLegibility;
   }
 
+  /* Hide iOS Safari's native <input type="search"> clear button.
+   * Without this, the native X and our custom X overlap; on some iOS
+   * versions the native X clears the value without firing the React
+   * onChange/onInput event, leaving the React state out of sync. */
+  input[type='search']::-webkit-search-cancel-button,
+  input[type='search']::-webkit-search-decoration {
+    -webkit-appearance: none;
+    appearance: none;
+  }
+
   body {
     @apply bg-background text-foreground antialiased;
     font-feature-settings: 'rlig' 1, 'calt' 1, 'ss01' 1;
@@ -42,6 +52,19 @@
       transition-duration: 0.01ms !important;
       scroll-behavior: auto !important;
     }
+  }
+
+  /* ---------------------------------------------------------------------
+   * When any Radix dialog / sheet / drawer is open, hide the compare tray.
+   * On iOS Safari, two fixed elements (tray + sheet overlay) compete for
+   * taps at the bottom of the viewport — the tray's z-index is below the
+   * sheet, but Safari still repaints it on top in some configurations.
+   * Hiding the tray while a sheet is open is the cleanest fix and the
+   * user is unlikely to want to see both at once anyway.
+   * ------------------------------------------------------------------- */
+  :has([data-state='open'][role='dialog']) .atmosphere-tray,
+  :has([data-state='open'][role='alertdialog']) .atmosphere-tray {
+    display: none !important;
   }
 }
 
@@ -355,6 +378,19 @@
   }
 
   /* ---------------------------------------------------------------------
+   * Touch interaction baseline.
+   * `touch-action: manipulation` disables iOS Safari's 300 ms
+   * double-tap-to-zoom delay without disabling pinch-to-zoom. Apply to
+   * every interactive element so taps are dispatched immediately.
+   * ------------------------------------------------------------------- */
+  button,
+  [role='button'],
+  a,
+  [data-interactive] {
+    touch-action: manipulation;
+  }
+
+  /* ---------------------------------------------------------------------
    * Premium motion language.
    * ------------------------------------------------------------------- */
 
@@ -366,13 +402,18 @@
       border-color var(--duration-fast) var(--ease-standard),
       color var(--duration-fast) var(--ease-standard);
   }
-  .motion-premium:hover:not(:disabled):not([data-disabled]) {
-    transform: translateY(-1px);
-    box-shadow: var(--shadow-md);
-  }
-  .motion-premium:active:not(:disabled):not([data-disabled]) {
-    transform: translateY(0) scale(0.985);
-    transition-duration: var(--duration-instant);
+  /* On hover-capable devices only (mouse, trackpad), apply the lift. On
+   * touch devices (phones, tablets) the hover state is sticky and the
+   * transform interferes with tap delivery on iOS Safari. */
+  @media (hover: hover) {
+    .motion-premium:hover:not(:disabled):not([data-disabled]) {
+      transform: translateY(-1px);
+      box-shadow: var(--shadow-md);
+    }
+    .motion-premium:active:not(:disabled):not([data-disabled]) {
+      transform: translateY(0) scale(0.985);
+      transition-duration: var(--duration-instant);
+    }
   }
   .motion-premium:focus-visible {
     box-shadow: 0 0 0 2px hsl(var(--background)), 0 0 0 4px hsl(var(--ring));
@@ -387,12 +428,14 @@
       transform var(--duration-fast) var(--ease-spring),
       box-shadow var(--duration-fast) var(--ease-standard);
   }
-  .motion-press:hover:not(:disabled):not([data-disabled]) {
-    transform: translateY(-1px);
-  }
-  .motion-press:active:not(:disabled):not([data-disabled]) {
-    transform: translateY(0) scale(0.985);
-    transition-duration: var(--duration-instant);
+  @media (hover: hover) {
+    .motion-press:hover:not(:disabled):not([data-disabled]) {
+      transform: translateY(-1px);
+    }
+    .motion-press:active:not(:disabled):not([data-disabled]) {
+      transform: translateY(0) scale(0.985);
+      transition-duration: var(--duration-instant);
+    }
   }
 
   .motion-card {

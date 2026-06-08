@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { SearchBar } from '@/components/search/search-bar';
@@ -9,6 +10,14 @@ import { TrackedCTA } from '@/components/analytics/tracked-cta';
 import { LocationPicker } from '@/components/location/location-picker';
 
 export function Hero() {
+  const router = useRouter();
+
+  const handleSearch = (value: string) => {
+    if (value.trim()) {
+      router.push(`/search?q=${encodeURIComponent(value.trim())}`);
+    }
+  };
+
   return (
     <section className="relative isolate overflow-hidden py-20 md:py-32">
       <AuroraBackground />
@@ -24,7 +33,7 @@ export function Hero() {
           Academies, coaches, and pathways across India — in one trusted place.
         </p>
         <div className="mt-8 w-full max-w-xl">
-          <SearchBar value="" onValueChange={() => undefined} placeholder="Search by sport, city, or academy name…" />
+          <SearchBar onSearch={handleSearch} placeholder="Search by sport, city, or academy name…" />
         </div>
         <div className="mt-4">
           <LocationPicker />
