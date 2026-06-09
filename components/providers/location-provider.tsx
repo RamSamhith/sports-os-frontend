@@ -12,7 +12,23 @@ function readLocation(): LocationSummary | undefined {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return undefined;
-    return JSON.parse(raw) as LocationSummary;
+    const parsed = JSON.parse(raw);
+    if (
+      parsed &&
+      typeof parsed === 'object' &&
+      typeof parsed.city === 'string' &&
+      typeof parsed.state === 'string' &&
+      typeof parsed.country === 'string' &&
+      typeof parsed.lat === 'number' &&
+      typeof parsed.lng === 'number' &&
+      !Number.isNaN(parsed.lat) &&
+      !Number.isNaN(parsed.lng)
+    ) {
+      return parsed as LocationSummary;
+    }
+    // Malformed data — clear it to prevent downstream crashes.
+    localStorage.removeItem(STORAGE_KEY);
+    return undefined;
   } catch {
     return undefined;
   }

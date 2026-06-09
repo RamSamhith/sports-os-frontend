@@ -22,7 +22,15 @@ function readStored(): ConsentState {
   try {
     const raw = window.localStorage.getItem(STORAGE_KEY);
     if (!raw) return initial;
-    return { ...initial, ...(JSON.parse(raw) as Partial<ConsentState>) };
+    const parsed = JSON.parse(raw);
+    if (parsed && typeof parsed === 'object') {
+      return {
+        analytics: typeof parsed.analytics === 'boolean' ? parsed.analytics : initial.analytics,
+        marketing: typeof parsed.marketing === 'boolean' ? parsed.marketing : initial.marketing,
+        whatsapp: typeof parsed.whatsapp === 'boolean' ? parsed.whatsapp : initial.whatsapp,
+      };
+    }
+    return initial;
   } catch {
     return initial;
   }

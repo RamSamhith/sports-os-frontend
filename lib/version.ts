@@ -10,9 +10,19 @@
 export const APP_VERSION: string =
   process.env.NEXT_PUBLIC_APP_VERSION ?? '0.0.0';
 
-/** Short hash derived from the build timestamp. Changes every deploy. */
+/**
+ * Stable build hash.
+ *
+ * In production, NEXT_PUBLIC_BUILD_HASH is set at build time by next.config.mjs
+ * and is identical across all page loads within the same deployment.
+ *
+ * The fallback (`'local'`) is deliberately STATIC (not Date.now()) so that
+ * versioned envelopes in localStorage are stable across refreshes in dev.
+ * If the fallback changed on every load, every versioned envelope would fail
+ * the version check and wipe compare/shortlist state on every navigation.
+ */
 export const BUILD_HASH: string =
-  process.env.NEXT_PUBLIC_BUILD_HASH ?? Date.now().toString(36);
+  process.env.NEXT_PUBLIC_BUILD_HASH ?? 'local';
 
 /** localStorage key for the persisted build hash (used for auto-refresh). */
 export const VERSION_STORAGE_KEY = 'sportsos:build-version';

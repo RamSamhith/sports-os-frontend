@@ -156,10 +156,18 @@ export function CompareProvider({ children }: { children: React.ReactNode }) {
     let persisted: PersistedItem[];
     try {
       const raw = window.localStorage.getItem(STORAGE_KEY);
-      const existing: PersistedItem[] = raw ? (JSON.parse(raw) as PersistedItem[]) : [];
+      let existingItems: PersistedItem[] = [];
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (parsed && typeof parsed === 'object' && Array.isArray(parsed.items)) {
+          existingItems = parsed.items;
+        } else if (Array.isArray(parsed)) {
+          existingItems = parsed;
+        }
+      }
       persisted = items.map((it) => {
         const meta = extras[`${it.entityType}:${it.id}`];
-        const prior = existing.find((e) => e.entityType === it.entityType && e.id === it.id);
+        const prior = existingItems.find((e) => e.entityType === it.entityType && e.id === it.id);
         return {
           entityType: it.entityType,
           id: it.id,

@@ -24,7 +24,16 @@ function readChildren(): Child[] {
     const raw = localStorage.getItem(CHILDREN_KEY);
     if (!raw) return [];
     const parsed = JSON.parse(raw);
-    return Array.isArray(parsed) ? parsed : [];
+    if (!Array.isArray(parsed)) return [];
+    return parsed.filter(
+      (c) =>
+        c &&
+        typeof c === 'object' &&
+        typeof c.id === 'string' &&
+        typeof c.name === 'string' &&
+        typeof c.age === 'number' &&
+        typeof c.sport === 'string',
+    );
   } catch {
     return [];
   }
