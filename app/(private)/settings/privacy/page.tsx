@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
 
-const STORAGE_KEY = 'sportsos:settings';
+const STORAGE_KEY = 'sportsos:privacy';
 
 interface PrivacyState {
   profileVisibility: boolean;

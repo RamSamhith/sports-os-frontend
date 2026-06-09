@@ -46,8 +46,8 @@ export default function SettingsProfilePage() {
       e.email = 'Enter a valid email address';
     }
 
-    if (phone.trim() && !/^\+?[0-9\s-]{7,15}$/.test(phone.trim())) {
-      e.phone = 'Enter a valid phone number';
+    if (phone.trim() && !/^\d{10}$/.test(phone.trim())) {
+      e.phone = 'Phone must be exactly 10 digits';
     }
 
     return e;
@@ -63,8 +63,8 @@ export default function SettingsProfilePage() {
       if (!value.trim()) e.email = 'Email is required';
       else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) e.email = 'Enter a valid email address';
     } else if (field === 'phone') {
-      if (value.trim() && !/^\+?[0-9\s-]{7,15}$/.test(value.trim())) {
-        e.phone = 'Enter a valid phone number';
+      if (value.trim() && !/^\d{10}$/.test(value.trim())) {
+        e.phone = 'Phone must be exactly 10 digits';
       }
     }
 

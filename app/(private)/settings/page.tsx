@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Palette, User, Bell, Shield } from 'lucide-react';
+import { Palette, User, MapPin, Bell, Shield, LogOut } from 'lucide-react';
 
 const sections = [
   {
@@ -18,6 +18,12 @@ const sections = [
     icon: User,
   },
   {
+    title: 'Location',
+    description: 'City, GPS, and search radius',
+    href: '/settings/location',
+    icon: MapPin,
+  },
+  {
     title: 'Notifications',
     description: 'Email, WhatsApp, and push notification controls',
     href: '/settings/notifications',
@@ -28,6 +34,12 @@ const sections = [
     description: 'Data sharing, visibility, and consent settings',
     href: '/settings/privacy',
     icon: Shield,
+  },
+  {
+    title: 'Session',
+    description: 'Account info and sign out',
+    href: '/settings/session',
+    icon: LogOut,
   },
 ];
 

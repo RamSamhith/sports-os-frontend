@@ -10,8 +10,10 @@ import { cn } from '@/lib/utils/cn';
 const settingsNav: ReadonlyArray<{ label: string; href: string; description: string }> = [
   { label: 'Theme', href: '/settings/theme', description: 'Appearance, contrast, motion' },
   { label: 'Profile', href: '/settings/profile', description: 'Name, photo, contact details' },
+  { label: 'Location', href: '/settings/location', description: 'City, GPS, search radius' },
   { label: 'Notifications', href: '/settings/notifications', description: 'Email, WhatsApp, push' },
   { label: 'Privacy', href: '/settings/privacy', description: 'Data, sharing, visibility' },
+  { label: 'Session', href: '/settings/session', description: 'Account, sign out' },
 ];
 
 export default function SettingsLayout({ children }: { children: ReactNode }) {

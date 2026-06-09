@@ -29,7 +29,7 @@ interface ChildFormDialogProps {
   child?: Child | null;
 }
 
-const skillLevels = ['Beginner', 'Intermediate', 'Advanced', 'Elite'];
+const skillLevels = ['Beginner', 'Intermediate', 'Advanced', 'Competitive'];
 
 export function ChildFormDialog({ open, onOpenChange, onSubmit, child }: ChildFormDialogProps) {
   const isEdit = !!child;
