@@ -442,7 +442,9 @@
     transition:
       transform var(--duration-standard) var(--ease-spring),
       box-shadow var(--duration-standard) var(--ease-standard),
-      border-color var(--duration-standard) var(--ease-standard);
+      border-color var(--duration-standard) var(--ease-standard),
+      background-color var(--duration-standard) var(--ease-standard),
+      color var(--duration-standard) var(--ease-standard);
   }
   @media (hover: hover) {
     .motion-card:hover {
@@ -465,14 +467,19 @@
   /* -------------------------------------------------------------------
    * Theme transition — smooth colour morph on theme switch.
    * .theme-transitioning is toggled by the theme toggle button for 250 ms.
+   * Applies to ALL descendants so cards, dialogs, selects, inputs, etc.
+   * all transition together — no mixed-theme mid-switch state.
    * Only animates safe paint properties — no layout, no transform.
    * ------------------------------------------------------------------- */
-  .theme-transitioning {
+  .theme-transitioning,
+  .theme-transitioning *,
+  .theme-transitioning *::before,
+  .theme-transitioning *::after {
     transition:
       background-color 0.25s var(--ease-luxe),
       color 0.25s var(--ease-luxe),
       border-color 0.25s var(--ease-luxe),
-      box-shadow 0.25s var(--ease-luxe);
+      box-shadow 0.25s var(--ease-luxe) !important;
   }
 
   /* -------------------------------------------------------------------
