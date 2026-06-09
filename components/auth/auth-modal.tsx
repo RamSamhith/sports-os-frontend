@@ -403,7 +403,8 @@ function RegisterView({
     else if (name.trim().length < 2) e.name = 'Name must be at least 2 characters';
     if (!email.trim()) e.email = 'Email is required';
     else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) e.email = 'Enter a valid email address';
-    if (phone.trim() && !/^\+?[0-9\s-]{7,15}$/.test(phone.trim())) e.phone = 'Enter a valid phone number';
+    if (!phone.trim()) e.phone = 'Phone number is required';
+    else if (!/^\+?[0-9\s-]{7,15}$/.test(phone.trim())) e.phone = 'Enter a valid phone number';
     if (!password) e.password = 'Password is required';
     else if (password.length < 8) e.password = 'Password must be at least 8 characters';
     if (!confirmPassword) e.confirmPassword = 'Please confirm your password';
@@ -420,7 +421,8 @@ function RegisterView({
       if (!value.trim()) e.email = 'Email is required';
       else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) e.email = 'Enter a valid email address';
     } else if (field === 'phone') {
-      if (value.trim() && !/^\+?[0-9\s-]{7,15}$/.test(value.trim())) e.phone = 'Enter a valid phone number';
+      if (!value.trim()) e.phone = 'Phone number is required';
+      else if (!/^\+?[0-9\s-]{7,15}$/.test(value.trim())) e.phone = 'Enter a valid phone number';
     } else if (field === 'password') {
       if (!value) e.password = 'Password is required';
       else if (value.length < 8) e.password = 'Password must be at least 8 characters';
@@ -468,7 +470,7 @@ function RegisterView({
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    setTouched({ name: true, email: true, password: true, confirmPassword: true });
+    setTouched({ name: true, email: true, phone: true, password: true, confirmPassword: true });
     const ve = validate();
     setErrors(ve);
     if (Object.keys(ve).length > 0) return;
@@ -478,7 +480,7 @@ function RegisterView({
     setAuth(true);
     setIsSubmitting(false);
     onSuccess();
-    router.push('/onboarding/role');
+    router.push('/verify/signup');
   }
 
   const errorId = (f: string) => `modal-register-${f}-error`;
@@ -529,7 +531,7 @@ function RegisterView({
             {errors.email && <p id={errorId('email')} role="alert" className="text-destructive text-xs">{errors.email}</p>}
           </motion.div>
           <motion.div variants={reduced ? undefined : formFieldVariants} initial="hidden" animate="visible" transition={{ delay: 0.10 }} className="flex flex-col gap-1.5">
-            <Label htmlFor="modal-reg-phone">Phone number (optional)</Label>
+            <Label htmlFor="modal-reg-phone">Phone number</Label>
             <Input
               id="modal-reg-phone"
               type="tel"
@@ -537,6 +539,8 @@ function RegisterView({
               value={phone}
               onChange={(e) => handleChange('phone', e.target.value)}
               onBlur={(e) => handleBlur('phone', e.target.value)}
+              autoComplete="tel"
+              required
               aria-invalid={!!errors.phone}
               aria-describedby={errors.phone ? errorId('phone') : undefined}
               disabled={isSubmitting}

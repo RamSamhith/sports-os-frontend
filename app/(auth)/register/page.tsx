@@ -66,7 +66,9 @@ export default function RegisterPage() {
       e.email = 'Enter a valid email address';
     }
 
-    if (phone.trim() && !/^\+?[0-9\s-]{7,15}$/.test(phone.trim())) {
+    if (!phone.trim()) {
+      e.phone = 'Phone number is required';
+    } else if (!/^\+?[0-9\s-]{7,15}$/.test(phone.trim())) {
       e.phone = 'Enter a valid phone number';
     }
 
@@ -95,7 +97,8 @@ export default function RegisterPage() {
       if (!value.trim()) e.email = 'Email is required';
       else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) e.email = 'Enter a valid email address';
     } else if (field === 'phone') {
-      if (value.trim() && !/^\+?[0-9\s-]{7,15}$/.test(value.trim())) e.phone = 'Enter a valid phone number';
+      if (!value.trim()) e.phone = 'Phone number is required';
+      else if (value.trim() && !/^\+?[0-9\s-]{7,15}$/.test(value.trim())) e.phone = 'Enter a valid phone number';
     } else if (field === 'password') {
       if (!value) e.password = 'Password is required';
       else if (value.length < 8) e.password = 'Password must be at least 8 characters';
@@ -145,7 +148,7 @@ export default function RegisterPage() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    setTouched({ name: true, email: true, password: true, confirmPassword: true });
+    setTouched({ name: true, email: true, phone: true, password: true, confirmPassword: true });
 
     const validationErrors = validate();
     setErrors(validationErrors);
@@ -158,7 +161,7 @@ export default function RegisterPage() {
     setProfile({ name: name.trim(), email: email.trim(), phone: phone.trim() });
     setAuth(true);
     setIsSubmitting(false);
-    router.push('/onboarding/role');
+    router.push('/verify/signup');
   }
 
   const errorId = (field: string) => `register-${field}-error`;
@@ -260,7 +263,7 @@ export default function RegisterPage() {
               transition={{ delay: 0.22 }}
               className="flex flex-col gap-1.5"
             >
-              <Label htmlFor="register-phone">Phone number (optional)</Label>
+              <Label htmlFor="register-phone">Phone number</Label>
               <Input
                 id="register-phone"
                 type="tel"
@@ -269,6 +272,7 @@ export default function RegisterPage() {
                 onChange={(e) => handleChange('phone', e.target.value)}
                 onBlur={(e) => handleBlur('phone', e.target.value)}
                 autoComplete="tel"
+                required
                 aria-invalid={!!errors.phone}
                 aria-describedby={errors.phone ? errorId('phone') : undefined}
                 disabled={isSubmitting}
