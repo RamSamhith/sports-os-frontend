@@ -70,8 +70,11 @@ export default function RegisterPage() {
 
     if (!phone.trim()) {
       e.phone = 'Phone number is required';
-    } else if (!/^\+?[0-9\s-]{7,15}$/.test(phone.trim())) {
-      e.phone = 'Enter a valid phone number';
+    } else {
+      const digits = phone.replace(/\D/g, '');
+      if (digits.length !== 10) {
+        e.phone = 'Phone number must be exactly 10 digits';
+      }
     }
 
     if (!password) {
@@ -100,7 +103,10 @@ export default function RegisterPage() {
       else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) e.email = 'Enter a valid email address';
     } else if (field === 'phone') {
       if (!value.trim()) e.phone = 'Phone number is required';
-      else if (value.trim() && !/^\+?[0-9\s-]{7,15}$/.test(value.trim())) e.phone = 'Enter a valid phone number';
+      else {
+        const digits = value.replace(/\D/g, '');
+        if (digits.length !== 10) e.phone = 'Phone number must be exactly 10 digits';
+      }
     } else if (field === 'password') {
       if (!value) e.password = 'Password is required';
       else if (value.length < 8) e.password = 'Password must be at least 8 characters';

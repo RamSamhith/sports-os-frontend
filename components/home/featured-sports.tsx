@@ -3,6 +3,7 @@ import { Section } from '@/components/layout/section';
 import { SportCard } from '@/components/sports/sport-card';
 import { sports } from '@/data/sports';
 import Link from 'next/link';
+import { Trophy } from 'lucide-react';
 
 export function FeaturedSports() {
   const featured = sports.slice(0, 8);
@@ -18,11 +19,21 @@ export function FeaturedSports() {
             View all →
           </Link>
         </div>
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-          {featured.map((s) => (
-            <SportCard key={s.id} sport={s} />
-          ))}
-        </div>
+        {featured.length === 0 ? (
+          <div className="text-muted-foreground flex flex-col items-center gap-3 rounded-xl border border-dashed py-12 text-center">
+            <Trophy className="h-10 w-10 opacity-40" />
+            <div>
+              <p className="text-foreground font-medium">No sports listed yet</p>
+              <p className="text-sm">Explore the sports ecosystem as it grows.</p>
+            </div>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+            {featured.map((s) => (
+              <SportCard key={s.id} sport={s} />
+            ))}
+          </div>
+        )}
       </Container>
     </Section>
   );

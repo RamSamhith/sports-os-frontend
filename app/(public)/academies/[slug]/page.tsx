@@ -22,7 +22,10 @@ export function generateStaticParams() {
 
 export function generateMetadata({ params }: { params: { slug: string } }): Metadata {
   const academy = academyBySlug(params.slug);
-  if (!academy) return {};
+  if (!academy) {
+    notFound();
+    return {};
+  }
 
   const title = `${academy.name} — Sports Academy in ${academy.location.city}`;
   const description = academy.description.slice(0, 155);

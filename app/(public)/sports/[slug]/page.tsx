@@ -15,7 +15,10 @@ export function generateStaticParams() {
 
 export function generateMetadata({ params }: { params: { slug: string } }): Metadata {
   const sport = sportBySlug(params.slug);
-  if (!sport) return {};
+  if (!sport) {
+    notFound();
+    return {};
+  }
 
   const title = `${sport.name} — Sports Pathway & Competitions`;
   const description = sport.description.slice(0, 155);

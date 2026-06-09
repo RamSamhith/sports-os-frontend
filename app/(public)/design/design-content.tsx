@@ -219,7 +219,7 @@ export function DesignContent() {
               title="Stagger on view"
               description="Children reveal in sequence when scrolled into view."
             >
-              <StaggerContainer className="grid grid-cols-3 gap-2">
+              <StaggerContainer className="grid grid-cols-2 gap-2 sm:grid-cols-3">
                 {[1, 2, 3, 4, 5, 6].map((i) => (
                   <StaggerItem key={i}>
                     <div className="bg-muted/40 grid h-12 place-items-center rounded-md text-sm">{i}</div>

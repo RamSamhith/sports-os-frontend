@@ -47,8 +47,13 @@ export default function PersonalPage() {
       e.email = 'Enter a valid email address';
     }
 
-    if (phone.trim() && !/^\+?[0-9\s-]{7,15}$/.test(phone.trim())) {
-      e.phone = 'Enter a valid phone number';
+    if (!phone.trim()) {
+      e.phone = 'Phone number is required';
+    } else {
+      const digits = phone.replace(/\D/g, '');
+      if (digits.length !== 10) {
+        e.phone = 'Phone number must be exactly 10 digits';
+      }
     }
 
     return e;
@@ -64,8 +69,10 @@ export default function PersonalPage() {
       if (!value.trim()) e.email = 'Email is required';
       else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) e.email = 'Enter a valid email address';
     } else if (field === 'phone') {
-      if (value.trim() && !/^\+?[0-9\s-]{7,15}$/.test(value.trim())) {
-        e.phone = 'Enter a valid phone number';
+      if (!value.trim()) e.phone = 'Phone number is required';
+      else {
+        const digits = value.replace(/\D/g, '');
+        if (digits.length !== 10) e.phone = 'Phone number must be exactly 10 digits';
       }
     }
 

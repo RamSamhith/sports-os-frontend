@@ -20,7 +20,10 @@ export function generateStaticParams() {
 
 export function generateMetadata({ params }: { params: { slug: string } }): Metadata {
   const coach = coachBySlug(params.slug);
-  if (!coach) return {};
+  if (!coach) {
+    notFound();
+    return {};
+  }
 
   const title = `${coach.name} — Sports Coach in ${coach.location.city}`;
   const description = `${coach.specialization.join(', ')} — ${coach.experienceYears}+ years experience in ${coach.location.city}, ${coach.location.state}.`;

@@ -3,6 +3,7 @@ import { Container } from '@/components/layout/container';
 import { Section } from '@/components/layout/section';
 import { AcademyCardPlaceholder } from '@/components/academies/academy-card-placeholder';
 import { academies } from '@/data/academies';
+import { School } from 'lucide-react';
 
 export function FeaturedAcademies() {
   const featured = [...academies]
@@ -21,11 +22,21 @@ export function FeaturedAcademies() {
             View all →
           </Link>
         </div>
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {featured.map((academy, i) => (
-            <AcademyCardPlaceholder key={academy.id} academy={academy} priority={i === 0} />
-          ))}
-        </div>
+        {featured.length === 0 ? (
+          <div className="text-muted-foreground flex flex-col items-center gap-3 rounded-xl border border-dashed py-12 text-center">
+            <School className="h-10 w-10 opacity-40" />
+            <div>
+              <p className="text-foreground font-medium">No academies yet</p>
+              <p className="text-sm">Check back soon for verified academies in your area.</p>
+            </div>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {featured.map((academy, i) => (
+              <AcademyCardPlaceholder key={academy.id} academy={academy} priority={i === 0} />
+            ))}
+          </div>
+        )}
       </Container>
     </Section>
   );

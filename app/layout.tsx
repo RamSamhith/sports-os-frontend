@@ -88,6 +88,7 @@ const themeBootstrap = `
       var prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
       resolved = prefersDark ? 'midnight-ice' : 'alpine-light';
     }
+    var lightThemes = ['alpine-light'];
     var root = document.documentElement;
     var classes = root.classList;
     for (var i = classes.length - 1; i >= 0; i--) {
@@ -96,7 +97,7 @@ const themeBootstrap = `
     }
     classes.add(resolved);
     root.setAttribute('data-theme', resolved);
-    root.style.colorScheme = 'dark';
+    root.style.colorScheme = lightThemes.indexOf(resolved) !== -1 ? 'light' : 'dark';
   } catch (e) {
     document.documentElement.classList.add(${JSON.stringify(themeConfig.defaultTheme)});
   }

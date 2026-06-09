@@ -87,6 +87,22 @@ export function ShortlistView({ entityType }: ShortlistViewProps) {
     const items = ids
       .map((id) => academies.find((a) => a.id === id))
       .filter((a): a is (typeof academies)[number] => Boolean(a));
+
+    if (items.length === 0 && ids.length > 0) {
+      return (
+        <EmptyState
+          icon={<Bookmark className="h-5 w-5" />}
+          title="No saved academies found"
+          description="Saved items may have been removed. Try browsing academies again."
+          action={
+            <Button asChild>
+              <Link href="/academies">Browse Academies</Link>
+            </Button>
+          }
+        />
+      );
+    }
+
     return (
       <div className="flex flex-col gap-4">
         <div className="flex items-center justify-between">
@@ -120,6 +136,22 @@ export function ShortlistView({ entityType }: ShortlistViewProps) {
     const items = ids
       .map((id) => coaches.find((c) => c.id === id))
       .filter((c): c is (typeof coaches)[number] => Boolean(c));
+
+    if (items.length === 0 && ids.length > 0) {
+      return (
+        <EmptyState
+          icon={<Bookmark className="h-5 w-5" />}
+          title="No saved coaches found"
+          description="Saved items may have been removed. Try browsing coaches again."
+          action={
+            <Button asChild>
+              <Link href="/coaches">Browse Coaches</Link>
+            </Button>
+          }
+        />
+      );
+    }
+
     return (
       <div className="flex flex-col gap-4">
         <div className="flex items-center justify-between">
@@ -153,6 +185,22 @@ export function ShortlistView({ entityType }: ShortlistViewProps) {
   const sportItems = ids
     .map((id) => sports.find((s) => s.id === id))
     .filter((s): s is (typeof sports)[number] => Boolean(s));
+
+  if (sportItems.length === 0 && ids.length > 0) {
+    return (
+      <EmptyState
+        icon={<Bookmark className="h-5 w-5" />}
+        title="No saved sports found"
+        description="Saved items may have been removed. Try browsing sports again."
+        action={
+          <Button asChild>
+            <Link href="/sports">Browse Sports</Link>
+          </Button>
+        }
+      />
+    );
+  }
+
   return (
     <div className="flex flex-col gap-4">
       <div className="flex items-center justify-between">

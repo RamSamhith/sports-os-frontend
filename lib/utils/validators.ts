@@ -1,11 +1,24 @@
 import { z } from 'zod';
 
-export const emailSchema = z.string().email();
+export const emailSchema = z.string().min(1, 'Email is required').email('Enter a valid email address');
+
 export const phoneSchema = z
   .string()
-  .min(10)
-  .max(15)
-  .regex(/^\+?[0-9\s-]+$/);
+  .min(1, 'Phone number is required')
+  .regex(/^\d{10}$/, 'Phone number must be exactly 10 digits');
+
+export function validateEmail(value: string): string {
+  if (!value.trim()) return 'Email is required';
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) return 'Enter a valid email address';
+  return '';
+}
+
+export function validatePhone(value: string): string {
+  if (!value.trim()) return 'Phone number is required';
+  const digits = value.replace(/\D/g, '');
+  if (digits.length !== 10) return 'Phone number must be exactly 10 digits';
+  return '';
+}
 
 export const slugSchema = z
   .string()
