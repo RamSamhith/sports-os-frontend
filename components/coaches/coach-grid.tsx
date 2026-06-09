@@ -34,7 +34,7 @@ export function CoachGrid({
   const grid = gridClass[columns];
   if (loading) {
     return (
-      <div aria-busy="true" aria-label="Loading coaches" className={`grid gap-4 ${grid}`}>
+      <div aria-busy="true" aria-label="Loading coaches" className={`grid items-start gap-4 ${grid}`}>
         {Array.from({ length: 6 }).map((_, i) => (
           <CoachCardSkeleton key={i} />
         ))}
@@ -68,7 +68,7 @@ export function CoachGrid({
     );
   }
   return (
-    <div className={`grid gap-4 ${grid}`}>
+    <div className={`grid items-start gap-4 ${grid}`}>
       {coaches.map((coach) => (
         <CoachCardPlaceholder key={coach.id} coach={coach} />
       ))}

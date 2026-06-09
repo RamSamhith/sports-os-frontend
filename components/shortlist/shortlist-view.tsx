@@ -37,7 +37,7 @@ export function ShortlistView({ entityType }: ShortlistViewProps) {
     return (
       <div
         aria-hidden
-        className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3"
+        className="grid grid-cols-1 items-start gap-4 sm:grid-cols-2 lg:grid-cols-3"
       >
         {Array.from({ length: 3 }).map((_, i) => (
           <div
@@ -121,7 +121,7 @@ export function ShortlistView({ entityType }: ShortlistViewProps) {
             <Trash2 className="h-4 w-4" />
           </Button>
         </div>
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid grid-cols-1 items-start gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {items.map((a) => (
             <div key={a.id} className="relative">
               <AcademyCardPlaceholder academy={a} />
@@ -170,7 +170,7 @@ export function ShortlistView({ entityType }: ShortlistViewProps) {
             <Trash2 className="h-4 w-4" />
           </Button>
         </div>
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid grid-cols-1 items-start gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {items.map((c) => (
             <div key={c.id} className="relative">
               <CoachCardPlaceholder coach={c} />
@@ -219,7 +219,7 @@ export function ShortlistView({ entityType }: ShortlistViewProps) {
           <Trash2 className="h-4 w-4" />
         </Button>
       </div>
-      <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
+      <div className="grid grid-cols-2 items-start gap-4 sm:grid-cols-3 md:grid-cols-4">
         {sportItems.map((s) => (
           <div key={s.id} className="relative">
             <SportCard sport={s} />

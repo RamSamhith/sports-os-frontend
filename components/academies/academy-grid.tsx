@@ -34,7 +34,7 @@ export function AcademyGrid({
   const grid = gridClass[columns];
   if (loading) {
     return (
-      <div aria-busy="true" aria-label="Loading academies" className={`grid gap-4 ${grid}`}>
+      <div aria-busy="true" aria-label="Loading academies" className={`grid items-start gap-4 ${grid}`}>
         {Array.from({ length: 6 }).map((_, i) => (
           <AcademyCardSkeleton key={i} />
         ))}
@@ -68,7 +68,7 @@ export function AcademyGrid({
     );
   }
   return (
-    <div className={`grid gap-4 ${grid}`}>
+    <div className={`grid items-start gap-4 ${grid}`}>
       {academies.map((academy, i) => (
         <AcademyCardPlaceholder key={academy.id} academy={academy} priority={i === 0} />
       ))}

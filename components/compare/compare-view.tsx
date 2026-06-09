@@ -124,7 +124,7 @@ export function CompareView() {
         </Button>
       </div>
 
-      <div className={cn('grid gap-4', cardGrid)}>
+      <div className={cn('grid items-start gap-4', cardGrid)}>
         {resolved.map((slot) => (
           <CompareCard
             key={`${slot.kind}-${slot.entity.id}`}

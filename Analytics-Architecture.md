@@ -17,6 +17,7 @@ Measure the discovery → enquiry funnel, evaluate trust and comparison behavior
 ## Consent Model
 
 Categories:
+
 - `essential` — always on (auth, security, enquiry delivery)
 - `analytics` — product usage, page views, search behavior
 - `marketing` — campaigns, attribution
@@ -29,6 +30,7 @@ Consent is stored as `ConsentRecord` per user/session. Client provider reads con
 Naming: `domain.action` (snake_case), versioned via `schema_version`.
 
 Page / Discovery
+
 - `page.view` { route, referrer, viewport, consent }
 - `home.cta_click` { cta_id, location }
 - `search.submit` { query, results_count, filters, location }
@@ -40,12 +42,14 @@ Page / Discovery
 - `list.infinite_load` { entity, page, results_count }
 
 Detail / Trust
+
 - `detail.view` { entity, id, source, location }
 - `detail.trust_badge_view` { entity, id, badge_type }
 - `detail.contact_click` { entity, id, channel }
 - `detail.share` { entity, id, channel }
 
 Compare / Shortlist
+
 - `compare.add` { entity, id, source }
 - `compare.remove` { entity, id }
 - `compare.view` { ids[], source }
@@ -54,6 +58,7 @@ Compare / Shortlist
 - `shortlist.view` { child_id? }
 
 Enquiry / Lead (server-emitted, source of truth)
+
 - `enquiry.submit` { entity, id, intent, sport, city, lead_id, consent_flags }
 - `enquiry.delivered` { lead_id, channel, latency_ms }
 - `enquiry.failed` { lead_id, reason }
@@ -62,23 +67,27 @@ Enquiry / Lead (server-emitted, source of truth)
 - `lead.assigned` { lead_id, to }
 
 Location
+
 - `location.detect` { source: gps | manual | ip, success, city }
 - `location.change` { from_city, to_city, source }
 - `location.radius_change` { from_km, to_km, reason: manual | auto_expand }
 
 Auth / Profile
+
 - `auth.login` { method, success }
 - `auth.register` { method, role }
 - `profile.child_add` { child_id }
 - `profile.child_switch` { child_id }
 
 Errors / Performance
+
 - `error.client` { message, route, stack_hash }
 - `perf.web_vital` { metric, value, route }
 
 ## Data Model
 
 Event (server)
+
 - id, schema_version
 - name, properties (JSON)
 - user_id? (hashed if no consent), session_id
@@ -88,6 +97,7 @@ Event (server)
 - ip_hash, ua_hash
 
 Event (client → batched)
+
 - queue persisted in IndexedDB
 - flushed on visibility hidden, on interval (15s), on page unload
 - retried with backoff
@@ -95,17 +105,20 @@ Event (client → batched)
 ## Collection Architecture
 
 Client
+
 - `AnalyticsProvider` initializes with consent
 - `useTrack()` hook for component events
 - `TrackedLink` / `TrackedCTA` wrappers for declarative events
 - Bounded queue, dropped on quota exceeded (never block UI)
 
 Server
+
 - Route handlers / server actions emit business events directly
 - Edge function for `page.view` capture (lightweight, no PII)
 - Idempotency key for retry safety
 
 Transport
+
 - Primary: server `/api/events` (POST, JSON, batched)
 - Fallback: navigator.sendBeacon on unload
 - Backpressure: drop oldest non-essential, keep essential
@@ -119,28 +132,34 @@ Transport
 ## Dashboards (Internal)
 
 Funnel
+
 - Sessions → Search → Detail → Compare/Shortlist → Enquiry → Delivered → WhatsApp confirmed
 
 Discovery
+
 - Top searches, zero-result searches, filter usage
 - Top cities, top sports, radius expansion rate
 
 Trust
+
 - Verified vs unverified detail views
 - Contact click rate by verification status
 - Last-updated impact on engagement
 
 Comparison
+
 - Compare tray additions/removals
 - Compare view conversion to enquiry
 - Most compared attribute differences
 
 Leads
+
 - Leads by city, sport, intent
 - Time-to-first-contact, time-to-trial
 - Conversion to enrolled (manual mark)
 
 Operational
+
 - Enquiry failure rate
 - p95 latency per route
 - Cache hit ratio

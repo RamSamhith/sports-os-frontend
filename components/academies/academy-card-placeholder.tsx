@@ -57,7 +57,7 @@ export function AcademyCardPlaceholder({ academy, priority = false }: { academy:
       whileHover={reduced ? undefined : { y: -3, scale: 1.005 }}
       whileTap={reduced ? undefined : { scale: 0.995 }}
       transition={{ duration: duration.fast, ease: ease.athletic }}
-      className="will-change-transform w-full"
+      className="w-full"
     >
     <Card className="group overflow-hidden hover:border-foreground/25">
       <Link

@@ -94,7 +94,7 @@ export function CoachCardPlaceholder({ coach }: { coach: Coach }) {
       transition={{ duration: duration.fast, ease: ease.athletic }}
       className="w-full"
     >
-      <Card className="group relative flex h-full flex-col p-4 transition-[box-shadow] duration-200 ease-out hover:shadow-[var(--shadow-md)]">
+      <Card className="group relative flex flex-col p-4 transition-[box-shadow] duration-200 ease-out hover:shadow-[var(--shadow-md)]">
         {/* Top row: Avatar + Identity + Actions */}
         <div className="flex items-start gap-3">
           <CoachAvatar name={name} sport={sportsCoached[0] ?? 'athletics'} />

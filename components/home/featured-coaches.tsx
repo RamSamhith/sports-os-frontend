@@ -31,7 +31,7 @@ export function FeaturedCoaches() {
             </div>
           </div>
         ) : (
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid grid-cols-1 items-start gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {featured.map((coach) => (
               <CoachCardPlaceholder key={coach.id} coach={coach} />
             ))}

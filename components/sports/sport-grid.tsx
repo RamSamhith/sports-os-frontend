@@ -35,7 +35,7 @@ export function SportGrid({
   const grid = gridClass[columns];
   if (loading) {
     return (
-      <div aria-busy="true" aria-label="Loading sports" className={`grid gap-4 ${grid}`}>
+      <div aria-busy="true" aria-label="Loading sports" className={`grid items-start gap-4 ${grid}`}>
         {Array.from({ length: 8 }).map((_, i) => (
           <SportCardSkeleton key={i} />
         ))}
@@ -69,7 +69,7 @@ export function SportGrid({
     );
   }
   return (
-    <div className={`grid gap-4 ${grid}`}>
+    <div className={`grid items-start gap-4 ${grid}`}>
       {sports.map((sport) => (
         <SportCard key={sport.id} sport={sport} />
       ))}

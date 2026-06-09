@@ -27,7 +27,7 @@ export function SportCard({ sport }: { sport: Sport }) {
       whileHover={reduced ? undefined : { y: -3, scale: 1.005 }}
       whileTap={reduced ? undefined : { scale: 0.995 }}
       transition={{ duration: duration.fast, ease: ease.athletic }}
-      className="will-change-transform w-full"
+      className="w-full"
     >
       <Card className="group flex flex-col gap-3 p-4 hover:border-foreground/25">
         <div className="flex items-center gap-3">
