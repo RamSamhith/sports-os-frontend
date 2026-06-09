@@ -20,6 +20,10 @@ const iconFor: Record<ThemeName, React.ComponentType<{ className?: string }>> = 
  *
  * Cycle: Midnight Ice → Ember Orange → Graphite Titanium → Alpine Light → Midnight Ice.
  * The icon swap is animated via framer-motion; reduced motion disables it.
+ *
+ * Theme transition: adds `.theme-transitioning` to <html> for 250 ms so CSS
+ * can animate background, color, border, and box-shadow properties smoothly.
+ * No MutationObserver — direct toggle avoids infinite loops.
  */
 export function ThemeCycleButton() {
   const { mounted, activeTheme, setTheme } = useThemeSafe();
@@ -28,12 +32,19 @@ export function ThemeCycleButton() {
   const Icon = iconFor[activeTheme];
   const meta = themeMeta[activeTheme];
 
+  const handleThemeChange = React.useCallback(() => {
+    const root = document.documentElement;
+    root.classList.add('theme-transitioning');
+    setTimeout(() => root.classList.remove('theme-transitioning'), 250);
+    setTheme(nextTheme(activeTheme));
+  }, [activeTheme, setTheme]);
+
   return (
     <Button
       variant="ghost"
       size="icon-touch"
       aria-label={`Theme: ${meta.label}. Click to switch.`}
-      onClick={() => setTheme(nextTheme(activeTheme))}
+      onClick={handleThemeChange}
       className="relative overflow-visible"
     >
       <AnimatePresence mode="wait" initial={false}>

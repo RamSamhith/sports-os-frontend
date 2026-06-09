@@ -9,7 +9,11 @@ import { useThemeSafe } from '@/lib/hooks/use-theme-safe';
 export default function ThemeSettingsPage() {
   const { mounted, activeTheme, setTheme, theme, systemTheme } = useThemeSafe();
 
-  const handleSelect = (id: ThemeName) => setTheme(id);
+  const handleSelect = (id: ThemeName) => {
+    document.documentElement.classList.add('theme-transitioning');
+    setTimeout(() => document.documentElement.classList.remove('theme-transitioning'), 250);
+    setTheme(id);
+  };
 
   return (
     <div className="flex flex-col gap-6">
@@ -47,7 +51,11 @@ export default function ThemeSettingsPage() {
           <CardContent>
             <button
               type="button"
-              onClick={() => setTheme('system')}
+              onClick={() => {
+                document.documentElement.classList.add('theme-transitioning');
+                setTimeout(() => document.documentElement.classList.remove('theme-transitioning'), 250);
+                setTheme('system');
+              }}
               className="border-border bg-card text-card-foreground hover:border-foreground/20 motion-press inline-flex items-center gap-2 rounded-md border px-3 py-2 text-sm"
             >
               <span aria-hidden className="bg-primary inline-block h-2.5 w-2.5 rounded-full" />
