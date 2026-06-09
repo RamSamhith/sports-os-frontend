@@ -2,21 +2,39 @@
 
 import { ThemeProvider as NextThemesProvider } from 'next-themes';
 import type { ReactNode } from 'react';
+import { useEffect, useRef } from 'react';
 import { themeConfig } from '@/config/theme';
 
 /**
  * SportsOS ThemeProvider — wraps next-themes with our 4-theme config.
  *
- * Hydration safety:
- *   - The pre-hydration script in app/layout.tsx sets the theme class on
- *     <html> before paint, so there is no flash of incorrect theme.
- *   - We pass `enableSystem` separately so that the OS preference resolves
- *     to one of our 4 themes (not to a "system" string the user has to
- *     map by hand).
- *   - We set `disableTransitionOnChange` so a theme switch doesn't fire
- *     transitions on every element.
+ * When the theme changes, we toggle a `.theme-transitioning` class on
+ * <html> for 300 ms so CSS can animate background, border, text, card,
+ * and shadow properties smoothly.
  */
 export function ThemeProvider({ children }: { children: ReactNode }) {
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    const observer = new MutationObserver((mutations) => {
+      for (const m of mutations) {
+        if (m.attributeName === 'class') {
+          // Theme class changed — start transition window
+          document.documentElement.classList.add('theme-transitioning');
+          if (timerRef.current) clearTimeout(timerRef.current);
+          timerRef.current = setTimeout(() => {
+            document.documentElement.classList.remove('theme-transitioning');
+          }, 350);
+        }
+      }
+    });
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+    return () => {
+      observer.disconnect();
+      if (timerRef.current) clearTimeout(timerRef.current);
+    };
+  }, []);
+
   return (
     <NextThemesProvider
       attribute="class"
@@ -24,7 +42,6 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
       enableSystem={themeConfig.enableSystem}
       storageKey={themeConfig.storageKey}
       themes={[...themeConfig.themes]}
-      disableTransitionOnChange
     >
       {children}
     </NextThemesProvider>

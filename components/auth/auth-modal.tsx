@@ -479,7 +479,6 @@ function RegisterView({
     setProfile({ name: name.trim(), email: email.trim(), phone: phone.trim() });
     setAuth(true);
     setIsSubmitting(false);
-    onSuccess();
     router.push('/verify/signup');
   }
 

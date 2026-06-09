@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { motion, useReducedMotion } from 'framer-motion';
 import { ImageWithFallback } from '@/components/ui/image-with-fallback';
+import { Card } from '@/components/ui/card';
 import { CompareButton } from '@/components/academies/compare-button';
 import { fixtureImages } from '@/lib/images';
 import { ease, duration } from '@/components/motion/constants';
@@ -26,50 +27,52 @@ export function SportCard({ sport }: { sport: Sport }) {
       whileHover={reduced ? undefined : { y: -3, scale: 1.005 }}
       whileTap={reduced ? undefined : { scale: 0.995 }}
       transition={{ duration: duration.fast, ease: ease.athletic }}
-      className="border-border/60 bg-card/40 hover:border-foreground/30 group relative flex flex-col gap-3 overflow-hidden rounded-xl border p-4 backdrop-blur-md will-change-transform"
+      className="will-change-transform w-full"
     >
-      <div className="flex items-center gap-3">
-        <span className="bg-muted/40 relative h-9 w-9 shrink-0 overflow-hidden rounded-md">
-          <ImageWithFallback
-            src={imageSrc}
-            alt={`${name} cover`}
-            fill
-            sizes="36px"
-            className="object-cover"
-            fallback={
-              <span className="bg-primary/15 text-foreground/80 grid h-full w-full place-items-center text-sm font-semibold uppercase">
-                {initial}
-              </span>
-            }
+      <Card className="group flex flex-col gap-3 p-4 hover:border-foreground/25">
+        <div className="flex items-center gap-3">
+          <span className="bg-muted/40 relative h-9 w-9 shrink-0 overflow-hidden rounded-md">
+            <ImageWithFallback
+              src={imageSrc}
+              alt={`${name} cover`}
+              fill
+              sizes="36px"
+              className="object-cover"
+              fallback={
+                <span className="bg-primary/15 text-foreground/80 grid h-full w-full place-items-center text-sm font-semibold uppercase">
+                  {initial}
+                </span>
+              }
+            />
+          </span>
+          <div className="min-w-0 flex-1">
+            <Link href={`/sports/${slug}`} className="hover:underline">
+              <h3 className="line-clamp-1 text-base font-semibold tracking-tight">{name}</h3>
+            </Link>
+            <div className="text-muted-foreground text-xs capitalize">{category}</div>
+          </div>
+          <CompareButton
+            entityType="sport"
+            id={id}
+            label={name}
+            sublabel={category}
+            href={`/sports/${slug}`}
           />
-        </span>
-        <div className="min-w-0 flex-1">
-          <Link href={`/sports/${slug}`} className="hover:underline">
-            <h3 className="line-clamp-1 text-base font-semibold tracking-tight">{name}</h3>
-          </Link>
-          <div className="text-muted-foreground text-xs capitalize">{category}</div>
         </div>
-        <CompareButton
-          entityType="sport"
-          id={id}
-          label={name}
-          sublabel={category}
-          href={`/sports/${slug}`}
-        />
-      </div>
-      {description ? (
-        <Link
-          href={`/sports/${slug}`}
-          className="text-muted-foreground line-clamp-2 text-xs text-pretty hover:text-foreground/80"
-        >
-          {description}
-        </Link>
-      ) : null}
-      {ageText ? (
-        <span className="text-muted-foreground text-[10px] tracking-widest uppercase">
-          {ageText}
-        </span>
-      ) : null}
+        {description ? (
+          <Link
+            href={`/sports/${slug}`}
+            className="text-muted-foreground line-clamp-2 text-xs text-pretty hover:text-foreground/80"
+          >
+            {description}
+          </Link>
+        ) : null}
+        {ageText ? (
+          <span className="text-muted-foreground text-[10px] tracking-widest uppercase">
+            {ageText}
+          </span>
+        ) : null}
+      </Card>
     </motion.div>
   );
 }

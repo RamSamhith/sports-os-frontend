@@ -45,10 +45,10 @@ export default function SearchPage() {
   const recentQueries = recentItems.map((r) => r.query);
 
   return (
-    <Section>
+    <Section spacing="sm">
       <Container size="lg">
         <Breadcrumbs items={[{ label: 'Home', href: '/' }, { label: 'Search' }]} className="mb-4" />
-        <header className="mb-8">
+        <header className="mb-6">
           <h1 className="text-3xl font-semibold tracking-tight md:text-4xl">Search Results</h1>
           {query && (
             <p className="text-muted-foreground mt-1 text-sm">
@@ -57,7 +57,7 @@ export default function SearchPage() {
           )}
         </header>
 
-        <div className="mb-6">
+        <div className="mb-4">
           <SearchInput
             value={query}
             onValueChange={setQuery}
@@ -70,7 +70,7 @@ export default function SearchPage() {
         </div>
 
         {!query && recentQueries.length > 0 && (
-          <div className="mb-6">
+          <div className="mb-4">
             <RecentSearches
               queries={recentQueries}
               onSelect={(q) => {
@@ -82,23 +82,23 @@ export default function SearchPage() {
         )}
 
         <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
-          <TabsList className="grid w-full grid-cols-4">
+          <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4">
             <TabsTrigger value="all">All</TabsTrigger>
             <TabsTrigger value="academies">Academies</TabsTrigger>
             <TabsTrigger value="coaches">Coaches</TabsTrigger>
             <TabsTrigger value="sports">Sports</TabsTrigger>
           </TabsList>
           <TabsContent value="all" className="mt-6">
-            <div className="grid gap-8 md:grid-cols-3">
-              <section className="md:col-span-1">
+            <div className="flex flex-col gap-8">
+              <section>
                 <h2 className="text-lg font-semibold mb-3">Academies</h2>
                 <AcademyListing />
               </section>
-              <section className="md:col-span-1">
+              <section>
                 <h2 className="text-lg font-semibold mb-3">Coaches</h2>
                 <CoachesListing />
               </section>
-              <section className="md:col-span-1">
+              <section>
                 <h2 className="text-lg font-semibold mb-3">Sports</h2>
                 <SportsListing />
               </section>

@@ -33,7 +33,7 @@ const fieldVariants = {
 export default function RegisterPage() {
   const reduced = useReducedMotion();
   const router = useRouter();
-  const { setAuth, setProfile, isAuthenticated, isLoading } = useAuth();
+  const { setAuth, setProfile, isAuthenticated, isLoading, verified, onboardingCompleted } = useAuth();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
@@ -43,13 +43,15 @@ export default function RegisterPage() {
   const [touched, setTouched] = useState<Record<string, boolean>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Redirect authenticated users to home
+  // Redirect authenticated users based on onboarding state
   useEffect(() => {
     if (isLoading) return;
     if (isAuthenticated) {
-      router.replace('/');
+      if (!verified) router.replace('/verify/signup');
+      else if (!onboardingCompleted) router.replace('/onboarding/role');
+      else router.replace('/profile/personal');
     }
-  }, [isLoading, isAuthenticated, router]);
+  }, [isLoading, isAuthenticated, verified, onboardingCompleted, router]);
 
   function validate(): FieldErrors {
     const e: FieldErrors = {};

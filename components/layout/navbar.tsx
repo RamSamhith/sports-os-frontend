@@ -11,13 +11,18 @@ import { Button } from '@/components/ui/button';
 import { Container } from '@/components/layout/container';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { Separator } from '@/components/ui/separator';
+import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover';
 import { useCommandPalette } from '@/components/command/command-palette-provider';
 import { ThemeCycleButton } from '@/components/theme/theme-toggle';
+import { LocationPicker } from '@/components/location/location-picker';
+import { useLocation } from '@/lib/hooks/use-location';
 
 export function Navbar() {
   const pathname = usePathname();
   const [open, setOpen] = React.useState(false);
+  const [locationOpen, setLocationOpen] = React.useState(false);
   const commandPalette = useCommandPalette();
+  const { location } = useLocation();
   // Tracks whether the navbar's fade-in has finished, so we don't paint a
   // framer-motion transform during the first frame (which on iOS Safari
   // would break the sticky stacking context for the first 240 ms).
@@ -81,9 +86,16 @@ export function Navbar() {
               >
                 <Search className="h-4 w-4" />
               </Button>
-              <Button variant="ghost" size="icon-touch" aria-label="Location">
-                <MapPin className="h-4 w-4" />
-              </Button>
+              <Popover open={locationOpen} onOpenChange={setLocationOpen}>
+                <PopoverTrigger asChild>
+                  <Button variant="ghost" size="icon-touch" aria-label="Set location">
+                    <MapPin className="h-4 w-4" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent align="end" sideOffset={8} className="w-80">
+                  <LocationPicker />
+                </PopoverContent>
+              </Popover>
               <Button variant="ghost" size="icon-touch" aria-label="Shortlist" asChild>
                 <Link href="/shortlist">
                   <Bookmark className="h-4 w-4" />
@@ -129,6 +141,9 @@ export function Navbar() {
                     );
                   })}
                   <Separator className="my-2" />
+                  <div className="px-3 py-2">
+                    <LocationPicker />
+                  </div>
                   <div className="flex items-center justify-between">
                     <p className="text-muted-foreground text-xs font-semibold tracking-widest uppercase">
                       Theme

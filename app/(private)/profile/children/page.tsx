@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { ChildCard } from '@/components/profile/child-card';
 import { ChildFormDialog } from '@/components/profile/child-form-dialog';
@@ -12,16 +12,22 @@ import { useAuth } from '@/lib/hooks/use-auth';
 import { Plus, UserRoundPlus } from 'lucide-react';
 
 export default function ChildrenPage() {
-  const { role } = useAuth();
+  const { role, isLoading } = useAuth();
   const router = useRouter();
   const { children, activeChildId, addChild, updateChild, removeChild } = useChildren();
   const [formOpen, setFormOpen] = useState(false);
   const [editingChild, setEditingChild] = useState<Child | null>(null);
   const [removingChild, setRemovingChild] = useState<Child | null>(null);
 
-  // Guard: redirect athletes to personal page
-  if (role === 'athlete') {
-    router.replace('/profile/personal');
+  // Guard: redirect athletes to personal page (no flash)
+  const isAthlete = role === 'athlete';
+  useEffect(() => {
+    if (!isLoading && isAthlete) {
+      router.replace('/profile/personal');
+    }
+  }, [isLoading, isAthlete, router]);
+
+  if (isLoading || isAthlete) {
     return null;
   }
 

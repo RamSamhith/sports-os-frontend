@@ -1,7 +1,7 @@
 'use client';
 
 import { motion, useReducedMotion, AnimatePresence } from 'framer-motion';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
@@ -18,17 +18,17 @@ const CODE = '123456';
 export default function VerifySignupPage() {
   const reduced = useReducedMotion();
   const router = useRouter();
-  const { isAuthenticated, isLoading, profile, setAuth } = useAuth();
+  const { isAuthenticated, isLoading, profile, verified: authVerified, setVerified } = useAuth();
   const [otp, setOtp] = useState('');
   const [error, setError] = useState('');
   const [isVerifying, setIsVerifying] = useState(false);
-  const [verified, setVerified] = useState(false);
   const [resendCooldown, setResendCooldown] = useState(0);
 
   useEffect(() => {
     if (isLoading) return;
     if (!isAuthenticated) router.replace('/register');
-  }, [isLoading, isAuthenticated, router]);
+    else if (authVerified) router.replace('/onboarding/role');
+  }, [isLoading, isAuthenticated, authVerified, router]);
 
   useEffect(() => {
     if (resendCooldown <= 0) return;
@@ -36,13 +36,7 @@ export default function VerifySignupPage() {
     return () => clearTimeout(t);
   }, [resendCooldown]);
 
-  useEffect(() => {
-    if (otp.length === 6) {
-      handleVerify(otp);
-    }
-  }, [otp]);
-
-  async function handleVerify(code: string) {
+  const handleVerify = useCallback(async (code: string) => {
     setIsVerifying(true);
     setError('');
     await new Promise((r) => setTimeout(r, 1200));
@@ -53,7 +47,13 @@ export default function VerifySignupPage() {
       setOtp('');
     }
     setIsVerifying(false);
-  }
+  }, [setVerified]);
+
+  useEffect(() => {
+    if (otp.length === 6) {
+      handleVerify(otp);
+    }
+  }, [otp, handleVerify]);
 
   function handleResend() {
     setResendCooldown(30);
@@ -84,7 +84,7 @@ export default function VerifySignupPage() {
       <Card className="w-full max-w-sm">
         <CardContent className="pt-6">
           <AnimatePresence mode="wait" initial={false}>
-            {verified ? (
+            {authVerified ? (
               <motion.div
                 key="success"
                 variants={screenVariants}
@@ -111,11 +111,6 @@ export default function VerifySignupPage() {
                   <Button className="w-full gap-2" onClick={handleContinueToRole}>
                     Continue to Profile Setup
                   </Button>
-                  <Link href="/">
-                    <Button className="w-full" variant="ghost">
-                      Back to Home
-                    </Button>
-                  </Link>
                 </div>
               </motion.div>
             ) : (

@@ -13,7 +13,14 @@ interface AcademyGridProps {
   onRetry?: () => void;
   onClear?: () => void;
   clearLabel?: string;
+  columns?: 1 | 2 | 3;
 }
+
+const gridClass = {
+  1: 'grid-cols-1',
+  2: 'grid-cols-1 sm:grid-cols-2',
+  3: 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3',
+} as const;
 
 export function AcademyGrid({
   academies,
@@ -22,10 +29,12 @@ export function AcademyGrid({
   onRetry,
   onClear,
   clearLabel = 'Clear filters',
+  columns = 3,
 }: AcademyGridProps) {
+  const grid = gridClass[columns];
   if (loading) {
     return (
-      <div aria-busy="true" aria-label="Loading academies" className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <div aria-busy="true" aria-label="Loading academies" className={`grid gap-4 ${grid}`}>
         {Array.from({ length: 6 }).map((_, i) => (
           <AcademyCardSkeleton key={i} />
         ))}
@@ -59,7 +68,7 @@ export function AcademyGrid({
     );
   }
   return (
-    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+    <div className={`grid gap-4 ${grid}`}>
       {academies.map((academy, i) => (
         <AcademyCardPlaceholder key={academy.id} academy={academy} priority={i === 0} />
       ))}

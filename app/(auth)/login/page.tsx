@@ -30,20 +30,22 @@ const fieldVariants = {
 export default function LoginPage() {
   const reduced = useReducedMotion();
   const router = useRouter();
-  const { setAuth, isAuthenticated, isLoading } = useAuth();
+  const { setAuth, isAuthenticated, isLoading, verified, onboardingCompleted } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errors, setErrors] = useState<FieldErrors>({});
   const [touched, setTouched] = useState<Record<string, boolean>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Redirect authenticated users to home
+  // Redirect authenticated users based on onboarding state
   useEffect(() => {
     if (isLoading) return;
     if (isAuthenticated) {
-      router.replace('/');
+      if (!verified) router.replace('/verify/signup');
+      else if (!onboardingCompleted) router.replace('/onboarding/role');
+      else router.replace('/profile/personal');
     }
-  }, [isLoading, isAuthenticated, router]);
+  }, [isLoading, isAuthenticated, verified, onboardingCompleted, router]);
 
   function validate(): FieldErrors {
     const e: FieldErrors = {};
@@ -123,7 +125,9 @@ export default function LoginPage() {
     await new Promise((r) => setTimeout(r, 1200));
     setAuth(true);
     setIsSubmitting(false);
-    router.push('/');
+    if (!verified) router.push('/verify/signup');
+    else if (!onboardingCompleted) router.push('/onboarding/role');
+    else router.push('/profile/personal');
   }
 
   const errorId = (field: string) => `login-${field}-error`;

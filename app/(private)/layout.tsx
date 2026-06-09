@@ -6,6 +6,7 @@ import { ProfileSidebar } from '@/components/profile/profile-sidebar';
 import { Container } from '@/components/layout/container';
 import { ErrorBoundary } from '@/components/feedback/error-boundary';
 import { PrivateGuard } from '@/components/auth/private-guard';
+import { PageTransition } from '@/components/motion/page-transition';
 
 export default function PrivateLayout({ children }: { children: ReactNode }) {
   return (
@@ -16,7 +17,9 @@ export default function PrivateLayout({ children }: { children: ReactNode }) {
         <PrivateGuard>
           <Container className="grid grid-cols-1 gap-6 py-10 md:grid-cols-[240px_1fr]">
             <ProfileSidebar />
-            <main id="main" className="min-w-0">{children}</main>
+            <main id="main" className="min-w-0">
+              <PageTransition>{children}</PageTransition>
+            </main>
           </Container>
         </PrivateGuard>
       </ErrorBoundary>

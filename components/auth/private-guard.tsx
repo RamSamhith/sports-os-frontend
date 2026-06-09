@@ -7,13 +7,18 @@ import { ProfileSkeleton } from '@/components/feedback/skeletons';
 
 export function PrivateGuard({ children }: { children: React.ReactNode }) {
   const router = useRouter();
-  const { isAuthenticated, isLoading } = useAuth();
+  const { isAuthenticated, isLoading, verified, onboardingCompleted } = useAuth();
 
   useEffect(() => {
-    if (!isLoading && !isAuthenticated) {
+    if (isLoading) return;
+    if (!isAuthenticated) {
       router.replace('/welcome');
+    } else if (!verified) {
+      router.replace('/verify/signup');
+    } else if (!onboardingCompleted) {
+      router.replace('/onboarding/role');
     }
-  }, [isLoading, isAuthenticated, router]);
+  }, [isLoading, isAuthenticated, verified, onboardingCompleted, router]);
 
   if (isLoading) {
     return (
@@ -23,7 +28,7 @@ export function PrivateGuard({ children }: { children: React.ReactNode }) {
     );
   }
 
-  if (!isAuthenticated) {
+  if (!isAuthenticated || !verified || !onboardingCompleted) {
     return null;
   }
 

@@ -20,6 +20,8 @@ export interface AuthContextValue {
   role: OnboardingRole | null;
   /** Whether the user has completed the onboarding role selection. */
   onboardingCompleted: boolean;
+  /** Whether the user has completed OTP verification after signup. */
+  verified: boolean;
 
   /** User profile data (name, email, phone). */
   profile: UserProfile;
@@ -30,6 +32,8 @@ export interface AuthContextValue {
   setRole: (role: OnboardingRole) => void;
   /** Mark onboarding as complete (called after role selection). */
   completeOnboarding: () => void;
+  /** Mark OTP verification as complete. */
+  setVerified: (verified: boolean) => void;
   /** Update user profile data. */
   setProfile: (profile: Partial<UserProfile>) => void;
   /** Clear all auth state and redirect. */

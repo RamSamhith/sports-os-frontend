@@ -35,7 +35,7 @@ export function CoachCardPlaceholder({ coach }: { coach: Coach }) {
       whileHover={reduced ? undefined : { y: -3, scale: 1.005 }}
       whileTap={reduced ? undefined : { scale: 0.995 }}
       transition={{ duration: duration.fast, ease: ease.athletic }}
-      className="will-change-transform"
+      className="will-change-transform w-full"
     >
     <Card className="flex flex-wrap items-center gap-3 p-4 sm:flex-nowrap">
       <span

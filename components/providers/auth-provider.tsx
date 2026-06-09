@@ -10,6 +10,7 @@ interface PersistedAuthState {
   isAuthenticated: boolean;
   role: OnboardingRole | null;
   onboardingCompleted: boolean;
+  verified: boolean;
 }
 
 interface PersistedProfile {
@@ -23,15 +24,16 @@ const defaultProfile: UserProfile = { name: '', email: '', phone: '' };
 function readState(): PersistedAuthState {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return { isAuthenticated: false, role: null, onboardingCompleted: false };
+    if (!raw) return { isAuthenticated: false, role: null, onboardingCompleted: false, verified: false };
     const parsed = JSON.parse(raw);
     return {
       isAuthenticated: !!parsed.isAuthenticated,
       role: parsed.role === 'athlete' || parsed.role === 'parent' ? parsed.role : null,
       onboardingCompleted: !!parsed.onboardingCompleted,
+      verified: !!parsed.verified,
     };
   } catch {
-    return { isAuthenticated: false, role: null, onboardingCompleted: false };
+    return { isAuthenticated: false, role: null, onboardingCompleted: false, verified: false };
   }
 }
 
@@ -102,6 +104,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     isAuthenticated: false,
     role: null,
     onboardingCompleted: false,
+    verified: false,
   });
   const [profile, setProfileState] = useState<UserProfile>({ ...defaultProfile });
   const [hydrated, setHydrated] = useState(false);
@@ -142,13 +145,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setState((prev) => ({ ...prev, onboardingCompleted: true }));
   }, []);
 
+  const setVerified = useCallback((verified: boolean) => {
+    setState((prev) => ({ ...prev, verified }));
+  }, []);
+
   const setProfile = useCallback((updates: Partial<UserProfile>) => {
     setProfileState((prev) => ({ ...prev, ...updates }));
   }, []);
 
   const signOut = useCallback(() => {
-    setState({ isAuthenticated: false, role: null, onboardingCompleted: false });
+    setState({ isAuthenticated: false, role: null, onboardingCompleted: false, verified: false });
     setProfileState({ ...defaultProfile });
+    // Clear all app-specific localStorage keys
+    try {
+      localStorage.removeItem('sportsos:settings');
+      localStorage.removeItem('sportsos:preferences');
+      localStorage.removeItem('sportsos:children');
+      localStorage.removeItem('sportsos:active-child');
+    } catch { /* ignore */ }
   }, []);
 
   const value = useMemo<AuthContextValue>(
@@ -157,14 +171,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       isLoading: !hydrated,
       role: state.role,
       onboardingCompleted: state.onboardingCompleted,
+      verified: state.verified,
       profile,
       setAuth,
       setRole,
       completeOnboarding,
+      setVerified,
       setProfile,
       signOut,
     }),
-    [state, hydrated, profile, setAuth, setRole, completeOnboarding, setProfile, signOut],
+    [state, hydrated, profile, setAuth, setRole, completeOnboarding, setVerified, setProfile, signOut],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

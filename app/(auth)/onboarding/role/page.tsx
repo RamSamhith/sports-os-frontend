@@ -108,8 +108,7 @@ export default function RoleSelectionPage() {
   function handleContinue() {
     if (!selected) return;
     setRole(selected);
-    // Placeholder: next onboarding step will read this value
-    router.push('/');
+    router.push('/profile/personal');
   }
 
   return (

@@ -461,4 +461,46 @@
       transform: scale(1.08);
     }
   }
+
+  /* -------------------------------------------------------------------
+   * Theme transition — smooth colour morph on theme switch.
+   * .theme-transitioning is toggled by ThemeProvider for 350 ms.
+   * ------------------------------------------------------------------- */
+  .theme-transitioning,
+  .theme-transitioning *,
+  .theme-transitioning *::before,
+  .theme-transitioning *::after {
+    transition:
+      background-color 0.3s var(--ease-luxe),
+      border-color 0.3s var(--ease-luxe),
+      color 0.3s var(--ease-luxe),
+      box-shadow 0.3s var(--ease-luxe),
+      fill 0.3s var(--ease-luxe),
+      stroke 0.3s var(--ease-luxe) !important;
+  }
+
+  /* -------------------------------------------------------------------
+   * Microinteractions
+   * ------------------------------------------------------------------- */
+
+  /* Form error shake — 400 ms, subtle horizontal jolt. */
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    10%, 50%, 90% { transform: translateX(-3px); }
+    30%, 70% { transform: translateX(3px); }
+  }
+  .animate-shake {
+    animation: shake 0.4s var(--ease-standard);
+  }
+
+  /* Checkbox indicator bounce on check. */
+  @keyframes check-bounce {
+    0% { transform: scale(0); }
+    50% { transform: scale(1.25); }
+    70% { transform: scale(0.9); }
+    100% { transform: scale(1); }
+  }
+  [data-state='checked'] > .checkbox-indicator {
+    animation: check-bounce 0.3s var(--ease-spring);
+  }
 }
