@@ -7,6 +7,7 @@ import { cn } from '@/lib/utils/cn';
 
 interface OfflineContextValue {
   isOffline: boolean;
+  isControlled: boolean;
 }
 
 const OfflineContext = React.createContext<OfflineContextValue | null>(null);
@@ -20,17 +21,30 @@ export function useOffline() {
 }
 
 export function OfflineProvider({ children }: { children: React.ReactNode }) {
-  // Start assuming online (good default). The useEffect below will reconcile
-  // with the real network state on the client.
   const [isOffline, setIsOffline] = React.useState(false);
+  const [isControlled, setIsControlled] = React.useState(false);
 
   React.useEffect(() => {
     if (typeof window === 'undefined') return;
     setIsOffline(!window.navigator.onLine);
+
     const handleOnline = () => setIsOffline(false);
     const handleOffline = () => setIsOffline(true);
+
     window.addEventListener('online', handleOnline);
     window.addEventListener('offline', handleOffline);
+
+    if ('serviceWorker' in navigator) {
+      setIsControlled(!!navigator.serviceWorker.controller);
+      const onController = () => setIsControlled(!!navigator.serviceWorker.controller);
+      navigator.serviceWorker.addEventListener('controllerchange', onController);
+      return () => {
+        window.removeEventListener('online', handleOnline);
+        window.removeEventListener('offline', handleOffline);
+        navigator.serviceWorker.removeEventListener('controllerchange', onController);
+      };
+    }
+
     return () => {
       window.removeEventListener('online', handleOnline);
       window.removeEventListener('offline', handleOffline);
@@ -38,7 +52,7 @@ export function OfflineProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   return (
-    <OfflineContext.Provider value={{ isOffline }}>
+    <OfflineContext.Provider value={{ isOffline, isControlled }}>
       {children}
       <OfflineBanner isOffline={isOffline} />
     </OfflineContext.Provider>
@@ -61,7 +75,7 @@ function OfflineBanner({ isOffline }: { isOffline: boolean }) {
           )}
         >
           <WifiOff aria-hidden className="h-3.5 w-3.5" />
-          <span>You’re offline. Showing the latest cached information.</span>
+          <span>You&apos;re offline. Showing the latest cached information.</span>
         </motion.div>
       ) : null}
     </AnimatePresence>

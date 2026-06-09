@@ -20,6 +20,8 @@ import { OfflineProvider } from '@/components/providers/offline-provider';
 import { CommandPaletteProvider } from '@/components/command/command-palette-provider';
 import { Atmosphere } from '@/components/theme/atmosphere';
 import { VersionCheck } from '@/components/providers/version-check';
+import { ServiceWorkerRegistration } from '@/components/providers/sw-register';
+import { UpdateBanner } from '@/components/providers/update-banner';
 import './globals.css';
 
 const inter = Inter({
@@ -114,6 +116,18 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           // eslint-disable-next-line react/no-danger
           dangerouslySetInnerHTML={{ __html: themeBootstrap }}
         />
+        {/* PWA Meta Tags */}
+        <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/icons/icon-32.png" />
+        <link rel="icon" type="image/png" sizes="16x16" href="/icons/icon-16.png" />
+        <link rel="icon" href="/icons/icon.svg" type="image/svg+xml" />
+        <link rel="mask-icon" href="/icons/icon.svg" color="#0B1020" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+        <meta name="apple-mobile-web-app-title" content="SportsOS" />
+        <meta name="msapplication-TileColor" content="#0B1020" />
+        <meta name="msapplication-TileImage" content="/icons/icon-192.png" />
+        <meta name="theme-color" content="#0B1020" />
       </head>
       <body className={`${inter.variable} ${geistDisplay.variable} ${geistMono.variable} font-sans`}>
         {/* Dynamic, per-theme atmospheric background. Three layered
@@ -123,6 +137,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <ThemeProvider>
           <ThemeSync />
           <VersionCheck />
+          <ServiceWorkerRegistration />
           <OfflineProvider>
             <CommandPaletteProvider>
               <MotionConfigProvider>
@@ -134,6 +149,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
                           {children}
                           <ConsentBanner />
                           <Toaster />
+                          <UpdateBanner />
                           <WebVitalsReporter />
                         </AnalyticsProvider>
                       </CompareProvider>
