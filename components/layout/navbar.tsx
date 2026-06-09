@@ -65,6 +65,7 @@ export function Navbar() {
                   {active && (
                     <motion.span
                       layoutId="nav-active"
+                      data-nav-active
                       className="bg-foreground/10 absolute inset-0 -z-10 rounded-md shadow-[var(--shadow-inset-hairline)]"
                       transition={{ type: 'spring', stiffness: 380, damping: 30 }}
                     />

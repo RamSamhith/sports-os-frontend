@@ -42,7 +42,7 @@ export function Hero() {
   };
 
   return (
-    <section className="relative isolate overflow-hidden py-20 md:py-32">
+    <section className="relative isolate overflow-hidden py-20 md:py-32 ambient-shimmer">
       <AuroraBackground />
 
       {/* Subtle diagonal field lines — sports identity accent */}

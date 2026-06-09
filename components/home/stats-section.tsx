@@ -27,7 +27,7 @@ export function StatsSection() {
           {stats.map((s) => (
             <div
               key={s.label}
-              className="border-border/60 bg-card/40 rounded-xl border p-5 text-center"
+              className="border-border/60 bg-card/40 card-breathe rounded-xl border p-5 text-center"
             >
               <div className="text-2xl font-semibold tracking-tight md:text-3xl">{s.value}</div>
               <div className="text-muted-foreground mt-1 text-xs tracking-wide uppercase">{s.label}</div>

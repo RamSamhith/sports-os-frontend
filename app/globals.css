@@ -108,17 +108,18 @@
   .sport-swimming { background: hsl(191 80% 56%); color: hsl(217 78% 8%); }
 
   /* ---------------------------------------------------------------------
-   * Premium 4-layer background engine.
+   * Premium 6-layer background engine.
    *
    * - .atmosphere__mesh       — animated mesh gradient (slow drift)
    * - .atmosphere__aurora     — soft drifting radial glows
-   * - .atmosphere__parallax   — ultra-slow parallax depth
+   * - .atmosphere__parallax   — ultra-slow parallax layer
+   * - .atmosphere__sports     — sports identity geometry (2-5% opacity)
+   * - .atmosphere__depth      — multi-speed parallax depth layer
    * - .atmosphere__veil       — diffusion for content contrast
    *
    * Each theme gets distinct gradient stops, blend modes, and motion
-   * speeds via the --atm-* / --mesh-* / --aurora-* / --parallax-* /
-   * --veil-* tokens. The shortest period is ~11 s so the user sees
-   * movement within the first 3–5 s.
+   * speeds via the --atm-* tokens. The shortest period is ~11 s so
+   * the user sees movement within the first 3–5 s.
    * ------------------------------------------------------------------- */
   .atmosphere {
     position: fixed;
@@ -132,6 +133,8 @@
   .atmosphere__mesh,
   .atmosphere__aurora,
   .atmosphere__parallax,
+  .atmosphere__sports,
+  .atmosphere__depth,
   .atmosphere__veil {
     position: absolute;
     inset: -25%;
@@ -164,6 +167,29 @@
     animation: parallax-drift calc(var(--atm-speed, 28s) * 2.2) var(--ease-soft) infinite;
   }
 
+  /* Sports identity — trajectory arcs, lane markings, field geometry.
+   * Extremely low opacity (2-5%), extremely slow movement.
+   * Creates subconscious depth without competing with content. */
+  .atmosphere__sports {
+    background: var(--sports-bg, none);
+    background-size: var(--sports-size, 300% 300%);
+    background-position: 50% 50%;
+    opacity: var(--sports-opacity, 0.03);
+    mix-blend-mode: var(--sports-blend, screen);
+    animation: sports-drift calc(var(--atm-speed, 28s) * 3) var(--ease-soft) infinite;
+  }
+
+  /* Multi-speed parallax depth — moves at a different rate than the main
+   * parallax layer, creating a sense of layered depth. */
+  .atmosphere__depth {
+    background: var(--depth-bg, none);
+    background-size: 200% 200%;
+    background-position: 50% 50%;
+    opacity: var(--depth-opacity, 0.20);
+    mix-blend-mode: var(--depth-blend, screen);
+    animation: depth-drift calc(var(--atm-speed, 28s) * 1.8) var(--ease-soft) infinite alternate;
+  }
+
   .atmosphere__veil {
     background: var(--veil-bg, none);
     opacity: var(--veil-opacity, 0.30);
@@ -190,6 +216,22 @@
   .midnight-ice .atmosphere__veil {
     --veil-bg: linear-gradient(180deg, transparent 0%, hsl(222 47% 8% / 0.30) 100%);
   }
+  /* Stadium-light movement — deep ambient bloom. */
+  .midnight-ice .atmosphere__sports {
+    --sports-bg:
+      repeating-linear-gradient(110deg, transparent 0px, transparent 180px, hsl(217 91% 60% / 0.04) 180px, hsl(217 91% 60% / 0.04) 181px),
+      repeating-linear-gradient(70deg, transparent 0px, transparent 220px, hsl(217 91% 40% / 0.03) 220px, hsl(217 91% 40% / 0.03) 221px),
+      radial-gradient(ellipse 40% 30% at 50% 50%, hsl(217 91% 60% / 0.05) 0%, transparent 70%);
+    --sports-size: 200% 200%;
+    --sports-opacity: 0.04;
+  }
+  .midnight-ice .atmosphere__depth {
+    --depth-bg:
+      radial-gradient(50% 40% at 30% 60%, hsl(217 91% 35% / 0.25) 0%, transparent 70%),
+      radial-gradient(40% 35% at 70% 30%, hsl(222 35% 20% / 0.20) 0%, transparent 60%);
+    --depth-opacity: 0.25;
+    --depth-blend: screen;
+  }
 
   /* ---------------- EMBER ORANGE — warm stadium glow --------------- */
   .ember-orange .atmosphere__mesh {
@@ -210,6 +252,22 @@
   }
   .ember-orange .atmosphere__veil {
     --veil-bg: linear-gradient(180deg, transparent 0%, hsl(18 31% 5% / 0.30) 100%);
+  }
+  /* Warm energy streaks — competitive feel. */
+  .ember-orange .atmosphere__sports {
+    --sports-bg:
+      repeating-linear-gradient(95deg, transparent 0px, transparent 200px, hsl(20 100% 55% / 0.04) 200px, hsl(20 100% 55% / 0.04) 201px),
+      repeating-linear-gradient(85deg, transparent 0px, transparent 160px, hsl(30 100% 50% / 0.03) 160px, hsl(30 100% 50% / 0.03) 161px),
+      radial-gradient(ellipse 45% 35% at 50% 50%, hsl(20 100% 55% / 0.05) 0%, transparent 70%);
+    --sports-size: 200% 200%;
+    --sports-opacity: 0.04;
+  }
+  .ember-orange .atmosphere__depth {
+    --depth-bg:
+      radial-gradient(50% 40% at 40% 50%, hsl(20 100% 40% / 0.20) 0%, transparent 70%),
+      radial-gradient(35% 30% at 65% 40%, hsl(30 100% 50% / 0.15) 0%, transparent 60%);
+    --depth-opacity: 0.20;
+    --depth-blend: screen;
   }
 
   /* ---------------- GRAPHITE TITANIUM — metallic sweep ------------ */
@@ -232,6 +290,22 @@
   .graphite-titanium .atmosphere__veil {
     --veil-bg: linear-gradient(180deg, transparent 0%, hsl(0 0% 0% / 0.40) 100%);
   }
+  /* Metallic depth movement — luxury motion. */
+  .graphite-titanium .atmosphere__sports {
+    --sports-bg:
+      repeating-linear-gradient(100deg, transparent 0px, transparent 250px, hsl(220 13% 60% / 0.03) 250px, hsl(220 13% 60% / 0.03) 251px),
+      repeating-linear-gradient(80deg, transparent 0px, transparent 200px, hsl(0 0% 40% / 0.02) 200px, hsl(0 0% 40% / 0.02) 201px),
+      radial-gradient(ellipse 35% 25% at 50% 50%, hsl(220 13% 50% / 0.03) 0%, transparent 70%);
+    --sports-size: 250% 250%;
+    --sports-opacity: 0.025;
+  }
+  .graphite-titanium .atmosphere__depth {
+    --depth-bg:
+      radial-gradient(45% 35% at 50% 50%, hsl(220 13% 40% / 0.12) 0%, transparent 70%),
+      linear-gradient(115deg, transparent 30%, hsl(220 13% 60% / 0.06) 50%, transparent 70%);
+    --depth-opacity: 0.15;
+    --depth-blend: screen;
+  }
 
   /* ---------------- ALPINE LIGHT — gentle daylight drift ----------- */
   .alpine-light .atmosphere__mesh {
@@ -253,6 +327,23 @@
   .alpine-light .atmosphere__veil {
     --veil-bg: linear-gradient(180deg, hsl(0 0% 100% / 0.20) 0%, transparent 100%);
   }
+  /* Clean field lines — bright moving glow. */
+  .alpine-light .atmosphere__sports {
+    --sports-bg:
+      repeating-linear-gradient(105deg, transparent 0px, transparent 280px, hsl(217 91% 60% / 0.03) 280px, hsl(217 91% 60% / 0.03) 281px),
+      repeating-linear-gradient(75deg, transparent 0px, transparent 220px, hsl(217 60% 50% / 0.02) 220px, hsl(217 60% 50% / 0.02) 221px),
+      radial-gradient(ellipse 40% 30% at 50% 50%, hsl(217 91% 60% / 0.03) 0%, transparent 70%);
+    --sports-size: 200% 200%;
+    --sports-opacity: 0.025;
+    --sports-blend: multiply;
+  }
+  .alpine-light .atmosphere__depth {
+    --depth-bg:
+      radial-gradient(50% 40% at 50% 50%, hsl(217 60% 85% / 0.15) 0%, transparent 70%),
+      radial-gradient(40% 35% at 60% 40%, hsl(220 14% 90% / 0.10) 0%, transparent 60%);
+    --depth-opacity: 0.15;
+    --depth-blend: multiply;
+  }
 
   @keyframes mesh-drift {
     0%   { background-position: 0% 0%;     transform: translate3d(0, 0, 0)     scale(1.0); }
@@ -272,6 +363,21 @@
   @keyframes veil-breathe {
     0%, 100% { opacity: 0.25; }
     50%      { opacity: 0.45; }
+  }
+
+  /* Sports identity drift — extremely slow, barely perceptible. */
+  @keyframes sports-drift {
+    0%   { background-position: 0% 0%;   transform: translate3d(0, 0, 0); }
+    33%  { background-position: 30% 20%; transform: translate3d(1%, 0.5%, 0); }
+    66%  { background-position: 60% 40%; transform: translate3d(-0.5%, 1%, 0); }
+    100% { background-position: 0% 0%;   transform: translate3d(0, 0, 0); }
+  }
+
+  /* Multi-speed parallax depth — different drift rate than main parallax. */
+  @keyframes depth-drift {
+    0%   { transform: translate3d(0, 0, 0)     scale(1.0);  }
+    50%  { transform: translate3d(1.5%, -1%, 0) scale(1.03); }
+    100% { transform: translate3d(-1%, 1.5%, 0) scale(1.01); }
   }
 
   /* ---------------------------------------------------------------------
@@ -462,6 +568,69 @@
     .motion-icon:hover {
       transform: scale(1.08);
     }
+  }
+
+  /* -------------------------------------------------------------------
+   * Card breathing — subtle shadow intensity oscillation.
+   * 100% → 105% → 100%, 8-second cycle.
+   * Creates a "living" feel without distraction.
+   * ------------------------------------------------------------------- */
+  @keyframes card-breathe {
+    0%, 100% { box-shadow: var(--shadow-sm); }
+    50%      { box-shadow: var(--shadow-md); }
+  }
+
+  .card-breathe {
+    animation: card-breathe 8s var(--ease-soft) infinite;
+  }
+  /* Pause breathing on hover so motion-card shadow transition takes over. */
+  @media (hover: hover) {
+    .card-breathe:hover {
+      animation-play-state: paused;
+    }
+  }
+
+  /* -------------------------------------------------------------------
+   * Subtle ambient shimmer — a barely-visible light sweep.
+   * Used on hero sections and feature highlights.
+   * ------------------------------------------------------------------- */
+  @keyframes ambient-shimmer {
+    0%   { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+  }
+
+  .ambient-shimmer {
+    position: relative;
+    overflow: hidden;
+  }
+  .ambient-shimmer::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      hsl(var(--primary) / 0.04) 45%,
+      hsl(var(--primary) / 0.08) 50%,
+      hsl(var(--primary) / 0.04) 55%,
+      transparent 100%
+    );
+    background-size: 200% 100%;
+    animation: ambient-shimmer 12s var(--ease-soft) infinite;
+    pointer-events: none;
+  }
+
+  /* -------------------------------------------------------------------
+   * Nav active indicator — subtle glow breathing.
+   * 6-second cycle, barely noticeable.
+   * ------------------------------------------------------------------- */
+  @keyframes nav-glow-breathe {
+    0%, 100% { opacity: 0.10; }
+    50%      { opacity: 0.18; }
+  }
+
+  [data-nav-active] {
+    animation: nav-glow-breathe 6s var(--ease-soft) infinite;
   }
 
   /* -------------------------------------------------------------------

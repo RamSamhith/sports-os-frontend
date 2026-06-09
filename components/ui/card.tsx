@@ -9,7 +9,7 @@ const Card = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElemen
         // Premium surface: visible hairline border + soft elevation + token
         // transition. Glassmorphism on dark themes (handled by the per-theme
         // backdrop), pure card on light.
-        'bg-card text-card-foreground border-border motion-card rounded-xl border shadow-[var(--shadow-sm)]',
+        'bg-card text-card-foreground border-border motion-card card-breathe rounded-xl border shadow-[var(--shadow-sm)]',
         className,
       )}
       {...props}
