@@ -6,6 +6,7 @@ import type { ReactNode } from 'react';
 import { siteConfig } from '@/config/site';
 import { themeConfig } from '@/config/theme';
 import { ThemeProvider } from '@/components/providers/theme-provider';
+import { ThemeSync } from '@/components/theme/theme-sync';
 import { AuthProvider } from '@/components/providers/auth-provider';
 import { LocationProvider } from '@/components/providers/location-provider';
 import { ShortlistProvider } from '@/components/providers/shortlist-provider';
@@ -119,6 +120,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
             gold sweep, stadium glow, mist fog). */}
         <Atmosphere />
         <ThemeProvider>
+          <ThemeSync />
           <OfflineProvider>
             <CommandPaletteProvider>
               <MotionConfigProvider>

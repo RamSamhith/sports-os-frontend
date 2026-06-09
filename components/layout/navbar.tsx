@@ -23,9 +23,6 @@ export function Navbar() {
   const [locationOpen, setLocationOpen] = React.useState(false);
   const commandPalette = useCommandPalette();
   const { location } = useLocation();
-  // Tracks whether the navbar's fade-in has finished, so we don't paint a
-  // framer-motion transform during the first frame (which on iOS Safari
-  // would break the sticky stacking context for the first 240 ms).
   const [mounted, setMounted] = React.useState(false);
   React.useEffect(() => setMounted(true), []);
 
@@ -89,8 +86,11 @@ export function Navbar() {
               </Button>
               <Popover open={locationOpen} onOpenChange={setLocationOpen}>
                 <PopoverTrigger asChild>
-                  <Button variant="ghost" size="icon-touch" aria-label="Set location">
+                  <Button variant="ghost" size="icon-touch" aria-label={location ? `Location: ${location.city || 'Set'}` : 'Set location'}>
                     <MapPin className="h-4 w-4" />
+                    {location && (
+                      <span className="bg-primary absolute -right-0.5 -top-0.5 h-2 w-2 rounded-full" />
+                    )}
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent align="end" sideOffset={8} className="w-80">

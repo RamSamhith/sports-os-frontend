@@ -69,7 +69,6 @@ export function LocationProvider({ children }: { children: ReactNode }) {
     return new Promise<void>((resolve, reject) => {
       if (!navigator.geolocation) {
         reject(new Error('Geolocation not supported'));
-        resolve();
         return;
       }
       navigator.geolocation.getCurrentPosition(
@@ -87,7 +86,6 @@ export function LocationProvider({ children }: { children: ReactNode }) {
         },
         (error) => {
           reject(error);
-          resolve();
         },
         { enableHighAccuracy: true, timeout: 10000, maximumAge: 300000 },
       );

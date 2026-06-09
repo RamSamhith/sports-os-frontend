@@ -21,7 +21,7 @@ export function ConsentBanner() {
         transition={{ duration: 0.24, ease: [0.2, 0, 0, 1] }}
         role="dialog"
         aria-label="Cookie consent"
-        className="bg-card/95 border-border/60 fixed inset-x-3 bottom-3 z-[var(--z-toast)] mx-auto max-w-2xl rounded-2xl border p-4 shadow-xl backdrop-blur md:inset-x-auto md:right-6 md:left-auto md:max-w-md"
+        className="bg-card border-border/60 fixed inset-x-3 bottom-3 z-[var(--z-toast)] mx-auto max-w-2xl rounded-2xl border p-4 shadow-xl md:inset-x-auto md:right-6 md:left-auto md:max-w-md"
       >
         <div className="flex flex-col gap-3">
           <div>

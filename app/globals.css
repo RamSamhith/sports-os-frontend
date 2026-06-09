@@ -132,13 +132,18 @@
 
   .atmosphere__mesh,
   .atmosphere__aurora,
-  .atmosphere__parallax,
+  .atmosphere__parallax {
+    position: absolute;
+    inset: -25%;
+    will-change: transform, opacity;
+    transform: translate3d(0, 0, 0);
+  }
+
   .atmosphere__sports,
   .atmosphere__depth,
   .atmosphere__veil {
     position: absolute;
     inset: -25%;
-    will-change: transform, opacity;
     transform: translate3d(0, 0, 0);
   }
 
@@ -571,22 +576,15 @@
   }
 
   /* -------------------------------------------------------------------
-   * Card breathing — subtle shadow intensity oscillation.
-   * 100% → 105% → 100%, 8-second cycle.
-   * Creates a "living" feel without distraction.
+   * Card breathing — removed infinite animation for performance.
+   * Cards now use simple hover transition only.
    * ------------------------------------------------------------------- */
-  @keyframes card-breathe {
-    0%, 100% { box-shadow: var(--shadow-sm); }
-    50%      { box-shadow: var(--shadow-md); }
-  }
-
   .card-breathe {
-    animation: card-breathe 8s var(--ease-soft) infinite;
+    transition: box-shadow var(--duration-standard) var(--ease-standard);
   }
-  /* Pause breathing on hover so motion-card shadow transition takes over. */
   @media (hover: hover) {
     .card-breathe:hover {
-      animation-play-state: paused;
+      box-shadow: var(--shadow-md);
     }
   }
 
@@ -674,5 +672,48 @@
   }
   [data-state='checked'] > .checkbox-indicator {
     animation: check-bounce 0.3s var(--ease-spring);
+  }
+
+  /* -------------------------------------------------------------------
+   * Skeleton shimmer keyframe (used by ui/skeleton.tsx).
+   * ------------------------------------------------------------------- */
+  @keyframes shimmer {
+    0%   { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+  }
+
+  /* -------------------------------------------------------------------
+   * Mobile performance — hide 3 extra atmosphere layers on small screens.
+   * Only mesh, aurora, and parallax run on mobile (3 vs 6 GPU layers).
+   * ------------------------------------------------------------------- */
+  @media (max-width: 640px) {
+    .atmosphere__sports,
+    .atmosphere__depth,
+    .atmosphere__veil {
+      display: none;
+    }
+  }
+
+  /* -------------------------------------------------------------------
+   * Reduced motion — stop ALL infinite CSS animations.
+   * ------------------------------------------------------------------- */
+  @media (prefers-reduced-motion: reduce) {
+    .atmosphere__mesh,
+    .atmosphere__aurora,
+    .atmosphere__parallax,
+    .atmosphere__sports,
+    .atmosphere__depth,
+    .atmosphere__veil {
+      animation: none !important;
+    }
+    .card-breathe {
+      animation: none !important;
+    }
+    .ambient-shimmer::after {
+      animation: none !important;
+    }
+    [data-nav-active] {
+      animation: none !important;
+    }
   }
 }

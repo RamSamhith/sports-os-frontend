@@ -19,7 +19,7 @@ export default function ContactPage() {
         <h1 className="text-3xl font-semibold tracking-tight md:text-4xl">Contact Us</h1>
         <p className="text-muted-foreground mt-1 text-sm">Last updated: June 2026</p>
 
-        <div className="prose prose-neutral dark:prose-invert mt-8 flex flex-col gap-6 text-sm text-pretty">
+        <div className="prose prose-neutral mt-8 flex flex-col gap-6 text-sm text-pretty">
           <section>
             <h2 className="text-lg font-semibold">Get in Touch</h2>
             <p>

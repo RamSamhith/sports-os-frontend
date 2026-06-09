@@ -8,10 +8,17 @@ import { useThemeSafe } from '@/lib/hooks/use-theme-safe';
 
 export default function ThemeSettingsPage() {
   const { mounted, activeTheme, setTheme, theme, systemTheme } = useThemeSafe();
+  const transitionTimerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const triggerTransition = React.useCallback(() => {
+    const root = document.documentElement;
+    if (transitionTimerRef.current) clearTimeout(transitionTimerRef.current);
+    root.classList.add('theme-transitioning');
+    transitionTimerRef.current = setTimeout(() => root.classList.remove('theme-transitioning'), 250);
+  }, []);
 
   const handleSelect = (id: ThemeName) => {
-    document.documentElement.classList.add('theme-transitioning');
-    setTimeout(() => document.documentElement.classList.remove('theme-transitioning'), 250);
+    triggerTransition();
     setTheme(id);
   };
 
@@ -52,8 +59,7 @@ export default function ThemeSettingsPage() {
             <button
               type="button"
               onClick={() => {
-                document.documentElement.classList.add('theme-transitioning');
-                setTimeout(() => document.documentElement.classList.remove('theme-transitioning'), 250);
+                triggerTransition();
                 setTheme('system');
               }}
               className="border-border bg-card text-card-foreground hover:border-foreground/20 motion-press inline-flex items-center gap-2 rounded-md border px-3 py-2 text-sm"

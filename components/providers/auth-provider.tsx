@@ -162,6 +162,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       localStorage.removeItem('sportsos:preferences');
       localStorage.removeItem('sportsos:children');
       localStorage.removeItem('sportsos:active-child');
+      localStorage.removeItem('sportsos:notifications');
+      localStorage.removeItem('sportsos:privacy');
+      localStorage.removeItem('sportsos:motion');
+      localStorage.removeItem('sportsos:location');
+      localStorage.removeItem('sportsos:location-radius');
+      localStorage.removeItem('sportsos:shortlist');
+      localStorage.removeItem('sportsos:compare');
+      localStorage.removeItem('sportsos:recent-searches');
     } catch { /* ignore */ }
   }, []);
 

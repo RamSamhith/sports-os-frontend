@@ -16,13 +16,14 @@ import { useRecentSearches } from '@/components/command/recent-searches-store';
 export default function SearchPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { items: recentItems } = useRecentSearches();
+  const { items: recentItems, push: pushRecent } = useRecentSearches();
 
   const [query, setQuery] = React.useState(() => searchParams.get('q') ?? '');
   const [activeTab, setActiveTab] = React.useState<'all' | 'academies' | 'coaches' | 'sports'>('all');
 
   const handleSearch = (value: string) => {
     setQuery(value);
+    if (value.trim()) pushRecent(value.trim());
     const params = new URLSearchParams(searchParams.toString());
     if (value) params.set('q', value);
     else params.delete('q');

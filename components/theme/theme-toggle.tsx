@@ -28,14 +28,17 @@ const iconFor: Record<ThemeName, React.ComponentType<{ className?: string }>> = 
 export function ThemeCycleButton() {
   const { mounted, activeTheme, setTheme } = useThemeSafe();
   const reduced = useReducedMotion();
+  const transitionTimerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const Icon = iconFor[activeTheme];
   const meta = themeMeta[activeTheme];
 
   const handleThemeChange = React.useCallback(() => {
     const root = document.documentElement;
+    // Debounce: clear any pending removal so rapid clicks don't truncate transitions
+    if (transitionTimerRef.current) clearTimeout(transitionTimerRef.current);
     root.classList.add('theme-transitioning');
-    setTimeout(() => root.classList.remove('theme-transitioning'), 250);
+    transitionTimerRef.current = setTimeout(() => root.classList.remove('theme-transitioning'), 250);
     setTheme(nextTheme(activeTheme));
   }, [activeTheme, setTheme]);
 
