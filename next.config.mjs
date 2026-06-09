@@ -1,3 +1,16 @@
+import { readFileSync } from 'fs';
+import { join } from 'path';
+import { createHash } from 'crypto';
+
+const packageJson = JSON.parse(readFileSync(join(process.cwd(), 'package.json'), 'utf8'));
+const APP_VERSION = packageJson.version;
+
+// Unique hash per build — changes on every `next build` invocation.
+const BUILD_HASH = createHash('sha256')
+  .update(`${APP_VERSION}-${Date.now()}-${Math.random()}`)
+  .digest('hex')
+  .slice(0, 12);
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
@@ -7,8 +20,6 @@ const nextConfig = {
   },
   images: {
     formats: ['image/avif', 'image/webp'],
-    // Allow locally-served SVGs (we ship hand-authored placeholders under /public).
-    // No remote SVG is allowed.
     dangerouslyAllowSVG: true,
     contentDispositionType: 'attachment',
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
@@ -29,7 +40,29 @@ const nextConfig = {
           { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=(self)' },
         ],
       },
+      {
+        source: '/_next/static/:path*',
+        headers: [
+          { key: 'Cache-Control', value: 'public, max-age=31536000, immutable' },
+        ],
+      },
+      {
+        source: '/:path*.{js,css,png,jpg,jpeg,gif,ico,svg,woff,woff2,ttf,eot}',
+        headers: [
+          { key: 'Cache-Control', value: 'public, max-age=31536000, immutable' },
+        ],
+      },
+      {
+        source: '/',
+        headers: [
+          { key: 'Cache-Control', value: 'public, s-maxage=60, stale-while-revalidate=300' },
+        ],
+      },
     ];
+  },
+  env: {
+    NEXT_PUBLIC_APP_VERSION: APP_VERSION,
+    NEXT_PUBLIC_BUILD_HASH: BUILD_HASH,
   },
 };
 

@@ -3,6 +3,7 @@
 import * as React from 'react';
 import { CompareContext, type CompareContextValue, type CompareItem, type CompareItemMeta } from '@/lib/hooks/use-compare';
 import { useStorageSync } from '@/lib/hooks/use-storage-sync';
+import { BUILD_HASH } from '@/lib/version';
 import { academies } from '@/data/academies';
 import { academiesById } from '@/data/academies';
 import { academiesBySlug } from '@/data/academies';
@@ -65,6 +66,11 @@ function buildValidKeys(): Set<string> {
   return keys;
 }
 
+interface PersistedEnvelope {
+  version: string;
+  items: PersistedItem[];
+}
+
 function applyFromRaw(
   raw: string | null,
   setItems: (items: CompareItem[]) => void,
@@ -77,8 +83,22 @@ function applyFromRaw(
   }
   let parsed: PersistedItem[] = [];
   try {
-    const data = JSON.parse(raw) as PersistedItem[];
-    parsed = Array.isArray(data) ? data : [];
+    const data = JSON.parse(raw);
+    // Support both versioned envelope and legacy plain-array format.
+    if (data && typeof data === 'object' && Array.isArray(data.items) && typeof data.version === 'string') {
+      if (data.version !== BUILD_HASH) {
+        // Stale deployment — clear persisted compare state.
+        window.localStorage.removeItem(STORAGE_KEY);
+        setItems([]);
+        setExtras({});
+        return;
+      }
+      parsed = data.items;
+    } else if (Array.isArray(data)) {
+      parsed = data;
+    } else {
+      parsed = [];
+    }
   } catch {
     parsed = [];
   }
@@ -111,7 +131,8 @@ function applyFromRaw(
 function writePersisted(items: PersistedItem[]) {
   if (typeof window === 'undefined') return;
   try {
-    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
+    const envelope: PersistedEnvelope = { version: BUILD_HASH, items };
+    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(envelope));
   } catch {
     /* ignore quota / disabled storage */
   }

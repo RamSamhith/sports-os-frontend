@@ -19,6 +19,7 @@ import { MotionConfigProvider } from '@/components/motion/motion-config';
 import { OfflineProvider } from '@/components/providers/offline-provider';
 import { CommandPaletteProvider } from '@/components/command/command-palette-provider';
 import { Atmosphere } from '@/components/theme/atmosphere';
+import { VersionCheck } from '@/components/providers/version-check';
 import './globals.css';
 
 const inter = Inter({
@@ -121,6 +122,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <Atmosphere />
         <ThemeProvider>
           <ThemeSync />
+          <VersionCheck />
           <OfflineProvider>
             <CommandPaletteProvider>
               <MotionConfigProvider>

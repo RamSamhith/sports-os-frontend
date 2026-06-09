@@ -3,6 +3,7 @@
 import * as React from 'react';
 import { ShortlistContext, type ShortlistContextValue } from '@/lib/hooks/use-shortlist';
 import { useStorageSync } from '@/lib/hooks/use-storage-sync';
+import { BUILD_HASH } from '@/lib/version';
 import { academies } from '@/data/academies';
 import { coaches } from '@/data/coaches';
 import { sports } from '@/data/sports';
@@ -19,13 +20,29 @@ interface PersistedItem {
   addedAt: string;
 }
 
+interface PersistedEnvelope {
+  version: string;
+  items: PersistedItem[];
+}
+
 function readPersisted(): PersistedItem[] {
   if (typeof window === 'undefined') return [];
   try {
     const raw = window.localStorage.getItem(STORAGE_KEY);
     if (!raw) return [];
-    const parsed = JSON.parse(raw) as PersistedItem[];
-    if (!Array.isArray(parsed)) return [];
+    const data = JSON.parse(raw);
+    let parsed: PersistedItem[];
+    if (data && typeof data === 'object' && Array.isArray(data.items) && typeof data.version === 'string') {
+      if (data.version !== BUILD_HASH) {
+        window.localStorage.removeItem(STORAGE_KEY);
+        return [];
+      }
+      parsed = data.items;
+    } else if (Array.isArray(data)) {
+      parsed = data;
+    } else {
+      return [];
+    }
     return parsed.filter(
       (i) =>
         i &&
@@ -41,7 +58,8 @@ function readPersisted(): PersistedItem[] {
 function writePersisted(items: PersistedItem[]) {
   if (typeof window === 'undefined') return;
   try {
-    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
+    const envelope: PersistedEnvelope = { version: BUILD_HASH, items };
+    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(envelope));
   } catch {
     /* ignore quota / disabled storage */
   }
@@ -77,8 +95,20 @@ function applyFromRaw(
   }
   let parsed: PersistedItem[] = [];
   try {
-    const data = JSON.parse(raw) as PersistedItem[];
-    parsed = Array.isArray(data) ? data : [];
+    const data = JSON.parse(raw);
+    if (data && typeof data === 'object' && Array.isArray(data.items) && typeof data.version === 'string') {
+      if (data.version !== BUILD_HASH) {
+        window.localStorage.removeItem(STORAGE_KEY);
+        setItems([]);
+        setExtras({});
+        return;
+      }
+      parsed = data.items;
+    } else if (Array.isArray(data)) {
+      parsed = data;
+    } else {
+      parsed = [];
+    }
   } catch {
     parsed = [];
   }
