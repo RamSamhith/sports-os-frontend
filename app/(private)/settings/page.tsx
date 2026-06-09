@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Palette, User, MapPin, Bell, Shield, LogOut } from 'lucide-react';
+import { Palette, User, MapPin, Bell, Shield, LogOut, Play } from 'lucide-react';
 
 const sections = [
   {
@@ -40,6 +40,12 @@ const sections = [
     description: 'Account info and sign out',
     href: '/settings/session',
     icon: LogOut,
+  },
+  {
+    title: 'Motion',
+    description: 'Reduce animations for accessibility',
+    href: '/settings/motion',
+    icon: Play,
   },
 ];
 

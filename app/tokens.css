@@ -67,6 +67,12 @@
   --info-foreground: 0 0% 100%;
   --rating: 38 92% 50%;
 
+  /* Sport-identity accent colors */
+  --sport-cricket: 217 76% 50%;
+  --sport-football: 142 50% 45%;
+  --sport-tennis: 46 65% 51%;
+  --sport-swimming: 191 80% 56%;
+
   /* Layout */
   --content-max: 1440px;
   --content-narrow: 960px;

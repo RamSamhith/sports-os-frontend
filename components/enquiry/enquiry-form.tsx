@@ -74,10 +74,10 @@ export function EnquiryForm({
   return (
     <form onSubmit={onSubmit} className="flex flex-col gap-4" noValidate>
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-        <Field label="Parent name" error={errors.parentName}>
+        <Field label="Parent name" error={errors.parentName} fieldName="parentName">
           <Input value={values.parentName} onChange={(e) => set('parentName', e.target.value)} placeholder="Your name" />
         </Field>
-        <Field label="Email" error={errors.parentEmail}>
+        <Field label="Email" error={errors.parentEmail} fieldName="parentEmail">
           <Input
             type="email"
             value={values.parentEmail}
@@ -85,7 +85,7 @@ export function EnquiryForm({
             placeholder="you@example.com"
           />
         </Field>
-        <Field label="Phone" error={errors.parentPhone}>
+        <Field label="Phone" error={errors.parentPhone} fieldName="parentPhone">
           <Input
             type="tel"
             value={values.parentPhone}
@@ -93,13 +93,13 @@ export function EnquiryForm({
             placeholder="+91…"
           />
         </Field>
-        <Field label="Sport" error={errors.sport}>
+        <Field label="Sport" error={errors.sport} fieldName="sport">
           <Input value={values.sport} onChange={(e) => set('sport', e.target.value)} placeholder="Cricket" />
         </Field>
-        <Field label="Child name (optional)">
+        <Field label="Child name (optional)" fieldName="childName">
           <Input value={values.childName ?? ''} onChange={(e) => set('childName', e.target.value)} placeholder="Optional" />
         </Field>
-        <Field label="Child age (optional)" error={errors.childAge}>
+        <Field label="Child age (optional)" error={errors.childAge} fieldName="childAge">
           <Input
             type="number"
             min={3}
@@ -110,7 +110,7 @@ export function EnquiryForm({
           />
         </Field>
       </div>
-      <Field label="Message (optional)">
+      <Field label="Message (optional)" fieldName="message">
         <Textarea
           rows={4}
           value={values.message ?? ''}
@@ -125,12 +125,15 @@ export function EnquiryForm({
   );
 }
 
-function Field({ label, error, children }: { label: string; error?: string; children: React.ReactNode }) {
+function Field({ label, error, fieldName, children }: { label: string; error?: string; fieldName: string; children: React.ReactNode }) {
+  const errorId = error ? `field-${fieldName}-error` : undefined;
   return (
     <div className="flex flex-col gap-1.5">
-      <Label>{label}</Label>
-      {children}
-      {error ? <p className="text-destructive text-xs">{error}</p> : null}
+      <Label htmlFor={`field-${fieldName}`}>{label}</Label>
+      <div id={`field-${fieldName}`} aria-invalid={!!error || undefined} aria-describedby={errorId}>
+        {children}
+      </div>
+      {error ? <p id={errorId} role="alert" className="text-destructive text-xs">{error}</p> : null}
     </div>
   );
 }

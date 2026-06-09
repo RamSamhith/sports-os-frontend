@@ -1,7 +1,7 @@
 'use client';
 
 import { motion, useReducedMotion, AnimatePresence } from 'framer-motion';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
@@ -91,8 +91,13 @@ const footerVariants = {
 export default function RoleSelectionPage() {
   const reduced = useReducedMotion();
   const router = useRouter();
-  const { setRole } = useAuth();
+  const { isAuthenticated, isLoading, setRole } = useAuth();
   const [selected, setSelected] = useState<Role | null>(null);
+
+  useEffect(() => {
+    if (isLoading) return;
+    if (!isAuthenticated) router.replace('/login');
+  }, [isLoading, isAuthenticated, router]);
 
   function handleSelect(role: Role) {
     setSelected(role);

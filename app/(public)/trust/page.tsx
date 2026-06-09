@@ -1,6 +1,7 @@
 import { Container } from '@/components/layout/container';
 import { Section } from '@/components/layout/section';
 import { Breadcrumbs } from '@/components/seo/breadcrumbs';
+import Link from 'next/link';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
@@ -34,7 +35,7 @@ export default function TrustPage() {
             <p>
               Academies and coaches on SportsOS go through a verification process. Verified
               listings display a trust badge indicating their verification status. We encourage
-              users to优先选择 verified providers.
+              users to prefer verified providers.
             </p>
           </section>
 
@@ -52,7 +53,7 @@ export default function TrustPage() {
             <p>
               Your personal information is protected with industry-standard security measures.
               We never sell your data to third parties. Please review our{' '}
-              <a href="/privacy" className="text-foreground underline">Privacy Policy</a> for
+              <Link href="/privacy" className="text-foreground underline">Privacy Policy</Link> for
               full details.
             </p>
           </section>
@@ -89,7 +90,7 @@ export default function TrustPage() {
             <h2 className="text-lg font-semibold">Contact</h2>
             <p>
               For trust and safety concerns, please reach out through our{' '}
-              <a href="/contact" className="text-foreground underline">contact page</a>.
+              <Link href="/contact" className="text-foreground underline">contact page</Link>.
             </p>
           </section>
         </div>

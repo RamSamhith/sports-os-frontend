@@ -19,7 +19,7 @@ const columns: Column<Row>[] = [
   { key: 'name', header: 'Name', cell: (r) => r.name },
   { key: 'city', header: 'City', cell: (r) => r.city },
   { key: 'status', header: 'Status', cell: (r) => <StatusPill status={r.status} /> },
-  { key: 'actions', header: '', cell: () => <Button size="sm" variant="outline">Review</Button> },
+  { key: 'actions', header: '', cell: () => <Button size="sm" variant="outline" disabled>Review</Button> },
 ];
 
 export default function AdminAcademiesPage() {

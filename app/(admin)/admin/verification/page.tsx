@@ -10,7 +10,7 @@ const columns: Column<Row>[] = [
   { key: 'target', header: 'Target', cell: (r) => r.target },
   { key: 'type', header: 'Type', cell: (r) => r.type },
   { key: 'submittedAt', header: 'Submitted', cell: (r) => r.submittedAt },
-  { key: 'actions', header: '', cell: () => <Button size="sm" variant="outline">Review</Button> },
+  { key: 'actions', header: '', cell: () => <Button size="sm" variant="outline" disabled>Review</Button> },
 ];
 
 export default function VerificationPage() {

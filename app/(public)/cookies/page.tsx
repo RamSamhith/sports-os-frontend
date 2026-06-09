@@ -1,6 +1,7 @@
 import { Container } from '@/components/layout/container';
 import { Section } from '@/components/layout/section';
 import { Breadcrumbs } from '@/components/seo/breadcrumbs';
+import Link from 'next/link';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
@@ -53,7 +54,7 @@ export default function CookiesPage() {
               Analytics cookies help us understand how visitors interact with the platform.
               This data is aggregated and anonymised. You can opt out of analytics cookies
               through your{' '}
-              <a href="/profile/settings" className="text-foreground underline">privacy settings</a>.
+              <Link href="/profile/settings" className="text-foreground underline">privacy settings</Link>.
             </p>
           </section>
 
@@ -104,7 +105,7 @@ export default function CookiesPage() {
             <h2 className="text-lg font-semibold">Contact</h2>
             <p>
               For questions about our cookie policy, please reach out through our{' '}
-              <a href="/contact" className="text-foreground underline">contact page</a>.
+              <Link href="/contact" className="text-foreground underline">contact page</Link>.
             </p>
           </section>
         </div>

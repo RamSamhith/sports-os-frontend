@@ -1,7 +1,7 @@
 'use client';
 
 import { motion, useReducedMotion, AnimatePresence } from 'framer-motion';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
@@ -18,7 +18,7 @@ const CODE = '123456';
 export default function VerifyPhonePage() {
   const reduced = useReducedMotion();
   const router = useRouter();
-  const { isAuthenticated, isLoading, profile } = useAuth();
+  const { isAuthenticated, isLoading, profile, setVerified: setAuthVerified } = useAuth();
   const [otp, setOtp] = useState('');
   const [error, setError] = useState('');
   const [isVerifying, setIsVerifying] = useState(false);
@@ -36,24 +36,25 @@ export default function VerifyPhonePage() {
     return () => clearTimeout(t);
   }, [resendCooldown]);
 
-  useEffect(() => {
-    if (otp.length === 6) {
-      handleVerify(otp);
-    }
-  }, [otp]);
-
-  async function handleVerify(code: string) {
+  const handleVerify = useCallback(async (code: string) => {
     setIsVerifying(true);
     setError('');
     await new Promise((r) => setTimeout(r, 1200));
     if (code === CODE) {
+      setAuthVerified(true);
       setVerified(true);
     } else {
       setError('Invalid code. Try 123456 for demo.');
       setOtp('');
     }
     setIsVerifying(false);
-  }
+  }, [setAuthVerified]);
+
+  useEffect(() => {
+    if (otp.length === 6) {
+      handleVerify(otp);
+    }
+  }, [otp, handleVerify]);
 
   function handleResend() {
     setResendCooldown(30);

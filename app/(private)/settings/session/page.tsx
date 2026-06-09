@@ -3,10 +3,17 @@
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/lib/hooks/use-auth';
+import { useRouter } from 'next/navigation';
 import { LogOut } from 'lucide-react';
 
 export default function SettingsSessionPage() {
   const { profile, role, signOut } = useAuth();
+  const router = useRouter();
+
+  function handleSignOut() {
+    signOut();
+    router.push('/welcome');
+  }
 
   return (
     <div className="flex flex-col gap-6">
@@ -31,7 +38,7 @@ export default function SettingsSessionPage() {
             )}
           </div>
 
-          <Button variant="destructive" onClick={signOut} className="w-fit gap-2">
+          <Button variant="destructive" onClick={handleSignOut} className="w-fit gap-2">
             <LogOut className="h-4 w-4" />
             Sign out
           </Button>

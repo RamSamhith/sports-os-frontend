@@ -1,6 +1,7 @@
 import { Container } from '@/components/layout/container';
 import { Section } from '@/components/layout/section';
 import { Breadcrumbs } from '@/components/seo/breadcrumbs';
+import Link from 'next/link';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
@@ -79,7 +80,7 @@ export default function AboutPage() {
             <h2 className="text-lg font-semibold">Contact</h2>
             <p>
               Have questions or want to partner with us? Reach out through our{' '}
-              <a href="/contact" className="text-foreground underline">contact page</a> or
+              <Link href="/contact" className="text-foreground underline">contact page</Link> or
               send an enquiry through the platform.
             </p>
           </section>

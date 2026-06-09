@@ -1,6 +1,7 @@
 import { Container } from '@/components/layout/container';
 import { Section } from '@/components/layout/section';
 import { Breadcrumbs } from '@/components/seo/breadcrumbs';
+import Link from 'next/link';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
@@ -61,7 +62,7 @@ export default function ContactPage() {
             <p>
               For reporting issues with listings, reviews, or user conduct, please refer
               to our{' '}
-              <a href="/trust" className="text-foreground underline">Trust &amp; Safety</a>{' '}
+              <Link href="/trust" className="text-foreground underline">Trust &amp; Safety</Link>{' '}
               page or contact us directly through the platform.
             </p>
           </section>

@@ -3,11 +3,10 @@ import { themeNames } from './config/theme';
 
 const config: Config = {
   // All four themes are switched by adding a class to <html>.
-  // next-themes writes one of: `dark`, `light`, `arena`, `focus`.
+  // Theme classes: `midnight-ice`, `ember-orange`, `graphite-titanium`, `alpine-light`.
   // Tailwind's `darkMode: ['class', 'dark']` enables the `dark:` variant
-  // and keeps the cascade predictable. The other three themes rely on
-  // direct token reads (`bg-background`, etc.) and don't need their own
-  // `arena:` / `focus:` variants.
+  // and keeps the cascade predictable. The themes rely on direct token reads
+  // (`bg-background`, etc.) and don't need their own variant prefixes.
   darkMode: ['class', 'dark'],
   content: [
     './app/**/*.{ts,tsx}',

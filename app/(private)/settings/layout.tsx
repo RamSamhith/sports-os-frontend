@@ -14,6 +14,7 @@ const settingsNav: ReadonlyArray<{ label: string; href: string; description: str
   { label: 'Notifications', href: '/settings/notifications', description: 'Email, WhatsApp, push' },
   { label: 'Privacy', href: '/settings/privacy', description: 'Data, sharing, visibility' },
   { label: 'Session', href: '/settings/session', description: 'Account, sign out' },
+  { label: 'Motion', href: '/settings/motion', description: 'Reduce animations' },
 ];
 
 export default function SettingsLayout({ children }: { children: ReactNode }) {
