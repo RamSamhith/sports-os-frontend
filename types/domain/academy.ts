@@ -45,6 +45,7 @@ export interface Academy {
   sportsOffered: string[]; // sport slugs
   facilities: Facility[];
   trainingLevels: TrainingLevel[];
+  ageRange?: { min?: number; max?: number };
   batchInformation?: string;
   certifications: Certification[];
   verificationStatus: VerificationStatus;

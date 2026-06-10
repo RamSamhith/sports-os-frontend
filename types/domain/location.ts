@@ -7,6 +7,7 @@ export interface LocationSummary {
   city: string;
   state: string;
   country: string;
+  district?: string;
   lat: number;
   lng: number;
   pincode?: string;

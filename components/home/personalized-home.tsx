@@ -102,7 +102,7 @@ export function PersonalizedHome() {
           <Container size="lg">
             <SuggestedAcademies
               academies={suggestedAcademies.fallback}
-              title="Popular in Your Area"
+              title="Explore More Academies"
               viewAllHref="/academies"
             />
           </Container>
