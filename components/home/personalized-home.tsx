@@ -53,10 +53,13 @@ export function PersonalizedHome() {
   const showContinueExploring = lastAcademy || lastCoach
   const showRecentlyViewed = recentAcademies.length > 0 || recentCoaches.length > 0
 
+  const allSuggestedAcademies = [...suggestedAcademies.primary, ...suggestedAcademies.fallback]
+  const allSuggestedCoaches = [...suggestedCoaches.primary, ...suggestedCoaches.fallback]
+
   const hasContent =
-    suggestedAcademies.length > 0 ||
+    allSuggestedAcademies.length > 0 ||
     academyCoaches.length > 0 ||
-    suggestedCoaches.length > 0 ||
+    allSuggestedCoaches.length > 0 ||
     showContinueExploring ||
     showRecentlyViewed
 
@@ -76,11 +79,11 @@ export function PersonalizedHome() {
         </Container>
       </Section>
 
-      {suggestedAcademies.length > 0 && (
+      {allSuggestedAcademies.length > 0 && (
         <Section>
           <Container size="lg">
             <SuggestedAcademies
-              academies={suggestedAcademies}
+              academies={allSuggestedAcademies}
               title="Recommended For You"
               viewAllHref="/academies"
             />
@@ -99,11 +102,11 @@ export function PersonalizedHome() {
         </Section>
       )}
 
-      {!selectedAcademyId && suggestedCoaches.length > 0 && (
+      {!selectedAcademyId && allSuggestedCoaches.length > 0 && (
         <Section>
           <Container size="lg">
             <SuggestedCoaches
-              coaches={suggestedCoaches}
+              coaches={allSuggestedCoaches}
               title="Coaches For You"
               viewAllHref="/coaches"
             />

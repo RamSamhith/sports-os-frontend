@@ -18,7 +18,7 @@ const CODE = '123456';
 export default function VerifyEmailPage() {
   const reduced = useReducedMotion();
   const router = useRouter();
-  const { isAuthenticated, isLoading, profile, setVerified: setAuthVerified } = useAuth();
+  const { isAuthenticated, isLoading, profile, onboardingCompleted, setVerified: setAuthVerified } = useAuth();
   const [otp, setOtp] = useState('');
   const [error, setError] = useState('');
   const [isVerifying, setIsVerifying] = useState(false);
@@ -97,14 +97,14 @@ export default function VerifyEmailPage() {
                 </p>
 
                 <div className="mt-6 flex w-full flex-col gap-3">
-                  <Link href="/profile/personal">
+                  <Link href="/">
                     <Button className="w-full gap-2" variant="default">
-                      Go to Profile
+                      Go to Home
                     </Button>
                   </Link>
-                  <Link href="/">
+                  <Link href="/profile/personal">
                     <Button className="w-full" variant="ghost">
-                      Back to Home
+                      Go to Profile
                     </Button>
                   </Link>
                 </div>

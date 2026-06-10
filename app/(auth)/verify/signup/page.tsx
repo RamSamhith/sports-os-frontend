@@ -41,7 +41,7 @@ const methodConfig: Record<OtpMethod, { title: string; description: string; rese
 export default function VerifySignupPage() {
   const reduced = useReducedMotion();
   const router = useRouter();
-  const { isAuthenticated, isLoading, profile, verified: authVerified, setVerified } = useAuth();
+  const { isAuthenticated, isLoading, profile, verified: authVerified, onboardingCompleted, setVerified } = useAuth();
   const [otp, setOtp] = useState('');
   const [error, setError] = useState('');
   const [isVerifying, setIsVerifying] = useState(false);
@@ -73,8 +73,9 @@ export default function VerifySignupPage() {
   useEffect(() => {
     if (isLoading) return;
     if (!isAuthenticated) router.replace('/verify/method');
+    else if (authVerified && onboardingCompleted) router.replace('/');
     else if (authVerified) router.replace('/onboarding/role');
-  }, [isLoading, isAuthenticated, authVerified, router]);
+  }, [isLoading, isAuthenticated, authVerified, onboardingCompleted, router]);
 
   useEffect(() => {
     if (resendCooldown <= 0) return;

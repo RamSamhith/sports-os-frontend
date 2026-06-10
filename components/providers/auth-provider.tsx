@@ -171,6 +171,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       localStorage.removeItem('sportsos:compare');
       localStorage.removeItem('sportsos:recent-searches');
       localStorage.removeItem('sportsos:onboarding');
+      localStorage.removeItem('sportsos:academy-status');
+      localStorage.removeItem('sportsos:selected-academy');
+      localStorage.removeItem('sportsos:recently-viewed');
     } catch { /* ignore */ }
   }, []);
 

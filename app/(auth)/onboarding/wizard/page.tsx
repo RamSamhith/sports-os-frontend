@@ -79,7 +79,7 @@ export default function OnboardingWizardPage() {
     } else if (!role) {
       router.replace('/onboarding/role');
     } else if (completed && !isEdit) {
-      router.replace('/profile/personal');
+      router.replace('/');
     }
   }, [isLoading, isAuthenticated, role, completed, isEdit, router]);
 

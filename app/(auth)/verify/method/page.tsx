@@ -39,14 +39,15 @@ const methods: { id: OtpMethod; label: string; description: string; icon: typeof
 export default function OtpMethodPage() {
   const reduced = useReducedMotion();
   const router = useRouter();
-  const { isAuthenticated, isLoading, verified, profile } = useAuth();
+  const { isAuthenticated, isLoading, verified, onboardingCompleted, profile } = useAuth();
   const [selected, setSelected] = useState<OtpMethod | null>(null);
 
   useEffect(() => {
     if (isLoading) return;
     if (!isAuthenticated) router.replace('/register');
+    else if (verified && onboardingCompleted) router.replace('/');
     else if (verified) router.replace('/onboarding/role');
-  }, [isLoading, isAuthenticated, verified, router]);
+  }, [isLoading, isAuthenticated, verified, onboardingCompleted, router]);
 
   function handleContinue() {
     if (!selected) return;

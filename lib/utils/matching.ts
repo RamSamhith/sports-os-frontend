@@ -42,6 +42,8 @@ interface MatchAuditLog {
   userAge: number | undefined
   totalAcademies: number
   totalCoaches: number
+  sportMatchCount: number
+  locationMatchCount: number
   topAcademyMatches: { name: string; score: number; sportMatch: boolean; locationMatch: boolean }[]
   topCoachMatches: { name: string; score: number; sportMatch: boolean; locationMatch: boolean }[]
 }
@@ -56,25 +58,28 @@ export function logMatchingAudit(
   const userLocation = getUserLocation(onboarding)
   const userAge = getUserAge(onboarding)
 
+  const sportMatchCount = academies.filter((a) => hasSportMatch(a.sportsOffered || [], interests)).length
+  const locationMatchCount = academies.filter((a) => hasLocationMatch(a.location?.city, userLocation)).length
+
   const scoredAcademies = academies
     .map((a) => ({
       name: a.name,
       ...computeAcademyScore(a, interests, skillLevel, undefined, undefined, userLocation),
-      sportMatch: matchSports(a.sportsOffered || [], interests) > 0,
-      locationMatch: matchLocation(a.location?.city, userLocation) > 0,
+      sportMatch: hasSportMatch(a.sportsOffered || [], interests),
+      locationMatch: hasLocationMatch(a.location?.city, userLocation),
     }))
     .sort((a, b) => b.score - a.score)
-    .slice(0, 3)
+    .slice(0, 5)
 
   const scoredCoaches = coaches
     .map((c) => ({
       name: c.name,
       ...computeCoachScore(c, interests, skillLevel, undefined, undefined, userLocation),
-      sportMatch: matchSports(c.sportsCoached || [], interests) > 0,
-      locationMatch: matchLocation(c.location?.city, userLocation) > 0,
+      sportMatch: hasSportMatch(c.sportsCoached || [], interests),
+      locationMatch: hasLocationMatch(c.location?.city, userLocation),
     }))
     .sort((a, b) => b.score - a.score)
-    .slice(0, 3)
+    .slice(0, 5)
 
   const audit: MatchAuditLog = {
     timestamp: new Date().toISOString(),
@@ -85,6 +90,8 @@ export function logMatchingAudit(
     userAge,
     totalAcademies: academies.length,
     totalCoaches: coaches.length,
+    sportMatchCount,
+    locationMatchCount,
     topAcademyMatches: scoredAcademies.map((a) => ({
       name: a.name,
       score: a.score,
@@ -274,64 +281,56 @@ export interface SuggestedAcademy extends Academy {
   distance?: number
 }
 
+export interface AcademySuggestions {
+  primary: SuggestedAcademy[]
+  fallback: SuggestedAcademy[]
+  hasExactMatch: boolean
+}
+
 export function getSuggestedAcademies(
   academies: Academy[],
   onboarding: OnboardingData | null,
   userLat?: number,
   userLng?: number,
   limit = 6,
-): SuggestedAcademy[] {
-  if (!onboarding) return academies.slice(0, limit)
+): AcademySuggestions {
+  const empty: AcademySuggestions = { primary: [], fallback: [], hasExactMatch: false }
+  if (!onboarding) return { ...empty, primary: academies.slice(0, limit), fallback: [] }
 
   const interests = getInterests(onboarding)
   const skillLevel = getSkillLevel(onboarding)
   const userLocation = getUserLocation(onboarding)
 
-  if (interests.length === 0) return academies.slice(0, limit)
+  if (interests.length === 0) return { ...empty, primary: academies.slice(0, limit), fallback: [] }
 
-  // Tier 1: Sport match + Location match (best relevance)
-  const sportAndLocation = academies
-    .filter((a) => hasSportMatch(a.sportsOffered || [], interests) && hasLocationMatch(a.location?.city, userLocation))
+  // ONLY sport-matching academies (mandatory sport match)
+  const sportMatches = academies
+    .filter((a) => hasSportMatch(a.sportsOffered || [], interests))
     .map((a) => computeAcademyScore(a, interests, skillLevel, userLat, userLng, userLocation))
-    .sort((a, b) => b.score - a.score)
 
-  if (sportAndLocation.length >= limit) {
-    return sportAndLocation.slice(0, limit).map((r) => ({ ...r.academy, distance: r.distance }))
+  // Sort by: location match first, then skill, then rating
+  const sorted = sportMatches.sort((a, b) => {
+    const aLoc = hasLocationMatch(a.academy.location?.city, userLocation) ? 1 : 0
+    const bLoc = hasLocationMatch(b.academy.location?.city, userLocation) ? 1 : 0
+    if (aLoc !== bLoc) return bLoc - aLoc
+    return b.score - a.score
+  })
+
+  const primary = sorted.slice(0, limit).map((r) => ({ ...r.academy, distance: r.distance }))
+
+  // Fallback: other sports in same location (only if no sport matches exist)
+  if (primary.length === 0) {
+    const fallback = academies
+      .filter((a) => !hasSportMatch(a.sportsOffered || [], interests) && hasLocationMatch(a.location?.city, userLocation))
+      .map((a) => computeAcademyScore(a, interests, skillLevel, userLat, userLng, userLocation))
+      .sort((a, b) => b.score - a.score)
+      .slice(0, limit)
+      .map((r) => ({ ...r.academy, distance: r.distance }))
+
+    return { primary: [], fallback, hasExactMatch: false }
   }
 
-  // Tier 2: Sport match only (nearby cities fallback)
-  const sportOnly = academies
-    .filter((a) => hasSportMatch(a.sportsOffered || [], interests) && !hasLocationMatch(a.location?.city, userLocation))
-    .map((a) => computeAcademyScore(a, interests, skillLevel, userLat, userLng, userLocation))
-    .sort((a, b) => b.score - a.score)
-
-  const combined = [...sportAndLocation, ...sportOnly]
-
-  if (combined.length >= limit) {
-    return combined.slice(0, limit).map((r) => ({ ...r.academy, distance: r.distance }))
-  }
-
-  // Tier 3: Location match only (different sports, same city)
-  const locationOnly = academies
-    .filter((a) => !hasSportMatch(a.sportsOffered || [], interests) && hasLocationMatch(a.location?.city, userLocation))
-    .map((a) => computeAcademyScore(a, interests, skillLevel, userLat, userLng, userLocation))
-    .sort((a, b) => b.score - a.score)
-
-  const allCombined = [...combined, ...locationOnly]
-
-  if (allCombined.length >= limit) {
-    return allCombined.slice(0, limit).map((r) => ({ ...r.academy, distance: r.distance }))
-  }
-
-  // Tier 4: Everything else (fallback)
-  const remaining = academies
-    .filter((a) => !allCombined.some((c) => c.academy.id === a.id))
-    .map((a) => computeAcademyScore(a, interests, skillLevel, userLat, userLng, userLocation))
-    .sort((a, b) => b.score - a.score)
-
-  return [...allCombined, ...remaining]
-    .slice(0, limit)
-    .map((r) => ({ ...r.academy, distance: r.distance }))
+  return { primary, fallback: [], hasExactMatch: true }
 }
 
 // ── Public API: Suggested coaches ────────────────────────────────────
@@ -340,64 +339,54 @@ export interface SuggestedCoach extends Coach {
   distance?: number
 }
 
+export interface CoachSuggestions {
+  primary: SuggestedCoach[]
+  fallback: SuggestedCoach[]
+  hasExactMatch: boolean
+}
+
 export function getSuggestedCoaches(
   coaches: Coach[],
   onboarding: OnboardingData | null,
   userLat?: number,
   userLng?: number,
   limit = 6,
-): SuggestedCoach[] {
-  if (!onboarding) return coaches.slice(0, limit)
+): CoachSuggestions {
+  const empty: CoachSuggestions = { primary: [], fallback: [], hasExactMatch: false }
+  if (!onboarding) return { ...empty, primary: coaches.slice(0, limit), fallback: [] }
 
   const interests = getInterests(onboarding)
   const skillLevel = getSkillLevel(onboarding)
   const userLocation = getUserLocation(onboarding)
 
-  if (interests.length === 0) return coaches.slice(0, limit)
+  if (interests.length === 0) return { ...empty, primary: coaches.slice(0, limit), fallback: [] }
 
-  // Tier 1: Sport match + Location match
-  const sportAndLocation = coaches
-    .filter((c) => hasSportMatch(c.sportsCoached || [], interests) && hasLocationMatch(c.location?.city, userLocation))
+  // ONLY sport-matching coaches (mandatory sport match)
+  const sportMatches = coaches
+    .filter((c) => hasSportMatch(c.sportsCoached || [], interests))
     .map((c) => computeCoachScore(c, interests, skillLevel, userLat, userLng, userLocation))
-    .sort((a, b) => b.score - a.score)
 
-  if (sportAndLocation.length >= limit) {
-    return sportAndLocation.slice(0, limit).map((r) => ({ ...r.coach, distance: r.distance }))
+  const sorted = sportMatches.sort((a, b) => {
+    const aLoc = hasLocationMatch(a.coach.location?.city, userLocation) ? 1 : 0
+    const bLoc = hasLocationMatch(b.coach.location?.city, userLocation) ? 1 : 0
+    if (aLoc !== bLoc) return bLoc - aLoc
+    return b.score - a.score
+  })
+
+  const primary = sorted.slice(0, limit).map((r) => ({ ...r.coach, distance: r.distance }))
+
+  if (primary.length === 0) {
+    const fallback = coaches
+      .filter((c) => !hasSportMatch(c.sportsCoached || [], interests) && hasLocationMatch(c.location?.city, userLocation))
+      .map((c) => computeCoachScore(c, interests, skillLevel, userLat, userLng, userLocation))
+      .sort((a, b) => b.score - a.score)
+      .slice(0, limit)
+      .map((r) => ({ ...r.coach, distance: r.distance }))
+
+    return { primary: [], fallback, hasExactMatch: false }
   }
 
-  // Tier 2: Sport match only
-  const sportOnly = coaches
-    .filter((c) => hasSportMatch(c.sportsCoached || [], interests) && !hasLocationMatch(c.location?.city, userLocation))
-    .map((c) => computeCoachScore(c, interests, skillLevel, userLat, userLng, userLocation))
-    .sort((a, b) => b.score - a.score)
-
-  const combined = [...sportAndLocation, ...sportOnly]
-
-  if (combined.length >= limit) {
-    return combined.slice(0, limit).map((r) => ({ ...r.coach, distance: r.distance }))
-  }
-
-  // Tier 3: Location match only
-  const locationOnly = coaches
-    .filter((c) => !hasSportMatch(c.sportsCoached || [], interests) && hasLocationMatch(c.location?.city, userLocation))
-    .map((c) => computeCoachScore(c, interests, skillLevel, userLat, userLng, userLocation))
-    .sort((a, b) => b.score - a.score)
-
-  const allCombined = [...combined, ...locationOnly]
-
-  if (allCombined.length >= limit) {
-    return allCombined.slice(0, limit).map((r) => ({ ...r.coach, distance: r.distance }))
-  }
-
-  // Tier 4: Everything else
-  const remaining = coaches
-    .filter((c) => !allCombined.some((x) => x.coach.id === c.id))
-    .map((c) => computeCoachScore(c, interests, skillLevel, userLat, userLng, userLocation))
-    .sort((a, b) => b.score - a.score)
-
-  return [...allCombined, ...remaining]
-    .slice(0, limit)
-    .map((r) => ({ ...r.coach, distance: r.distance }))
+  return { primary, fallback: [], hasExactMatch: true }
 }
 
 // ── Public API: Nearby academies (distance-sorted) ───────────────────
