@@ -6,7 +6,6 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Button } from '@/components/ui/button';
 import { ShortlistToggle } from '@/components/shortlist/shortlist-toggle';
 import { CompareButton } from '@/components/academies/compare-button';
-import { AcademyStatusButton } from '@/components/academy/academy-status-button';
 import { CoachesAtAcademy } from '@/components/academy/coaches-at-academy';
 import { AcademyInfo } from '@/components/academy/academy-info';
 import { LocationMap } from '@/components/academy/location-map';
@@ -101,7 +100,7 @@ export default function AcademyDetailPage({ params }: { params: { slug: string }
             {/* Actions */}
             <div className="flex flex-wrap items-center gap-2">
               <Button asChild>
-                <Link href={`/enquiry/academy/${academy.slug}`}>Request trial</Link>
+                <Link href={`/enquiry/academy/${academy.slug}`}>Request Trial</Link>
               </Button>
               <ShortlistToggle
                 itemType="academy"
@@ -118,7 +117,6 @@ export default function AcademyDetailPage({ params }: { params: { slug: string }
                 sublabel={`${academy.location.city}, ${academy.location.state}`}
                 href={`/academies/${academy.slug}`}
               />
-              <AcademyStatusButton academyId={academy.id} />
             </div>
           </CardContent>
         </Card>
@@ -219,7 +217,7 @@ export default function AcademyDetailPage({ params }: { params: { slug: string }
             lat={academy.location.lat}
             lng={academy.location.lng}
             label={academy.name}
-            className="h-[200px] md:h-[250px]"
+            className="h-[180px] sm:h-[200px] md:h-[220px] lg:h-[250px]"
           />
         </div>
       </Container>

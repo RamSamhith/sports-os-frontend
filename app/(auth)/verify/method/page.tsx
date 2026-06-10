@@ -6,24 +6,33 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useRouter } from 'next/navigation';
 import { SharedLayout } from '@/components/motion/shared-layout';
-import { MessageCircle, Smartphone, ArrowRight } from 'lucide-react';
+import { MessageCircle, Smartphone, Mail, ArrowRight } from 'lucide-react';
 import { useAuth } from '@/lib/hooks/use-auth';
 import { cn } from '@/lib/utils/cn';
 
-type OtpMethod = 'whatsapp' | 'sms';
+type OtpMethod = 'email' | 'sms' | 'whatsapp';
 
-const methods: { id: OtpMethod; label: string; description: string; icon: typeof Smartphone }[] = [
+const methods: { id: OtpMethod; label: string; description: string; icon: typeof Smartphone; getDestination: (email: string, phone: string) => string }[] = [
   {
-    id: 'whatsapp',
-    label: 'WhatsApp OTP',
-    description: 'Get a code on WhatsApp',
-    icon: MessageCircle,
+    id: 'email',
+    label: 'Email OTP',
+    description: 'Get a code via email',
+    icon: Mail,
+    getDestination: (email) => email || 'your email',
   },
   {
     id: 'sms',
     label: 'SMS OTP',
     description: 'Get a code via text message',
     icon: Smartphone,
+    getDestination: (_email, phone) => phone || 'your number',
+  },
+  {
+    id: 'whatsapp',
+    label: 'WhatsApp OTP',
+    description: 'Get a code on WhatsApp',
+    icon: MessageCircle,
+    getDestination: (_email, phone) => phone || 'your number',
   },
 ];
 
@@ -41,17 +50,23 @@ export default function OtpMethodPage() {
 
   function handleContinue() {
     if (!selected) return;
+    const method = methods.find((m) => m.id === selected);
+    const destination = method?.getDestination(profile?.email ?? '', profile?.phone ?? '') ?? '';
     sessionStorage.setItem('sportsos:otp-method', selected);
+    sessionStorage.setItem('sportsos:otp-destination', destination);
     router.push('/verify/signup');
   }
 
-  const maskedContact = selected === 'whatsapp'
-    ? profile?.phone
+  function getMaskedDestination(method: OtpMethod): string {
+    if (method === 'email') {
+      return profile?.email
+        ? profile.email.slice(0, 2) + '***@' + profile.email.split('@')[1]
+        : 'your email';
+    }
+    return profile?.phone
       ? profile.phone.slice(0, -4).replace(/./g, '*') + profile.phone.slice(-4)
-      : 'your number'
-    : profile?.email
-      ? profile.email.slice(0, 2) + '***@' + profile.email.split('@')[1]
-      : 'your email';
+      : 'your number';
+  }
 
   return (
     <SharedLayout layoutId="auth-card">
@@ -96,6 +111,7 @@ export default function OtpMethodPage() {
             {methods.map((method) => {
               const isSelected = selected === method.id;
               const Icon = method.icon;
+              const destination = getMaskedDestination(method.id);
               return (
                 <button
                   key={method.id}
@@ -121,7 +137,7 @@ export default function OtpMethodPage() {
                   </div>
                   <div className="flex-1">
                     <p className="font-semibold text-sm">{method.label}</p>
-                    <p className="text-muted-foreground text-xs">{method.description}</p>
+                    <p className="text-muted-foreground text-xs">{destination}</p>
                   </div>
                   <div
                     className={cn(
@@ -163,7 +179,9 @@ export default function OtpMethodPage() {
             transition={{ delay: 0.4, duration: 0.3 }}
             className="text-muted-foreground mt-4 text-center text-xs"
           >
-            We&apos;ll send a 6-digit code to {selected ? maskedContact : 'you'}
+            {selected
+              ? `We'll send a 6-digit code to ${getMaskedDestination(selected)}`
+              : 'Select a method to continue'}
           </motion.p>
         </CardContent>
       </Card>

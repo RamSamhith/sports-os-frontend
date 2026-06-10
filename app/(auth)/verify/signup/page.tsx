@@ -4,17 +4,39 @@ import { motion, useReducedMotion, AnimatePresence } from 'framer-motion';
 import { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { SharedLayout } from '@/components/motion/shared-layout';
 import { OtpInput } from '@/components/ui/otp-input';
-import { Loader2, CheckCircle2, ArrowLeft, ShieldCheck, RotateCcw, Pencil } from 'lucide-react';
+import { Loader2, CheckCircle2, ShieldCheck, RotateCcw, Pencil, Mail, Smartphone, MessageCircle } from 'lucide-react';
 import { useAuth } from '@/lib/hooks/use-auth';
 
 const FAST = { duration: 0.2, ease: [0.2, 0, 0, 1] as const };
 
 const CODE = '123456';
 const DRAFT_KEY = 'sportsos:signup-draft';
+
+type OtpMethod = 'email' | 'sms' | 'whatsapp';
+
+const methodConfig: Record<OtpMethod, { title: string; description: string; resendText: string; icon: typeof Mail }> = {
+  email: {
+    title: 'Verify Your Email',
+    description: 'We sent a 6-digit verification code to',
+    resendText: 'Resend Email Code',
+    icon: Mail,
+  },
+  sms: {
+    title: 'Verify Your Phone Number',
+    description: 'We sent a 6-digit verification code to',
+    resendText: 'Resend SMS Code',
+    icon: Smartphone,
+  },
+  whatsapp: {
+    title: 'Verify Your WhatsApp Number',
+    description: 'We sent a 6-digit verification code to',
+    resendText: 'Resend WhatsApp Code',
+    icon: MessageCircle,
+  },
+};
 
 export default function VerifySignupPage() {
   const reduced = useReducedMotion();
@@ -24,15 +46,29 @@ export default function VerifySignupPage() {
   const [error, setError] = useState('');
   const [isVerifying, setIsVerifying] = useState(false);
   const [resendCooldown, setResendCooldown] = useState(0);
-
-  const [otpMethod, setOtpMethod] = useState<string>('sms');
+  const [otpMethod, setOtpMethod] = useState<OtpMethod>('email');
+  const [destination, setDestination] = useState('');
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      const method = sessionStorage.getItem('sportsos:otp-method');
-      if (method) setOtpMethod(method);
+      const method = sessionStorage.getItem('sportsos:otp-method') as OtpMethod | null;
+      const dest = sessionStorage.getItem('sportsos:otp-destination');
+      if (method && methodConfig[method]) {
+        setOtpMethod(method);
+      }
+      if (dest) {
+        setDestination(dest);
+      } else {
+        // Fallback: compute destination from profile
+        const fallbackMethod = method || 'email';
+        if (fallbackMethod === 'email') {
+          setDestination(profile?.email || 'your email');
+        } else {
+          setDestination(profile?.phone || 'your number');
+        }
+      }
     }
-  }, []);
+  }, [profile]);
 
   useEffect(() => {
     if (isLoading) return;
@@ -51,7 +87,6 @@ export default function VerifySignupPage() {
     setError('');
     await new Promise((r) => setTimeout(r, 1200));
     if (code === CODE) {
-      // Clear signup draft after successful verification
       try {
         sessionStorage.removeItem(DRAFT_KEY);
       } catch {
@@ -77,21 +112,29 @@ export default function VerifySignupPage() {
     setError('');
   }
 
+  function handleEditContact() {
+    // Save current form data to draft before navigating
+    if (profile?.name || profile?.email || profile?.phone) {
+      try {
+        sessionStorage.setItem(DRAFT_KEY, JSON.stringify({
+          name: profile?.name || '',
+          email: profile?.email || '',
+          phone: profile?.phone || '',
+        }));
+      } catch {
+        // ignore
+      }
+    }
+    router.push('/verify/method');
+  }
+
   const screenVariants = {
     enter: { opacity: 0, x: reduced ? 0 : 12 },
     center: { opacity: 1, x: 0, transition: { ...FAST, duration: 0.25 } },
     exit: { opacity: 0, x: reduced ? 0 : -12, transition: { ...FAST, duration: 0.15 } },
   };
 
-  const maskedContact = otpMethod === 'whatsapp'
-    ? profile?.phone
-      ? profile.phone.slice(0, -4).replace(/./g, '*') + profile.phone.slice(-4)
-      : 'your number'
-    : profile?.email
-      ? profile.email.slice(0, 2) + '***@' + profile.email.split('@')[1]
-      : 'your email';
-
-  const methodLabel = otpMethod === 'whatsapp' ? 'WhatsApp' : 'email';
+  const config = methodConfig[otpMethod];
 
   function handleContinueToRole() {
     router.push('/onboarding/role');
@@ -146,10 +189,10 @@ export default function VerifySignupPage() {
                   <span className="text-primary text-sm font-medium">Verify Your Account</span>
                 </div>
 
-                <h1 className="text-2xl font-bold tracking-tight text-center">Enter verification code</h1>
+                <h1 className="text-2xl font-bold tracking-tight text-center">{config.title}</h1>
                 <p className="text-muted-foreground mt-1 text-center text-sm">
-                  We sent a 6-digit code to{' '}
-                  <span className="text-foreground font-medium">{maskedContact}</span> via {methodLabel}
+                  {config.description}{' '}
+                  <span className="text-foreground font-medium">{destination}</span>
                 </p>
 
                 <div className="mt-6 flex justify-center">
@@ -175,22 +218,13 @@ export default function VerifySignupPage() {
 
                 <div className="mt-6 flex w-full flex-col gap-3">
                   <Button
-                    className="w-full gap-2"
-                    variant="outline"
-                    disabled={isVerifying}
-                    onClick={() => router.push('/verify/method')}
-                  >
-                    <ArrowLeft className="h-4 w-4" />
-                    Back to Sign Up
-                  </Button>
-                  <Button
                     className="w-full"
                     variant="ghost"
                     onClick={handleResend}
                     disabled={resendCooldown > 0 || isVerifying}
                   >
                     <RotateCcw className="h-4 w-4 mr-1" />
-                    {resendCooldown > 0 ? `Resend in ${resendCooldown}s` : 'Resend Code'}
+                    {resendCooldown > 0 ? `Resend in ${resendCooldown}s` : config.resendText}
                   </Button>
                 </div>
 
@@ -204,12 +238,16 @@ export default function VerifySignupPage() {
                 </div>
 
                 <div className="flex flex-col gap-2">
-                  <Link href="/register">
-                    <Button className="w-full gap-2" variant="ghost" size="sm">
-                      <Pencil className="h-3.5 w-3.5" />
-                      Edit phone or email
-                    </Button>
-                  </Link>
+                  <Button
+                    className="w-full gap-2"
+                    variant="ghost"
+                    size="sm"
+                    onClick={handleEditContact}
+                    disabled={isVerifying}
+                  >
+                    <Pencil className="h-3.5 w-3.5" />
+                    Edit phone or email
+                  </Button>
                 </div>
               </motion.div>
             )}

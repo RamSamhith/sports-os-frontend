@@ -41,6 +41,14 @@ export function OtpInput({
     }
   }
 
+  function handlePaste(e: React.ClipboardEvent<HTMLInputElement>) {
+    e.preventDefault();
+    const pasted = e.clipboardData.getData('text').replace(/\D/g, '').slice(0, length);
+    if (pasted) {
+      onChange(pasted);
+    }
+  }
+
   function handleClick() {
     inputRef.current?.focus();
   }
@@ -57,10 +65,12 @@ export function OtpInput({
         type="text"
         inputMode="numeric"
         pattern="[0-9]*"
+        name="otp"
         maxLength={length}
         value={value}
         onChange={handleChange}
         onKeyDown={handleKeyDown}
+        onPaste={handlePaste}
         onFocus={() => setFocused(true)}
         onBlur={() => setFocused(false)}
         disabled={disabled}

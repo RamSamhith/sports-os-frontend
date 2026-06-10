@@ -30,6 +30,8 @@ const fieldVariants = {
   show: { opacity: 1, x: 0, transition: { duration: 0.3, ease: [0.2, 0, 0, 1] } },
 };
 
+const DRAFT_KEY = 'sportsos:signup-draft';
+
 export default function RegisterPage() {
   const reduced = useReducedMotion();
   const router = useRouter();
@@ -39,8 +41,11 @@ export default function RegisterPage() {
   const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [errors, setErrors] = useState<FieldErrors>({});
+  const [touched, setTouched] = useState<Record<string, boolean>>({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Restore signup draft when returning from OTP verification
+  // Restore signup draft when returning from OTP verification or edit flow
   useEffect(() => {
     if (typeof window === 'undefined') return;
     try {
@@ -57,17 +62,14 @@ export default function RegisterPage() {
       // ignore
     }
   }, []);
-  const [errors, setErrors] = useState<FieldErrors>({});
-  const [touched, setTouched] = useState<Record<string, boolean>>({});
-  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Redirect authenticated users based on onboarding state
   useEffect(() => {
     if (isLoading) return;
     if (isAuthenticated) {
-      if (!verified) router.replace('/verify/signup');
+      if (!verified) router.replace('/verify/method');
       else if (!onboardingCompleted) router.replace('/onboarding/role');
-      else router.replace('/profile/personal');
+      else router.replace('/');
     }
   }, [isLoading, isAuthenticated, verified, onboardingCompleted, router]);
 
@@ -200,39 +202,7 @@ export default function RegisterPage() {
     router.push('/verify/method');
   }
 
-  const DRAFT_KEY = 'sportsos:signup-draft';
-
-interface SignupDraft {
-  name: string;
-  email: string;
-  phone: string;
-}
-
-function readDraft(): SignupDraft | null {
-  if (typeof window === 'undefined') return null;
-  try {
-    const raw = sessionStorage.getItem(DRAFT_KEY);
-    if (!raw) return null;
-    const parsed = JSON.parse(raw);
-    if (typeof parsed.name === 'string' && typeof parsed.email === 'string' && typeof parsed.phone === 'string') {
-      return parsed;
-    }
-    return null;
-  } catch {
-    return null;
-  }
-}
-
-function clearDraft() {
-  if (typeof window === 'undefined') return;
-  try {
-    sessionStorage.removeItem(DRAFT_KEY);
-  } catch {
-    // ignore
-  }
-}
-
-const errorId = (field: string) => `register-${field}-error`;
+  const errorId = (field: string) => `register-${field}-error`;
 
   return (
     <SharedLayout layoutId="auth-card">

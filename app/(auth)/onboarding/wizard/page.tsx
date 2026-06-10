@@ -155,7 +155,8 @@ export default function OnboardingWizardPage() {
           skillLevel: data.parent.skillLevel,
         });
       }
-      router.push('/profile/personal');
+      // Redirect to homepage for immediate personalization
+      router.push('/');
     }
   }
 
@@ -218,13 +219,21 @@ export default function OnboardingWizardPage() {
             <Label htmlFor="wizard-age">Your age</Label>
             <Input
               id="wizard-age"
-              type="number"
+              type="text"
+              inputMode="numeric"
+              pattern="[0-9]*"
               min={3}
               max={80}
               placeholder="e.g. 14"
               value={age}
-              onChange={(e) => setAge(e.target.value)}
+              onChange={(e) => {
+                const val = e.target.value.replace(/\D/g, '')
+                if (val === '' || (Number(val) >= 0 && Number(val) <= 120)) {
+                  setAge(val)
+                }
+              }}
               autoFocus
+              autoComplete="off"
             />
           </div>
         )}
@@ -264,13 +273,21 @@ export default function OnboardingWizardPage() {
             <Label htmlFor="wizard-child-age">Child&apos;s age</Label>
             <Input
               id="wizard-child-age"
-              type="number"
+              type="text"
+              inputMode="numeric"
+              pattern="[0-9]*"
               min={3}
               max={18}
               placeholder="e.g. 8"
               value={age}
-              onChange={(e) => setAge(e.target.value)}
+              onChange={(e) => {
+                const val = e.target.value.replace(/\D/g, '')
+                if (val === '' || (Number(val) >= 0 && Number(val) <= 120)) {
+                  setAge(val)
+                }
+              }}
               autoFocus
+              autoComplete="off"
             />
           </div>
         )}

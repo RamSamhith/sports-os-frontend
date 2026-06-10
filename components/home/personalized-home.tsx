@@ -1,10 +1,10 @@
 'use client'
 
-import { useMemo } from 'react'
+import { useMemo, useEffect } from 'react'
 import { useOnboarding } from '@/lib/hooks/use-onboarding'
 import { useRecentlyViewed } from '@/lib/hooks/use-recently-viewed'
 import { useAcademySelection } from '@/lib/hooks/use-academy-selection'
-import { getSuggestedAcademies, getSuggestedCoaches } from '@/lib/utils/matching'
+import { getSuggestedAcademies, getSuggestedCoaches, logMatchingAudit } from '@/lib/utils/matching'
 import { academies } from '@/data/academies'
 import { coaches } from '@/data/coaches'
 import { MatchingExplanation } from './matching-explanation'
@@ -38,6 +38,13 @@ export function PersonalizedHome() {
     () => getSuggestedCoaches(coaches, onboarding, USER_LAT, USER_LNG, 4),
     [onboarding]
   )
+
+  // Debug audit: log matching source and results
+  useEffect(() => {
+    if (completed && onboarding) {
+      logMatchingAudit(onboarding, academies, coaches)
+    }
+  }, [completed, onboarding])
 
   if (!completed || !onboarding) return null
 

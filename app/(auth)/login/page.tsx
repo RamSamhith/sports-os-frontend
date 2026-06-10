@@ -41,9 +41,9 @@ export default function LoginPage() {
   useEffect(() => {
     if (isLoading) return;
     if (isAuthenticated) {
-      if (!verified) router.replace('/verify/signup');
+      if (!verified) router.replace('/verify/method');
       else if (!onboardingCompleted) router.replace('/onboarding/role');
-      else router.replace('/profile/personal');
+      else router.replace('/');
     }
   }, [isLoading, isAuthenticated, verified, onboardingCompleted, router]);
 
