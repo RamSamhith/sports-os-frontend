@@ -138,7 +138,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const setRole = useCallback((role: OnboardingRole) => {
-    setState((prev) => ({ ...prev, role, onboardingCompleted: true }));
+    setState((prev) => ({ ...prev, role }));
   }, []);
 
   const completeOnboarding = useCallback(() => {
@@ -170,6 +170,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       localStorage.removeItem('sportsos:shortlist');
       localStorage.removeItem('sportsos:compare');
       localStorage.removeItem('sportsos:recent-searches');
+      localStorage.removeItem('sportsos:onboarding');
     } catch { /* ignore */ }
   }, []);
 

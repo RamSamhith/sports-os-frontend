@@ -14,6 +14,7 @@ export const routes = {
   login: '/login',
   register: '/register',
   onboardingRole: '/onboarding/role',
+  onboardingWizard: '/onboarding/wizard',
   forgotPassword: '/forgot-password',
   profile: '/profile',
   profilePersonal: '/profile/personal',

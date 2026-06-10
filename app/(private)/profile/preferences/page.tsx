@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import Link from 'next/link';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -14,9 +15,10 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { useAuth } from '@/lib/hooks/use-auth';
+import { useOnboarding } from '@/lib/hooks/use-onboarding';
 import { sportTaxonomy } from '@/lib/constants/sport-taxonomy';
 import { RADIUS_OPTIONS } from '@/lib/constants/radii';
-import { CheckCircle2 } from 'lucide-react';
+import { CheckCircle2, Pencil } from 'lucide-react';
 
 const STORAGE_KEY = 'sportsos:preferences';
 
@@ -57,6 +59,7 @@ function writePreferences(state: PreferencesState) {
 
 export default function PreferencesPage() {
   const { role } = useAuth();
+  const { athleteData, parentData } = useOnboarding();
   const [city, setCity] = useState('');
   const [radius, setRadius] = useState(5);
   const [sports, setSports] = useState<string[]>([]);
@@ -68,12 +71,21 @@ export default function PreferencesPage() {
 
   useEffect(() => {
     const stored = readPreferences();
-    setCity(stored.city);
-    setRadius(stored.radius);
-    setSports(stored.sports);
-    setGoals(stored.goals);
+    // Merge onboarding data as defaults if preferences are empty
+    const merged = {
+      city: stored.city || athleteData?.location || parentData?.location || '',
+      radius: stored.radius,
+      sports: stored.sports.length > 0
+        ? stored.sports
+        : athleteData?.sportInterests || parentData?.sportInterests || [],
+      goals: stored.goals || athleteData?.goals || '',
+    };
+    setCity(merged.city);
+    setRadius(merged.radius);
+    setSports(merged.sports);
+    setGoals(merged.goals);
     setHydrated(true);
-  }, []);
+  }, [athleteData, parentData]);
 
   function validate(): PreferencesErrors {
     const e: PreferencesErrors = {};
@@ -147,12 +159,22 @@ export default function PreferencesPage() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Preferences</CardTitle>
-        <CardDescription>
-          {role === 'parent'
-            ? 'Set preferences for your child.'
-            : 'Set your sport and search preferences.'}
-        </CardDescription>
+        <div className="flex items-center justify-between">
+          <div>
+            <CardTitle>Preferences</CardTitle>
+            <CardDescription>
+              {role === 'parent'
+                ? 'Set preferences for your child.'
+                : 'Set your sport and search preferences.'}
+            </CardDescription>
+          </div>
+          <Link href="/onboarding/wizard?edit=true" prefetch={false}>
+            <Button variant="ghost" size="sm" className="gap-1.5">
+              <Pencil className="h-3.5 w-3.5" />
+              Edit setup
+            </Button>
+          </Link>
+        </div>
       </CardHeader>
       <CardContent className="flex flex-col gap-6">
         {/* Location */}

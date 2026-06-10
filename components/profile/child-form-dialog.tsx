@@ -27,11 +27,12 @@ interface ChildFormDialogProps {
   onOpenChange: (open: boolean) => void;
   onSubmit: (data: { name: string; age: number; sport: string; skillLevel?: string }) => void;
   child?: Child | null;
+  defaultData?: { name?: string; age?: number; sport?: string; skillLevel?: string };
 }
 
 const skillLevels = ['Beginner', 'Intermediate', 'Advanced', 'Competitive'];
 
-export function ChildFormDialog({ open, onOpenChange, onSubmit, child }: ChildFormDialogProps) {
+export function ChildFormDialog({ open, onOpenChange, onSubmit, child, defaultData }: ChildFormDialogProps) {
   const isEdit = !!child;
   const [name, setName] = useState('');
   const [age, setAge] = useState('');
@@ -46,6 +47,11 @@ export function ChildFormDialog({ open, onOpenChange, onSubmit, child }: ChildFo
         setAge(String(child.age));
         setSport(child.sport);
         setSkillLevel(child.skillLevel ?? '');
+      } else if (defaultData) {
+        setName(defaultData.name ?? '');
+        setAge(defaultData.age ? String(defaultData.age) : '');
+        setSport(defaultData.sport ?? '');
+        setSkillLevel(defaultData.skillLevel ?? '');
       } else {
         setName('');
         setAge('');
@@ -54,7 +60,7 @@ export function ChildFormDialog({ open, onOpenChange, onSubmit, child }: ChildFo
       }
       setErrors({});
     }
-  }, [open, child]);
+  }, [open, child, defaultData]);
 
   function validate() {
     const e: typeof errors = {};

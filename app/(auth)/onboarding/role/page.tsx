@@ -113,7 +113,7 @@ export default function RoleSelectionPage() {
   function handleContinue() {
     if (!selected) return;
     setRole(selected);
-    router.push('/profile/personal');
+    router.push('/onboarding/wizard');
   }
 
   return (

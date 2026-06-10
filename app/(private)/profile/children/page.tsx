@@ -9,12 +9,14 @@ import { Button } from '@/components/ui/button';
 import { EmptyState } from '@/components/feedback/empty-state';
 import { useChildren, type Child } from '@/lib/hooks/use-children';
 import { useAuth } from '@/lib/hooks/use-auth';
+import { useOnboarding } from '@/lib/hooks/use-onboarding';
 import { Plus, UserRoundPlus } from 'lucide-react';
 
 export default function ChildrenPage() {
   const { role, isLoading } = useAuth();
   const router = useRouter();
   const { children, activeChildId, addChild, updateChild, removeChild } = useChildren();
+  const { parentData } = useOnboarding();
   const [formOpen, setFormOpen] = useState(false);
   const [editingChild, setEditingChild] = useState<Child | null>(null);
   const [removingChild, setRemovingChild] = useState<Child | null>(null);
@@ -48,6 +50,15 @@ export default function ChildrenPage() {
       setRemovingChild(null);
     }
   }
+
+  const childDefaults = parentData
+    ? {
+        name: parentData.childName,
+        age: parentData.childAge,
+        sport: parentData.sportInterests[0] ?? '',
+        skillLevel: parentData.skillLevel,
+      }
+    : undefined;
 
   return (
     <div className="flex flex-col gap-4">
@@ -97,6 +108,7 @@ export default function ChildrenPage() {
         }}
         onSubmit={editingChild ? handleEdit : handleAdd}
         child={editingChild}
+        defaultData={!editingChild ? childDefaults : undefined}
       />
 
       <ChildRemoveDialog

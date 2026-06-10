@@ -16,7 +16,7 @@ export function PrivateGuard({ children }: { children: React.ReactNode }) {
     } else if (!verified) {
       router.replace('/verify/signup');
     } else if (!onboardingCompleted) {
-      router.replace('/onboarding/role');
+      router.replace('/onboarding/wizard');
     }
   }, [isLoading, isAuthenticated, verified, onboardingCompleted, router]);
 
