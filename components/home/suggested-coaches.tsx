@@ -3,7 +3,7 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { type SuggestedCoach } from '@/lib/utils/matching'
-import { Star, MapPin, Navigation, Clock } from 'lucide-react'
+import { Star, MapPin, Navigation, Clock, ChevronRight } from 'lucide-react'
 
 interface SuggestedCoachesProps {
   coaches: SuggestedCoach[]
@@ -92,6 +92,10 @@ function CoachCard({ coach }: { coach: SuggestedCoach }) {
                 +{(coach.sportsCoached || []).length - 2}
               </Badge>
             )}
+          </div>
+          <div className="flex items-center justify-between pt-1">
+            <span className="text-primary text-xs font-medium">View Profile</span>
+            <ChevronRight className="h-4 w-4 text-muted-foreground transition-transform group-hover:translate-x-0.5" />
           </div>
         </CardContent>
       </Card>

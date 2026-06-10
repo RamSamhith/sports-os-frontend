@@ -12,7 +12,7 @@ import { sportTaxonomy } from '@/lib/constants/sport-taxonomy';
 import { academies } from '@/data/academies';
 import { coaches } from '@/data/coaches';
 import { MyAcademyCard } from '@/components/profile/my-academy-card';
-import { Pencil, MapPin, Target, Trophy, User, Users, Sparkles, School, Star, ChevronRight } from 'lucide-react';
+import { Pencil, MapPin, Target, Trophy, User, Users, Sparkles, School, Star, ChevronRight, Search, BookOpen } from 'lucide-react';
 
 function getSportName(slug: string): string {
   return sportTaxonomy.find((s) => s.slug === slug)?.name ?? slug;
@@ -170,6 +170,30 @@ export default function ProfilePage() {
       )}
 
       <MyAcademyCard academies={academies} />
+
+      {!selectedAcademyId && (
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex flex-col items-center text-center gap-3">
+              <div className="bg-muted/50 grid h-12 w-12 place-items-center rounded-full">
+                <School className="h-5 w-5 text-muted-foreground" />
+              </div>
+              <div>
+                <p className="text-sm font-semibold">No academy selected yet</p>
+                <p className="text-muted-foreground text-xs mt-1">
+                  Browse academies and select one as your primary academy.
+                </p>
+              </div>
+              <Button size="sm" asChild>
+                <Link href="/academies">
+                  <Search className="h-3.5 w-3.5 mr-1" />
+                  Browse Academies
+                </Link>
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {selectedAcademy && academyCoaches.length > 0 && (
         <Card>

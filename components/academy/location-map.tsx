@@ -13,7 +13,7 @@ export function LocationMap({ lat, lng, label, className }: LocationMapProps) {
 
   return (
     <div className={className}>
-      <div className="relative aspect-[16/9] w-full overflow-hidden rounded-lg border bg-muted">
+      <div className="relative aspect-[16/9] w-full overflow-hidden rounded-lg border bg-muted h-full">
         <iframe
           title={`Map of ${label}`}
           src={mapUrl}

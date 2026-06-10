@@ -55,7 +55,7 @@ export function YourAcademy() {
           </CardContent>
         </Card>
       </Link>
-      <div className="flex gap-2">
+      <div className="flex flex-wrap gap-2">
         <Button size="sm" asChild>
           <Link href={`/academies/${academy.slug}`}>View Academy</Link>
         </Button>

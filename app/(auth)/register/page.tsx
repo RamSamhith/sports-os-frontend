@@ -39,6 +39,24 @@ export default function RegisterPage() {
   const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+
+  // Restore signup draft when returning from OTP verification
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    try {
+      const raw = sessionStorage.getItem(DRAFT_KEY);
+      if (!raw) return;
+      const parsed = JSON.parse(raw);
+      if (typeof parsed.name === 'string' && typeof parsed.email === 'string' && typeof parsed.phone === 'string') {
+        setName(parsed.name);
+        setEmail(parsed.email);
+        setPhone(parsed.phone);
+      }
+      sessionStorage.removeItem(DRAFT_KEY);
+    } catch {
+      // ignore
+    }
+  }, []);
   const [errors, setErrors] = useState<FieldErrors>({});
   const [touched, setTouched] = useState<Record<string, boolean>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -169,10 +187,52 @@ export default function RegisterPage() {
     setProfile({ name: name.trim(), email: email.trim(), phone: phone.trim() });
     setAuth(true);
     setIsSubmitting(false);
+    // Save draft so "Edit phone/email" can restore form state
+    try {
+      sessionStorage.setItem(DRAFT_KEY, JSON.stringify({
+        name: name.trim(),
+        email: email.trim(),
+        phone: phone.trim(),
+      }));
+    } catch {
+      // ignore
+    }
     router.push('/verify/method');
   }
 
-  const errorId = (field: string) => `register-${field}-error`;
+  const DRAFT_KEY = 'sportsos:signup-draft';
+
+interface SignupDraft {
+  name: string;
+  email: string;
+  phone: string;
+}
+
+function readDraft(): SignupDraft | null {
+  if (typeof window === 'undefined') return null;
+  try {
+    const raw = sessionStorage.getItem(DRAFT_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    if (typeof parsed.name === 'string' && typeof parsed.email === 'string' && typeof parsed.phone === 'string') {
+      return parsed;
+    }
+    return null;
+  } catch {
+    return null;
+  }
+}
+
+function clearDraft() {
+  if (typeof window === 'undefined') return;
+  try {
+    sessionStorage.removeItem(DRAFT_KEY);
+  } catch {
+    // ignore
+  }
+}
+
+const errorId = (field: string) => `register-${field}-error`;
 
   return (
     <SharedLayout layoutId="auth-card">

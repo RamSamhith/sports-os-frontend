@@ -3,7 +3,7 @@
 import * as React from 'react';
 import Link from 'next/link';
 import { motion, useReducedMotion } from 'framer-motion';
-import { Bookmark, BookmarkCheck, GitCompare, MapPin, Star } from 'lucide-react';
+import { Bookmark, BookmarkCheck, GitCompare, MapPin, Star, Navigation } from 'lucide-react';
 import { toast } from 'sonner';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -18,7 +18,13 @@ import { useCompare } from '@/lib/hooks/use-compare';
 import { ease, duration } from '@/components/motion/constants';
 import type { Academy } from '@/types/domain/academy';
 
-export function AcademyCardPlaceholder({ academy, priority = false }: { academy: Academy; priority?: boolean }) {
+interface AcademyCardPlaceholderProps {
+  academy: Academy;
+  priority?: boolean;
+  distance?: number;
+}
+
+export function AcademyCardPlaceholder({ academy, priority = false, distance }: AcademyCardPlaceholderProps) {
   const reduced = useReducedMotion();
   const {
     id,
@@ -112,6 +118,13 @@ export function AcademyCardPlaceholder({ academy, priority = false }: { academy:
             </div>
           </div>
         </div>
+
+        {distance != null && (
+          <div className="flex items-center gap-1 text-xs text-muted-foreground">
+            <Navigation className="h-3 w-3 shrink-0" />
+            <span>{distance} km away</span>
+          </div>
+        )}
 
         {sportSlugs.length > 0 ? (
           <div className="flex flex-wrap gap-1.5">

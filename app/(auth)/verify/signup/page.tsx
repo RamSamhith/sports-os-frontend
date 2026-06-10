@@ -14,6 +14,7 @@ import { useAuth } from '@/lib/hooks/use-auth';
 const FAST = { duration: 0.2, ease: [0.2, 0, 0, 1] as const };
 
 const CODE = '123456';
+const DRAFT_KEY = 'sportsos:signup-draft';
 
 export default function VerifySignupPage() {
   const reduced = useReducedMotion();
@@ -50,6 +51,12 @@ export default function VerifySignupPage() {
     setError('');
     await new Promise((r) => setTimeout(r, 1200));
     if (code === CODE) {
+      // Clear signup draft after successful verification
+      try {
+        sessionStorage.removeItem(DRAFT_KEY);
+      } catch {
+        // ignore
+      }
       setVerified(true);
     } else {
       setError('Invalid code. Try 123456 for demo.');

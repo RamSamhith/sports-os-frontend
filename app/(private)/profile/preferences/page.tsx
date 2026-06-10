@@ -21,11 +21,18 @@ import { RADIUS_OPTIONS } from '@/lib/constants/radii';
 import { CheckCircle2, Pencil } from 'lucide-react';
 
 const STORAGE_KEY = 'sportsos:preferences';
+const SKILL_LEVELS = [
+  { value: 'beginner', label: 'Beginner' },
+  { value: 'intermediate', label: 'Intermediate' },
+  { value: 'advanced', label: 'Advanced' },
+  { value: 'competitive', label: 'Competitive' },
+] as const;
 
 interface PreferencesState {
   city: string;
   radius: number;
   sports: string[];
+  skillLevel: string;
   goals: string;
 }
 
@@ -36,16 +43,17 @@ interface PreferencesErrors {
 function readPreferences(): PreferencesState {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return { city: '', radius: 5, sports: [], goals: '' };
+    if (!raw) return { city: '', radius: 5, sports: [], skillLevel: '', goals: '' };
     const parsed = JSON.parse(raw);
     return {
       city: typeof parsed.city === 'string' ? parsed.city : '',
       radius: typeof parsed.radius === 'number' ? parsed.radius : 5,
       sports: Array.isArray(parsed.sports) ? parsed.sports.filter((s: unknown) => typeof s === 'string') : [],
+      skillLevel: typeof parsed.skillLevel === 'string' ? parsed.skillLevel : '',
       goals: typeof parsed.goals === 'string' ? parsed.goals : '',
     };
   } catch {
-    return { city: '', radius: 5, sports: [], goals: '' };
+    return { city: '', radius: 5, sports: [], skillLevel: '', goals: '' };
   }
 }
 
@@ -63,6 +71,7 @@ export default function PreferencesPage() {
   const [city, setCity] = useState('');
   const [radius, setRadius] = useState(5);
   const [sports, setSports] = useState<string[]>([]);
+  const [skillLevel, setSkillLevel] = useState('');
   const [goals, setGoals] = useState('');
   const [errors, setErrors] = useState<PreferencesErrors>({});
   const [touched, setTouched] = useState<Record<string, boolean>>({});
@@ -78,11 +87,13 @@ export default function PreferencesPage() {
       sports: stored.sports.length > 0
         ? stored.sports
         : athleteData?.sportInterests || parentData?.sportInterests || [],
+      skillLevel: stored.skillLevel || athleteData?.skillLevel || parentData?.skillLevel || '',
       goals: stored.goals || athleteData?.goals || '',
     };
     setCity(merged.city);
     setRadius(merged.radius);
     setSports(merged.sports);
+    setSkillLevel(merged.skillLevel);
     setGoals(merged.goals);
     setHydrated(true);
   }, [athleteData, parentData]);
@@ -150,6 +161,7 @@ export default function PreferencesPage() {
       city: city.trim(),
       radius,
       sports,
+      skillLevel,
       goals: goals.trim(),
     };
     writePreferences(prefs);
@@ -250,6 +262,30 @@ export default function PreferencesPage() {
           {sports.length === 0 && (
             <p className="text-muted-foreground text-xs">Select at least one sport.</p>
           )}
+        </div>
+
+        {/* Skill Level */}
+        <div className="flex flex-col gap-1.5">
+          <Label htmlFor="pref-skill-level">Skill level</Label>
+          <Select
+            value={skillLevel}
+            onValueChange={(v) => { setSkillLevel(v); setSaved(false); }}
+            disabled={!hydrated}
+          >
+            <SelectTrigger id="pref-skill-level" aria-label="Skill level">
+              <SelectValue placeholder="Select your skill level" />
+            </SelectTrigger>
+            <SelectContent>
+              {SKILL_LEVELS.map((level) => (
+                <SelectItem key={level.value} value={level.value}>
+                  {level.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <p className="text-muted-foreground text-xs">
+            Helps us suggest better matches for you.
+          </p>
         </div>
 
         {/* Goals */}

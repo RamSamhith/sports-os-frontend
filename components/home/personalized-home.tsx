@@ -1,5 +1,6 @@
 'use client'
 
+import { useMemo } from 'react'
 import { useOnboarding } from '@/lib/hooks/use-onboarding'
 import { useRecentlyViewed } from '@/lib/hooks/use-recently-viewed'
 import { useAcademySelection } from '@/lib/hooks/use-academy-selection'
@@ -23,14 +24,22 @@ export function PersonalizedHome() {
   const { recentAcademies, recentCoaches } = useRecentlyViewed()
   const { selectedAcademyId } = useAcademySelection()
 
+  const suggestedAcademies = useMemo(
+    () => getSuggestedAcademies(academies, onboarding, USER_LAT, USER_LNG, 6),
+    [onboarding]
+  )
+
+  const academyCoaches = useMemo(
+    () => selectedAcademyId ? coaches.filter((c) => c.academyId === selectedAcademyId) : [],
+    [selectedAcademyId]
+  )
+
+  const suggestedCoaches = useMemo(
+    () => getSuggestedCoaches(coaches, onboarding, USER_LAT, USER_LNG, 4),
+    [onboarding]
+  )
+
   if (!completed || !onboarding) return null
-
-  const suggestedAcademies = getSuggestedAcademies(academies, onboarding, USER_LAT, USER_LNG, 6)
-
-  const academyCoaches = selectedAcademyId
-    ? coaches.filter((c) => c.academyId === selectedAcademyId)
-    : []
-  const suggestedCoaches = getSuggestedCoaches(coaches, onboarding, USER_LAT, USER_LNG, 4)
 
   const lastAcademy = recentAcademies[0]
   const lastCoach = recentCoaches[0]
@@ -63,7 +72,11 @@ export function PersonalizedHome() {
       {suggestedAcademies.length > 0 && (
         <Section>
           <Container size="lg">
-            <SuggestedAcademies academies={suggestedAcademies} />
+            <SuggestedAcademies
+              academies={suggestedAcademies}
+              title="Recommended For You"
+              viewAllHref="/academies"
+            />
           </Container>
         </Section>
       )}
@@ -82,7 +95,11 @@ export function PersonalizedHome() {
       {!selectedAcademyId && suggestedCoaches.length > 0 && (
         <Section>
           <Container size="lg">
-            <SuggestedCoaches coaches={suggestedCoaches} />
+            <SuggestedCoaches
+              coaches={suggestedCoaches}
+              title="Coaches For You"
+              viewAllHref="/coaches"
+            />
           </Container>
         </Section>
       )}

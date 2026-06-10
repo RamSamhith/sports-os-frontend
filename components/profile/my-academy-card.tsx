@@ -6,18 +6,19 @@ import { useAcademyStatus } from '@/lib/hooks/use-academy-status'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { MapPin, Star, Shield, X } from 'lucide-react'
+import { MapPin, Star, Shield, X, Navigation } from 'lucide-react'
 
 interface MyAcademyCardProps {
   academies: Array<{
     id: string
     slug: string
     name: string
-    location?: { city?: string; state?: string }
+    location?: { city?: string; state?: string; lat?: number; lng?: number }
     rating?: number | { average: number; count: number }
     verificationStatus?: string
     sportsOffered?: string[]
   }>
+  distance?: number
 }
 
 const statusColors: Record<string, string> = {
@@ -26,7 +27,7 @@ const statusColors: Record<string, string> = {
   selected: 'bg-green-100 text-green-700',
 }
 
-export function MyAcademyCard({ academies }: MyAcademyCardProps) {
+export function MyAcademyCard({ academies, distance }: MyAcademyCardProps) {
   const { selectedAcademyId, clearSelection } = useAcademySelection()
   const { getStatus } = useAcademyStatus()
 
@@ -73,6 +74,12 @@ export function MyAcademyCard({ academies }: MyAcademyCardProps) {
               {academy.location?.city}, {academy.location?.state}
             </span>
           </div>
+          {distance != null && (
+            <div className="flex items-center gap-1 text-xs text-muted-foreground mt-1">
+              <Navigation className="h-3 w-3" />
+              <span>{distance} km away</span>
+            </div>
+          )}
         </div>
         <div className="flex items-center gap-2 text-sm">
           <div className="flex items-center gap-1">
@@ -95,7 +102,7 @@ export function MyAcademyCard({ academies }: MyAcademyCardProps) {
             ))}
           </div>
         )}
-        <div className="flex gap-2 pt-1">
+        <div className="flex flex-wrap gap-2 pt-1">
           <Button size="sm" asChild>
             <Link href={`/academies/${academy.slug}`}>
               View Academy

@@ -1,8 +1,9 @@
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
 import { type RecentlyViewedItem } from '@/lib/hooks/use-recently-viewed'
-import { Clock, Dumbbell, Users } from 'lucide-react'
+import { Clock, Dumbbell, Users, ChevronRight, History } from 'lucide-react'
 
 interface RecentlyViewedProps {
   academies: RecentlyViewedItem[]
@@ -19,7 +20,10 @@ export function RecentlyViewed({ academies, coaches }: RecentlyViewedProps) {
   return (
     <section className="space-y-4">
       <div className="flex items-center justify-between">
-        <h2 className="text-xl font-semibold text-foreground">Recently Viewed</h2>
+        <div className="flex items-center gap-2">
+          <History className="h-4 w-4 text-muted-foreground" />
+          <h2 className="text-xl font-semibold text-foreground">Recently Viewed</h2>
+        </div>
       </div>
       <div className="grid gap-3 sm:grid-cols-2 md:grid-cols-3">
         {items.slice(0, 4).map((item) => (
@@ -49,14 +53,22 @@ function RecentlyViewedCard({ item }: { item: RecentlyViewedItem }) {
               <CardTitle className="text-sm font-semibold leading-tight line-clamp-1">
                 {item.name}
               </CardTitle>
-              <p className="text-xs text-muted-foreground">{label}</p>
+              <Badge variant="secondary" className="mt-1 text-[10px]">
+                {label}
+              </Badge>
             </div>
           </div>
         </CardHeader>
         <CardContent>
-          <div className="flex items-center gap-1 text-xs text-muted-foreground">
-            <Clock className="h-3 w-3" />
-            <span>{timeAgo}</span>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-1 text-xs text-muted-foreground">
+              <Clock className="h-3 w-3" />
+              <span>{timeAgo}</span>
+            </div>
+            <div className="flex items-center gap-1 text-primary text-xs font-medium">
+              <span>View</span>
+              <ChevronRight className="h-3 w-3 transition-transform group-hover:translate-x-0.5" />
+            </div>
           </div>
         </CardContent>
       </Card>

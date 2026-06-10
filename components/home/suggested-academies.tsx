@@ -3,7 +3,7 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { type SuggestedAcademy } from '@/lib/utils/matching'
-import { Star, MapPin, Shield, Navigation } from 'lucide-react'
+import { Star, MapPin, Shield, Navigation, ChevronRight } from 'lucide-react'
 
 interface SuggestedAcademiesProps {
   academies: SuggestedAcademy[]
@@ -91,6 +91,10 @@ function AcademyCard({ academy }: { academy: SuggestedAcademy }) {
                 +{(academy.sportsOffered || []).length - 3}
               </Badge>
             )}
+          </div>
+          <div className="flex items-center justify-between pt-1">
+            <span className="text-primary text-xs font-medium">View Details</span>
+            <ChevronRight className="h-4 w-4 text-muted-foreground transition-transform group-hover:translate-x-0.5" />
           </div>
         </CardContent>
       </Card>

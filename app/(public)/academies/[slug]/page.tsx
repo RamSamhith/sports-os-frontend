@@ -6,7 +6,6 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Button } from '@/components/ui/button';
 import { ShortlistToggle } from '@/components/shortlist/shortlist-toggle';
 import { CompareButton } from '@/components/academies/compare-button';
-import { SelectAcademyButton } from '@/components/academy/select-academy-button';
 import { AcademyStatusButton } from '@/components/academy/academy-status-button';
 import { CoachesAtAcademy } from '@/components/academy/coaches-at-academy';
 import { AcademyInfo } from '@/components/academy/academy-info';
@@ -21,7 +20,7 @@ import { academyBySlug, academies } from '@/data/academies';
 import { coaches } from '@/data/coaches';
 import { siteConfig } from '@/config/site';
 import Link from 'next/link';
-import { Globe, Mail, Phone } from 'lucide-react';
+import { Globe, Mail, Phone, Instagram, Facebook, Youtube } from 'lucide-react';
 
 export function generateStaticParams() {
   return academies.map((academy) => ({ slug: academy.slug }));
@@ -99,6 +98,7 @@ export default function AcademyDetailPage({ params }: { params: { slug: string }
               <LastUpdated at={academy.lastUpdatedAt} />
               <CertificationIndicator count={academy.certifications.length} />
             </div>
+            {/* Actions */}
             <div className="flex flex-wrap items-center gap-2">
               <Button asChild>
                 <Link href={`/enquiry/academy/${academy.slug}`}>Request trial</Link>
@@ -118,16 +118,13 @@ export default function AcademyDetailPage({ params }: { params: { slug: string }
                 sublabel={`${academy.location.city}, ${academy.location.state}`}
                 href={`/academies/${academy.slug}`}
               />
-              <SelectAcademyButton
-                academyId={academy.id}
-                academyName={academy.name}
-              />
               <AcademyStatusButton academyId={academy.id} />
             </div>
           </CardContent>
         </Card>
 
-        <div className="mt-6 grid gap-6 md:grid-cols-2">
+        {/* Academy Info */}
+        <div className="mt-6">
           <Card>
             <CardContent className="p-4">
               <AcademyInfo
@@ -140,7 +137,10 @@ export default function AcademyDetailPage({ params }: { params: { slug: string }
               />
             </CardContent>
           </Card>
+        </div>
 
+        {/* Contact */}
+        <div className="mt-6">
           <Card>
             <CardContent className="p-4">
               <div className="space-y-3">
@@ -181,19 +181,47 @@ export default function AcademyDetailPage({ params }: { params: { slug: string }
           </Card>
         </div>
 
+        {/* Social Links */}
         <div className="mt-6">
-          <LocationMap
-            lat={academy.location.lat}
-            lng={academy.location.lng}
-            label={academy.name}
-          />
+          <Card>
+            <CardContent className="p-4">
+              <div className="space-y-3">
+                <h2 className="text-lg font-semibold text-foreground">Social Links</h2>
+                <div className="grid gap-2 text-sm">
+                  <div className="flex items-center gap-2">
+                    <Instagram className="h-4 w-4 shrink-0 text-muted-foreground" />
+                    <span className="text-muted-foreground">Not Available</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Facebook className="h-4 w-4 shrink-0 text-muted-foreground" />
+                    <span className="text-muted-foreground">Not Available</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Youtube className="h-4 w-4 shrink-0 text-muted-foreground" />
+                    <span className="text-muted-foreground">Not Available</span>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
         </div>
 
+        {/* Coaches */}
         {academyCoaches.length > 0 && (
           <div className="mt-6">
             <CoachesAtAcademy coaches={academyCoaches} academyName={academy.name} />
           </div>
         )}
+
+        {/* Map - Compact */}
+        <div className="mt-6">
+          <LocationMap
+            lat={academy.location.lat}
+            lng={academy.location.lng}
+            label={academy.name}
+            className="h-[200px] md:h-[250px]"
+          />
+        </div>
       </Container>
     </Section>
   );
