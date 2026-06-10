@@ -17,9 +17,9 @@ export function ContinueExploring({ lastAcademy, lastCoach }: ContinueExploringP
   if (items.length === 0) return null
 
   return (
-    <section className="space-y-3">
+    <section className="space-y-4">
       <h2 className="text-xl font-semibold text-foreground">Continue Exploring</h2>
-      <div className="grid gap-3 sm:grid-cols-2">
+      <div className="grid gap-4 sm:grid-cols-2">
         {items.map((item) => (
           <ContinueCard key={`${item.type}-${item.id}`} item={item} />
         ))}

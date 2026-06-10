@@ -24,7 +24,7 @@ export function YourAcademy() {
     : academy.rating?.average ?? 0
 
   return (
-    <section className="space-y-3">
+    <section className="space-y-4">
       <h2 className="text-lg font-semibold text-foreground">Your Academy</h2>
       <Link href={`/academies/${academy.slug}`} className="group block">
         <Card className="transition-all hover:shadow-md group-hover:border-primary/50">

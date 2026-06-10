@@ -25,7 +25,7 @@ export function RecentlyViewed({ academies, coaches }: RecentlyViewedProps) {
           <h2 className="text-xl font-semibold text-foreground">Recently Viewed</h2>
         </div>
       </div>
-      <div className="grid gap-3 sm:grid-cols-2 md:grid-cols-3">
+      <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3">
         {items.slice(0, 4).map((item) => (
           <RecentlyViewedCard key={`${item.type}-${item.id}`} item={item} />
         ))}

@@ -1,3 +1,5 @@
+export * from './use-academy-selection';
+export * from './use-academy-status';
 export * from './use-analytics';
 export * from './use-auth';
 export * from './use-children';
@@ -6,6 +8,8 @@ export * from './use-consent';
 export * from './use-debounce';
 export * from './use-location';
 export * from './use-media-query';
+export * from './use-onboarding';
+export * from './use-recently-viewed';
 export * from './use-reduced-motion';
 export * from './use-search-query';
 export * from './use-shortlist';

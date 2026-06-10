@@ -13,9 +13,9 @@ export function CoachesAtAcademy({ coaches, academyName }: CoachesAtAcademyProps
   if (coaches.length === 0) return null
 
   return (
-    <section className="space-y-3">
+    <section className="space-y-4">
       <h2 className="text-lg font-semibold text-foreground">Coaches at {academyName}</h2>
-      <div className="grid gap-3 sm:grid-cols-2">
+      <div className="grid gap-4 sm:grid-cols-2">
         {coaches.map((coach) => (
           <CompactCoachCard key={coach.id} coach={coach} />
         ))}
