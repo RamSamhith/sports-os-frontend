@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Button } from '@/components/ui/button';
 import { ShortlistToggle } from '@/components/shortlist/shortlist-toggle';
 import { CompareButton } from '@/components/academies/compare-button';
+import { SelectAcademyButton } from '@/components/academy/select-academy-button';
 import { VerifiedBadge } from '@/components/trust/verified-badge';
 import { LastUpdated } from '@/components/trust/last-updated';
 import { CertificationIndicator } from '@/components/trust/certification-indicator';
@@ -108,6 +109,10 @@ export default function AcademyDetailPage({ params }: { params: { slug: string }
                 label={academy.name}
                 sublabel={`${academy.location.city}, ${academy.location.state}`}
                 href={`/academies/${academy.slug}`}
+              />
+              <SelectAcademyButton
+                academyId={academy.id}
+                academyName={academy.name}
               />
             </div>
           </CardContent>

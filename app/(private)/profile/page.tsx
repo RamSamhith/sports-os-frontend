@@ -6,11 +6,45 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useAuth } from '@/lib/hooks/use-auth';
 import { useOnboarding } from '@/lib/hooks/use-onboarding';
+import { getMatchingCriteria } from '@/lib/utils/matching';
 import { sportTaxonomy } from '@/lib/constants/sport-taxonomy';
-import { Pencil, MapPin, Target, Trophy, User, Users } from 'lucide-react';
+import { academies } from '@/data/academies';
+import { MyAcademyCard } from '@/components/profile/my-academy-card';
+import { Pencil, MapPin, Target, Trophy, User, Users, Sparkles } from 'lucide-react';
 
 function getSportName(slug: string): string {
   return sportTaxonomy.find((s) => s.slug === slug)?.name ?? slug;
+}
+
+function MatchingCriteriaCard() {
+  const { data: onboarding } = useOnboarding();
+  if (!onboarding) return null;
+
+  const criteria = getMatchingCriteria(onboarding);
+  if (criteria.length === 0) return null;
+
+  return (
+    <Card>
+      <CardHeader>
+        <div className="flex items-center gap-2">
+          <Sparkles className="text-primary h-4 w-4" />
+          <CardTitle className="text-base">Why These Results</CardTitle>
+        </div>
+      </CardHeader>
+      <CardContent>
+        <p className="text-muted-foreground text-sm mb-2">
+          Showing relevant academies and coaches based on:
+        </p>
+        <div className="flex flex-wrap gap-1.5">
+          {criteria.map((c) => (
+            <Badge key={c} variant="secondary" className="text-xs">
+              {c}
+            </Badge>
+          ))}
+        </div>
+      </CardContent>
+    </Card>
+  );
 }
 
 export default function ProfilePage() {
@@ -131,6 +165,12 @@ export default function ProfilePage() {
           </CardContent>
         </Card>
       )}
+
+      {completed && (
+        <MatchingCriteriaCard />
+      )}
+
+      <MyAcademyCard academies={academies} />
     </div>
   );
 }

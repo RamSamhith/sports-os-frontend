@@ -6,6 +6,7 @@ import { FeaturedAcademies } from '@/components/home/featured-academies';
 import { FeaturedCoaches } from '@/components/home/featured-coaches';
 import { CtaSection } from '@/components/home/cta-section';
 import { HomepageAuthModal } from '@/components/auth/homepage-auth-modal';
+import { PersonalizedHome } from '@/components/home/personalized-home';
 
 export default function HomePage() {
   return (
@@ -13,6 +14,7 @@ export default function HomePage() {
       <Hero />
       <SearchSection />
       <StatsSection />
+      <PersonalizedHome />
       <FeaturedSports />
       <FeaturedAcademies />
       <FeaturedCoaches />
