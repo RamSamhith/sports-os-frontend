@@ -2,6 +2,7 @@
 
 import { useOnboarding } from '@/lib/hooks/use-onboarding'
 import { useRecentlyViewed } from '@/lib/hooks/use-recently-viewed'
+import { useAcademySelection } from '@/lib/hooks/use-academy-selection'
 import { getSuggestedAcademies, getSuggestedCoaches } from '@/lib/utils/matching'
 import { academies } from '@/data/academies'
 import { coaches } from '@/data/coaches'
@@ -20,11 +21,16 @@ const USER_LNG = 77.5946
 export function PersonalizedHome() {
   const { data: onboarding, completed } = useOnboarding()
   const { recentAcademies, recentCoaches } = useRecentlyViewed()
+  const { selectedAcademyId } = useAcademySelection()
 
   if (!completed || !onboarding) return null
 
   const suggestedAcademies = getSuggestedAcademies(academies, onboarding, USER_LAT, USER_LNG, 6)
-  const suggestedCoaches = getSuggestedCoaches(coaches, onboarding, USER_LAT, USER_LNG, 6)
+
+  const academyCoaches = selectedAcademyId
+    ? coaches.filter((c) => c.academyId === selectedAcademyId)
+    : []
+  const suggestedCoaches = getSuggestedCoaches(coaches, onboarding, USER_LAT, USER_LNG, 4)
 
   const lastAcademy = recentAcademies[0]
   const lastCoach = recentCoaches[0]
@@ -33,6 +39,7 @@ export function PersonalizedHome() {
 
   const hasContent =
     suggestedAcademies.length > 0 ||
+    academyCoaches.length > 0 ||
     suggestedCoaches.length > 0 ||
     showContinueExploring ||
     showRecentlyViewed
@@ -53,14 +60,6 @@ export function PersonalizedHome() {
         </Container>
       </Section>
 
-      {showContinueExploring && (
-        <Section>
-          <Container size="lg">
-            <ContinueExploring lastAcademy={lastAcademy} lastCoach={lastCoach} />
-          </Container>
-        </Section>
-      )}
-
       {suggestedAcademies.length > 0 && (
         <Section>
           <Container size="lg">
@@ -69,10 +68,29 @@ export function PersonalizedHome() {
         </Section>
       )}
 
-      {suggestedCoaches.length > 0 && (
+      {academyCoaches.length > 0 && (
+        <Section>
+          <Container size="lg">
+            <SuggestedCoaches
+              coaches={academyCoaches}
+              title="Coaches at Your Academy"
+            />
+          </Container>
+        </Section>
+      )}
+
+      {!selectedAcademyId && suggestedCoaches.length > 0 && (
         <Section>
           <Container size="lg">
             <SuggestedCoaches coaches={suggestedCoaches} />
+          </Container>
+        </Section>
+      )}
+
+      {showContinueExploring && (
+        <Section>
+          <Container size="lg">
+            <ContinueExploring lastAcademy={lastAcademy} lastCoach={lastCoach} />
           </Container>
         </Section>
       )}

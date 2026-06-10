@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { WizardShell } from '@/components/onboarding/wizard-shell';
+import { LocationPicker } from '@/components/ui/location-picker';
 import { useAuth } from '@/lib/hooks/use-auth';
 import { useOnboarding, type OnboardingData, type SkillLevel } from '@/lib/hooks/use-onboarding';
 import { useChildren } from '@/lib/hooks/use-children';
@@ -278,12 +279,10 @@ export default function OnboardingWizardPage() {
         {step === 2 && (
           <div className="flex flex-col gap-1.5">
             <Label htmlFor="wizard-location">City</Label>
-            <Input
-              id="wizard-location"
-              placeholder="e.g. Bengaluru"
+            <LocationPicker
               value={location}
-              onChange={(e) => setLocation(e.target.value)}
-              autoFocus
+              onChange={setLocation}
+              placeholder="e.g. Bengaluru"
             />
           </div>
         )}

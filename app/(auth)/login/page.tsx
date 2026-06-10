@@ -125,9 +125,9 @@ export default function LoginPage() {
     await new Promise((r) => setTimeout(r, 1200));
     setAuth(true);
     setIsSubmitting(false);
-    if (!verified) router.push('/verify/signup');
+    if (!verified) router.push('/verify/method');
     else if (!onboardingCompleted) router.push('/onboarding/role');
-    else router.push('/profile/personal');
+    else router.replace('/');
   }
 
   const errorId = (field: string) => `login-${field}-error`;

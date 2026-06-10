@@ -169,7 +169,7 @@ export default function RegisterPage() {
     setProfile({ name: name.trim(), email: email.trim(), phone: phone.trim() });
     setAuth(true);
     setIsSubmitting(false);
-    router.push('/verify/signup');
+    router.push('/verify/method');
   }
 
   const errorId = (field: string) => `register-${field}-error`;

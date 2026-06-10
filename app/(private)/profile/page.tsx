@@ -6,11 +6,13 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useAuth } from '@/lib/hooks/use-auth';
 import { useOnboarding } from '@/lib/hooks/use-onboarding';
+import { useAcademySelection } from '@/lib/hooks/use-academy-selection';
 import { getMatchingCriteria } from '@/lib/utils/matching';
 import { sportTaxonomy } from '@/lib/constants/sport-taxonomy';
 import { academies } from '@/data/academies';
+import { coaches } from '@/data/coaches';
 import { MyAcademyCard } from '@/components/profile/my-academy-card';
-import { Pencil, MapPin, Target, Trophy, User, Users, Sparkles } from 'lucide-react';
+import { Pencil, MapPin, Target, Trophy, User, Users, Sparkles, School, Star, ChevronRight } from 'lucide-react';
 
 function getSportName(slug: string): string {
   return sportTaxonomy.find((s) => s.slug === slug)?.name ?? slug;
@@ -25,16 +27,11 @@ function MatchingCriteriaCard() {
 
   return (
     <Card>
-      <CardHeader>
-        <div className="flex items-center gap-2">
+      <CardContent className="p-4">
+        <div className="flex items-center gap-2 mb-2">
           <Sparkles className="text-primary h-4 w-4" />
-          <CardTitle className="text-base">Why These Results</CardTitle>
+          <p className="text-sm font-medium">Based on</p>
         </div>
-      </CardHeader>
-      <CardContent>
-        <p className="text-muted-foreground text-sm mb-2">
-          Showing relevant academies and coaches based on:
-        </p>
         <div className="flex flex-wrap gap-1.5">
           {criteria.map((c) => (
             <Badge key={c} variant="secondary" className="text-xs">
@@ -50,7 +47,16 @@ function MatchingCriteriaCard() {
 export default function ProfilePage() {
   const { role } = useAuth();
   const { athleteData, parentData, completed } = useOnboarding();
+  const { selectedAcademyId } = useAcademySelection();
   const isParent = role === 'parent';
+
+  const selectedAcademy = selectedAcademyId
+    ? academies.find((a) => a.id === selectedAcademyId)
+    : null;
+
+  const academyCoaches = selectedAcademyId
+    ? coaches.filter((c) => c.academyId === selectedAcademyId)
+    : [];
 
   return (
     <div className="flex flex-col gap-4">
@@ -71,22 +77,19 @@ export default function ProfilePage() {
             )}
           </div>
         </CardHeader>
-        <CardContent className="text-muted-foreground text-sm">
-          {isParent
-            ? 'Use the sidebar to manage personal info, children, preferences, saved items, and enquiries.'
-            : 'Use the sidebar to manage personal info, preferences, saved items, and enquiries.'}
-        </CardContent>
       </Card>
+
+      <MatchingCriteriaCard />
 
       {completed && athleteData && !isParent && (
         <Card>
-          <CardHeader>
+          <CardHeader className="pb-3">
             <div className="flex items-center gap-2">
               <Trophy className="text-primary h-4 w-4" />
-              <CardTitle className="text-base">Your Sport Profile</CardTitle>
+              <CardTitle className="text-base">My Sport</CardTitle>
             </div>
           </CardHeader>
-          <CardContent className="flex flex-col gap-3">
+          <CardContent className="flex flex-col gap-2">
             <div className="flex flex-wrap gap-3 text-sm">
               <div className="flex items-center gap-1.5">
                 <User className="text-muted-foreground h-3.5 w-3.5" />
@@ -124,13 +127,13 @@ export default function ProfilePage() {
 
       {completed && parentData && isParent && (
         <Card>
-          <CardHeader>
+          <CardHeader className="pb-3">
             <div className="flex items-center gap-2">
               <Users className="text-primary h-4 w-4" />
-              <CardTitle className="text-base">Child&apos;s Sport Profile</CardTitle>
+              <CardTitle className="text-base">My Child&apos;s Sport</CardTitle>
             </div>
           </CardHeader>
-          <CardContent className="flex flex-col gap-3">
+          <CardContent className="flex flex-col gap-2">
             <div className="flex flex-wrap gap-3 text-sm">
               <div className="flex items-center gap-1.5">
                 <User className="text-muted-foreground h-3.5 w-3.5" />
@@ -166,11 +169,55 @@ export default function ProfilePage() {
         </Card>
       )}
 
-      {completed && (
-        <MatchingCriteriaCard />
-      )}
-
       <MyAcademyCard academies={academies} />
+
+      {selectedAcademy && academyCoaches.length > 0 && (
+        <Card>
+          <CardHeader className="pb-3">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <School className="text-primary h-4 w-4" />
+                <CardTitle className="text-base">My Coaches</CardTitle>
+              </div>
+              <Badge variant="secondary" className="text-xs">{academyCoaches.length}</Badge>
+            </div>
+            <CardDescription className="text-xs">
+              At {selectedAcademy.name}
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-2">
+            {academyCoaches.slice(0, 3).map((coach) => (
+              <Link
+                key={coach.id}
+                href={`/coaches/${coach.slug}`}
+                className="flex items-center gap-3 rounded-lg p-2 hover:bg-accent transition-colors"
+              >
+                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-muted text-xs font-semibold">
+                  {coach.name.split(' ').map((n) => n[0]).join('').slice(0, 2)}
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm font-medium line-clamp-1">{coach.name}</p>
+                  <p className="text-xs text-muted-foreground line-clamp-1">
+                    {coach.specialization.slice(0, 2).join(', ')}
+                  </p>
+                </div>
+                <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                  <Star className="h-3 w-3 fill-amber-400 text-amber-400" />
+                  {coach.rating.average.toFixed(1)}
+                </div>
+                <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground" />
+              </Link>
+            ))}
+            {academyCoaches.length > 3 && (
+              <Button variant="ghost" size="sm" asChild className="w-full">
+                <Link href={`/coaches?academy=${selectedAcademy.slug}`}>
+                  View all {academyCoaches.length} coaches
+                </Link>
+              </Button>
+            )}
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 }

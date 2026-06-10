@@ -24,9 +24,18 @@ export default function VerifySignupPage() {
   const [isVerifying, setIsVerifying] = useState(false);
   const [resendCooldown, setResendCooldown] = useState(0);
 
+  const [otpMethod, setOtpMethod] = useState<string>('sms');
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const method = sessionStorage.getItem('sportsos:otp-method');
+      if (method) setOtpMethod(method);
+    }
+  }, []);
+
   useEffect(() => {
     if (isLoading) return;
-    if (!isAuthenticated) router.replace('/register');
+    if (!isAuthenticated) router.replace('/verify/method');
     else if (authVerified) router.replace('/onboarding/role');
   }, [isLoading, isAuthenticated, authVerified, router]);
 
@@ -67,13 +76,15 @@ export default function VerifySignupPage() {
     exit: { opacity: 0, x: reduced ? 0 : -12, transition: { ...FAST, duration: 0.15 } },
   };
 
-  const maskedPhone = profile?.phone
-    ? profile.phone.slice(0, -4).replace(/./g, '*') + profile.phone.slice(-4)
-    : 'your number';
+  const maskedContact = otpMethod === 'whatsapp'
+    ? profile?.phone
+      ? profile.phone.slice(0, -4).replace(/./g, '*') + profile.phone.slice(-4)
+      : 'your number'
+    : profile?.email
+      ? profile.email.slice(0, 2) + '***@' + profile.email.split('@')[1]
+      : 'your email';
 
-  const maskedEmail = profile?.email
-    ? profile.email.slice(0, 2) + '***@' + profile.email.split('@')[1]
-    : 'your email';
+  const methodLabel = otpMethod === 'whatsapp' ? 'WhatsApp' : 'email';
 
   function handleContinueToRole() {
     router.push('/onboarding/role');
@@ -131,7 +142,7 @@ export default function VerifySignupPage() {
                 <h1 className="text-2xl font-bold tracking-tight text-center">Enter verification code</h1>
                 <p className="text-muted-foreground mt-1 text-center text-sm">
                   We sent a 6-digit code to{' '}
-                  <span className="text-foreground font-medium">{maskedPhone}</span>
+                  <span className="text-foreground font-medium">{maskedContact}</span> via {methodLabel}
                 </p>
 
                 <div className="mt-6 flex justify-center">
@@ -160,7 +171,7 @@ export default function VerifySignupPage() {
                     className="w-full gap-2"
                     variant="outline"
                     disabled={isVerifying}
-                    onClick={() => router.push('/register')}
+                    onClick={() => router.push('/verify/method')}
                   >
                     <ArrowLeft className="h-4 w-4" />
                     Back to Sign Up

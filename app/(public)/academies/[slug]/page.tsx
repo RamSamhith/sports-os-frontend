@@ -10,6 +10,7 @@ import { SelectAcademyButton } from '@/components/academy/select-academy-button'
 import { AcademyStatusButton } from '@/components/academy/academy-status-button';
 import { CoachesAtAcademy } from '@/components/academy/coaches-at-academy';
 import { AcademyInfo } from '@/components/academy/academy-info';
+import { LocationMap } from '@/components/academy/location-map';
 import { VerifiedBadge } from '@/components/trust/verified-badge';
 import { LastUpdated } from '@/components/trust/last-updated';
 import { CertificationIndicator } from '@/components/trust/certification-indicator';
@@ -178,6 +179,14 @@ export default function AcademyDetailPage({ params }: { params: { slug: string }
               </div>
             </CardContent>
           </Card>
+        </div>
+
+        <div className="mt-6">
+          <LocationMap
+            lat={academy.location.lat}
+            lng={academy.location.lng}
+            label={academy.name}
+          />
         </div>
 
         {academyCoaches.length > 0 && (
