@@ -142,6 +142,52 @@ export default function CoachDetailPage({ params }: { params: { slug: string } }
             </Link>
           </div>
         )}
+
+        {/* Achievements */}
+        <div className="mt-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>Achievements</CardTitle>
+              <CardDescription>Certifications, awards, and career milestones</CardDescription>
+            </CardHeader>
+            <CardContent className="flex flex-col gap-4">
+              {coach.certifications.length > 0 && (
+                <div>
+                  <h3 className="text-sm font-semibold text-foreground mb-2">Certifications</h3>
+                  <ul className="space-y-2">
+                    {coach.certifications.map((cert, i) => (
+                      <li key={i} className="flex items-start gap-2 text-sm text-muted-foreground">
+                        <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-primary/60" />
+                        <div>
+                          <span className="text-foreground font-medium">{cert.name}</span>
+                          <span className="ml-1">— {cert.issuer} ({cert.year})</span>
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              <div>
+                <h3 className="text-sm font-semibold text-foreground mb-2">Experience Milestones</h3>
+                <div className="rounded-lg bg-muted px-3 py-2 text-sm">
+                  <span className="font-semibold">{coach.experienceYears}+ years</span>
+                  <span className="text-muted-foreground ml-1">of coaching experience</span>
+                </div>
+              </div>
+
+              <div>
+                <h3 className="text-sm font-semibold text-foreground mb-2">Awards</h3>
+                <p className="text-sm text-muted-foreground">No achievements available yet</p>
+              </div>
+
+              <div>
+                <h3 className="text-sm font-semibold text-foreground mb-2">Athletes Trained</h3>
+                <p className="text-sm text-muted-foreground">No achievements available yet</p>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
       </Container>
     </Section>
   );

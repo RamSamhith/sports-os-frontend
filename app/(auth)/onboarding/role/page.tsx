@@ -91,13 +91,14 @@ const footerVariants = {
 export default function RoleSelectionPage() {
   const reduced = useReducedMotion();
   const router = useRouter();
-  const { isAuthenticated, isLoading, setRole } = useAuth();
+  const { isAuthenticated, isLoading, verified, setRole } = useAuth();
   const [selected, setSelected] = useState<Role | null>(null);
 
   useEffect(() => {
     if (isLoading) return;
     if (!isAuthenticated) router.replace('/login');
-  }, [isLoading, isAuthenticated, router]);
+    else if (!verified) router.replace('/verify/method');
+  }, [isLoading, isAuthenticated, verified, router]);
 
   function handleSelect(role: Role) {
     setSelected(role);

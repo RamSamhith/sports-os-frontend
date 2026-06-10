@@ -159,8 +159,8 @@ function matchSports(itemSports: string[], interests: string[]): number {
   const interestSlugs = interests.map(slugify)
   let score = 0
   for (const sport of itemSports) {
-    const sportLower = toLower(sport)
-    if (interestSlugs.some((s) => sportLower.includes(s) || s.includes(sportLower))) {
+    const sportSlug = slugify(sport)
+    if (interestSlugs.includes(sportSlug)) {
       score += SPORT_WEIGHT
     }
   }

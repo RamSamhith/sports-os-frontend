@@ -126,7 +126,7 @@ export default function VerifySignupPage() {
         // ignore
       }
     }
-    router.push('/verify/method');
+    router.push('/register');
   }
 
   const screenVariants = {

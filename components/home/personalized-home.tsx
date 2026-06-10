@@ -20,23 +20,28 @@ const USER_LAT = 12.9716
 const USER_LNG = 77.5946
 
 export function PersonalizedHome() {
-  const { data: onboarding, completed } = useOnboarding()
+  const { data: onboarding, completed, hydrated } = useOnboarding()
   const { recentAcademies, recentCoaches } = useRecentlyViewed()
   const { selectedAcademyId } = useAcademySelection()
 
-  const suggestedAcademies = useMemo(
-    () => getSuggestedAcademies(academies, onboarding, USER_LAT, USER_LNG, 6),
-    [onboarding]
+  const suggestions = useMemo(
+    () => {
+      if (!onboarding || !completed) {
+        return { academies: { primary: [], fallback: [], hasExactMatch: false }, coaches: { primary: [], fallback: [], hasExactMatch: false } }
+      }
+      return {
+        academies: getSuggestedAcademies(academies, onboarding, USER_LAT, USER_LNG, 6),
+        coaches: getSuggestedCoaches(coaches, onboarding, USER_LAT, USER_LNG, 4),
+      }
+    },
+    [onboarding, completed]
   )
+
+  const { academies: suggestedAcademies, coaches: suggestedCoaches } = suggestions
 
   const academyCoaches = useMemo(
     () => selectedAcademyId ? coaches.filter((c) => c.academyId === selectedAcademyId) : [],
     [selectedAcademyId]
-  )
-
-  const suggestedCoaches = useMemo(
-    () => getSuggestedCoaches(coaches, onboarding, USER_LAT, USER_LNG, 4),
-    [onboarding]
   )
 
   // Debug audit: log matching source and results
@@ -46,20 +51,19 @@ export function PersonalizedHome() {
     }
   }, [completed, onboarding])
 
-  if (!completed || !onboarding) return null
+  if (!hydrated || !completed || !onboarding) return null
 
   const lastAcademy = recentAcademies[0]
   const lastCoach = recentCoaches[0]
   const showContinueExploring = lastAcademy || lastCoach
   const showRecentlyViewed = recentAcademies.length > 0 || recentCoaches.length > 0
 
-  const allSuggestedAcademies = [...suggestedAcademies.primary, ...suggestedAcademies.fallback]
-  const allSuggestedCoaches = [...suggestedCoaches.primary, ...suggestedCoaches.fallback]
-
   const hasContent =
-    allSuggestedAcademies.length > 0 ||
+    suggestedAcademies.primary.length > 0 ||
+    suggestedAcademies.fallback.length > 0 ||
     academyCoaches.length > 0 ||
-    allSuggestedCoaches.length > 0 ||
+    suggestedCoaches.primary.length > 0 ||
+    suggestedCoaches.fallback.length > 0 ||
     showContinueExploring ||
     showRecentlyViewed
 
@@ -73,18 +77,32 @@ export function PersonalizedHome() {
         </Container>
       </Section>
 
-      <Section>
-        <Container size="lg">
-          <MatchingExplanation />
-        </Container>
-      </Section>
+      {suggestedAcademies.hasExactMatch && (
+        <Section>
+          <Container size="lg">
+            <MatchingExplanation />
+          </Container>
+        </Section>
+      )}
 
-      {allSuggestedAcademies.length > 0 && (
+      {suggestedAcademies.primary.length > 0 && (
         <Section>
           <Container size="lg">
             <SuggestedAcademies
-              academies={allSuggestedAcademies}
+              academies={suggestedAcademies.primary}
               title="Recommended For You"
+              viewAllHref="/academies"
+            />
+          </Container>
+        </Section>
+      )}
+
+      {!suggestedAcademies.hasExactMatch && suggestedAcademies.fallback.length > 0 && (
+        <Section>
+          <Container size="lg">
+            <SuggestedAcademies
+              academies={suggestedAcademies.fallback}
+              title="Popular in Your Area"
               viewAllHref="/academies"
             />
           </Container>
@@ -102,12 +120,24 @@ export function PersonalizedHome() {
         </Section>
       )}
 
-      {!selectedAcademyId && allSuggestedCoaches.length > 0 && (
+      {!selectedAcademyId && suggestedCoaches.primary.length > 0 && (
         <Section>
           <Container size="lg">
             <SuggestedCoaches
-              coaches={allSuggestedCoaches}
+              coaches={suggestedCoaches.primary}
               title="Coaches For You"
+              viewAllHref="/coaches"
+            />
+          </Container>
+        </Section>
+      )}
+
+      {!selectedAcademyId && !suggestedCoaches.hasExactMatch && suggestedCoaches.fallback.length > 0 && (
+        <Section>
+          <Container size="lg">
+            <SuggestedCoaches
+              coaches={suggestedCoaches.fallback}
+              title="Coaches in Your Area"
               viewAllHref="/coaches"
             />
           </Container>

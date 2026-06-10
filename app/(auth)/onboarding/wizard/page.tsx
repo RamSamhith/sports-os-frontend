@@ -35,7 +35,7 @@ export default function OnboardingWizardPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const isEdit = searchParams.get('edit') === 'true';
-  const { isAuthenticated, isLoading, role, completeOnboarding: markAuthComplete } = useAuth();
+  const { isAuthenticated, isLoading, role, verified, completeOnboarding: markAuthComplete } = useAuth();
   const { completed, athleteData, parentData, completeOnboarding, updateOnboardingData, hydrated } = useOnboarding();
   const { children, addChild } = useChildren();
   const isParent = role === 'parent';
@@ -76,12 +76,14 @@ export default function OnboardingWizardPage() {
     if (isLoading) return;
     if (!isAuthenticated) {
       router.replace('/login');
+    } else if (!verified) {
+      router.replace('/verify/method');
     } else if (!role) {
       router.replace('/onboarding/role');
     } else if (completed && !isEdit) {
       router.replace('/');
     }
-  }, [isLoading, isAuthenticated, role, completed, isEdit, router]);
+  }, [isLoading, isAuthenticated, verified, role, completed, isEdit, router]);
 
   const canNext = useCallback(() => {
     if (isParent) {
