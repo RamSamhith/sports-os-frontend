@@ -2,10 +2,11 @@
 
 import Link from 'next/link'
 import { useAcademySelection } from '@/lib/hooks/use-academy-selection'
+import { useAcademyStatus } from '@/lib/hooks/use-academy-status'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { MapPin, Star, Shield, ExternalLink, X } from 'lucide-react'
+import { MapPin, Star, Shield, X } from 'lucide-react'
 
 interface MyAcademyCardProps {
   academies: Array<{
@@ -19,8 +20,15 @@ interface MyAcademyCardProps {
   }>
 }
 
+const statusColors: Record<string, string> = {
+  interested: 'bg-pink-100 text-pink-700',
+  shortlisted: 'bg-blue-100 text-blue-700',
+  selected: 'bg-green-100 text-green-700',
+}
+
 export function MyAcademyCard({ academies }: MyAcademyCardProps) {
   const { selectedAcademyId, clearSelection } = useAcademySelection()
+  const { getStatus } = useAcademyStatus()
 
   if (!selectedAcademyId) return null
 
@@ -32,11 +40,20 @@ export function MyAcademyCard({ academies }: MyAcademyCardProps) {
       ? academy.rating
       : academy.rating?.average ?? 0
 
+  const status = getStatus(academy.id)
+
   return (
     <Card>
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between">
-          <CardTitle className="text-base">My Academy</CardTitle>
+          <div className="flex items-center gap-2">
+            <CardTitle className="text-base">My Academy</CardTitle>
+            {status && (
+              <Badge variant="secondary" className={`text-[10px] capitalize ${statusColors[status] ?? ''}`}>
+                {status}
+              </Badge>
+            )}
+          </div>
           <Button
             variant="ghost"
             size="sm"
@@ -85,7 +102,7 @@ export function MyAcademyCard({ academies }: MyAcademyCardProps) {
             </Link>
           </Button>
           <Button size="sm" variant="outline" asChild>
-            <Link href={`/academies/${academy.slug}#enquire`}>
+            <Link href={`/enquiry/academy/${academy.slug}`}>
               Enquire
             </Link>
           </Button>

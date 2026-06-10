@@ -10,6 +10,7 @@ import { SuggestedAcademies } from './suggested-academies'
 import { SuggestedCoaches } from './suggested-coaches'
 import { RecentlyViewed } from './recently-viewed'
 import { ContinueExploring } from './continue-exploring'
+import { YourAcademy } from './your-academy'
 import { Section } from '@/components/layout/section'
 import { Container } from '@/components/layout/container'
 
@@ -40,6 +41,12 @@ export function PersonalizedHome() {
 
   return (
     <div className="space-y-0">
+      <Section>
+        <Container size="lg">
+          <YourAcademy />
+        </Container>
+      </Section>
+
       <Section>
         <Container size="lg">
           <MatchingExplanation />

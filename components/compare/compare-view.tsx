@@ -212,6 +212,26 @@ function CompareCard({ slot, onRemove }: { slot: Entity; onRemove: () => void })
             <span className="text-muted-foreground">({(entity as Coach).rating.count})</span>
           </div>
         ) : null}
+        {kind === 'academy' && (
+          <div className="flex gap-2 pt-1">
+            <Button size="sm" variant="default" asChild className="h-7 text-xs">
+              <Link href={href}>View Details</Link>
+            </Button>
+            <Button size="sm" variant="outline" asChild className="h-7 text-xs">
+              <Link href={`/enquiry/academy/${(entity as Academy).slug}`}>Enquire Now</Link>
+            </Button>
+          </div>
+        )}
+        {kind === 'coach' && (
+          <div className="flex gap-2 pt-1">
+            <Button size="sm" variant="default" asChild className="h-7 text-xs">
+              <Link href={href}>View Coach</Link>
+            </Button>
+            <Button size="sm" variant="outline" asChild className="h-7 text-xs">
+              <Link href={`/enquiry/coach/${(entity as Coach).slug}`}>Enquire Now</Link>
+            </Button>
+          </div>
+        )}
       </CardContent>
     </Card>
   );

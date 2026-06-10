@@ -7,6 +7,9 @@ import { Button } from '@/components/ui/button';
 import { ShortlistToggle } from '@/components/shortlist/shortlist-toggle';
 import { CompareButton } from '@/components/academies/compare-button';
 import { SelectAcademyButton } from '@/components/academy/select-academy-button';
+import { AcademyStatusButton } from '@/components/academy/academy-status-button';
+import { CoachesAtAcademy } from '@/components/academy/coaches-at-academy';
+import { AcademyInfo } from '@/components/academy/academy-info';
 import { VerifiedBadge } from '@/components/trust/verified-badge';
 import { LastUpdated } from '@/components/trust/last-updated';
 import { CertificationIndicator } from '@/components/trust/certification-indicator';
@@ -14,8 +17,10 @@ import { ImageWithFallback } from '@/components/ui/image-with-fallback';
 import { fixtureImages } from '@/lib/images';
 import { notFound } from 'next/navigation';
 import { academyBySlug, academies } from '@/data/academies';
+import { coaches } from '@/data/coaches';
 import { siteConfig } from '@/config/site';
 import Link from 'next/link';
+import { Globe, Mail, Phone } from 'lucide-react';
 
 export function generateStaticParams() {
   return academies.map((academy) => ({ slug: academy.slug }));
@@ -54,6 +59,8 @@ export function generateMetadata({ params }: { params: { slug: string } }): Meta
 export default function AcademyDetailPage({ params }: { params: { slug: string } }) {
   const academy = academyBySlug(params.slug);
   if (!academy) notFound();
+
+  const academyCoaches = coaches.filter((c) => c.academyId === academy.id);
 
   return (
     <Section>
@@ -114,9 +121,70 @@ export default function AcademyDetailPage({ params }: { params: { slug: string }
                 academyId={academy.id}
                 academyName={academy.name}
               />
+              <AcademyStatusButton academyId={academy.id} />
             </div>
           </CardContent>
         </Card>
+
+        <div className="mt-6 grid gap-6 md:grid-cols-2">
+          <Card>
+            <CardContent className="p-4">
+              <AcademyInfo
+                address={academy.location.address}
+                city={academy.location.city}
+                state={academy.location.state}
+                country={academy.location.country}
+                sportsOffered={academy.sportsOffered}
+                website={academy.contact.website}
+              />
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardContent className="p-4">
+              <div className="space-y-3">
+                <h2 className="text-lg font-semibold text-foreground">Contact</h2>
+                <div className="grid gap-2 text-sm">
+                  {academy.contact.phone && (
+                    <div className="flex items-center gap-2">
+                      <Phone className="h-4 w-4 shrink-0 text-muted-foreground" />
+                      <a href={`tel:${academy.contact.phone}`} className="text-primary hover:underline">
+                        {academy.contact.phone}
+                      </a>
+                    </div>
+                  )}
+                  {academy.contact.email && (
+                    <div className="flex items-center gap-2">
+                      <Mail className="h-4 w-4 shrink-0 text-muted-foreground" />
+                      <a href={`mailto:${academy.contact.email}`} className="text-primary hover:underline line-clamp-1">
+                        {academy.contact.email}
+                      </a>
+                    </div>
+                  )}
+                  {academy.contact.website && (
+                    <div className="flex items-center gap-2">
+                      <Globe className="h-4 w-4 shrink-0 text-muted-foreground" />
+                      <a
+                        href={academy.contact.website}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-primary hover:underline line-clamp-1"
+                      >
+                        {academy.contact.website.replace(/^https?:\/\//, '')}
+                      </a>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {academyCoaches.length > 0 && (
+          <div className="mt-6">
+            <CoachesAtAcademy coaches={academyCoaches} academyName={academy.name} />
+          </div>
+        )}
       </Container>
     </Section>
   );
