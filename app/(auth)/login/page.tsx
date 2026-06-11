@@ -1,7 +1,7 @@
 'use client';
 
 import { motion, useReducedMotion } from 'framer-motion';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -36,10 +36,15 @@ export default function LoginPage() {
   const [errors, setErrors] = useState<FieldErrors>({});
   const [touched, setTouched] = useState<Record<string, boolean>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const justLoggedIn = useRef(false);
 
   // Redirect authenticated users based on onboarding state
   useEffect(() => {
     if (isLoading) return;
+    if (justLoggedIn.current) {
+      justLoggedIn.current = false;
+      return;
+    }
     if (isAuthenticated) {
       if (!verified) router.replace('/verify/method');
       else if (!onboardingCompleted) router.replace('/onboarding/role');
@@ -123,6 +128,7 @@ export default function LoginPage() {
     setIsSubmitting(true);
     // Placeholder: real authentication wiring lives in a later phase
     await new Promise((r) => setTimeout(r, 1200));
+    justLoggedIn.current = true;
     setAuth(true);
     setIsSubmitting(false);
     if (!verified) router.push('/verify/method');

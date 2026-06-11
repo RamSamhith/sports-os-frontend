@@ -1,7 +1,7 @@
 'use client';
 
 import { motion, useReducedMotion } from 'framer-motion';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -44,6 +44,7 @@ export default function RegisterPage() {
   const [errors, setErrors] = useState<FieldErrors>({});
   const [touched, setTouched] = useState<Record<string, boolean>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const justRegistered = useRef(false);
 
   // Restore signup draft when returning from OTP verification or edit flow
   useEffect(() => {
@@ -64,9 +65,16 @@ export default function RegisterPage() {
   }, []);
 
   // Redirect authenticated users based on onboarding state
-  // Skip redirect if coming from "Edit phone or email" flow in verification
+  // Skip if registration just happened (handler already navigated via setAuth → re-render)
+  // Skip if coming from "Edit phone or email" flow in verification
   useEffect(() => {
     if (isLoading) return;
+    // When registration handler triggers setAuth, this effect fires.
+    // We let the handler's downstream effect handle navigation instead.
+    if (justRegistered.current) {
+      justRegistered.current = false;
+      return;
+    }
     if (isAuthenticated) {
       const isEditing = typeof window !== 'undefined' && sessionStorage.getItem('sportsos:editing-contact') === 'true';
       if (isEditing) {
@@ -193,6 +201,8 @@ export default function RegisterPage() {
     // Placeholder: real registration wiring lives in a later phase
     await new Promise((r) => setTimeout(r, 1500));
     setProfile({ name: name.trim(), email: email.trim(), phone: phone.trim() });
+    // Set flag BEFORE setAuth so the effect sees it and skips the conflicting redirect
+    justRegistered.current = true;
     setAuth(true);
     setIsSubmitting(false);
     // Save draft so "Edit phone/email" can restore form state
