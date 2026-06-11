@@ -1,7 +1,7 @@
 'use client';
 
 import { motion, useReducedMotion } from 'framer-motion';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -36,19 +36,23 @@ export default function LoginPage() {
   const [errors, setErrors] = useState<FieldErrors>({});
   const [touched, setTouched] = useState<Record<string, boolean>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const justLoggedIn = useRef(false);
 
-  // Redirect authenticated users based on onboarding state
+  // Debug: log mount
+  useEffect(() => {
+    console.log('[AUTH DEBUG] LoginPage mounted');
+    return () => console.log('[AUTH DEBUG] LoginPage unmounted');
+  }, []);
+
+  // Redirect fully onboarded users away from login page.
+  // For all other cases, the handleSubmit is the sole navigation source.
   useEffect(() => {
     if (isLoading) return;
-    if (justLoggedIn.current) {
-      justLoggedIn.current = false;
-      return;
-    }
     if (isAuthenticated) {
-      if (!verified) router.replace('/verify/method');
-      else if (!onboardingCompleted) router.replace('/onboarding/role');
-      else router.replace('/');
+      console.log('[AUTH DEBUG] LoginPage effect: isAuthenticated=true, verified:', verified, 'onboardingCompleted:', onboardingCompleted);
+      if (verified && onboardingCompleted) {
+        console.log('[AUTH DEBUG] LoginPage: fully onboarded, redirecting to /');
+        router.replace('/');
+      }
     }
   }, [isLoading, isAuthenticated, verified, onboardingCompleted, router]);
 
@@ -128,7 +132,7 @@ export default function LoginPage() {
     setIsSubmitting(true);
     // Placeholder: real authentication wiring lives in a later phase
     await new Promise((r) => setTimeout(r, 1200));
-    justLoggedIn.current = true;
+    console.log('[AUTH DEBUG] LoginPage handleSubmit: setting auth=true');
     setAuth(true);
     setIsSubmitting(false);
     if (!verified) router.push('/verify/method');

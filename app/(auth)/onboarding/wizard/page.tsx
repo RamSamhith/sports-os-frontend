@@ -73,14 +73,24 @@ export default function OnboardingWizardPage() {
   const steps = isParent ? PARENT_STEPS : ATHLETE_STEPS;
 
   useEffect(() => {
+    console.log('[AUTH DEBUG] OnboardingWizardPage mounted');
+    return () => console.log('[AUTH DEBUG] OnboardingWizardPage unmounted');
+  }, []);
+
+  useEffect(() => {
     if (isLoading) return;
+    console.log('[AUTH DEBUG] OnboardingWizardPage effect running. isAuthenticated:', isAuthenticated, 'verified:', verified, 'role:', role, 'completed:', completed);
     if (!isAuthenticated) {
+      console.log('[AUTH DEBUG] OnboardingWizardPage: not authenticated, redirect to /login');
       router.replace('/login');
     } else if (!verified) {
+      console.log('[AUTH DEBUG] OnboardingWizardPage: not verified, redirect to /verify/method');
       router.replace('/verify/method');
     } else if (!role) {
+      console.log('[AUTH DEBUG] OnboardingWizardPage: no role, redirect to /onboarding/role');
       router.replace('/onboarding/role');
     } else if (completed && !isEdit) {
+      console.log('[AUTH DEBUG] OnboardingWizardPage: already completed, redirect to /');
       router.replace('/');
     }
   }, [isLoading, isAuthenticated, verified, role, completed, isEdit, router]);
@@ -144,10 +154,12 @@ export default function OnboardingWizardPage() {
 
     if (isEdit) {
       updateOnboardingData(data);
+      console.log('[AUTH DEBUG] OnboardingWizardPage: edit complete, navigating to /profile/personal');
       router.push('/profile/personal');
     } else {
       completeOnboarding(data);
       markAuthComplete();
+      console.log('[AUTH DEBUG] OnboardingWizardPage: onboarding complete, data:', JSON.stringify(data));
       // Auto-create child from onboarding data for parent role
       if (isParent && data.parent && children.length === 0) {
         addChild({
@@ -156,8 +168,10 @@ export default function OnboardingWizardPage() {
           sport: data.parent.sportInterests[0] ?? '',
           skillLevel: data.parent.skillLevel,
         });
+        console.log('[AUTH DEBUG] OnboardingWizardPage: auto-created child');
       }
       // Redirect to homepage for immediate personalization
+      console.log('[AUTH DEBUG] OnboardingWizardPage: navigating to /');
       router.push('/');
     }
   }

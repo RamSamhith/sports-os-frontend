@@ -25,14 +25,14 @@ const methodConfig: Record<OtpMethod, { title: string; description: string; rese
     icon: Mail,
   },
   sms: {
-    title: 'Verify Your Phone Number',
-    description: 'We sent a 6-digit verification code to',
+    title: 'Verify Your Phone',
+    description: 'We sent a 6-digit verification code via SMS to',
     resendText: 'Resend SMS Code',
     icon: Smartphone,
   },
   whatsapp: {
-    title: 'Verify Your WhatsApp Number',
-    description: 'We sent a 6-digit verification code to',
+    title: 'Verify WhatsApp',
+    description: 'We sent a 6-digit verification code via WhatsApp to',
     resendText: 'Resend WhatsApp Code',
     icon: MessageCircle,
   },
@@ -50,31 +50,34 @@ export default function VerifySignupPage() {
   const [destination, setDestination] = useState('');
 
   useEffect(() => {
+    console.log('[AUTH DEBUG] VerifySignupPage mounted');
     if (typeof window !== 'undefined') {
       const method = sessionStorage.getItem('sportsos:otp-method') as OtpMethod | null;
       const dest = sessionStorage.getItem('sportsos:otp-destination');
+      console.log('[AUTH DEBUG] VerifySignupPage: loaded method:', method, 'destination:', dest);
       if (method && methodConfig[method]) {
         setOtpMethod(method);
       }
       if (dest) {
         setDestination(dest);
-      } else {
-        // Fallback: compute destination from profile
-        const fallbackMethod = method || 'email';
-        if (fallbackMethod === 'email') {
-          setDestination(profile?.email || 'your email');
-        } else {
-          setDestination(profile?.phone || 'your number');
-        }
       }
     }
-  }, [profile]);
+    return () => console.log('[AUTH DEBUG] VerifySignupPage unmounted');
+  }, []);
 
   useEffect(() => {
     if (isLoading) return;
-    if (!isAuthenticated) router.replace('/verify/method');
-    else if (authVerified && onboardingCompleted) router.replace('/');
-    else if (authVerified) router.replace('/onboarding/role');
+    console.log('[AUTH DEBUG] VerifySignupPage effect running. isAuthenticated:', isAuthenticated, 'authVerified:', authVerified);
+    if (!isAuthenticated) {
+      console.log('[AUTH DEBUG] VerifySignupPage: not authenticated, redirect to /verify/method');
+      router.replace('/verify/method');
+    } else if (authVerified && onboardingCompleted) {
+      console.log('[AUTH DEBUG] VerifySignupPage: verified+onboarded, redirect to /');
+      router.replace('/');
+    } else if (authVerified) {
+      console.log('[AUTH DEBUG] VerifySignupPage: verified, redirect to /onboarding/role');
+      router.replace('/onboarding/role');
+    }
   }, [isLoading, isAuthenticated, authVerified, onboardingCompleted, router]);
 
   useEffect(() => {
@@ -88,6 +91,7 @@ export default function VerifySignupPage() {
     setError('');
     await new Promise((r) => setTimeout(r, 1200));
     if (code === CODE) {
+      console.log('[AUTH DEBUG] VerifySignupPage: OTP correct, setting verified=true');
       try {
         sessionStorage.removeItem(DRAFT_KEY);
       } catch {
@@ -114,6 +118,7 @@ export default function VerifySignupPage() {
   }
 
   function handleEditContact() {
+    console.log('[AUTH DEBUG] VerifySignupPage: edit contact clicked, navigating to /register');
     // Save current form data to draft before navigating
     if (profile?.name || profile?.email || profile?.phone) {
       try {
@@ -126,7 +131,6 @@ export default function VerifySignupPage() {
         // ignore
       }
     }
-    // Set flag to suppress auth redirect in register page
     try {
       sessionStorage.setItem('sportsos:editing-contact', 'true');
     } catch {

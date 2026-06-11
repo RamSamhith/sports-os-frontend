@@ -1,12 +1,15 @@
 'use client'
 
 import { useMemo, useEffect } from 'react'
+import { useAuth } from '@/lib/hooks/use-auth'
 import { useOnboarding } from '@/lib/hooks/use-onboarding'
+import { useChildren } from '@/lib/hooks/use-children'
 import { useRecentlyViewed } from '@/lib/hooks/use-recently-viewed'
 import { useAcademySelection } from '@/lib/hooks/use-academy-selection'
 import { getSuggestedAcademies, getSuggestedCoaches, logMatchingAudit } from '@/lib/utils/matching'
 import { academies } from '@/data/academies'
 import { coaches } from '@/data/coaches'
+import type { OnboardingData, SkillLevel } from '@/lib/hooks/use-onboarding'
 import { MatchingExplanation } from './matching-explanation'
 import { SuggestedAcademies } from './suggested-academies'
 import { SuggestedCoaches } from './suggested-coaches'
@@ -20,21 +23,38 @@ const USER_LAT = 12.9716
 const USER_LNG = 77.5946
 
 export function PersonalizedHome() {
+  const { role } = useAuth()
   const { data: onboarding, completed, hydrated } = useOnboarding()
+  const { activeChild } = useChildren()
   const { recentAcademies, recentCoaches } = useRecentlyViewed()
   const { selectedAcademyId } = useAcademySelection()
 
+  // For parent role, merge active child data into onboarding for recommendations
+  const effectiveOnboarding = useMemo<OnboardingData | null>(() => {
+    if (!onboarding || !completed) return null
+    if (role !== 'parent' || !activeChild || !onboarding.parent) return onboarding
+    return {
+      parent: {
+        ...onboarding.parent,
+        childName: activeChild.name,
+        childAge: activeChild.age,
+        sportInterests: [activeChild.sport],
+        skillLevel: (activeChild.skillLevel as SkillLevel) ?? onboarding.parent.skillLevel,
+      },
+    }
+  }, [onboarding, completed, role, activeChild])
+
   const suggestions = useMemo(
     () => {
-      if (!onboarding || !completed) {
+      if (!effectiveOnboarding) {
         return { academies: { primary: [], fallback: [], hasExactMatch: false }, coaches: { primary: [], fallback: [], hasExactMatch: false } }
       }
       return {
-        academies: getSuggestedAcademies(academies, onboarding, USER_LAT, USER_LNG, 6),
-        coaches: getSuggestedCoaches(coaches, onboarding, USER_LAT, USER_LNG, 4),
+        academies: getSuggestedAcademies(academies, effectiveOnboarding, USER_LAT, USER_LNG, 6),
+        coaches: getSuggestedCoaches(coaches, effectiveOnboarding, USER_LAT, USER_LNG, 4),
       }
     },
-    [onboarding, completed]
+    [effectiveOnboarding]
   )
 
   const { academies: suggestedAcademies, coaches: suggestedCoaches } = suggestions
@@ -46,12 +66,14 @@ export function PersonalizedHome() {
 
   // Debug audit: log matching source and results
   useEffect(() => {
-    if (completed && onboarding) {
-      logMatchingAudit(onboarding, academies, coaches)
+    if (completed && effectiveOnboarding) {
+      const source = role === 'parent' && activeChild ? 'activeChild' : 'onboarding'
+      console.log('[PERSONALIZE] Using source:', source, 'onboarding:', effectiveOnboarding)
+      logMatchingAudit(effectiveOnboarding, academies, coaches)
     }
-  }, [completed, onboarding])
+  }, [completed, effectiveOnboarding, role, activeChild])
 
-  if (!hydrated || !completed || !onboarding) return null
+  if (!hydrated || !completed || !effectiveOnboarding) return null
 
   const lastAcademy = recentAcademies[0]
   const lastCoach = recentCoaches[0]

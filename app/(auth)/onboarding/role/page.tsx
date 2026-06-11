@@ -95,9 +95,20 @@ export default function RoleSelectionPage() {
   const [selected, setSelected] = useState<Role | null>(null);
 
   useEffect(() => {
+    console.log('[AUTH DEBUG] RoleSelectionPage mounted');
+    return () => console.log('[AUTH DEBUG] RoleSelectionPage unmounted');
+  }, []);
+
+  useEffect(() => {
     if (isLoading) return;
-    if (!isAuthenticated) router.replace('/login');
-    else if (!verified) router.replace('/verify/method');
+    console.log('[AUTH DEBUG] RoleSelectionPage effect: isAuthenticated:', isAuthenticated, 'verified:', verified);
+    if (!isAuthenticated) {
+      console.log('[AUTH DEBUG] RoleSelectionPage: not authenticated, redirect to /login');
+      router.replace('/login');
+    } else if (!verified) {
+      console.log('[AUTH DEBUG] RoleSelectionPage: not verified, redirect to /verify/method');
+      router.replace('/verify/method');
+    }
   }, [isLoading, isAuthenticated, verified, router]);
 
   function handleSelect(role: Role) {
@@ -113,6 +124,7 @@ export default function RoleSelectionPage() {
 
   function handleContinue() {
     if (!selected) return;
+    console.log('[AUTH DEBUG] RoleSelectionPage: role selected:', selected, 'navigating to /onboarding/wizard');
     setRole(selected);
     router.push('/onboarding/wizard');
   }
