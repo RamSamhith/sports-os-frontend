@@ -386,7 +386,7 @@ function RegisterView({
   custom?: number;
   variants?: Variants;
 }) {
-  const { setAuth, setProfile } = useAuth();
+  const { setAuth, setProfile, isAuthenticated, verified, onboardingCompleted, isLoading } = useAuth();
   const router = useRouter();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -396,6 +396,29 @@ function RegisterView({
   const [errors, setErrors] = useState<FieldErrors>({});
   const [touched, setTouched] = useState<Record<string, boolean>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Navigate after auth state change (fresh registration)
+  // The handler only navigates for edit flow — this effect handles everything else
+  useEffect(() => {
+    if (isLoading) return;
+    if (isAuthenticated) {
+      const isEditing = typeof window !== 'undefined' && sessionStorage.getItem('sportsos:editing-contact') === 'true';
+      if (isEditing) {
+        sessionStorage.removeItem('sportsos:editing-contact');
+        return;
+      }
+      if (!verified) {
+        router.push('/verify/method');
+        return;
+      }
+      if (!onboardingCompleted) {
+        router.push('/onboarding/role');
+        return;
+      }
+      onSuccess();
+      router.push('/');
+    }
+  }, [isLoading, isAuthenticated, verified, onboardingCompleted, router, onSuccess]);
 
   function validate(): FieldErrors {
     const e: FieldErrors = {};
@@ -483,9 +506,14 @@ function RegisterView({
     setIsSubmitting(true);
     await new Promise((r) => setTimeout(r, 1500));
     setProfile({ name: name.trim(), email: email.trim(), phone: phone.trim() });
+    const wasAuthenticated = isAuthenticated;
     setAuth(true);
     setIsSubmitting(false);
-    router.push('/verify/signup');
+    // Handler navigates ONLY for edit flow.
+    // For fresh registration, the effect handles navigation after setAuth.
+    if (wasAuthenticated) {
+      router.push('/verify/method');
+    }
   }
 
   const errorId = (f: string) => `modal-register-${f}-error`;

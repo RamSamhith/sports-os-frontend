@@ -69,18 +69,33 @@ export default function RegisterPage() {
     return () => console.log('[AUTH DEBUG] RegisterPage unmounted');
   }, []);
 
-  // Redirect fully onboarded users away from register page.
-  // For all other cases (fresh registration, edit flow), the handleSubmit
-  // is the sole navigation source — no dual-navigation conflict.
+  // SOLE navigation source for fresh registration and returning users.
+  // The handler only navigates for edit flow (where setAuth is a no-op and
+  // the effect does NOT fire because auth deps don't change).
+  // NEVER put a router.push/replace in both the handler and this effect.
   useEffect(() => {
     if (isLoading) return;
     if (isAuthenticated) {
       console.log('[AUTH DEBUG] RegisterPage effect: isAuthenticated=true, verified:', verified, 'onboardingCompleted:', onboardingCompleted);
-      if (verified && onboardingCompleted) {
-        console.log('[AUTH DEBUG] RegisterPage: fully onboarded, redirecting to /');
-        router.replace('/');
+      // Edit flow: user came from verify/signup → suppress redirect
+      const isEditing = typeof window !== 'undefined' && sessionStorage.getItem('sportsos:editing-contact') === 'true';
+      if (isEditing) {
+        console.log('[AUTH DEBUG] RegisterPage effect: edit flow detected, suppressing redirect');
+        sessionStorage.removeItem('sportsos:editing-contact');
+        return;
       }
-      // Do NOT redirect for !verified — handler navigates to /verify/method
+      if (!verified) {
+        console.log('[AUTH DEBUG] RegisterPage effect: not verified, navigating to /verify/method');
+        router.replace('/verify/method');
+        return;
+      }
+      if (!onboardingCompleted) {
+        console.log('[AUTH DEBUG] RegisterPage effect: onboarding not complete, navigating to /onboarding/role');
+        router.replace('/onboarding/role');
+        return;
+      }
+      console.log('[AUTH DEBUG] RegisterPage effect: fully onboarded, navigating to /');
+      router.replace('/');
     }
   }, [isLoading, isAuthenticated, verified, onboardingCompleted, router]);
 
@@ -198,7 +213,8 @@ export default function RegisterPage() {
     // Placeholder: real registration wiring lives in a later phase
     await new Promise((r) => setTimeout(r, 1500));
     setProfile({ name: name.trim(), email: email.trim(), phone: phone.trim() });
-    console.log('[AUTH DEBUG] RegisterPage handleSubmit: setting auth=true, navigating to /verify/method');
+    const wasAuthenticated = isAuthenticated;
+    console.log('[AUTH DEBUG] RegisterPage handleSubmit: wasAuthenticated:', wasAuthenticated, 'setting auth=true');
     setAuth(true);
     setIsSubmitting(false);
     // Save draft so "Edit phone/email" can restore form state
@@ -211,7 +227,13 @@ export default function RegisterPage() {
     } catch {
       // ignore
     }
-    router.push('/verify/method');
+    // Handler navigates ONLY for edit flow (wasAuthenticated was true).
+    // For fresh registration (wasAuthenticated was false), the effect handles
+    // navigation after setAuth triggers a re-render with isAuthenticated=true.
+    if (wasAuthenticated) {
+      console.log('[AUTH DEBUG] RegisterPage handleSubmit: edit flow, navigating to /verify/method');
+      router.push('/verify/method');
+    }
   }
 
   const errorId = (field: string) => `register-${field}-error`;
