@@ -1,1 +1,10 @@
 export * from './client';
+export { register, login, sendOtp, verifyOtp, logout } from './auth';
+export * from './users';
+export * from './children';
+export * from './academies';
+export * from './coaches';
+export * from './favorites';
+export * from './enquiries';
+export * from './sports';
+export * from './recommendations';
