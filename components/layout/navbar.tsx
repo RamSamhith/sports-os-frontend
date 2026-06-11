@@ -18,6 +18,7 @@ import { LocationPicker } from '@/components/location/location-picker';
 import { useLocation } from '@/lib/hooks/use-location';
 
 export function Navbar() {
+  console.count('Navbar');
   const pathname = usePathname();
   const [open, setOpen] = React.useState(false);
   const [locationOpen, setLocationOpen] = React.useState(false);

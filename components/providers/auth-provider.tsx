@@ -100,6 +100,7 @@ function migrateLegacyKeys(current: PersistedAuthState): PersistedAuthState {
 }
 
 export function AuthProvider({ children }: { children: ReactNode }) {
+  console.count('AuthProvider');
   const [state, setState] = useState<PersistedAuthState>({
     isAuthenticated: false,
     role: null,
@@ -134,23 +135,41 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [profile, hydrated]);
 
   const setAuth = useCallback((authenticated: boolean) => {
-    setState((prev) => ({ ...prev, isAuthenticated: authenticated }));
+    setState((prev) => {
+      if (prev.isAuthenticated === authenticated) return prev;
+      return { ...prev, isAuthenticated: authenticated };
+    });
   }, []);
 
   const setRole = useCallback((role: OnboardingRole) => {
-    setState((prev) => ({ ...prev, role }));
+    setState((prev) => {
+      if (prev.role === role) return prev;
+      return { ...prev, role };
+    });
   }, []);
 
   const completeOnboarding = useCallback(() => {
-    setState((prev) => ({ ...prev, onboardingCompleted: true }));
+    setState((prev) => {
+      if (prev.onboardingCompleted) return prev;
+      return { ...prev, onboardingCompleted: true };
+    });
   }, []);
 
   const setVerified = useCallback((verified: boolean) => {
-    setState((prev) => ({ ...prev, verified }));
+    setState((prev) => {
+      if (prev.verified === verified) return prev;
+      return { ...prev, verified };
+    });
   }, []);
 
   const setProfile = useCallback((updates: Partial<UserProfile>) => {
-    setProfileState((prev) => ({ ...prev, ...updates }));
+    setProfileState((prev) => {
+      const next = { ...prev, ...updates };
+      if (next.name === prev.name && next.email === prev.email && next.phone === prev.phone) {
+        return prev;
+      }
+      return next;
+    });
   }, []);
 
   const signOut = useCallback(() => {
