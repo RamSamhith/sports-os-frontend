@@ -64,9 +64,15 @@ export default function RegisterPage() {
   }, []);
 
   // Redirect authenticated users based on onboarding state
+  // Skip redirect if coming from "Edit phone or email" flow in verification
   useEffect(() => {
     if (isLoading) return;
     if (isAuthenticated) {
+      const isEditing = typeof window !== 'undefined' && sessionStorage.getItem('sportsos:editing-contact') === 'true';
+      if (isEditing) {
+        sessionStorage.removeItem('sportsos:editing-contact');
+        return;
+      }
       if (!verified) router.replace('/verify/method');
       else if (!onboardingCompleted) router.replace('/onboarding/role');
       else router.replace('/');

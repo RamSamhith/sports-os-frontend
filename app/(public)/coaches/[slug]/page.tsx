@@ -69,7 +69,7 @@ export default function CoachDetailPage({ params }: { params: { slug: string } }
           className="mb-4"
         />
         <Card className="overflow-hidden">
-          <div className="bg-muted/40 relative aspect-[21/9] w-full overflow-hidden">
+          <div className="bg-muted/40 relative h-48 w-full overflow-hidden md:h-56 lg:h-64 xl:h-72">
             <ImageWithFallback
               src={coach.avatar ?? fixtureImages.coaches[coach.id]}
               alt={`${coach.name} cover image`}

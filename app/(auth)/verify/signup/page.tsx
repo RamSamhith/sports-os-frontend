@@ -126,6 +126,12 @@ export default function VerifySignupPage() {
         // ignore
       }
     }
+    // Set flag to suppress auth redirect in register page
+    try {
+      sessionStorage.setItem('sportsos:editing-contact', 'true');
+    } catch {
+      // ignore
+    }
     router.push('/register');
   }
 

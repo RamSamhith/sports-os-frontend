@@ -73,7 +73,7 @@ export default function AcademyDetailPage({ params }: { params: { slug: string }
           className="mb-4"
         />
         <Card>
-          <div className="bg-muted/40 relative aspect-[21/9] w-full overflow-hidden">
+          <div className="bg-muted/40 relative h-48 w-full overflow-hidden md:h-56 lg:h-64 xl:h-72">
             <ImageWithFallback
               src={academy.coverImage ?? fixtureImages.academies[academy.id]}
               alt={`${academy.name} cover image`}
@@ -212,65 +212,76 @@ export default function AcademyDetailPage({ params }: { params: { slug: string }
               <CardDescription>Championships, awards, and notable milestones</CardDescription>
             </CardHeader>
             <CardContent className="flex flex-col gap-4">
-              {academy.achievementSignals ? (
-                <>
-                  {academy.achievementSignals.competitionParticipations.length > 0 && (
-                    <div>
-                      <h3 className="text-sm font-semibold text-foreground mb-2">Championships & Competitions</h3>
-                      <ul className="space-y-1">
-                        {academy.achievementSignals.competitionParticipations.map((comp) => (
-                          <li key={comp} className="flex items-center gap-2 text-sm text-muted-foreground">
-                            <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-primary/60" />
-                            {comp}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
-                  {academy.achievementSignals.milestones.length > 0 && (
-                    <div>
-                      <h3 className="text-sm font-semibold text-foreground mb-2">Awards & Milestones</h3>
-                      <ul className="space-y-1">
-                        {academy.achievementSignals.milestones.map((m) => (
-                          <li key={m} className="flex items-center gap-2 text-sm text-muted-foreground">
-                            <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-primary/60" />
-                            {m}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
-                  {(academy.achievementSignals.stateAthletesProduced > 0 || academy.achievementSignals.nationalAthletesProduced > 0) && (
-                    <div>
-                      <h3 className="text-sm font-semibold text-foreground mb-2">Notable Alumni</h3>
-                      <div className="flex flex-wrap gap-3">
-                        {academy.achievementSignals.stateAthletesProduced > 0 && (
-                          <div className="rounded-lg bg-muted px-3 py-2 text-sm">
-                            <span className="font-semibold">{academy.achievementSignals.stateAthletesProduced}</span>
-                            <span className="text-muted-foreground ml-1">State-level athletes produced</span>
+              {
+                (() => {
+                  const a = academy.achievementSignals
+                  const hasContent = a && (
+                    a.competitionParticipations.length > 0 ||
+                    a.milestones.length > 0 ||
+                    a.stateAthletesProduced > 0 ||
+                    a.nationalAthletesProduced > 0
+                  )
+                  return hasContent ? (
+                    <>
+                      {a!.competitionParticipations.length > 0 && (
+                        <div>
+                          <h3 className="text-sm font-semibold text-foreground mb-2">Championships & Competitions</h3>
+                          <ul className="space-y-1">
+                            {a!.competitionParticipations.map((comp) => (
+                              <li key={comp} className="flex items-center gap-2 text-sm text-muted-foreground">
+                                <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-primary/60" />
+                                {comp}
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+                      {a!.milestones.length > 0 && (
+                        <div>
+                          <h3 className="text-sm font-semibold text-foreground mb-2">Awards & Milestones</h3>
+                          <ul className="space-y-1">
+                            {a!.milestones.map((m) => (
+                              <li key={m} className="flex items-center gap-2 text-sm text-muted-foreground">
+                                <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-primary/60" />
+                                {m}
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+                      {(a!.stateAthletesProduced > 0 || a!.nationalAthletesProduced > 0) && (
+                        <div>
+                          <h3 className="text-sm font-semibold text-foreground mb-2">Notable Alumni</h3>
+                          <div className="flex flex-wrap gap-3">
+                            {a!.stateAthletesProduced > 0 && (
+                              <div className="rounded-lg bg-muted px-3 py-2 text-sm">
+                                <span className="font-semibold">{a!.stateAthletesProduced}</span>
+                                <span className="text-muted-foreground ml-1">State-level athletes produced</span>
+                              </div>
+                            )}
+                            {a!.nationalAthletesProduced > 0 && (
+                              <div className="rounded-lg bg-muted px-3 py-2 text-sm">
+                                <span className="font-semibold">{a!.nationalAthletesProduced}</span>
+                                <span className="text-muted-foreground ml-1">National-level athletes produced</span>
+                              </div>
+                            )}
                           </div>
-                        )}
-                        {academy.achievementSignals.nationalAthletesProduced > 0 && (
-                          <div className="rounded-lg bg-muted px-3 py-2 text-sm">
-                            <span className="font-semibold">{academy.achievementSignals.nationalAthletesProduced}</span>
-                            <span className="text-muted-foreground ml-1">National-level athletes produced</span>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  )}
-                  {academy.createdAt && (
-                    <div>
-                      <h3 className="text-sm font-semibold text-foreground mb-1">Years Operating</h3>
-                      <p className="text-sm text-muted-foreground">
-                        {Math.max(1, new Date().getFullYear() - new Date(academy.createdAt).getFullYear())} years
-                      </p>
-                    </div>
-                  )}
-                </>
-              ) : (
-                <p className="text-sm text-muted-foreground">No achievements available yet</p>
-              )}
+                        </div>
+                      )}
+                      {academy.createdAt && (
+                        <div>
+                          <h3 className="text-sm font-semibold text-foreground mb-1">Years Operating</h3>
+                          <p className="text-sm text-muted-foreground">
+                            {Math.max(1, new Date().getFullYear() - new Date(academy.createdAt).getFullYear())} years
+                          </p>
+                        </div>
+                      )}
+                    </>
+                  ) : (
+                    <p className="text-sm text-muted-foreground">No achievements available yet</p>
+                  )
+                })()
+              }
             </CardContent>
           </Card>
         </div>

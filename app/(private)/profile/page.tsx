@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useAuth } from '@/lib/hooks/use-auth';
 import { useOnboarding } from '@/lib/hooks/use-onboarding';
+import { useChildren } from '@/lib/hooks/use-children';
 import { useAcademySelection } from '@/lib/hooks/use-academy-selection';
 import { getMatchingCriteria } from '@/lib/utils/matching';
 import { sportTaxonomy } from '@/lib/constants/sport-taxonomy';
@@ -47,6 +48,7 @@ function MatchingCriteriaCard() {
 export default function ProfilePage() {
   const { role } = useAuth();
   const { athleteData, parentData, completed } = useOnboarding();
+  const { activeChild } = useChildren();
   const { selectedAcademyId } = useAcademySelection();
   const isParent = role === 'parent';
 
@@ -130,7 +132,7 @@ export default function ProfilePage() {
           <CardHeader className="pb-3">
             <div className="flex items-center gap-2">
               <Users className="text-primary h-4 w-4" />
-              <CardTitle className="text-base">My Child&apos;s Sport</CardTitle>
+              <CardTitle className="text-base">{activeChild ? `${activeChild.name}'s Sport` : "My Child's Sport"}</CardTitle>
             </div>
           </CardHeader>
           <CardContent className="flex flex-col gap-2">
@@ -138,12 +140,12 @@ export default function ProfilePage() {
               <div className="flex items-center gap-1.5">
                 <User className="text-muted-foreground h-3.5 w-3.5" />
                 <span className="text-muted-foreground">Name:</span>
-                <span className="font-medium">{parentData.childName}</span>
+                <span className="font-medium">{activeChild?.name ?? parentData.childName}</span>
               </div>
               <div className="flex items-center gap-1.5">
                 <User className="text-muted-foreground h-3.5 w-3.5" />
                 <span className="text-muted-foreground">Age:</span>
-                <span className="font-medium">{parentData.childAge}</span>
+                <span className="font-medium">{activeChild?.age ?? parentData.childAge}</span>
               </div>
               <div className="flex items-center gap-1.5">
                 <MapPin className="text-muted-foreground h-3.5 w-3.5" />
@@ -153,10 +155,17 @@ export default function ProfilePage() {
               <div className="flex items-center gap-1.5">
                 <Target className="text-muted-foreground h-3.5 w-3.5" />
                 <span className="text-muted-foreground">Skill:</span>
-                <span className="font-medium capitalize">{parentData.skillLevel}</span>
+                <span className="font-medium capitalize">{activeChild?.skillLevel ?? parentData.skillLevel}</span>
               </div>
             </div>
-            {parentData.sportInterests.length > 0 && (
+            {activeChild && (
+              <div className="flex flex-wrap gap-1.5">
+                <Badge key={activeChild.sport} variant="secondary" className="text-xs">
+                  {getSportName(activeChild.sport)}
+                </Badge>
+              </div>
+            )}
+            {!activeChild && parentData.sportInterests.length > 0 && (
               <div className="flex flex-wrap gap-1.5">
                 {parentData.sportInterests.map((slug) => (
                   <Badge key={slug} variant="secondary" className="text-xs">
