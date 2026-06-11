@@ -1,9 +1,5 @@
 import { LeadDetail } from '@/components/admin/lead-detail';
 
-export function generateStaticParams() {
-  return [{ id: '_placeholder' }];
-}
-
 export default function AdminLeadDetailPage({ params }: { params: { id: string } }) {
   return (
     <div className="flex flex-col gap-4">
