@@ -3,8 +3,14 @@ import { Section } from '@/components/layout/section';
 import { EnquiryForm } from '@/components/enquiry/enquiry-form';
 import { Breadcrumbs } from '@/components/seo/breadcrumbs';
 import { notFound } from 'next/navigation';
-import { academyBySlug } from '@/data/academies';
-import { coachBySlug } from '@/data/coaches';
+import { academyBySlug, academies } from '@/data/academies';
+import { coachBySlug, coaches } from '@/data/coaches';
+
+export function generateStaticParams() {
+  const academyParams = academies.map((a) => ({ type: 'academy' as const, id: a.slug }));
+  const coachParams = coaches.map((c) => ({ type: 'coach' as const, id: c.slug }));
+  return [...academyParams, ...coachParams];
+}
 
 export default function EnquiryPage({
   params,
