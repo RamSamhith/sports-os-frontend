@@ -98,8 +98,8 @@ export default function AcademyDetailPage({ params }: { params: { slug: string }
               <CertificationIndicator count={academy.certifications.length} />
             </div>
             {/* Actions */}
-            <div className="flex flex-wrap items-center gap-2">
-              <Button asChild>
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:flex-wrap">
+              <Button asChild size="lg">
                 <Link href={`/enquiry/academy/${academy.slug}`}>Request Trial</Link>
               </Button>
               <ShortlistToggle

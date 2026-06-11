@@ -24,7 +24,7 @@ export function ShortlistToggle({
   label,
   sublabel,
   href,
-  size = 'sm',
+  size = 'lg',
   variant = 'outline',
   labelText,
 }: ShortlistToggleProps) {

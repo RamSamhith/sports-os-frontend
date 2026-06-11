@@ -1,26 +1,6 @@
-import type { Pagination } from '@/types/domain/common';
 import type { EnquiryIntent, EnquiryTargetType } from '@/types/domain/enquiry';
 
-export interface ApiSuccess<T> {
-  ok: true;
-  data: T;
-}
-
-export interface ApiFailure {
-  ok: false;
-  error: {
-    code: string;
-    message: string;
-    details?: Record<string, unknown>;
-  };
-}
-
-export type ApiResponse<T> = ApiSuccess<T> | ApiFailure;
-
-export interface ListResponse<T> {
-  items: T[];
-  pagination: Pagination;
-}
+export type { ApiSuccess, ApiFailure, ApiResponse, ListResponse } from '@/lib/api/client';
 
 export interface SearchSuggestRequest {
   query: string;

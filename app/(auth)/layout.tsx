@@ -6,9 +6,9 @@ import Link from 'next/link';
 
 export default function AuthLayout({ children }: { children: ReactNode }) {
   return (
-    <div className="relative isolate min-h-screen">
+    <div className="relative isolate min-h-dvh overflow-y-auto">
       <AuroraBackground />
-      <Container size="sm" className="relative flex min-h-screen flex-col items-center justify-center py-10">
+      <Container size="sm" className="relative flex min-h-dvh flex-col items-center justify-center py-10">
         <Link href="/" className="mb-6 flex items-center gap-2 font-semibold">
           <span className="bg-primary/20 ring-primary/30 grid h-8 w-8 place-items-center rounded-lg ring-1">
             <span className="bg-primary h-3 w-3 rounded-sm" />

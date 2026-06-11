@@ -98,8 +98,8 @@ export default function CoachDetailPage({ params }: { params: { slug: string } }
                 </Badge>
               ))}
             </div>
-            <div className="flex flex-wrap items-center gap-2">
-              <Button asChild>
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:flex-wrap">
+              <Button asChild size="lg">
                 <Link href={`/enquiry/coach/${coach.slug}`}>Request callback</Link>
               </Button>
               <ShortlistToggle

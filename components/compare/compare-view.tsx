@@ -64,13 +64,13 @@ export function CompareView() {
         description="Tap the compare button on any academy, coach, or sport to add them here."
         action={
           <div className="flex flex-wrap gap-2">
-            <Button asChild>
+            <Button asChild size="lg">
               <Link href="/academies">Explore Academies</Link>
             </Button>
-            <Button asChild variant="outline">
+            <Button asChild variant="outline" size="lg">
               <Link href="/coaches">Explore Coaches</Link>
             </Button>
-            <Button asChild variant="outline">
+            <Button asChild variant="outline" size="lg">
               <Link href="/sports">Explore Sports</Link>
             </Button>
           </div>

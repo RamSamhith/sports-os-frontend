@@ -85,12 +85,12 @@ export function WizardShell({
 
           <div className="flex gap-3">
             {currentStep > 0 && (
-              <Button variant="outline" onClick={onBack} className="flex-1">
+              <Button variant="outline" onClick={onBack} className="flex-1" size="lg">
                 <ArrowLeft className="h-4 w-4" />
                 Back
               </Button>
             )}
-            <Button onClick={onNext} disabled={!canNext} className="flex-1 gap-2">
+            <Button onClick={onNext} disabled={!canNext} className="flex-1 gap-2" size="lg">
               {isLastStep ? 'Complete' : 'Continue'}
               <ArrowRight className="h-4 w-4" />
             </Button>

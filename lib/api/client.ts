@@ -21,24 +21,45 @@ export interface ListResponse<T> {
   pagination: Pagination;
 }
 
-export interface PaginatedApiResponse<T> {
-  ok: true;
-  data: ListResponse<T>;
-}
-
 const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? '';
+
+function getToken(): string | null {
+  if (typeof window === 'undefined') return null;
+  try {
+    return localStorage.getItem('sportsos:auth-token');
+  } catch {
+    return null;
+  }
+}
 
 async function request<T>(
   path: string,
   options: RequestInit = {},
 ): Promise<ApiResponse<T>> {
   const url = `${API_BASE}${path}`;
+
+  const headers: Record<string, string> = {};
+  const token = getToken();
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
+  }
+  const body = options.body;
+  if (body && typeof body === 'string') {
+    headers['Content-Type'] = 'application/json';
+  }
+  if (options.headers) {
+    Object.assign(headers, options.headers);
+  }
+
   try {
-    const res = await fetch(url, {
-      headers: { 'Content-Type': 'application/json', ...options.headers },
-      ...options,
-    });
+    const res = await fetch(url, { ...options, headers });
+
+    if (res.status === 204) {
+      return { ok: true, data: undefined as T };
+    }
+
     const json = await res.json();
+
     if (!res.ok) {
       return {
         ok: false,
@@ -49,6 +70,7 @@ async function request<T>(
         },
       };
     }
+
     return { ok: true, data: json.data ?? json };
   } catch (err) {
     return {

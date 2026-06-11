@@ -55,7 +55,7 @@ export function OtpInput({
 
   return (
     <div
-      className={cn('flex items-center gap-2', className)}
+      className={cn('relative flex items-center gap-2', className)}
       onClick={handleClick}
       role="group"
       aria-label="One-time code"
@@ -76,7 +76,7 @@ export function OtpInput({
         disabled={disabled}
         autoComplete="one-time-code"
         aria-label={`Enter ${length}-digit code`}
-        className="sr-only"
+        className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
       />
       {Array.from({ length }, (_, i) => {
         const char = digits[i] ?? '';
@@ -86,7 +86,7 @@ export function OtpInput({
             key={i}
             aria-hidden="true"
             className={cn(
-              'flex h-12 w-10 items-center justify-center rounded-lg border text-lg font-semibold transition-colors',
+              'flex h-12 w-9 sm:w-10 items-center justify-center rounded-lg border text-lg font-semibold transition-colors',
               isActive
                 ? 'border-primary ring-primary/30 ring-2'
                 : char

@@ -180,7 +180,7 @@ export default function VerifySignupPage() {
                 </p>
 
                 <div className="mt-6 flex w-full flex-col gap-3">
-                  <Button className="w-full gap-2" onClick={handleContinueToRole}>
+                  <Button className="w-full gap-2" size="lg" onClick={handleContinueToRole}>
                     Continue to Profile Setup
                   </Button>
                 </div>
@@ -231,6 +231,7 @@ export default function VerifySignupPage() {
                   <Button
                     className="w-full"
                     variant="ghost"
+                    size="lg"
                     onClick={handleResend}
                     disabled={resendCooldown > 0 || isVerifying}
                   >
@@ -252,7 +253,7 @@ export default function VerifySignupPage() {
                   <Button
                     className="w-full gap-2"
                     variant="ghost"
-                    size="sm"
+                    size="lg"
                     onClick={handleEditContact}
                     disabled={isVerifying}
                   >
