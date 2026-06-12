@@ -8,20 +8,20 @@ import { Button } from '@/components/ui/button';
 import { useShortlist } from '@/lib/hooks/use-shortlist';
 import { AcademyCardPlaceholder } from '@/components/academies/academy-card-placeholder';
 import { CoachCardPlaceholder } from '@/components/coaches/coach-card-placeholder';
-import { SportCard } from '@/components/sports/sport-card';
 import { EmptyState } from '@/components/feedback/empty-state';
 import { academies } from '@/data/academies';
 import { coaches } from '@/data/coaches';
-import { sports } from '@/data/sports';
+import type { Academy } from '@/types/domain/academy';
+import type { Coach } from '@/types/domain/coach';
 
-type Supported = 'academy' | 'coach' | 'sport';
+type Supported = 'academy' | 'coach';
 
 interface ShortlistViewProps {
   entityType: Supported;
 }
 
 export function ShortlistView({ entityType }: ShortlistViewProps) {
-  const { items, remove, clear, extras } = useShortlist();
+  const { items, remove, extras, populatedData } = useShortlist();
   const [mounted, setMounted] = React.useState(false);
   React.useEffect(() => setMounted(true), []);
 
@@ -29,11 +29,7 @@ export function ShortlistView({ entityType }: ShortlistViewProps) {
     .filter((it) => it.itemType === entityType)
     .map((it) => it.itemId);
 
-  // Stale-id cleanup is performed by the ShortlistProvider on hydration
-  // and on every storage event, so we don't need to do it here.
-
   if (!mounted) {
-    // Render a placeholder grid that matches the eventual layout to avoid CLS.
     return (
       <div
         aria-hidden
@@ -49,14 +45,7 @@ export function ShortlistView({ entityType }: ShortlistViewProps) {
     );
   }
 
-  // Use proper plural labels (not naive `entityType + 'es'`, which would
-  // produce "academys" for `entityType === 'academy'`).
-  const pluralLabel =
-    entityType === 'sport'
-      ? 'sports'
-      : entityType === 'academy'
-        ? 'Academies'
-        : 'Coaches';
+  const pluralLabel = entityType === 'academy' ? 'Academies' : 'Coaches';
 
   if (ids.length === 0) {
     return (
@@ -66,15 +55,7 @@ export function ShortlistView({ entityType }: ShortlistViewProps) {
         description="Saved items appear here. Tap the bookmark on a card to add."
         action={
           <Button asChild>
-            <Link
-              href={
-                entityType === 'academy'
-                  ? '/academies'
-                  : entityType === 'coach'
-                    ? '/coaches'
-                    : '/sports'
-              }
-            >
+            <Link href={entityType === 'academy' ? '/academies' : '/coaches'}>
               Browse {pluralLabel}
             </Link>
           </Button>
@@ -83,118 +64,32 @@ export function ShortlistView({ entityType }: ShortlistViewProps) {
     );
   }
 
-  if (entityType === 'academy') {
-    const items = ids
-      .map((id) => academies.find((a) => a.id === id))
-      .filter((a): a is (typeof academies)[number] => Boolean(a));
-
-    if (items.length === 0 && ids.length > 0) {
-      return (
-        <EmptyState
-          icon={<Bookmark className="h-5 w-5" />}
-          title="No saved academies found"
-          description="Saved items may have been removed. Try browsing academies again."
-          action={
-            <Button asChild>
-              <Link href="/academies">Browse Academies</Link>
-            </Button>
-          }
-        />
-      );
+  // Build list of items: try populated data first, then static data
+  const resolvedItems: Array<{ id: string; data: Academy | Coach }> = [];
+  for (const id of ids) {
+    const popKey = `${entityType}:${id}`;
+    const pop = populatedData?.[popKey];
+    if (pop) {
+      resolvedItems.push({ id, data: pop as unknown as Academy | Coach });
+    } else {
+      const staticItem = entityType === 'academy'
+        ? academies.find((a) => a.id === id)
+        : coaches.find((c) => c.id === id);
+      if (staticItem) resolvedItems.push({ id, data: staticItem });
     }
-
-    return (
-      <div className="flex flex-col gap-4">
-        <div className="flex items-center justify-between">
-          <p className="text-muted-foreground text-sm">
-            {items.length} saved {items.length === 1 ? 'academy' : 'Academies'}
-          </p>
-          <Button
-            variant="ghost"
-            size="icon-touch"
-            onClick={() => {
-              for (const a of items) remove('academy', a.id);
-              toast('Cleared all saved academies');
-            }}
-            aria-label="Clear all saved academies"
-          >
-            <Trash2 className="h-4 w-4" />
-          </Button>
-        </div>
-        <div className="grid grid-cols-1 items-start gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {items.map((a) => (
-            <div key={a.id} className="relative">
-              <AcademyCardPlaceholder academy={a} />
-            </div>
-          ))}
-        </div>
-      </div>
-    );
   }
 
-  if (entityType === 'coach') {
-    const items = ids
-      .map((id) => coaches.find((c) => c.id === id))
-      .filter((c): c is (typeof coaches)[number] => Boolean(c));
-
-    if (items.length === 0 && ids.length > 0) {
-      return (
-        <EmptyState
-          icon={<Bookmark className="h-5 w-5" />}
-          title="No saved coaches found"
-          description="Saved items may have been removed. Try browsing coaches again."
-          action={
-            <Button asChild>
-              <Link href="/coaches">Browse Coaches</Link>
-            </Button>
-          }
-        />
-      );
-    }
-
-    return (
-      <div className="flex flex-col gap-4">
-        <div className="flex items-center justify-between">
-          <p className="text-muted-foreground text-sm">
-            {items.length} saved coach{items.length === 1 ? '' : 'es'}
-          </p>
-          <Button
-            variant="ghost"
-            size="icon-touch"
-            onClick={() => {
-              for (const c of items) remove('coach', c.id);
-              toast('Cleared all saved coaches');
-            }}
-            aria-label="Clear all saved coaches"
-          >
-            <Trash2 className="h-4 w-4" />
-          </Button>
-        </div>
-        <div className="grid grid-cols-1 items-start gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {items.map((c) => (
-            <div key={c.id} className="relative">
-              <CoachCardPlaceholder coach={c} />
-            </div>
-          ))}
-        </div>
-      </div>
-    );
-  }
-
-  // sports
-  const sportItems = ids
-    .map((id) => sports.find((s) => s.id === id))
-    .filter((s): s is (typeof sports)[number] => Boolean(s));
-
-  if (sportItems.length === 0 && ids.length > 0) {
+  if (resolvedItems.length === 0 && ids.length > 0) {
     return (
       <EmptyState
         icon={<Bookmark className="h-5 w-5" />}
-        title="No saved sports found"
-        description="Saved items may have been removed. Try browsing sports again."
+        title={`No saved ${pluralLabel.toLowerCase()} found`}
+        description="Saved items may have been removed. Try browsing again."
         action={
           <Button asChild>
-            <Link href="/sports">Browse Sports</Link>
+            <Link href={entityType === 'academy' ? '/academies' : '/coaches'}>
+              Browse {pluralLabel}
+            </Link>
           </Button>
         }
       />
@@ -205,24 +100,28 @@ export function ShortlistView({ entityType }: ShortlistViewProps) {
     <div className="flex flex-col gap-4">
       <div className="flex items-center justify-between">
         <p className="text-muted-foreground text-sm">
-          {sportItems.length} saved sport{sportItems.length === 1 ? '' : 's'}
+          {resolvedItems.length} saved {resolvedItems.length === 1 ? entityType : pluralLabel}
         </p>
         <Button
           variant="ghost"
           size="icon-touch"
           onClick={() => {
-            for (const s of sportItems) remove('sport', s.id);
-            toast('Cleared all saved sports');
+            for (const item of resolvedItems) remove(entityType, item.id);
+            toast(`Cleared all saved ${pluralLabel.toLowerCase()}`);
           }}
-          aria-label="Clear all saved sports"
+          aria-label={`Clear all saved ${pluralLabel.toLowerCase()}`}
         >
           <Trash2 className="h-4 w-4" />
         </Button>
       </div>
-      <div className="grid grid-cols-2 items-start gap-4 sm:grid-cols-3 md:grid-cols-4">
-        {sportItems.map((s) => (
-          <div key={s.id} className="relative">
-            <SportCard sport={s} />
+      <div className="grid grid-cols-1 items-start gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {resolvedItems.map((item) => (
+          <div key={item.id} className="relative">
+            {entityType === 'academy' ? (
+              <AcademyCardPlaceholder academy={item.data as Academy} />
+            ) : (
+              <CoachCardPlaceholder coach={item.data as Coach} />
+            )}
           </div>
         ))}
       </div>

@@ -4,9 +4,8 @@ import * as React from 'react';
 import { ShortlistContext, type ShortlistContextValue } from '@/lib/hooks/use-shortlist';
 import { useStorageSync } from '@/lib/hooks/use-storage-sync';
 import { BUILD_HASH } from '@/lib/version';
-import { academies } from '@/data/academies';
-import { coaches } from '@/data/coaches';
-import { sports } from '@/data/sports';
+import { useAuth } from '@/lib/hooks/use-auth';
+import { getMyShortlistPopulated, addToShortlist, removeFromShortlist } from '@/lib/api/shortlist';
 import type { ShortlistItem, ShortlistItemType } from '@/types/domain/shortlist';
 
 const STORAGE_KEY = 'sportsos:shortlist';
@@ -31,25 +30,15 @@ function readPersisted(): PersistedItem[] {
     const raw = window.localStorage.getItem(STORAGE_KEY);
     if (!raw) return [];
     const data = JSON.parse(raw);
-    let parsed: PersistedItem[];
     if (data && typeof data === 'object' && Array.isArray(data.items) && typeof data.version === 'string') {
       if (data.version !== BUILD_HASH) {
         window.localStorage.removeItem(STORAGE_KEY);
         return [];
       }
-      parsed = data.items;
-    } else if (Array.isArray(data)) {
-      parsed = data;
-    } else {
-      return [];
+      return data.items;
     }
-    return parsed.filter(
-      (i) =>
-        i &&
-        typeof i.itemId === 'string' &&
-        typeof i.itemType === 'string' &&
-        typeof i.label === 'string',
-    );
+    if (Array.isArray(data)) return data;
+    return [];
   } catch {
     return [];
   }
@@ -60,9 +49,7 @@ function writePersisted(items: PersistedItem[]) {
   try {
     const envelope: PersistedEnvelope = { version: BUILD_HASH, items };
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify(envelope));
-  } catch {
-    /* ignore quota / disabled storage */
-  }
+  } catch { /* ignore */ }
 }
 
 function toContextItem(p: PersistedItem): ShortlistItem {
@@ -75,81 +62,65 @@ function toContextItem(p: PersistedItem): ShortlistItem {
   };
 }
 
-function buildValidKeys(): Set<string> {
-  const keys = new Set<string>();
-  for (const a of academies) keys.add(`academy:${a.id}`);
-  for (const c of coaches) keys.add(`coach:${c.id}`);
-  for (const s of sports) keys.add(`sport:${s.id}`);
-  return keys;
-}
-
-function applyFromRaw(
-  raw: string | null,
-  setItems: (items: ShortlistItem[]) => void,
-  setExtras: (m: Record<string, { label: string; sublabel?: string; href: string }>) => void,
-): void {
-  if (raw == null) {
-    setItems([]);
-    setExtras({});
-    return;
-  }
-  let parsed: PersistedItem[] = [];
-  try {
-    const data = JSON.parse(raw);
-    if (data && typeof data === 'object' && Array.isArray(data.items) && typeof data.version === 'string') {
-      if (data.version !== BUILD_HASH) {
-        window.localStorage.removeItem(STORAGE_KEY);
-        setItems([]);
-        setExtras({});
-        return;
-      }
-      parsed = data.items;
-    } else if (Array.isArray(data)) {
-      parsed = data;
-    } else {
-      parsed = [];
-    }
-  } catch {
-    parsed = [];
-  }
-  parsed = parsed.filter(
-    (i) =>
-      i &&
-      typeof i.itemId === 'string' &&
-      typeof i.itemType === 'string' &&
-      typeof i.label === 'string',
-  );
-  // Provider-level cleanup: drop ids that no longer match a fixture.
-  const valid = buildValidKeys();
-  parsed = parsed.filter((p) => valid.has(`${p.itemType}:${p.itemId}`));
-  setItems(parsed.map(toContextItem));
-  const map: Record<string, { label: string; sublabel?: string; href: string }> = {};
-  for (const p of parsed) {
-    map[`${p.itemType}:${p.itemId}`] = {
-      label: p.label,
-      sublabel: p.sublabel,
-      href: p.href,
-    };
-  }
-  setExtras(map);
-}
-
 interface ShortlistProviderProps {
   children: React.ReactNode;
 }
 
 export function ShortlistProvider({ children }: ShortlistProviderProps) {
-  // We start empty on the server; hydrate from localStorage on the client.
+  const { isAuthenticated } = useAuth();
   const [items, setItems] = React.useState<ShortlistItem[]>([]);
   const [extras, setExtras] = React.useState<Record<string, { label: string; sublabel?: string; href: string }>>({});
   const [hydrated, setHydrated] = React.useState(false);
+  const [populatedData, setPopulatedData] = React.useState<Record<string, Record<string, unknown>>>({});
 
+  // On mount / auth change: hydrate from localStorage, then fetch from API if authenticated
   React.useEffect(() => {
-    applyFromRaw(window.localStorage.getItem(STORAGE_KEY), setItems, setExtras);
+    const persisted = readPersisted();
+    setItems(persisted.map(toContextItem));
+    const map: Record<string, { label: string; sublabel?: string; href: string }> = {};
+    for (const p of persisted) {
+      map[`${p.itemType}:${p.itemId}`] = { label: p.label, sublabel: p.sublabel, href: p.href };
+    }
+    setExtras(map);
     setHydrated(true);
-  }, []);
 
-  // Persist on every change once hydrated.
+    if (isAuthenticated) {
+      getMyShortlistPopulated().then((res) => {
+        if (res.ok) {
+          const apiItems: ShortlistItem[] = res.data.map((it: any) => ({
+            id: it.id,
+            userId: it.userId,
+            itemType: it.itemType,
+            itemId: it.itemId,
+            createdAt: it.createdAt,
+          }));
+          setItems(apiItems);
+          // Build populated data map and extras from API data
+          const popMap: Record<string, Record<string, unknown>> = {};
+          const extrasMap: Record<string, { label: string; sublabel?: string; href: string }> = {};
+          for (const it of res.data) {
+            if (it.data) {
+              popMap[`${it.itemType}:${it.itemId}`] = it.data;
+              const d = it.data as any;
+              extrasMap[`${it.itemType}:${it.itemId}`] = {
+                label: d.name ?? it.itemId,
+                sublabel: it.itemType === 'academy'
+                  ? `${d.location?.city ?? ''}, ${d.location?.state ?? ''}`
+                  : `${d.location?.city ?? ''} · ${d.experienceYears ?? ''}+ yrs`,
+                href: it.itemType === 'academy'
+                  ? `/academies/${d.slug ?? it.itemId}`
+                  : `/coaches/${d.slug ?? it.itemId}`,
+              };
+            }
+          }
+          setPopulatedData(popMap);
+          setExtras(extrasMap);
+        }
+      });
+    }
+  }, [isAuthenticated]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Persist to localStorage on every change (for offline/guest fallback)
   React.useEffect(() => {
     if (!hydrated) return;
     const persisted: PersistedItem[] = items.map((it) => ({
@@ -163,9 +134,20 @@ export function ShortlistProvider({ children }: ShortlistProviderProps) {
     writePersisted(persisted);
   }, [items, extras, hydrated]);
 
-  // Multi-tab sync: when another tab writes to localStorage, re-hydrate.
+  // Multi-tab sync
   useStorageSync(STORAGE_KEY, (raw) => {
-    applyFromRaw(raw, setItems, setExtras);
+    if (isAuthenticated) return;
+    if (raw == null) { setItems([]); setExtras({}); return; }
+    try {
+      const data = JSON.parse(raw);
+      const parsed: PersistedItem[] = data?.items ?? (Array.isArray(data) ? data : []);
+      setItems(parsed.map(toContextItem));
+      const map: Record<string, { label: string; sublabel?: string; href: string }> = {};
+      for (const p of parsed) {
+        map[`${p.itemType}:${p.itemId}`] = { label: p.label, sublabel: p.sublabel, href: p.href };
+      }
+      setExtras(map);
+    } catch { setItems([]); setExtras({}); }
   });
 
   const has = React.useCallback(
@@ -178,13 +160,7 @@ export function ShortlistProvider({ children }: ShortlistProviderProps) {
     (item) => {
       setItems((prev) => {
         if (prev.some((i) => i.itemType === item.itemType && i.itemId === item.itemId)) return prev;
-        const next: ShortlistItem = {
-          ...item,
-          id: `${item.itemType}:${item.itemId}`,
-          userId: 'guest',
-          createdAt: new Date().toISOString(),
-        };
-        return [...prev, next];
+        return [...prev, { ...item, id: `${item.itemType}:${item.itemId}`, userId: 'guest', createdAt: new Date().toISOString() }];
       });
     },
     [],
@@ -197,14 +173,15 @@ export function ShortlistProvider({ children }: ShortlistProviderProps) {
       delete next[`${itemType}:${itemId}`];
       return next;
     });
+    setPopulatedData((prev) => {
+      const next = { ...prev };
+      delete next[`${itemType}:${itemId}`];
+      return next;
+    });
   }, []);
 
-  const clear = React.useCallback(() => {
-    setItems([]);
-    setExtras({});
-  }, []);
+  const clear = React.useCallback(() => { setItems([]); setExtras({}); setPopulatedData({}); }, []);
 
-  // Helper: add with display metadata. Returns true if added, false if already present.
   const addWithMeta = React.useCallback(
     (
       itemType: ShortlistItemType,
@@ -215,31 +192,49 @@ export function ShortlistProvider({ children }: ShortlistProviderProps) {
       setItems((prev) => {
         if (prev.some((i) => i.itemType === itemType && i.itemId === itemId)) return prev;
         added = true;
-        return [
-          ...prev,
-          {
-            id: `${itemType}:${itemId}`,
-            userId: 'guest',
-            itemType,
-            itemId,
-            createdAt: new Date().toISOString(),
-          },
-        ];
+        return [...prev, { id: `${itemType}:${itemId}`, userId: 'guest', itemType, itemId, createdAt: new Date().toISOString() }];
       });
-      if (added) {
-        setExtras((prev) => ({ ...prev, [`${itemType}:${itemId}`]: meta }));
-      }
+      if (added) setExtras((prev) => ({ ...prev, [`${itemType}:${itemId}`]: meta }));
       return added;
     },
     [],
   );
 
+  // Wrapped addWithMeta that also calls API when authenticated
+  const addWithMetaAndSync = React.useCallback(
+    (
+      itemType: ShortlistItemType,
+      itemId: string,
+      meta: { label: string; sublabel?: string; href: string },
+    ) => {
+      const added = addWithMeta(itemType, itemId, meta);
+      if (added && isAuthenticated && (itemType === 'academy' || itemType === 'coach')) {
+        addToShortlist(itemType, itemId).catch(() => {});
+      }
+      return added;
+    },
+    [addWithMeta, isAuthenticated],
+  );
+
+  // Wrapped remove that also calls API when authenticated
+  const removeAndSync = React.useCallback(
+    (itemType: ShortlistItemType, itemId: string) => {
+      const record = items.find((i) => i.itemType === itemType && i.itemId === itemId);
+      remove(itemType, itemId);
+      if (isAuthenticated && record && !record.id.startsWith(`${itemType}:${itemId}`) && (itemType === 'academy' || itemType === 'coach')) {
+        removeFromShortlist(record.id).catch(() => {});
+      }
+    },
+    [remove, isAuthenticated, items],
+  );
+
   const value = React.useMemo<ShortlistContextValue & {
     extras: typeof extras;
-    addWithMeta: typeof addWithMeta;
+    addWithMeta: typeof addWithMetaAndSync;
+    populatedData: typeof populatedData;
   }>(
-    () => ({ items, has, add, remove, clear, extras, addWithMeta }),
-    [items, has, add, remove, clear, extras, addWithMeta],
+    () => ({ items, has, add, remove: removeAndSync, clear, extras, addWithMeta: addWithMetaAndSync, populatedData }),
+    [items, has, add, removeAndSync, clear, extras, addWithMetaAndSync, populatedData],
   );
 
   return <ShortlistContext.Provider value={value}>{children}</ShortlistContext.Provider>;

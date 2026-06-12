@@ -17,6 +17,7 @@ export interface ShortlistContextValue {
   clear: () => void;
   addWithMeta: (itemType: ShortlistItemType, itemId: string, meta: ShortlistMeta) => boolean;
   extras: Record<string, ShortlistMeta>;
+  populatedData?: Record<string, Record<string, unknown>>;
 }
 
 export const ShortlistContext = createContext<ShortlistContextValue | null>(null);

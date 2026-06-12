@@ -7,16 +7,12 @@ export default function SavedPage() {
       <TabsList>
         <TabsTrigger value="academies">Academies</TabsTrigger>
         <TabsTrigger value="coaches">Coaches</TabsTrigger>
-        <TabsTrigger value="sports">Sports</TabsTrigger>
       </TabsList>
       <TabsContent value="academies">
         <ShortlistView entityType="academy" />
       </TabsContent>
       <TabsContent value="coaches">
         <ShortlistView entityType="coach" />
-      </TabsContent>
-      <TabsContent value="sports">
-        <ShortlistView entityType="sport" />
       </TabsContent>
     </Tabs>
   );
