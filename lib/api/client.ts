@@ -61,12 +61,13 @@ async function request<T>(
     const json = await res.json();
 
     if (!res.ok) {
+      const err = json.error ?? json;
       return {
         ok: false,
         error: {
-          code: json.code ?? 'UNKNOWN_ERROR',
-          message: json.message ?? res.statusText,
-          details: json.details,
+          code: err.code ?? 'UNKNOWN_ERROR',
+          message: err.message ?? res.statusText,
+          details: err.details,
         },
       };
     }
