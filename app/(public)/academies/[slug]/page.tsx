@@ -1,4 +1,7 @@
-import type { Metadata } from 'next';
+'use client';
+
+import * as React from 'react';
+import { useParams } from 'next/navigation';
 import { Container } from '@/components/layout/container';
 import { Section } from '@/components/layout/section';
 import { Breadcrumbs } from '@/components/seo/breadcrumbs';
@@ -6,7 +9,6 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Button } from '@/components/ui/button';
 import { ShortlistToggle } from '@/components/shortlist/shortlist-toggle';
 import { CompareButton } from '@/components/academies/compare-button';
-import { CoachesAtAcademy } from '@/components/academy/coaches-at-academy';
 import { AcademyInfo } from '@/components/academy/academy-info';
 import { LocationMap } from '@/components/academy/location-map';
 import { VerifiedBadge } from '@/components/trust/verified-badge';
@@ -14,52 +16,67 @@ import { LastUpdated } from '@/components/trust/last-updated';
 import { CertificationIndicator } from '@/components/trust/certification-indicator';
 import { ImageWithFallback } from '@/components/ui/image-with-fallback';
 import { fixtureImages } from '@/lib/images';
-import { notFound } from 'next/navigation';
-import { academyBySlug, academies } from '@/data/academies';
-import { coaches } from '@/data/coaches';
-import { siteConfig } from '@/config/site';
+import { getAcademy } from '@/lib/api/academies';
+import type { Academy } from '@/types/domain/academy';
 import Link from 'next/link';
-import { Globe, Mail, Phone, Instagram, Facebook, Youtube } from 'lucide-react';
+import { Globe, Mail, Phone, Instagram, Facebook, Youtube, Loader2, AlertTriangle } from 'lucide-react';
 
-export function generateStaticParams() {
-  return academies.map((academy) => ({ slug: academy.slug }));
-}
+export default function AcademyDetailPage() {
+  const params = useParams();
+  const slug = params.slug as string;
+  const [academy, setAcademy] = React.useState<Academy | null>(null);
+  const [loading, setLoading] = React.useState(true);
+  const [error, setError] = React.useState<string | null>(null);
 
-export function generateMetadata({ params }: { params: { slug: string } }): Metadata {
-  const academy = academyBySlug(params.slug);
-  if (!academy) {
-    notFound();
-    return {};
+  React.useEffect(() => {
+    let cancelled = false;
+    async function load() {
+      setLoading(true);
+      setError(null);
+      const res = await getAcademy(slug);
+      if (cancelled) return;
+      if (res.ok) {
+        setAcademy(res.data);
+      } else {
+        setError(res.error.message);
+      }
+      setLoading(false);
+    }
+    load();
+    return () => { cancelled = true; };
+  }, [slug]);
+
+  if (loading) {
+    return (
+      <Section>
+        <Container>
+          <div className="flex items-center justify-center py-24">
+            <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+            <span className="ml-3 text-muted-foreground">Loading academy…</span>
+          </div>
+        </Container>
+      </Section>
+    );
   }
 
-  const title = `${academy.name} — Sports Academy in ${academy.location.city}`;
-  const description = academy.description.slice(0, 155);
-  const url = `${siteConfig.url}/academies/${academy.slug}`;
-
-  return {
-    title,
-    description,
-    openGraph: {
-      title,
-      description,
-      url,
-      siteName: siteConfig.name,
-      type: 'website',
-      locale: siteConfig.locale,
-    },
-    twitter: {
-      card: 'summary_large_image',
-      title,
-      description,
-    },
-  };
-}
-
-export default function AcademyDetailPage({ params }: { params: { slug: string } }) {
-  const academy = academyBySlug(params.slug);
-  if (!academy) notFound();
-
-  const academyCoaches = coaches.filter((c) => c.academyId === academy.id);
+  if (error || !academy) {
+    return (
+      <Section>
+        <Container>
+          <div className="flex flex-col items-center justify-center gap-4 py-24 text-center">
+            <AlertTriangle className="h-12 w-12 text-destructive/40" />
+            <div>
+              <h2 className="text-xl font-semibold">Academy not found</h2>
+              <p className="text-sm text-muted-foreground mt-1">{error || 'This academy may have been removed.'}</p>
+            </div>
+            <Button asChild variant="outline">
+              <Link href="/academies">Browse academies</Link>
+            </Button>
+          </div>
+        </Container>
+      </Section>
+    );
+  }
 
   return (
     <Section>
@@ -94,10 +111,9 @@ export default function AcademyDetailPage({ params }: { params: { slug: string }
           <CardContent className="flex flex-col gap-4">
             <p className="text-sm text-pretty">{academy.description}</p>
             <div className="text-muted-foreground flex items-center gap-3 text-xs">
-              <LastUpdated at={academy.lastUpdatedAt} />
+              <LastUpdated at={academy.lastUpdatedAt || academy.createdAt} />
               <CertificationIndicator count={academy.certifications.length} />
             </div>
-            {/* Actions */}
             <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:flex-wrap">
               <Button asChild size="lg">
                 <Link href={`/enquiry/academy/${academy.slug}`}>Request Trial</Link>
@@ -121,7 +137,6 @@ export default function AcademyDetailPage({ params }: { params: { slug: string }
           </CardContent>
         </Card>
 
-        {/* Academy Info */}
         <div className="mt-6">
           <Card>
             <CardContent className="p-4">
@@ -137,7 +152,6 @@ export default function AcademyDetailPage({ params }: { params: { slug: string }
           </Card>
         </div>
 
-        {/* Contact */}
         <div className="mt-6">
           <Card>
             <CardContent className="p-4">
@@ -179,7 +193,6 @@ export default function AcademyDetailPage({ params }: { params: { slug: string }
           </Card>
         </div>
 
-        {/* Social Links */}
         <div className="mt-6">
           <Card>
             <CardContent className="p-4">
@@ -204,7 +217,6 @@ export default function AcademyDetailPage({ params }: { params: { slug: string }
           </Card>
         </div>
 
-        {/* Achievements */}
         <div className="mt-6">
           <Card>
             <CardHeader>
@@ -286,14 +298,6 @@ export default function AcademyDetailPage({ params }: { params: { slug: string }
           </Card>
         </div>
 
-        {/* Coaches */}
-        {academyCoaches.length > 0 && (
-          <div className="mt-6">
-            <CoachesAtAcademy coaches={academyCoaches} academyName={academy.name} />
-          </div>
-        )}
-
-        {/* Map - Compact */}
         <div className="mt-6">
           <LocationMap
             lat={academy.location.lat}

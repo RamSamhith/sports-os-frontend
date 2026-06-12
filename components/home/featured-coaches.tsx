@@ -1,11 +1,32 @@
+'use client';
+
+import * as React from 'react';
 import Link from 'next/link';
 import { Container } from '@/components/layout/container';
 import { Section } from '@/components/layout/section';
 import { CoachCardPlaceholder } from '@/components/coaches/coach-card-placeholder';
-import { coaches } from '@/data/coaches';
-import { Users } from 'lucide-react';
+import { getCoaches } from '@/lib/api/coaches';
+import { Users, Loader2 } from 'lucide-react';
+import type { Coach } from '@/types/domain/coach';
 
 export function FeaturedCoaches() {
+  const [coaches, setCoaches] = React.useState<Coach[]>([]);
+  const [loading, setLoading] = React.useState(true);
+
+  React.useEffect(() => {
+    let cancelled = false;
+    async function load() {
+      const res = await getCoaches({ pageSize: 100 });
+      if (cancelled) return;
+      if (res.ok) {
+        setCoaches(res.data.items);
+      }
+      setLoading(false);
+    }
+    load();
+    return () => { cancelled = true; };
+  }, []);
+
   const featured = [...coaches]
     .sort((a, b) => b.rating.average - a.rating.average)
     .slice(0, 3);
@@ -22,7 +43,11 @@ export function FeaturedCoaches() {
             View all →
           </Link>
         </div>
-        {featured.length === 0 ? (
+        {loading ? (
+          <div className="flex items-center justify-center py-12">
+            <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+          </div>
+        ) : featured.length === 0 ? (
           <div className="text-muted-foreground flex flex-col items-center gap-3 rounded-xl border border-dashed py-12 text-center">
             <Users className="h-10 w-10 opacity-40" />
             <div>

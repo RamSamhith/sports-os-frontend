@@ -1,4 +1,7 @@
-import type { Metadata } from 'next';
+'use client';
+
+import * as React from 'react';
+import { useParams } from 'next/navigation';
 import { Container } from '@/components/layout/container';
 import { Section } from '@/components/layout/section';
 import { Breadcrumbs } from '@/components/seo/breadcrumbs';
@@ -10,52 +13,67 @@ import { CompareButton } from '@/components/academies/compare-button';
 import { VerifiedBadge } from '@/components/trust/verified-badge';
 import { ImageWithFallback } from '@/components/ui/image-with-fallback';
 import { fixtureImages } from '@/lib/images';
-import { notFound } from 'next/navigation';
-import { coachBySlug, coaches } from '@/data/coaches';
-import { academyById } from '@/data/academies';
-import { siteConfig } from '@/config/site';
+import { getCoach } from '@/lib/api/coaches';
+import type { Coach } from '@/types/domain/coach';
 import Link from 'next/link';
-import { School, MapPin, Star, ChevronRight } from 'lucide-react';
+import { Loader2, AlertTriangle } from 'lucide-react';
 
-export function generateStaticParams() {
-  return coaches.map((coach) => ({ slug: coach.slug }));
-}
+export default function CoachDetailPage() {
+  const params = useParams();
+  const slug = params.slug as string;
+  const [coach, setCoach] = React.useState<Coach | null>(null);
+  const [loading, setLoading] = React.useState(true);
+  const [error, setError] = React.useState<string | null>(null);
 
-export function generateMetadata({ params }: { params: { slug: string } }): Metadata {
-  const coach = coachBySlug(params.slug);
-  if (!coach) {
-    notFound();
-    return {};
+  React.useEffect(() => {
+    let cancelled = false;
+    async function load() {
+      setLoading(true);
+      setError(null);
+      const res = await getCoach(slug);
+      if (cancelled) return;
+      if (res.ok) {
+        setCoach(res.data);
+      } else {
+        setError(res.error.message);
+      }
+      setLoading(false);
+    }
+    load();
+    return () => { cancelled = true; };
+  }, [slug]);
+
+  if (loading) {
+    return (
+      <Section>
+        <Container>
+          <div className="flex items-center justify-center py-24">
+            <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+            <span className="ml-3 text-muted-foreground">Loading coach…</span>
+          </div>
+        </Container>
+      </Section>
+    );
   }
 
-  const title = `${coach.name} — Sports Coach in ${coach.location.city}`;
-  const description = `${coach.specialization.join(', ')} — ${coach.experienceYears}+ years experience in ${coach.location.city}, ${coach.location.state}.`;
-  const url = `${siteConfig.url}/coaches/${coach.slug}`;
-
-  return {
-    title,
-    description,
-    openGraph: {
-      title,
-      description,
-      url,
-      siteName: siteConfig.name,
-      type: 'website',
-      locale: siteConfig.locale,
-    },
-    twitter: {
-      card: 'summary_large_image',
-      title,
-      description,
-    },
-  };
-}
-
-export default function CoachDetailPage({ params }: { params: { slug: string } }) {
-  const coach = coachBySlug(params.slug);
-  if (!coach) notFound();
-
-  const academy = coach.academyId ? academyById(coach.academyId) : null;
+  if (error || !coach) {
+    return (
+      <Section>
+        <Container>
+          <div className="flex flex-col items-center justify-center gap-4 py-24 text-center">
+            <AlertTriangle className="h-12 w-12 text-destructive/40" />
+            <div>
+              <h2 className="text-xl font-semibold">Coach not found</h2>
+              <p className="text-sm text-muted-foreground mt-1">{error || 'This coach may have been removed.'}</p>
+            </div>
+            <Button asChild variant="outline">
+              <Link href="/coaches">Browse coaches</Link>
+            </Button>
+          </div>
+        </Container>
+      </Section>
+    );
+  }
 
   return (
     <Section>
@@ -115,35 +133,6 @@ export default function CoachDetailPage({ params }: { params: { slug: string } }
           </CardContent>
         </Card>
 
-        {academy && (
-          <div className="mt-6">
-            <h2 className="text-lg font-semibold text-foreground mb-3">Academy Affiliation</h2>
-            <Link href={`/academies/${academy.slug}`} className="group block">
-              <Card className="transition-all hover:shadow-md group-hover:border-primary/50">
-                <CardContent className="flex items-center gap-3 p-4">
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary/10">
-                    <School className="h-5 w-5 text-primary" />
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <p className="text-sm font-semibold leading-tight line-clamp-1">
-                      {academy.name}
-                    </p>
-                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                      <MapPin className="h-3 w-3" />
-                      <span>{academy.location.city}, {academy.location.state}</span>
-                      <span>·</span>
-                      <Star className="h-3 w-3 fill-amber-400 text-amber-400" />
-                      <span>{academy.rating.average.toFixed(1)}</span>
-                    </div>
-                  </div>
-                  <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-0.5" />
-                </CardContent>
-              </Card>
-            </Link>
-          </div>
-        )}
-
-        {/* Achievements */}
         <div className="mt-6">
           <Card>
             <CardHeader>

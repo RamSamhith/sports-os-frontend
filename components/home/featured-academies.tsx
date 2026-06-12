@@ -1,11 +1,32 @@
+'use client';
+
+import * as React from 'react';
 import Link from 'next/link';
 import { Container } from '@/components/layout/container';
 import { Section } from '@/components/layout/section';
 import { AcademyCardPlaceholder } from '@/components/academies/academy-card-placeholder';
-import { academies } from '@/data/academies';
-import { School } from 'lucide-react';
+import { getAcademies } from '@/lib/api/academies';
+import { School, Loader2 } from 'lucide-react';
+import type { Academy } from '@/types/domain/academy';
 
 export function FeaturedAcademies() {
+  const [academies, setAcademies] = React.useState<Academy[]>([]);
+  const [loading, setLoading] = React.useState(true);
+
+  React.useEffect(() => {
+    let cancelled = false;
+    async function load() {
+      const res = await getAcademies({ pageSize: 100 });
+      if (cancelled) return;
+      if (res.ok) {
+        setAcademies(res.data.items);
+      }
+      setLoading(false);
+    }
+    load();
+    return () => { cancelled = true; };
+  }, []);
+
   const featured = [...academies]
     .sort((a, b) => b.rating.average - a.rating.average)
     .slice(0, 3);
@@ -22,7 +43,11 @@ export function FeaturedAcademies() {
             View all →
           </Link>
         </div>
-        {featured.length === 0 ? (
+        {loading ? (
+          <div className="flex items-center justify-center py-12">
+            <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+          </div>
+        ) : featured.length === 0 ? (
           <div className="text-muted-foreground flex flex-col items-center gap-3 rounded-xl border border-dashed py-12 text-center">
             <School className="h-10 w-10 opacity-40" />
             <div>

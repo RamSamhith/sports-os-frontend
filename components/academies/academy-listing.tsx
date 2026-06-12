@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { SlidersHorizontal, X } from 'lucide-react';
+import { SlidersHorizontal, X, Loader2, AlertTriangle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { SearchInput } from '@/components/ui/search-input';
 import { Badge } from '@/components/ui/badge';
@@ -13,30 +13,31 @@ import { AcademyGrid } from '@/components/academies/academy-grid';
 import { academyFilterFacilities, academyFilterLevels, verificationStatuses } from '@/lib/constants/filters';
 import { sportTaxonomy } from '@/lib/constants/sport-taxonomy';
 import { useSearchQuery } from '@/lib/hooks/use-search-query';
-import { academies } from '@/data/academies';
+import { getAcademies } from '@/lib/api/academies';
+import type { Academy } from '@/types/domain/academy';
 
 const sportOptions = sportTaxonomy.map((s) => ({
   value: s.slug,
   label: s.name,
-  count: academies.filter((a) => a.sportsOffered.includes(s.slug)).length,
+  count: 0,
 }));
 
 const facilityOptions = academyFilterFacilities.map((f) => ({
   value: f.value,
   label: f.label,
-  count: academies.filter((a) => a.facilities.includes(f.value as never)).length,
+  count: 0,
 }));
 
 const levelOptions = academyFilterLevels.map((l) => ({
   value: l.value,
   label: l.label,
-  count: academies.filter((a) => a.trainingLevels.includes(l.value as never)).length,
+  count: 0,
 }));
 
 const statusOptions = verificationStatuses.map((s) => ({
   value: s.value,
   label: s.label,
-  count: academies.filter((a) => a.verificationStatus === s.value).length,
+  count: 0,
 }));
 
 function readListFromParams(params: URLSearchParams, key: string): string[] {
@@ -51,10 +52,64 @@ export function AcademyListing() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
+  const [academies, setAcademies] = React.useState<Academy[]>([]);
+  const [loading, setLoading] = React.useState(true);
+  const [error, setError] = React.useState<string | null>(null);
+
   const [sports, setSports] = React.useState<string[]>(() => readListFromParams(searchParams, 'sport'));
   const [facilities, setFacilities] = React.useState<string[]>(() => readListFromParams(searchParams, 'facility'));
   const [levels, setLevels] = React.useState<string[]>(() => readListFromParams(searchParams, 'level'));
   const [statuses, setStatuses] = React.useState<string[]>(() => readListFromParams(searchParams, 'status'));
+
+  React.useEffect(() => {
+    let cancelled = false;
+    async function load() {
+      setLoading(true);
+      setError(null);
+      const res = await getAcademies({ pageSize: 100 });
+      if (cancelled) return;
+      if (res.ok) {
+        setAcademies(res.data.items);
+      } else {
+        setError(res.error.message);
+      }
+      setLoading(false);
+    }
+    load();
+    return () => { cancelled = true; };
+  }, []);
+
+  const dynamicSportOptions = React.useMemo(() =>
+    sportOptions.map((o) => ({
+      ...o,
+      count: academies.filter((a) => a.sportsOffered.includes(o.value)).length,
+    })),
+    [academies]
+  );
+
+  const dynamicFacilityOptions = React.useMemo(() =>
+    facilityOptions.map((o) => ({
+      ...o,
+      count: academies.filter((a) => a.facilities.includes(o.value as never)).length,
+    })),
+    [academies]
+  );
+
+  const dynamicLevelOptions = React.useMemo(() =>
+    levelOptions.map((o) => ({
+      ...o,
+      count: academies.filter((a) => a.trainingLevels.includes(o.value as never)).length,
+    })),
+    [academies]
+  );
+
+  const dynamicStatusOptions = React.useMemo(() =>
+    statusOptions.map((o) => ({
+      ...o,
+      count: academies.filter((a) => a.verificationStatus === o.value).length,
+    })),
+    [academies]
+  );
 
   const appliedCount =
     sports.length + facilities.length + levels.length + statuses.length + (query ? 1 : 0);
@@ -76,7 +131,6 @@ export function AcademyListing() {
   const removeLevel = (s: string) => setLevels((prev) => prev.filter((x) => x !== s));
   const removeStatus = (s: string) => setStatuses((prev) => prev.filter((x) => x !== s));
 
-  // Sync filter changes to URL (filter changes are immediate, not debounced)
   React.useEffect(() => {
     const params = new URLSearchParams(searchParams.toString());
     if (sports.length) params.set('sport', sports.join(','));
@@ -91,7 +145,6 @@ export function AcademyListing() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sports, facilities, levels, statuses]);
 
-  // Apply filters using IMMEDIATE query for instant feedback
   const filtered = React.useMemo(() => {
     const q = query.trim().toLowerCase();
     return academies.filter((a) => {
@@ -113,14 +166,14 @@ export function AcademyListing() {
       }
       return true;
     });
-  }, [query, sports, facilities, levels, statuses]);
+  }, [query, sports, facilities, levels, statuses, academies]);
 
   const chips: Array<{ key: string; label: string; layoutId?: string; onRemove: () => void }> = [];
   if (query) {
-    chips.push({ key: 'q', label: `“${query}”`, onRemove: removeQueryChip });
+    chips.push({ key: 'q', label: `"${query}"`, onRemove: removeQueryChip });
   }
   for (const s of sports) {
-    const opt = sportOptions.find((o) => o.value === s);
+    const opt = dynamicSportOptions.find((o) => o.value === s);
     chips.push({
       key: `sport-${s}`,
       label: opt?.label ?? s,
@@ -129,7 +182,7 @@ export function AcademyListing() {
     });
   }
   for (const s of facilities) {
-    const opt = facilityOptions.find((o) => o.value === s);
+    const opt = dynamicFacilityOptions.find((o) => o.value === s);
     chips.push({
       key: `facility-${s}`,
       label: opt?.label ?? s,
@@ -138,7 +191,7 @@ export function AcademyListing() {
     });
   }
   for (const s of levels) {
-    const opt = levelOptions.find((o) => o.value === s);
+    const opt = dynamicLevelOptions.find((o) => o.value === s);
     chips.push({
       key: `level-${s}`,
       label: opt?.label ?? s,
@@ -147,13 +200,57 @@ export function AcademyListing() {
     });
   }
   for (const s of statuses) {
-    const opt = statusOptions.find((o) => o.value === s);
+    const opt = dynamicStatusOptions.find((o) => o.value === s);
     chips.push({
       key: `status-${s}`,
       label: opt?.label ?? s,
       layoutId: `filter-status-${s}`,
       onRemove: () => removeStatus(s),
     });
+  }
+
+  if (loading) {
+    return (
+      <div className="flex flex-col gap-4">
+        <SearchInput
+          value=""
+          onValueChange={() => {}}
+          label="Search academies"
+          placeholder="Search academies by name, city, or sport…"
+          size="lg"
+          disabled
+        />
+        <div className="flex items-center justify-center py-12">
+          <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+          <span className="ml-2 text-sm text-muted-foreground">Loading academies…</span>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex flex-col gap-4">
+        <SearchInput
+          value=""
+          onValueChange={() => {}}
+          label="Search academies"
+          placeholder="Search academies by name, city, or sport…"
+          size="lg"
+          disabled
+        />
+        <div className="flex flex-col items-center justify-center gap-3 rounded-xl border border-dashed py-12 text-center">
+          <AlertTriangle className="h-10 w-10 text-destructive/40" />
+          <div>
+            <p className="text-foreground font-medium">Failed to load academies</p>
+            <p className="text-sm text-muted-foreground">{error}</p>
+          </div>
+          <Button size="sm" variant="outline" onClick={() => window.location.reload()}>
+            Try again
+          </Button>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -179,7 +276,7 @@ export function AcademyListing() {
         >
           <FilterGroup
             title="Sport"
-            options={sportOptions}
+            options={dynamicSportOptions}
             selected={sports}
             onChange={setSports}
             maxHeight="200px"
@@ -188,7 +285,7 @@ export function AcademyListing() {
           <Separator />
           <FilterGroup
             title="Facility"
-            options={facilityOptions}
+            options={dynamicFacilityOptions}
             selected={facilities}
             onChange={setFacilities}
             layoutIdPrefix="filter-facility"
@@ -196,7 +293,7 @@ export function AcademyListing() {
           <Separator />
           <FilterGroup
             title="Training level"
-            options={levelOptions}
+            options={dynamicLevelOptions}
             selected={levels}
             onChange={setLevels}
             layoutIdPrefix="filter-level"
@@ -204,7 +301,7 @@ export function AcademyListing() {
           <Separator />
           <FilterGroup
             title="Verification"
-            options={statusOptions}
+            options={dynamicStatusOptions}
             selected={statuses}
             onChange={setStatuses}
             layoutIdPrefix="filter-status"
