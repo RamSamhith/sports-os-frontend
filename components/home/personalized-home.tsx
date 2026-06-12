@@ -23,7 +23,6 @@ const USER_LAT = 12.9716
 const USER_LNG = 77.5946
 
 export function PersonalizedHome() {
-  console.count('PersonalizedHome');
   const { role } = useAuth()
   const { data: onboarding, completed, hydrated } = useOnboarding()
   const { activeChild } = useChildren()

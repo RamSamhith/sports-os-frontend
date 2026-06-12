@@ -100,7 +100,6 @@ function migrateLegacyKeys(current: PersistedAuthState): PersistedAuthState {
 }
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  console.count('AuthProvider');
   const [state, setState] = useState<PersistedAuthState>({
     isAuthenticated: false,
     role: null,

@@ -10,8 +10,6 @@ export function PrivateGuard({ children }: { children: React.ReactNode }) {
   const { isAuthenticated, isLoading, verified, onboardingCompleted, role } = useAuth();
   const hydratedOnce = useRef(false);
 
-  console.count('PrivateGuard');
-
   useEffect(() => {
     if (isLoading) return;
     hydratedOnce.current = true;
