@@ -1,13 +1,29 @@
-import type { Enquiry } from '@/types/domain/enquiry';
-import type { EnquiryCreateRequest, EnquiryCreateResponse } from '@/types/api';
+import { post, get } from './client';
 import type { ApiResponse } from './client';
+import type { Enquiry } from '@/types/domain/enquiry';
 
-export async function getEnquiries(): Promise<ApiResponse<Enquiry[]>> {
-  const { get } = await import('./client');
-  return get<Enquiry[]>('/enquiries');
+export interface EnquiryCreatePayload {
+  targetType: 'academy' | 'coach';
+  targetId: string;
+  intent?: string;
+  parentInfo: { name: string; email: string; phone: string };
+  childInfo?: { name: string; age: number };
+  sportInterest: string;
+  message?: string;
 }
 
-export async function createEnquiry(data: EnquiryCreateRequest): Promise<ApiResponse<EnquiryCreateResponse>> {
-  const { post } = await import('./client');
-  return post<EnquiryCreateResponse>('/enquiries', data);
+export interface EnquiryCreateResponse {
+  enquiryId: string;
+  leadId: string | null;
+  whatsappConfirmationSent: boolean;
+}
+
+export async function createEnquiry(
+  payload: EnquiryCreatePayload,
+): Promise<ApiResponse<EnquiryCreateResponse>> {
+  return post<EnquiryCreateResponse>('/enquiries', payload);
+}
+
+export async function getMyEnquiries(): Promise<ApiResponse<Enquiry[]>> {
+  return get<Enquiry[]>('/enquiries/me');
 }

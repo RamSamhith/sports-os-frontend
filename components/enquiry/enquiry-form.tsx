@@ -1,11 +1,14 @@
 'use client';
 
 import * as React from 'react';
+import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { Loader2 } from 'lucide-react';
+import { createEnquiry, type EnquiryCreatePayload } from '@/lib/api/enquiries';
 
 type FieldErrors = Partial<Record<keyof EnquiryFormValues, string>>;
 
@@ -48,31 +51,72 @@ export function EnquiryForm({
   targetId: string;
   defaultSport?: string;
 }) {
+  const router = useRouter();
   const [values, setValues] = React.useState<EnquiryFormValues>({
     ...initialValues,
     sport: defaultSport ?? '',
   });
   const [errors, setErrors] = React.useState<FieldErrors>({});
-  // targetType / targetId are present for callers that need them; we keep them
-  // in the closure so future submit handlers can include them.
-  void targetType;
-  void targetId;
+  const [serverError, setServerError] = React.useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = React.useState(false);
 
   const set = <K extends keyof EnquiryFormValues>(key: K, value: EnquiryFormValues[K]) => {
     setValues((v) => ({ ...v, [key]: value }));
   };
 
-  const onSubmit = (e: React.FormEvent) => {
+  const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setServerError(null);
     const nextErrors = validate(values);
     setErrors(nextErrors);
     if (Object.keys(nextErrors).length > 0) return;
+
+    setIsSubmitting(true);
+
+    const payload: EnquiryCreatePayload = {
+      targetType,
+      targetId,
+      intent: 'trial',
+      parentInfo: {
+        name: values.parentName.trim(),
+        email: values.parentEmail.trim(),
+        phone: values.parentPhone.trim(),
+      },
+      sportInterest: values.sport.trim(),
+    };
+
+    if (values.childName?.trim()) {
+      payload.childInfo = {
+        name: values.childName.trim(),
+        age: values.childAge ? Number(values.childAge) : 0,
+      };
+    }
+
+    if (values.message?.trim()) {
+      payload.message = values.message.trim();
+    }
+
+    const res = await createEnquiry(payload);
+
+    if (!res.ok) {
+      setServerError(res.error.message);
+      setIsSubmitting(false);
+      return;
+    }
+
     toast.success('Enquiry submitted');
-    setValues({ ...initialValues, sport: defaultSport ?? '' });
+    setIsSubmitting(false);
+    router.push('/enquiry/success');
   };
 
   return (
     <form onSubmit={onSubmit} className="flex flex-col gap-4" noValidate>
+      {serverError && (
+        <div className="rounded-md bg-destructive/10 px-3 py-2 text-sm text-destructive">
+          {serverError}
+        </div>
+      )}
+
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <Field label="Parent name" error={errors.parentName} fieldName="parentName">
           <Input value={values.parentName} onChange={(e) => set('parentName', e.target.value)} placeholder="Your name" />
@@ -119,7 +163,9 @@ export function EnquiryForm({
         />
       </Field>
       <div className="flex justify-end gap-2">
-        <Button type="submit">Submit enquiry</Button>
+        <Button type="submit" disabled={isSubmitting}>
+          {isSubmitting ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Submit enquiry'}
+        </Button>
       </div>
     </form>
   );

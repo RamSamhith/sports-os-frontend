@@ -1,21 +1,60 @@
+'use client';
+
+import * as React from 'react';
+import { useParams } from 'next/navigation';
 import { Container } from '@/components/layout/container';
 import { Section } from '@/components/layout/section';
 import { EnquiryForm } from '@/components/enquiry/enquiry-form';
 import { Breadcrumbs } from '@/components/seo/breadcrumbs';
-import { notFound } from 'next/navigation';
-import { academyBySlug } from '@/data/academies';
-import { coachBySlug } from '@/data/coaches';
+import { Loader2 } from 'lucide-react';
+import { getAcademy } from '@/lib/api/academies';
+import { getCoach } from '@/lib/api/coaches';
 
-export default function EnquiryPage({
-  params,
-}: {
-  params: { type: 'academy' | 'coach'; id: string };
-}) {
-  if (params.type !== 'academy' && params.type !== 'coach') notFound();
+export default function EnquiryPage() {
+  const params = useParams<{ type: string; id: string }>();
+  const type = params.type as 'academy' | 'coach';
   const slug = params.id;
-  const target =
-    params.type === 'academy' ? academyBySlug(slug) : coachBySlug(slug);
-  if (!target) notFound();
+
+  const [target, setTarget] = React.useState<{ name: string; id: string } | null>(null);
+  const [loading, setLoading] = React.useState(true);
+  const [notFound, setNotFound] = React.useState(false);
+
+  React.useEffect(() => {
+    if (type !== 'academy' && type !== 'coach') { setNotFound(true); return; }
+
+    const fetchTarget = async () => {
+      const res = type === 'academy' ? await getAcademy(slug) : await getCoach(slug);
+      if (res.ok && res.data) {
+        setTarget({ name: (res.data as any).name, id: res.data.id });
+      } else {
+        setNotFound(true);
+      }
+      setLoading(false);
+    };
+    fetchTarget();
+  }, [type, slug]);
+
+  if (notFound) {
+    return (
+      <Section>
+        <Container size="md">
+          <p className="text-muted-foreground text-center py-12">Not found.</p>
+        </Container>
+      </Section>
+    );
+  }
+
+  if (loading) {
+    return (
+      <Section>
+        <Container size="md">
+          <div className="flex items-center justify-center py-12">
+            <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+          </div>
+        </Container>
+      </Section>
+    );
+  }
 
   return (
     <Section>
@@ -24,8 +63,8 @@ export default function EnquiryPage({
           items={[
             { label: 'Home', href: '/' },
             {
-              label: params.type === 'academy' ? 'Academies' : 'Coaches',
-              href: params.type === 'academy' ? '/academies' : '/coaches',
+              label: type === 'academy' ? 'Academies' : 'Coaches',
+              href: type === 'academy' ? '/academies' : '/coaches',
             },
             { label: 'Enquiry' },
           ]}
@@ -34,10 +73,10 @@ export default function EnquiryPage({
         <h1 className="text-3xl font-semibold tracking-tight md:text-4xl">Enquiry</h1>
         <p className="text-muted-foreground mt-1 text-sm">
           Share a few details and we'll pass them along to{' '}
-          <span className="text-foreground font-medium">{target.name}</span>. You'll receive a WhatsApp confirmation.
+          <span className="text-foreground font-medium">{target?.name}</span>. You'll receive a WhatsApp confirmation.
         </p>
         <div className="mt-6">
-          <EnquiryForm targetType={params.type} targetId={target.id} />
+          {target && <EnquiryForm targetType={type} targetId={target.id} />}
         </div>
       </Container>
     </Section>
