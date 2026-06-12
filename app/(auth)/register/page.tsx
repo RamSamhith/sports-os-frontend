@@ -11,6 +11,7 @@ import { useRouter } from 'next/navigation';
 import { SharedLayout } from '@/components/motion/shared-layout';
 import { Loader2 } from 'lucide-react';
 import { useAuth } from '@/lib/hooks/use-auth';
+import { register as apiRegister } from '@/lib/api/auth';
 
 interface FieldErrors {
   name?: string;
@@ -42,6 +43,7 @@ export default function RegisterPage() {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [errors, setErrors] = useState<FieldErrors>({});
+  const [serverError, setServerError] = useState<string | null>(null);
   const [touched, setTouched] = useState<Record<string, boolean>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -203,6 +205,7 @@ export default function RegisterPage() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setTouched({ name: true, email: true, phone: true, password: true, confirmPassword: true });
+    setServerError(null);
 
     const validationErrors = validate();
     setErrors(validationErrors);
@@ -210,11 +213,27 @@ export default function RegisterPage() {
     if (Object.keys(validationErrors).length > 0) return;
 
     setIsSubmitting(true);
-    // Placeholder: real registration wiring lives in a later phase
-    await new Promise((r) => setTimeout(r, 1500));
-    setProfile({ name: name.trim(), email: email.trim(), phone: phone.trim() });
+
+    const res = await apiRegister({
+      name: name.trim(),
+      email: email.trim(),
+      password,
+      phone: phone.trim(),
+    });
+
+    if (!res.ok) {
+      setServerError(res.error.message);
+      setIsSubmitting(false);
+      return;
+    }
+
+    // Store token
+    try {
+      localStorage.setItem('sportsos:auth-token', res.data.token);
+    } catch { /* ignore */ }
+
+    setProfile({ name: res.data.user.name, email: res.data.user.email, phone: phone.trim() });
     const wasAuthenticated = isAuthenticated;
-    console.log('[AUTH DEBUG] RegisterPage handleSubmit: wasAuthenticated:', wasAuthenticated, 'setting auth=true');
     setAuth(true);
     setIsSubmitting(false);
     // Save draft so "Edit phone/email" can restore form state
@@ -227,12 +246,8 @@ export default function RegisterPage() {
     } catch {
       // ignore
     }
-    // Handler navigates ONLY for edit flow (wasAuthenticated was true).
-    // For fresh registration (wasAuthenticated was false), the effect handles
-    // navigation after setAuth triggers a re-render with isAuthenticated=true.
     if (wasAuthenticated) {
-      console.log('[AUTH DEBUG] RegisterPage handleSubmit: edit flow, navigating to /verify/method');
-      router.push('/verify/method');
+      router.push('/');
     }
   }
 
@@ -269,18 +284,24 @@ export default function RegisterPage() {
           <CardDescription>Save favourites, track enquiries, and manage your profile</CardDescription>
         </CardHeader>
         <CardContent>
-          <motion.form
-            onSubmit={handleSubmit}
-            initial={reduced ? { opacity: 0 } : 'hidden'}
-            animate={reduced ? { opacity: 1 } : 'show'}
-            variants={reduced ? undefined : formVariants}
-            transition={{ delay: 0.1 }}
-            className="flex flex-col gap-4"
-            noValidate
-          >
-            <motion.div
-              variants={reduced ? undefined : fieldVariants}
-              transition={{ delay: 0.15 }}
+            <motion.form
+              onSubmit={handleSubmit}
+              initial={reduced ? { opacity: 0 } : 'hidden'}
+              animate={reduced ? { opacity: 1 } : 'show'}
+              variants={reduced ? undefined : formVariants}
+              transition={{ delay: 0.1 }}
+              className="flex flex-col gap-4"
+              noValidate
+            >
+              {serverError && (
+                <div className="rounded-md bg-destructive/10 px-3 py-2 text-sm text-destructive">
+                  {serverError}
+                </div>
+              )}
+
+              <motion.div
+                variants={reduced ? undefined : fieldVariants}
+                transition={{ delay: 0.15 }}
               className="flex flex-col gap-1.5"
             >
               <Label htmlFor="register-name">Full Name</Label>

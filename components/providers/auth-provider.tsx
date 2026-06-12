@@ -177,6 +177,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setProfileState({ ...defaultProfile });
     // Clear all app-specific localStorage keys
     try {
+      localStorage.removeItem('sportsos:auth-token');
       localStorage.removeItem('sportsos:settings');
       localStorage.removeItem('sportsos:preferences');
       localStorage.removeItem('sportsos:children');

@@ -10,6 +10,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { SharedLayout } from '@/components/motion/shared-layout';
 import { useAuth } from '@/lib/hooks/use-auth';
+import { login as apiLogin } from '@/lib/api/auth';
 import { Loader2 } from 'lucide-react';
 
 interface FieldErrors {
@@ -30,10 +31,11 @@ const fieldVariants = {
 export default function LoginPage() {
   const reduced = useReducedMotion();
   const router = useRouter();
-  const { setAuth, isAuthenticated, isLoading, verified, onboardingCompleted } = useAuth();
+  const { setAuth, setProfile, isAuthenticated, isLoading, verified, onboardingCompleted } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errors, setErrors] = useState<FieldErrors>({});
+  const [serverError, setServerError] = useState<string | null>(null);
   const [touched, setTouched] = useState<Record<string, boolean>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -123,6 +125,7 @@ export default function LoginPage() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setTouched({ email: true, password: true });
+    setServerError(null);
 
     const validationErrors = validate();
     setErrors(validationErrors);
@@ -130,14 +133,24 @@ export default function LoginPage() {
     if (Object.keys(validationErrors).length > 0) return;
 
     setIsSubmitting(true);
-    // Placeholder: real authentication wiring lives in a later phase
-    await new Promise((r) => setTimeout(r, 1200));
-    console.log('[AUTH DEBUG] LoginPage handleSubmit: setting auth=true');
+
+    const res = await apiLogin({ email: email.trim(), password });
+
+    if (!res.ok) {
+      setServerError(res.error.message);
+      setIsSubmitting(false);
+      return;
+    }
+
+    // Store token
+    try {
+      localStorage.setItem('sportsos:auth-token', res.data.token);
+    } catch { /* ignore */ }
+
+    setProfile({ name: res.data.user.name, email: res.data.user.email, phone: '' });
     setAuth(true);
     setIsSubmitting(false);
-    if (!verified) router.push('/verify/method');
-    else if (!onboardingCompleted) router.push('/onboarding/role');
-    else router.replace('/');
+    router.replace('/');
   }
 
   const errorId = (field: string) => `login-${field}-error`;
@@ -174,16 +187,22 @@ export default function LoginPage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <motion.form
-            onSubmit={handleSubmit}
-            initial={reduced ? { opacity: 0 } : 'hidden'}
-            animate={reduced ? { opacity: 1 } : 'show'}
-            variants={reduced ? undefined : formVariants}
-            transition={{ delay: 0.1 }}
-            className="flex flex-col gap-4"
-            noValidate
-          >
-            <motion.div
+            <motion.form
+              onSubmit={handleSubmit}
+              initial={reduced ? { opacity: 0 } : 'hidden'}
+              animate={reduced ? { opacity: 1 } : 'show'}
+              variants={reduced ? undefined : formVariants}
+              transition={{ delay: 0.1 }}
+              className="flex flex-col gap-4"
+              noValidate
+            >
+              {serverError && (
+                <div className="rounded-md bg-destructive/10 px-3 py-2 text-sm text-destructive">
+                  {serverError}
+                </div>
+              )}
+
+              <motion.div
               variants={reduced ? undefined : fieldVariants}
               transition={{ delay: 0.15 }}
               className="flex flex-col gap-1.5"
