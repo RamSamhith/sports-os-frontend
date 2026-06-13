@@ -27,7 +27,7 @@ export interface AuthContextValue {
   profile: UserProfile;
 
   /** Set authenticated flag (true after register / login). */
-  setAuth: (authenticated: boolean) => void;
+  setAuth: (authenticated: boolean, onboarded?: boolean) => void;
   /** Set the user's role (called from onboarding role selection). */
   setRole: (role: OnboardingRole) => void;
   /** Mark onboarding as complete (called after role selection). */

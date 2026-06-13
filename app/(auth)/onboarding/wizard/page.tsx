@@ -10,6 +10,7 @@ import { LocationPicker } from '@/components/ui/location-picker';
 import { useAuth } from '@/lib/hooks/use-auth';
 import { useOnboarding, type OnboardingData, type SkillLevel } from '@/lib/hooks/use-onboarding';
 import { useChildren } from '@/lib/hooks/use-children';
+import { saveOnboarding } from '@/lib/api/auth';
 import { sportTaxonomy } from '@/lib/constants/sport-taxonomy';
 import { Check } from 'lucide-react';
 import { cn } from '@/lib/utils/cn';
@@ -154,6 +155,7 @@ export default function OnboardingWizardPage() {
     } else {
       completeOnboarding(data);
       markAuthComplete();
+      saveOnboarding().catch(() => { /* non-blocking */ });
       if (isParent && data.parent && children.length === 0) {
         addChild({
           name: data.parent.childName,

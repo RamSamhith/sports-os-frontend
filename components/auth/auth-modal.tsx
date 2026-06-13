@@ -313,8 +313,9 @@ function LoginView({
         return;
       }
       try { localStorage.setItem('sportsos:auth-token', res.data.token); } catch { /* ignore */ }
-      setProfile({ name: res.data.user.name, email: res.data.user.email, phone: (res.data.user as unknown as Record<string, unknown>).phone as string ?? '' });
-      setAuth(true);
+      const userPhone = res.data.user.phone ?? '';
+      setProfile({ name: res.data.user.name, email: res.data.user.email, phone: userPhone });
+      setAuth(true, res.data.user.onboardingCompleted);
       setIsSubmitting(false);
       onSuccess();
     } catch {
@@ -534,9 +535,10 @@ function RegisterView({
         return;
       }
       try { localStorage.setItem('sportsos:auth-token', res.data.token); } catch { /* ignore */ }
-      setProfile({ name: res.data.user.name, email: res.data.user.email, phone: (res.data.user as unknown as Record<string, unknown>).phone as string ?? phone.trim() });
+      const userPhone = res.data.user.phone ?? phone.trim();
+      setProfile({ name: res.data.user.name, email: res.data.user.email, phone: userPhone });
       const wasAuthenticated = isAuthenticated;
-      setAuth(true);
+      setAuth(true, res.data.user.onboardingCompleted);
       setIsSubmitting(false);
       if (wasAuthenticated) {
         router.push('/onboarding/role');

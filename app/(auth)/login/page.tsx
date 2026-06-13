@@ -147,12 +147,11 @@ export default function LoginPage() {
         localStorage.setItem('sportsos:auth-token', res.data.token);
       } catch { /* ignore */ }
 
-      setProfile({ name: res.data.user.name, email: res.data.user.email, phone: (res.data.user as unknown as Record<string, unknown>).phone as string ?? '' });
-      setAuth(true);
+      const userPhone = res.data.user.phone ?? '';
+      setProfile({ name: res.data.user.name, email: res.data.user.email, phone: userPhone });
+      setAuth(true, res.data.user.onboardingCompleted);
       setIsSubmitting(false);
-      const onboarded = localStorage.getItem('sportsos:auth-state');
-      const parsed = onboarded ? JSON.parse(onboarded) : null;
-      if (parsed?.onboardingCompleted) {
+      if (res.data.user.onboardingCompleted) {
         router.replace('/');
       } else {
         router.replace('/onboarding/role');

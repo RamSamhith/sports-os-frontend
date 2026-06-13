@@ -230,7 +230,7 @@ export default function RegisterPage() {
 
     setProfile({ name: res.data.user.name, email: res.data.user.email, phone: phone.trim() });
     const wasAuthenticated = isAuthenticated;
-    setAuth(true);
+    setAuth(true, res.data.user.onboardingCompleted);
     setIsSubmitting(false);
     // Save draft so "Edit phone/email" can restore form state
     try {

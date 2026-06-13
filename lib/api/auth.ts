@@ -73,3 +73,8 @@ export async function getMe(): Promise<ApiResponse<User>> {
   const { get } = await import('./client');
   return get<User>('/auth/me');
 }
+
+export async function saveOnboarding(): Promise<ApiResponse<User>> {
+  const { put } = await import('./client');
+  return put<User>('/auth/onboarding', {});
+}

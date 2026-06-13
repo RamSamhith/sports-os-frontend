@@ -133,11 +133,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, [profile, hydrated]);
 
-  const setAuth = useCallback((authenticated: boolean) => {
+  const setAuth = useCallback((authenticated: boolean, onboarded?: boolean) => {
     setState((prev) => {
-      if (prev.isAuthenticated === authenticated) return prev;
-      // MVP: auto-set verified when authenticated (OTP bypass)
-      return { ...prev, isAuthenticated: authenticated, verified: authenticated ? true : prev.verified };
+      if (prev.isAuthenticated === authenticated && (onboarded === undefined || prev.onboardingCompleted === onboarded)) return prev;
+      return {
+        ...prev,
+        isAuthenticated: authenticated,
+        verified: authenticated ? true : prev.verified,
+        onboardingCompleted: onboarded ?? prev.onboardingCompleted,
+      };
     });
   }, []);
 
@@ -190,7 +194,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       localStorage.removeItem('sportsos:shortlist');
       localStorage.removeItem('sportsos:compare');
       localStorage.removeItem('sportsos:recent-searches');
-      localStorage.removeItem('sportsos:onboarding');
       localStorage.removeItem('sportsos:academy-status');
       localStorage.removeItem('sportsos:selected-academy');
       localStorage.removeItem('sportsos:recently-viewed');

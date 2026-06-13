@@ -25,6 +25,7 @@ export interface User {
   avatar?: string;
   authProvider?: 'credentials' | 'google' | 'phone';
   lastLoginAt?: string;
+  onboardingCompleted?: boolean;
   preferences?: UserPreferences;
   themePreference?: 'midnight-ice' | 'ember-orange' | 'graphite-titanium' | 'alpine-light' | 'system';
   consent?: ConsentFlags;
