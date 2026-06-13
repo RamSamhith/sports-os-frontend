@@ -96,17 +96,22 @@ export function EnquiryForm({
       payload.message = values.message.trim();
     }
 
-    const res = await createEnquiry(payload);
+    try {
+      const res = await createEnquiry(payload);
 
-    if (!res.ok) {
-      setServerError(res.error.message);
+      if (!res.ok) {
+        setServerError(res.error.message);
+        setIsSubmitting(false);
+        return;
+      }
+
+      toast.success('Enquiry submitted');
       setIsSubmitting(false);
-      return;
+      router.push('/enquiry/success');
+    } catch {
+      setServerError('Network error. Please try again.');
+      setIsSubmitting(false);
     }
-
-    toast.success('Enquiry submitted');
-    setIsSubmitting(false);
-    router.push('/enquiry/success');
   };
 
   return (

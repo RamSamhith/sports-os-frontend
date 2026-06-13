@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/lib/hooks/use-auth';
+import { login as apiLogin, register as apiRegister } from '@/lib/api/auth';
 import { Loader2, ArrowLeft } from 'lucide-react';
 import { ease, duration } from '@/components/motion/constants';
 
@@ -235,10 +236,11 @@ function LoginView({
   custom?: number;
   variants?: Variants;
 }) {
-  const { setAuth } = useAuth();
+  const { setAuth, setProfile } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errors, setErrors] = useState<FieldErrors>({});
+  const [serverError, setServerError] = useState<string | null>(null);
   const [touched, setTouched] = useState<Record<string, boolean>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -297,14 +299,27 @@ function LoginView({
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setTouched({ email: true, password: true });
+    setServerError(null);
     const ve = validate();
     setErrors(ve);
     if (Object.keys(ve).length > 0) return;
     setIsSubmitting(true);
-    await new Promise((r) => setTimeout(r, 1200));
-    setAuth(true);
-    setIsSubmitting(false);
-    onSuccess();
+    try {
+      const res = await apiLogin({ email: email.trim(), password });
+      if (!res.ok) {
+        setServerError(res.error.message);
+        setIsSubmitting(false);
+        return;
+      }
+      try { localStorage.setItem('sportsos:auth-token', res.data.token); } catch { /* ignore */ }
+      setProfile({ name: res.data.user.name, email: res.data.user.email, phone: (res.data.user as unknown as Record<string, unknown>).phone as string ?? '' });
+      setAuth(true);
+      setIsSubmitting(false);
+      onSuccess();
+    } catch {
+      setServerError('Network error. Please try again.');
+      setIsSubmitting(false);
+    }
   }
 
   const errorId = (f: string) => `modal-login-${f}-error`;
@@ -325,6 +340,11 @@ function LoginView({
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="flex flex-col gap-4" noValidate>
+          {serverError && (
+            <div className="rounded-md bg-destructive/10 px-3 py-2 text-sm text-destructive">
+              {serverError}
+            </div>
+          )}
           <motion.div variants={reduced ? undefined : formFieldVariants} initial="hidden" animate="visible" transition={{ delay: 0.05 }} className="flex flex-col gap-1.5">
             <Label htmlFor="modal-login-email">Email</Label>
             <Input
@@ -394,6 +414,7 @@ function RegisterView({
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [errors, setErrors] = useState<FieldErrors>({});
+  const [serverError, setServerError] = useState<string | null>(null);
   const [touched, setTouched] = useState<Record<string, boolean>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -407,10 +428,7 @@ function RegisterView({
         sessionStorage.removeItem('sportsos:editing-contact');
         return;
       }
-      if (!verified) {
-        router.push('/verify/method');
-        return;
-      }
+      // MVP: verification skipped — verified is auto-set by setAuth(true)
       if (!onboardingCompleted) {
         router.push('/onboarding/role');
         return;
@@ -500,19 +518,29 @@ function RegisterView({
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setTouched({ name: true, email: true, phone: true, password: true, confirmPassword: true });
+    setServerError(null);
     const ve = validate();
     setErrors(ve);
     if (Object.keys(ve).length > 0) return;
     setIsSubmitting(true);
-    await new Promise((r) => setTimeout(r, 1500));
-    setProfile({ name: name.trim(), email: email.trim(), phone: phone.trim() });
-    const wasAuthenticated = isAuthenticated;
-    setAuth(true);
-    setIsSubmitting(false);
-    // Handler navigates ONLY for edit flow.
-    // For fresh registration, the effect handles navigation after setAuth.
-    if (wasAuthenticated) {
-      router.push('/verify/method');
+    try {
+      const res = await apiRegister({ name: name.trim(), email: email.trim(), phone: phone.trim(), password });
+      if (!res.ok) {
+        setServerError(res.error.message);
+        setIsSubmitting(false);
+        return;
+      }
+      try { localStorage.setItem('sportsos:auth-token', res.data.token); } catch { /* ignore */ }
+      setProfile({ name: res.data.user.name, email: res.data.user.email, phone: (res.data.user as unknown as Record<string, unknown>).phone as string ?? phone.trim() });
+      const wasAuthenticated = isAuthenticated;
+      setAuth(true);
+      setIsSubmitting(false);
+      if (wasAuthenticated) {
+        router.push('/onboarding/role');
+      }
+    } catch {
+      setServerError('Network error. Please try again.');
+      setIsSubmitting(false);
     }
   }
 
@@ -534,6 +562,11 @@ function RegisterView({
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="flex flex-col gap-4" noValidate>
+          {serverError && (
+            <div className="rounded-md bg-destructive/10 px-3 py-2 text-sm text-destructive">
+              {serverError}
+            </div>
+          )}
           <motion.div variants={reduced ? undefined : formFieldVariants} initial="hidden" animate="visible" transition={{ delay: 0.05 }} className="flex flex-col gap-1.5">
             <Label htmlFor="modal-reg-name">Full Name</Label>
             <Input

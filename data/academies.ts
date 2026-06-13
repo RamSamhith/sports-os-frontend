@@ -57,6 +57,7 @@ export const academies: Academy[] = [
     status: 'published',
     lastUpdatedAt: '2026-04-12T09:30:00.000Z',
     createdAt: '2024-01-15T00:00:00.000Z',
+    sourceCount: 0,
     indexedAt: '2026-04-12T10:00:00.000Z',
   },
   {
@@ -105,6 +106,7 @@ export const academies: Academy[] = [
     status: 'published',
     lastUpdatedAt: '2026-03-28T14:15:00.000Z',
     createdAt: '2024-02-20T00:00:00.000Z',
+    sourceCount: 0,
     indexedAt: '2026-03-28T15:00:00.000Z',
   },
   {
@@ -158,6 +160,7 @@ export const academies: Academy[] = [
     status: 'published',
     lastUpdatedAt: '2026-05-02T11:45:00.000Z',
     createdAt: '2023-09-10T00:00:00.000Z',
+    sourceCount: 0,
     indexedAt: '2026-05-02T12:00:00.000Z',
   },
   {
@@ -202,6 +205,7 @@ export const academies: Academy[] = [
     status: 'published',
     lastUpdatedAt: '2026-04-30T16:00:00.000Z',
     createdAt: '2024-05-01T00:00:00.000Z',
+    sourceCount: 0,
     indexedAt: '2026-04-30T16:30:00.000Z',
   },
   {
@@ -246,6 +250,7 @@ export const academies: Academy[] = [
     status: 'published',
     lastUpdatedAt: '2026-03-19T08:20:00.000Z',
     createdAt: '2024-06-12T00:00:00.000Z',
+    sourceCount: 0,
     indexedAt: '2026-03-19T09:00:00.000Z',
   },
   {
@@ -289,6 +294,7 @@ export const academies: Academy[] = [
     status: 'published',
     lastUpdatedAt: '2026-04-08T13:10:00.000Z',
     createdAt: '2024-09-22T00:00:00.000Z',
+    sourceCount: 0,
     indexedAt: '2026-04-08T14:00:00.000Z',
   },
   {
@@ -337,6 +343,7 @@ export const academies: Academy[] = [
     status: 'published',
     lastUpdatedAt: '2026-05-12T07:55:00.000Z',
     createdAt: '2023-11-04T00:00:00.000Z',
+    sourceCount: 0,
     indexedAt: '2026-05-12T08:00:00.000Z',
   },
   {
@@ -381,6 +388,7 @@ export const academies: Academy[] = [
     status: 'published',
     lastUpdatedAt: '2026-04-22T10:10:00.000Z',
     createdAt: '2024-07-18T00:00:00.000Z',
+    sourceCount: 0,
     indexedAt: '2026-04-22T10:30:00.000Z',
   },
   {
@@ -425,6 +433,7 @@ export const academies: Academy[] = [
     status: 'published',
     lastUpdatedAt: '2026-05-18T15:40:00.000Z',
     createdAt: '2023-08-22T00:00:00.000Z',
+    sourceCount: 0,
     indexedAt: '2026-05-18T16:00:00.000Z',
   },
   {
@@ -469,6 +478,7 @@ export const academies: Academy[] = [
     status: 'published',
     lastUpdatedAt: '2026-04-04T09:50:00.000Z',
     createdAt: '2024-10-09T00:00:00.000Z',
+    sourceCount: 0,
     indexedAt: '2026-04-04T10:00:00.000Z',
   },
   {
@@ -512,6 +522,7 @@ export const academies: Academy[] = [
     status: 'published',
     lastUpdatedAt: '2026-02-15T18:00:00.000Z',
     createdAt: '2025-01-12T00:00:00.000Z',
+    sourceCount: 0,
     indexedAt: '2026-02-15T18:30:00.000Z',
   },
   {
@@ -555,6 +566,7 @@ export const academies: Academy[] = [
     status: 'published',
     lastUpdatedAt: '2026-03-30T11:25:00.000Z',
     createdAt: '2025-02-08T00:00:00.000Z',
+    sourceCount: 0,
     indexedAt: '2026-03-30T12:00:00.000Z',
   },
 ];

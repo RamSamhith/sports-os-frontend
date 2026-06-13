@@ -54,6 +54,13 @@ export interface Academy {
   rating: Rating;
   coverImage?: string;
   gallery: string[];
+  sourceCount: number;
+  dataProvenance?: {
+    sourceType?: string;
+    sourceUrl?: string;
+    confidenceScore?: number;
+    lastVerifiedAt?: string;
+  }[];
   status: AcademyStatus;
   lastUpdatedAt: string;
   createdAt: string;

@@ -21,6 +21,13 @@ export interface Coach {
   };
   verificationStatus: VerificationStatus;
   rating: Rating;
+  sourceCount: number;
+  dataProvenance?: {
+    sourceType?: string;
+    sourceUrl?: string;
+    confidenceScore?: number;
+    lastVerifiedAt?: string;
+  }[];
   status: CoachStatus;
   lastUpdatedAt: string;
   createdAt: string;

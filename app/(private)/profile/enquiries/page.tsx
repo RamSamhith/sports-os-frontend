@@ -1,12 +1,10 @@
 'use client';
 
 import * as React from 'react';
-import Link from 'next/link';
-import { MessageCircle, ExternalLink } from 'lucide-react';
+import { MessageCircle } from 'lucide-react';
 import { EmptyState } from '@/components/feedback/empty-state';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import { Loader2 } from 'lucide-react';
 import { getMyEnquiries } from '@/lib/api/enquiries';
 import type { Enquiry } from '@/types/domain/enquiry';
@@ -68,11 +66,6 @@ export default function EnquiriesPage() {
                 <p className="text-muted-foreground mt-1 line-clamp-2 text-xs">{eq.message}</p>
               )}
             </div>
-            <Button size="sm" variant="ghost" asChild>
-              <Link href={`/${eq.targetType === 'academy' ? 'academies' : 'coaches'}/${eq.targetId}`}>
-                <ExternalLink className="h-3 w-3" />
-              </Link>
-            </Button>
           </CardContent>
         </Card>
       ))}

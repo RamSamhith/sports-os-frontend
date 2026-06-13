@@ -50,13 +50,12 @@ export default function LoginPage() {
   useEffect(() => {
     if (isLoading) return;
     if (isAuthenticated) {
-      console.log('[AUTH DEBUG] LoginPage effect: isAuthenticated=true, verified:', verified, 'onboardingCompleted:', onboardingCompleted);
-      if (verified && onboardingCompleted) {
-        console.log('[AUTH DEBUG] LoginPage: fully onboarded, redirecting to /');
+      // MVP: verification skipped — only check onboardingCompleted
+      if (onboardingCompleted) {
         router.replace('/');
       }
     }
-  }, [isLoading, isAuthenticated, verified, onboardingCompleted, router]);
+  }, [isLoading, isAuthenticated, onboardingCompleted, router]);
 
   function validate(): FieldErrors {
     const e: FieldErrors = {};
@@ -134,23 +133,28 @@ export default function LoginPage() {
 
     setIsSubmitting(true);
 
-    const res = await apiLogin({ email: email.trim(), password });
-
-    if (!res.ok) {
-      setServerError(res.error.message);
-      setIsSubmitting(false);
-      return;
-    }
-
-    // Store token
     try {
-      localStorage.setItem('sportsos:auth-token', res.data.token);
-    } catch { /* ignore */ }
+      const res = await apiLogin({ email: email.trim(), password });
 
-    setProfile({ name: res.data.user.name, email: res.data.user.email, phone: '' });
-    setAuth(true);
-    setIsSubmitting(false);
-    router.replace('/');
+      if (!res.ok) {
+        setServerError(res.error.message);
+        setIsSubmitting(false);
+        return;
+      }
+
+      // Store token
+      try {
+        localStorage.setItem('sportsos:auth-token', res.data.token);
+      } catch { /* ignore */ }
+
+      setProfile({ name: res.data.user.name, email: res.data.user.email, phone: (res.data.user as unknown as Record<string, unknown>).phone as string ?? '' });
+      setAuth(true);
+      setIsSubmitting(false);
+      router.replace('/');
+    } catch {
+      setServerError('Network error. Please try again.');
+      setIsSubmitting(false);
+    }
   }
 
   const errorId = (field: string) => `login-${field}-error`;

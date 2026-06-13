@@ -86,11 +86,7 @@ export default function RegisterPage() {
         sessionStorage.removeItem('sportsos:editing-contact');
         return;
       }
-      if (!verified) {
-        console.log('[AUTH DEBUG] RegisterPage effect: not verified, navigating to /verify/method');
-        router.replace('/verify/method');
-        return;
-      }
+      // MVP: verification skipped — verified is auto-set by setAuth(true)
       if (!onboardingCompleted) {
         console.log('[AUTH DEBUG] RegisterPage effect: onboarding not complete, navigating to /onboarding/role');
         router.replace('/onboarding/role');

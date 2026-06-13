@@ -136,7 +136,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const setAuth = useCallback((authenticated: boolean) => {
     setState((prev) => {
       if (prev.isAuthenticated === authenticated) return prev;
-      return { ...prev, isAuthenticated: authenticated };
+      // MVP: auto-set verified when authenticated (OTP bypass)
+      return { ...prev, isAuthenticated: authenticated, verified: authenticated ? true : prev.verified };
     });
   }, []);
 

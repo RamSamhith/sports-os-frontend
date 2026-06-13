@@ -105,10 +105,8 @@ export default function RoleSelectionPage() {
     if (!isAuthenticated) {
       console.log('[AUTH DEBUG] RoleSelectionPage: not authenticated, redirect to /login');
       router.replace('/login');
-    } else if (!verified) {
-      console.log('[AUTH DEBUG] RoleSelectionPage: not verified, redirect to /verify/method');
-      router.replace('/verify/method');
     }
+    // MVP: verification check removed
   }, [isLoading, isAuthenticated, verified, router]);
 
   function handleSelect(role: Role) {
