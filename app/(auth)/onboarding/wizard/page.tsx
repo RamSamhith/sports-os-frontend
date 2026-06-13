@@ -36,7 +36,7 @@ export default function OnboardingWizardPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const isEdit = searchParams.get('edit') === 'true';
-  const { isAuthenticated, isLoading, role, verified, completeOnboarding: markAuthComplete } = useAuth();
+  const { isAuthenticated, isLoading, role, verified, completeOnboarding: markAuthComplete, setOnboarding } = useAuth();
   const { completed, athleteData, parentData, completeOnboarding, updateOnboardingData, hydrated } = useOnboarding();
   const { children, addChild } = useChildren();
   const isParent = role === 'parent';
@@ -155,7 +155,44 @@ export default function OnboardingWizardPage() {
     } else {
       completeOnboarding(data);
       markAuthComplete();
-      saveOnboarding().catch(() => { /* non-blocking */ });
+
+      // Sync to auth context
+      const onboardingUpdate: Record<string, unknown> = {
+        sportInterests: sports,
+        skillLevel: skillLevel as string,
+        location: location.trim(),
+      };
+      if (isParent) {
+        onboardingUpdate.children = [{
+          name: childName.trim(),
+          age: Number(age),
+          sportInterests: sports,
+          skillLevel: skillLevel as string,
+        }];
+      } else {
+        onboardingUpdate.age = Number(age);
+        onboardingUpdate.gender = gender;
+        onboardingUpdate.goals = goals.trim();
+      }
+      setOnboarding(onboardingUpdate as Parameters<typeof setOnboarding>[0]);
+
+      // Persist to backend
+      saveOnboarding({
+        role: role || undefined,
+        age: isParent ? undefined : Number(age),
+        gender: isParent ? undefined : gender || undefined,
+        sportInterests: sports,
+        skillLevel: skillLevel as string || undefined,
+        goals: isParent ? undefined : goals.trim() || undefined,
+        location: location.trim() || undefined,
+        children: isParent ? [{
+          name: childName.trim(),
+          age: Number(age),
+          sportInterests: sports,
+          skillLevel: skillLevel as string || undefined,
+        }] : undefined,
+      }).catch(() => { /* non-blocking */ });
+
       if (isParent && data.parent && children.length === 0) {
         addChild({
           name: data.parent.childName,

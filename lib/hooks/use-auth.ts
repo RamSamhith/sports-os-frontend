@@ -10,6 +10,15 @@ export interface UserProfile {
   phone: string;
 }
 
+export interface AuthChild {
+  id: string;
+  name: string;
+  age: number;
+  gender?: string;
+  sportInterests: string[];
+  skillLevel?: string;
+}
+
 export interface AuthContextValue {
   /** Whether the user is authenticated (frontend flag). */
   isAuthenticated: boolean;
@@ -26,6 +35,17 @@ export interface AuthContextValue {
   /** User profile data (name, email, phone). */
   profile: UserProfile;
 
+  /** Onboarding data from backend (populated on login/me). */
+  onboarding: {
+    age: number | null;
+    gender: string | null;
+    sportInterests: string[];
+    skillLevel: string | null;
+    goals: string;
+    location: string;
+    children: AuthChild[];
+  };
+
   /** Set authenticated flag (true after register / login). */
   setAuth: (authenticated: boolean, onboarded?: boolean) => void;
   /** Set the user's role (called from onboarding role selection). */
@@ -36,6 +56,8 @@ export interface AuthContextValue {
   setVerified: (verified: boolean) => void;
   /** Update user profile data. */
   setProfile: (profile: Partial<UserProfile>) => void;
+  /** Update onboarding data from backend response. */
+  setOnboarding: (data: Partial<AuthContextValue['onboarding']>) => void;
   /** Clear all auth state and redirect. */
   signOut: () => void;
 }

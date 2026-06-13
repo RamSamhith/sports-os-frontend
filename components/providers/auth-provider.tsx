@@ -1,10 +1,12 @@
 'use client';
 
 import { createContext, useCallback, useEffect, useMemo, useState, type ReactNode } from 'react';
-import { AuthContext, type AuthContextValue, type OnboardingRole, type UserProfile } from '@/lib/hooks/use-auth';
+import { AuthContext, type AuthContextValue, type AuthChild, type OnboardingRole, type UserProfile } from '@/lib/hooks/use-auth';
+import { getMe } from '@/lib/api/auth';
 
 const STORAGE_KEY = 'sportsos:auth-state';
 const PROFILE_KEY = 'sportsos:profile';
+const ONBOARDING_KEY = 'sportsos:onboarding-data';
 
 interface PersistedAuthState {
   isAuthenticated: boolean;
@@ -19,7 +21,27 @@ interface PersistedProfile {
   phone: string;
 }
 
+interface PersistedOnboarding {
+  age: number | null;
+  gender: string | null;
+  sportInterests: string[];
+  skillLevel: string | null;
+  goals: string;
+  location: string;
+  children: AuthChild[];
+}
+
 const defaultProfile: UserProfile = { name: '', email: '', phone: '' };
+
+const defaultOnboarding: PersistedOnboarding = {
+  age: null,
+  gender: null,
+  sportInterests: [],
+  skillLevel: null,
+  goals: '',
+  location: '',
+  children: [],
+};
 
 function readState(): PersistedAuthState {
   try {
@@ -68,6 +90,33 @@ function writeProfile(profile: UserProfile) {
   }
 }
 
+function readOnboarding(): PersistedOnboarding {
+  try {
+    const raw = localStorage.getItem(ONBOARDING_KEY);
+    if (!raw) return { ...defaultOnboarding };
+    const parsed = JSON.parse(raw);
+    return {
+      age: typeof parsed.age === 'number' ? parsed.age : null,
+      gender: typeof parsed.gender === 'string' ? parsed.gender : null,
+      sportInterests: Array.isArray(parsed.sportInterests) ? parsed.sportInterests : [],
+      skillLevel: typeof parsed.skillLevel === 'string' ? parsed.skillLevel : null,
+      goals: typeof parsed.goals === 'string' ? parsed.goals : '',
+      location: typeof parsed.location === 'string' ? parsed.location : '',
+      children: Array.isArray(parsed.children) ? parsed.children : [],
+    };
+  } catch {
+    return { ...defaultOnboarding };
+  }
+}
+
+function writeOnboarding(data: PersistedOnboarding) {
+  try {
+    localStorage.setItem(ONBOARDING_KEY, JSON.stringify(data));
+  } catch {
+    // storage full or unavailable
+  }
+}
+
 /**
  * Migrate legacy localStorage keys into the unified auth state.
  * Runs once on mount.
@@ -107,16 +156,65 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     verified: false,
   });
   const [profile, setProfileState] = useState<UserProfile>({ ...defaultProfile });
+  const [onboarding, setOnboardingState] = useState<PersistedOnboarding>({ ...defaultOnboarding });
   const [hydrated, setHydrated] = useState(false);
 
-  // Hydrate from localStorage on mount
+  // Hydrate from localStorage on mount, then fetch from backend if token exists
   useEffect(() => {
     const stored = readState();
     const migrated = migrateLegacyKeys(stored);
     setState(migrated);
     writeState(migrated);
     setProfileState(readProfile());
+    setOnboardingState(readOnboarding());
     setHydrated(true);
+
+    // If authenticated, fetch fresh data from backend
+    if (migrated.isAuthenticated) {
+      getMe().then((res) => {
+        if (res.ok && res.data) {
+          const user = res.data;
+          // Update profile from backend
+          const backendProfile: UserProfile = {
+            name: user.name || '',
+            email: user.email || '',
+            phone: user.phone || '',
+          };
+          setProfileState(backendProfile);
+          writeProfile(backendProfile);
+
+          // Update onboarding from backend
+          const backendOnboarding: PersistedOnboarding = {
+            age: user.age ?? null,
+            gender: user.gender ?? null,
+            sportInterests: user.sportInterests || [],
+            skillLevel: user.skillLevel ?? null,
+            goals: user.goals || '',
+            location: user.location || '',
+            children: (user.children || []).map((c) => ({
+              id: c.id,
+              name: c.name,
+              age: c.age,
+              gender: c.gender,
+              sportInterests: c.sportInterests || [],
+              skillLevel: c.skillLevel,
+            })),
+          };
+          setOnboardingState(backendOnboarding);
+          writeOnboarding(backendOnboarding);
+
+          // Update auth state from backend
+          const backendRole = user.role === 'athlete' || user.role === 'parent' ? user.role as OnboardingRole : null;
+          setState((prev) => ({
+            ...prev,
+            role: backendRole || prev.role,
+            onboardingCompleted: !!user.onboardingCompleted,
+          }));
+        }
+      }).catch(() => {
+        // Non-critical — localStorage fallback is already hydrated
+      });
+    }
   }, []);
 
   // Persist auth state on every change (after hydration)
@@ -132,6 +230,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       writeProfile(profile);
     }
   }, [profile, hydrated]);
+
+  // Persist onboarding on every change (after hydration)
+  useEffect(() => {
+    if (hydrated) {
+      writeOnboarding(onboarding);
+    }
+  }, [onboarding, hydrated]);
 
   const setAuth = useCallback((authenticated: boolean, onboarded?: boolean) => {
     setState((prev) => {
@@ -176,9 +281,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     });
   }, []);
 
+  const setOnboarding = useCallback((updates: Partial<PersistedOnboarding>) => {
+    setOnboardingState((prev) => {
+      const next = { ...prev, ...updates };
+      return next;
+    });
+  }, []);
+
   const signOut = useCallback(() => {
     setState({ isAuthenticated: false, role: null, onboardingCompleted: false, verified: false });
     setProfileState({ ...defaultProfile });
+    setOnboardingState({ ...defaultOnboarding });
     // Clear all app-specific localStorage keys
     try {
       localStorage.removeItem('sportsos:auth-token');
@@ -197,6 +310,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       localStorage.removeItem('sportsos:academy-status');
       localStorage.removeItem('sportsos:selected-academy');
       localStorage.removeItem('sportsos:recently-viewed');
+      localStorage.removeItem('sportsos:onboarding');
     } catch { /* ignore */ }
   }, []);
 
@@ -208,14 +322,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       onboardingCompleted: state.onboardingCompleted,
       verified: state.verified,
       profile,
+      onboarding,
       setAuth,
       setRole,
       completeOnboarding,
       setVerified,
       setProfile,
+      setOnboarding,
       signOut,
     }),
-    [state, hydrated, profile, setAuth, setRole, completeOnboarding, setVerified, setProfile, signOut],
+    [state, hydrated, profile, onboarding, setAuth, setRole, completeOnboarding, setVerified, setProfile, setOnboarding, signOut],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

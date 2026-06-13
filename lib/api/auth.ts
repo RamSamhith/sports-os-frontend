@@ -44,6 +44,23 @@ export interface VerifyOtpResponse {
   token?: string;
 }
 
+export interface OnboardingPayload {
+  role?: string;
+  age?: number;
+  gender?: string;
+  sportInterests?: string[];
+  skillLevel?: string;
+  goals?: string;
+  location?: string;
+  children?: Array<{
+    name: string;
+    age: number;
+    gender?: string;
+    sportInterests?: string[];
+    skillLevel?: string;
+  }>;
+}
+
 export async function register(data: RegisterRequest): Promise<ApiResponse<RegisterResponse>> {
   const { post } = await import('./client');
   return post<RegisterResponse>('/auth/register', data);
@@ -74,7 +91,7 @@ export async function getMe(): Promise<ApiResponse<User>> {
   return get<User>('/auth/me');
 }
 
-export async function saveOnboarding(): Promise<ApiResponse<User>> {
+export async function saveOnboarding(data?: OnboardingPayload): Promise<ApiResponse<User>> {
   const { put } = await import('./client');
-  return put<User>('/auth/onboarding', {});
+  return put<User>('/auth/onboarding', data || {});
 }

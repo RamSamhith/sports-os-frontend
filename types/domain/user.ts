@@ -26,6 +26,14 @@ export interface User {
   authProvider?: 'credentials' | 'google' | 'phone';
   lastLoginAt?: string;
   onboardingCompleted?: boolean;
+  // Onboarding profile fields (persisted to backend)
+  age?: number | null;
+  gender?: 'male' | 'female' | 'other' | 'prefer_not_to_say' | null;
+  sportInterests?: string[];
+  skillLevel?: 'beginner' | 'intermediate' | 'advanced' | 'competitive' | null;
+  goals?: string;
+  location?: string;
+  children?: Child[];
   preferences?: UserPreferences;
   themePreference?: 'midnight-ice' | 'ember-orange' | 'graphite-titanium' | 'alpine-light' | 'system';
   consent?: ConsentFlags;
@@ -40,6 +48,7 @@ export interface Child {
   age: number;
   gender?: 'male' | 'female' | 'other' | 'prefer_not_to_say';
   sportInterests: string[]; // sport slugs
+  skillLevel?: 'beginner' | 'intermediate' | 'advanced' | 'competitive';
   createdAt: string;
   updatedAt: string;
 }
