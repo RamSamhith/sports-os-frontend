@@ -39,12 +39,6 @@ export default function LoginPage() {
   const [touched, setTouched] = useState<Record<string, boolean>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Debug: log mount
-  useEffect(() => {
-    console.log('[AUTH DEBUG] LoginPage mounted');
-    return () => console.log('[AUTH DEBUG] LoginPage unmounted');
-  }, []);
-
   // Redirect fully onboarded users away from login page.
   // For all other cases, the handleSubmit is the sole navigation source.
   useEffect(() => {

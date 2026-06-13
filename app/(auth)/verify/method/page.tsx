@@ -43,21 +43,12 @@ export default function OtpMethodPage() {
   const [selected, setSelected] = useState<OtpMethod | null>(null);
 
   useEffect(() => {
-    console.log('[AUTH DEBUG] OtpMethodPage mounted');
-    return () => console.log('[AUTH DEBUG] OtpMethodPage unmounted');
-  }, []);
-
-  useEffect(() => {
     if (isLoading) return;
-    console.log('[AUTH DEBUG] OtpMethodPage effect running. isAuthenticated:', isAuthenticated, 'verified:', verified);
     if (!isAuthenticated) {
-      console.log('[AUTH DEBUG] OtpMethodPage: not authenticated, redirect to /register');
       router.replace('/register');
     } else if (verified && onboardingCompleted) {
-      console.log('[AUTH DEBUG] OtpMethodPage: verified+onboarded, redirect to /');
       router.replace('/');
     } else if (verified) {
-      console.log('[AUTH DEBUG] OtpMethodPage: verified, redirect to /onboarding/role');
       router.replace('/onboarding/role');
     }
   }, [isLoading, isAuthenticated, verified, onboardingCompleted, router]);
@@ -66,7 +57,6 @@ export default function OtpMethodPage() {
     if (!selected) return;
     const method = methods.find((m) => m.id === selected);
     const destination = method?.getDestination(profile?.email ?? '', profile?.phone ?? '') ?? '';
-    console.log('[AUTH DEBUG] OtpMethodPage: method selected:', selected, 'destination:', destination, 'navigating to /verify/signup');
     sessionStorage.setItem('sportsos:otp-method', selected);
     sessionStorage.setItem('sportsos:otp-destination', destination);
     router.push('/verify/signup');

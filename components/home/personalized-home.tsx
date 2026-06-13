@@ -67,8 +67,6 @@ export function PersonalizedHome() {
   // Debug audit: log matching source and results
   useEffect(() => {
     if (completed && effectiveOnboarding) {
-      const source = role === 'parent' && activeChild ? 'activeChild' : 'onboarding'
-      console.log('[PERSONALIZE] Using source:', source, 'onboarding:', effectiveOnboarding)
       logMatchingAudit(effectiveOnboarding, academies, coaches)
     }
   }, [completed, effectiveOnboarding, role, activeChild])
