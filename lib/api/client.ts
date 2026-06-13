@@ -32,6 +32,73 @@ function getToken(): string | null {
   }
 }
 
+// ─── Refresh Queue ───────────────────────────────────────────
+// When a 401 TOKEN_EXPIRED is received, we pause all in-flight requests,
+// perform a single refresh, then retry them all with the new token.
+
+let isRefreshing = false;
+let refreshPromise: Promise<boolean> | null = null;
+let pendingRequests: Array<{ resolve: (token: string) => void; reject: (err: unknown) => void }> = [];
+
+function onRefreshed(token: string) {
+  pendingRequests.forEach((p) => p.resolve(token));
+  pendingRequests = [];
+}
+
+function onRefreshFailed(err: unknown) {
+  pendingRequests.forEach((p) => p.reject(err));
+  pendingRequests = [];
+}
+
+async function doRefresh(): Promise<boolean> {
+  try {
+    const res = await fetch(`${API_BASE}/auth/refresh`, {
+      method: 'POST',
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+    });
+    if (!res.ok) return false;
+    const json = await res.json();
+    if (json.ok && json.data?.token) {
+      try {
+        localStorage.setItem('sportsos:auth-token', json.data.token);
+      } catch { /* ignore */ }
+      return true;
+    }
+    return false;
+  } catch {
+    return false;
+  }
+}
+
+async function ensureRefresh(): Promise<string> {
+  if (!isRefreshing) {
+    isRefreshing = true;
+    refreshPromise = doRefresh();
+  }
+
+  const success = await refreshPromise;
+
+  isRefreshing = false;
+  refreshPromise = null;
+
+  if (!success) {
+    onRefreshFailed(new Error('Refresh failed'));
+    throw new Error('Session expired');
+  }
+
+  const newToken = getToken();
+  if (!newToken) {
+    onRefreshFailed(new Error('No token after refresh'));
+    throw new Error('Session expired');
+  }
+
+  onRefreshed(newToken);
+  return newToken;
+}
+
+// ─── Core Request Function ───────────────────────────────────
+
 async function request<T>(
   path: string,
   options: RequestInit = {},
@@ -52,7 +119,7 @@ async function request<T>(
   }
 
   try {
-    const res = await fetch(url, { ...options, headers });
+    const res = await fetch(url, { ...options, headers, credentials: 'include' });
 
     if (res.status === 204) {
       return { ok: true, data: undefined as T };
@@ -62,6 +129,70 @@ async function request<T>(
 
     if (!res.ok) {
       const err = json.error ?? json;
+
+      // Handle TOKEN_EXPIRED: attempt refresh and retry
+      if (res.status === 401 && err.code === 'TOKEN_EXPIRED') {
+        if (isRefreshing) {
+          // Another refresh is in progress — queue this request
+          try {
+            const newToken = await new Promise<string>((resolve, reject) => {
+              pendingRequests.push({ resolve, reject });
+            });
+            // Retry with new token
+            const retryHeaders: Record<string, string> = {};
+            retryHeaders['Authorization'] = `Bearer ${newToken}`;
+            retryHeaders['Content-Type'] = 'application/json';
+            const retryRes = await fetch(url, { ...options, headers: retryHeaders, credentials: 'include' });
+            const retryJson = await retryRes.json();
+            if (!retryRes.ok) {
+              const retryErr = retryJson.error ?? retryJson;
+              return {
+                ok: false,
+                error: {
+                  code: retryErr.code ?? 'UNKNOWN_ERROR',
+                  message: retryErr.message ?? retryRes.statusText,
+                  details: retryErr.details,
+                },
+              };
+            }
+            return { ok: true, data: retryJson.data ?? retryJson };
+          } catch {
+            return {
+              ok: false,
+              error: { code: 'UNAUTHORIZED', message: 'Session expired' },
+            };
+          }
+        }
+
+        // We are the first to encounter expired token — initiate refresh
+        try {
+          const newToken = await ensureRefresh();
+          // Retry with new token
+          const retryHeaders: Record<string, string> = {};
+          retryHeaders['Authorization'] = `Bearer ${newToken}`;
+          retryHeaders['Content-Type'] = 'application/json';
+          const retryRes = await fetch(url, { ...options, headers: retryHeaders, credentials: 'include' });
+          const retryJson = await retryRes.json();
+          if (!retryRes.ok) {
+            const retryErr = retryJson.error ?? retryJson;
+            return {
+              ok: false,
+              error: {
+                code: retryErr.code ?? 'UNKNOWN_ERROR',
+                message: retryErr.message ?? retryRes.statusText,
+                details: retryErr.details,
+              },
+            };
+          }
+          return { ok: true, data: retryJson.data ?? retryJson };
+        } catch {
+          return {
+            ok: false,
+            error: { code: 'UNAUTHORIZED', message: 'Session expired' },
+          };
+        }
+      }
+
       return {
         ok: false,
         error: {

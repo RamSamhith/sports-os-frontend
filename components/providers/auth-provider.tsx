@@ -2,7 +2,7 @@
 
 import { createContext, useCallback, useEffect, useMemo, useState, type ReactNode } from 'react';
 import { AuthContext, type AuthContextValue, type AuthChild, type OnboardingRole, type UserProfile } from '@/lib/hooks/use-auth';
-import { getMe } from '@/lib/api/auth';
+import { getMe, logout as apiLogout } from '@/lib/api/auth';
 
 const STORAGE_KEY = 'sportsos:auth-state';
 const PROFILE_KEY = 'sportsos:profile';
@@ -170,6 +170,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setHydrated(true);
 
     // If authenticated, fetch fresh data from backend
+    // If access token expired, the API client will auto-refresh via cookie
     if (migrated.isAuthenticated) {
       getMe().then((res) => {
         if (res.ok && res.data) {
@@ -210,6 +211,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             role: backendRole || prev.role,
             onboardingCompleted: !!user.onboardingCompleted,
           }));
+        } else if (res.ok === false && res.error?.code === 'UNAUTHORIZED') {
+          // Session fully expired (refresh token also invalid) — sign out
+          setState({ isAuthenticated: false, role: null, onboardingCompleted: false, verified: false });
+          setProfileState({ ...defaultProfile });
+          setOnboardingState({ ...defaultOnboarding });
+          try { localStorage.removeItem('sportsos:auth-token'); } catch { /* ignore */ }
         }
       }).catch(() => {
         // Non-critical — localStorage fallback is already hydrated
@@ -289,6 +296,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const signOut = useCallback(() => {
+    // Notify backend to revoke refresh token and clear cookie
+    apiLogout().catch(() => {});
     setState({ isAuthenticated: false, role: null, onboardingCompleted: false, verified: false });
     setProfileState({ ...defaultProfile });
     setOnboardingState({ ...defaultOnboarding });

@@ -81,6 +81,26 @@ export async function verifyOtp(data: VerifyOtpRequest): Promise<ApiResponse<Ver
   return post<VerifyOtpResponse>('/auth/verify-otp', data);
 }
 
+export async function refreshAccessToken(): Promise<ApiResponse<{ token: string }>> {
+  const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? '';
+  const res = await fetch(`${API_BASE}/auth/refresh`, {
+    method: 'POST',
+    credentials: 'include',
+    headers: { 'Content-Type': 'application/json' },
+  });
+  const json = await res.json();
+  if (!res.ok) {
+    return {
+      ok: false,
+      error: {
+        code: json.error?.code ?? 'UNAUTHORIZED',
+        message: json.error?.message ?? 'Refresh failed',
+      },
+    };
+  }
+  return { ok: true, data: json.data };
+}
+
 export async function logout(): Promise<ApiResponse<void>> {
   const { post } = await import('./client');
   return post<void>('/auth/logout');
@@ -94,4 +114,14 @@ export async function getMe(): Promise<ApiResponse<User>> {
 export async function saveOnboarding(data?: OnboardingPayload): Promise<ApiResponse<User>> {
   const { put } = await import('./client');
   return put<User>('/auth/onboarding', data || {});
+}
+
+export interface UpdateProfileRequest {
+  name?: string;
+  phone?: string;
+}
+
+export async function updateProfile(data: UpdateProfileRequest): Promise<ApiResponse<User>> {
+  const { patch } = await import('./client');
+  return patch<User>('/auth/profile', data);
 }

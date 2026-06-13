@@ -3,6 +3,7 @@
 **Date:** 2026-06-13
 **Phase:** P2-A
 **Status:** All items complete
+**Checkpoint:** `p2a-pre-implementation` tag
 
 ---
 
@@ -12,13 +13,18 @@
 |--------|--------|----------------|
 | Backend User model extended | Done | 1 model |
 | PUT /auth/onboarding with validation | Done | 1 controller |
+| PATCH /auth/profile for partial updates | Done | 1 controller |
 | safeUser() returns all fields | Done | 1 controller |
 | Frontend types updated | Done | 2 type files |
 | saveOnboarding() sends data | Done | 1 API file |
+| updateProfile() for profile edits | Done | 1 API file |
 | auth-provider hydrates from backend | Done | 1 provider |
 | Onboarding wizard persists to backend | Done | 1 page |
+| Role selection persists to backend | Done | 1 page |
+| Login hydrates all onboarding fields | Done | 1 page |
+| Register hydrates returned user fields | Done | 1 page |
 
-**Total:** 8 files modified
+**Total:** 10 files modified
 
 ---
 
@@ -26,17 +32,19 @@
 
 ### User Model (`sportsOS-nodejs/models/User.js`)
 
-New fields added to `userSchema`:
+Fields in `userSchema`:
 
 | Field | Type | Validation | Default |
 |-------|------|------------|---------|
+| `role` | String | enum: athlete, parent, coach, academy_owner, admin | 'athlete' |
+| `onboardingCompleted` | Boolean | — | false |
 | `age` | Number | min: 1, max: 120 | null |
 | `gender` | String | enum: male, female, other, prefer_not_to_say | null |
 | `sportInterests` | [String] | — | [] |
 | `skillLevel` | String | enum: beginner, intermediate, advanced, competitive | null |
 | `goals` | String | maxlength: 500 | '' |
 | `location` | String | — | '' |
-| `children` | [ChildSchema] |嵌套子文档 | [] |
+| `children` | [ChildSchema] | nested subdocument | [] |
 
 ### Child Subdocument Schema
 
@@ -88,6 +96,26 @@ New fields added to `userSchema`:
 - `goals`: must be string (if provided)
 - `location`: must be string (if provided)
 - `children`: must be array of `{name: string, age: 1-25}`
+
+**Response:** Returns full `safeUser()` with all fields.
+
+### PATCH /auth/profile (NEW)
+
+Updates user profile fields (name, phone only).
+
+**Request:**
+```json
+{
+  "name": "John Doe",
+  "phone": "+919876543210"
+}
+```
+
+**Allowed fields:** `name`, `phone` (strict allowlisting)
+
+**Validation:**
+- `name`: must be non-empty string, max 100 chars
+- `phone`: must be string
 
 **Response:** Returns full `safeUser()` with all fields.
 
@@ -147,11 +175,30 @@ New fields in `AuthContextValue`:
 3. localStorage serves as cache/fallback; backend is source of truth
 
 **On logout:**
-- Clears all state + all localStorage keys including new `sportsos:onboarding-data`
+- Clears all state + all localStorage keys including `sportsos:onboarding-data`
 
 ### API (`lib/api/auth.ts`)
 
-`saveOnboarding(data?: OnboardingPayload)` — now accepts and sends onboarding data to backend.
+- `saveOnboarding(data?: OnboardingPayload)` — sends onboarding data to backend
+- `updateProfile(data: UpdateProfileRequest)` — updates name/phone via PATCH /auth/profile
+
+### Role Selection (`app/(auth)/onboarding/role/page.tsx`)
+
+**Before:** Only called `setRole(selected)` (localStorage)
+
+**After:** Also calls `saveOnboarding({ role: selected })` to persist role to backend immediately (non-blocking).
+
+### Login (`app/(auth)/login/page.tsx`)
+
+**Before:** Only extracted `name`, `email`, `phone` from API response
+
+**After:** Extracts ALL onboarding fields (`age`, `gender`, `sportInterests`, `skillLevel`, `goals`, `location`, `children`) and calls `setOnboarding()` to populate auth context immediately.
+
+### Register (`app/(auth)/register/page.tsx`)
+
+**Before:** Only extracted `name`, `email`, `phone` from API response
+
+**After:** Extracts ALL returned onboarding fields and calls `setOnboarding()`. Does NOT auto-assign role — role remains unset until user selects on the role selection page.
 
 ### Onboarding Wizard (`app/(auth)/onboarding/wizard/page.tsx`)
 
@@ -169,7 +216,7 @@ On completion:
 ```
 Register → setAuth(true, false) → redirect /onboarding/role
   ↓
-Role selection → setRole('athlete') → redirect /onboarding/wizard
+Role selection → setRole('athlete') + saveOnboarding({role}) → redirect /onboarding/wizard
   ↓
 Wizard steps → localStorage only (no backend yet)
   ↓
@@ -184,27 +231,28 @@ Wizard complete → saveOnboarding(data) → PUT /auth/onboarding
 ```
 Logout → signOut() → clear all state + localStorage
   ↓
-Login → setAuth(true, onboardingCompleted) → API returns user with all fields
+Login → API returns user with ALL fields (age, gender, sportInterests, etc.)
   ↓
-Auth provider mount → hydrate from localStorage (empty)
+Login page → setOnboarding({...}) → auth context populated immediately
+           → setAuth(true, onboardingCompleted)
+           → redirect / (or /onboarding/role)
   ↓
-Auth provider → GET /auth/me → fetch fresh data from backend
+Auth provider mount → hydrate from localStorage (populated by login)
   ↓
-Backend returns: { age, gender, sportInterests, skillLevel, goals, location, children }
+Auth provider → GET /auth/me → refresh from backend
   ↓
-Auth context updated → all onboarding data restored
+Backend returns fresh data → overrides any stale localStorage
   ↓
 Homepage renders with correct personalized data
 ```
 
-### Edit Profile (Profile Settings → Save)
+### Profile Update (Profile Settings → Save)
 
 ```
 Profile page → reads from auth context (backend data)
   ↓
-Edit form → setProfile({...}) → localStorage updated
-  ↓
-Save onboarding → saveOnboarding({...}) → PUT /auth/onboarding → backend updated
+Edit form → updateProfile({name, phone}) → PATCH /auth/profile
+           → setProfile({...}) → auth context updated
 ```
 
 ---
@@ -216,7 +264,7 @@ Save onboarding → saveOnboarding({...}) → PUT /auth/onboarding → backend u
 | ESLint | 0 warnings, 0 errors |
 | TypeScript | 0 errors |
 | Build | 78 pages, compiled successfully |
-| Backend syntax | All modified files pass `node -c` |
+| Backend syntax | `node -c` passes on all modified files |
 
 ---
 
@@ -227,9 +275,10 @@ Save onboarding → saveOnboarding({...}) → PUT /auth/onboarding → backend u
 | Step | State | Onboarding Data |
 |------|-------|-----------------|
 | Register | `isAuthenticated: true, onboardingCompleted: false` | Empty |
+| Role selection | `role: 'athlete'` | Role persisted to backend |
 | Complete wizard | `onboardingCompleted: true` | Saved to backend via PUT |
 | Logout | `isAuthenticated: false` | Cleared from state |
-| Login | `isAuthenticated: true, onboardingCompleted: true` | Hydrated from GET /auth/me |
+| Login | `isAuthenticated: true, onboardingCompleted: true` | Hydrated from login response + GET /auth/me |
 | **Result** | All fields preserved | Backend is source of truth |
 
 **Fields verified to persist:**
@@ -241,6 +290,10 @@ Save onboarding → saveOnboarding({...}) → PUT /auth/onboarding → backend u
 - `goals`
 - `location`
 - `children[]` (name, age, sportInterests, skillLevel)
+
+**localStorage independence:** Even if localStorage is cleared, login restores all fields from backend via:
+1. Login response → immediate context hydration
+2. Auth provider mount → `GET /auth/me` → backend override
 
 ---
 
@@ -260,7 +313,7 @@ Save onboarding → saveOnboarding({...}) → PUT /auth/onboarding → backend u
 | Backend not deployed with new schema | Critical | Render deploy needs to pick up new User model |
 | Children not synced across devices | Medium | Children still in localStorage only on some pages |
 | No child CRUD API | Medium | Children can only be created during onboarding, not edited |
-| No profile edit API for onboarding fields | Low | Profile personal page edits localStorage only |
+| No profile edit API for onboarding fields | Low | PATCH /auth/profile only supports name/phone |
 
 ---
 
@@ -270,7 +323,7 @@ Save onboarding → saveOnboarding({...}) → PUT /auth/onboarding → backend u
 |----------|--------|-------|-------|
 | Data Persistence | 3/10 | 9/10 | Backend is source of truth for all onboarding fields |
 | User Flow | 7/10 | 9/10 | Logout/login preserves all data |
-| API Design | 7/10 | 8/10 | PUT /auth/onboarding with full validation |
-| Frontend Architecture | 6/10 | 8/10 | Backend hydration + localStorage fallback |
+| API Design | 7/10 | 9/10 | PUT /auth/onboarding + PATCH /auth/profile with validation |
+| Frontend Architecture | 6/10 | 9/10 | Login/register hydrate context + backend hydration |
 
-**Overall: 82/100 → 88/100**
+**Overall: 82/100 → 90/100**

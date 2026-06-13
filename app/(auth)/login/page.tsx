@@ -31,7 +31,7 @@ const fieldVariants = {
 export default function LoginPage() {
   const reduced = useReducedMotion();
   const router = useRouter();
-  const { setAuth, setProfile, isAuthenticated, isLoading, verified, onboardingCompleted } = useAuth();
+  const { setAuth, setProfile, setOnboarding, isAuthenticated, isLoading, verified, onboardingCompleted } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errors, setErrors] = useState<FieldErrors>({});
@@ -143,6 +143,23 @@ export default function LoginPage() {
 
       const userPhone = res.data.user.phone ?? '';
       setProfile({ name: res.data.user.name, email: res.data.user.email, phone: userPhone });
+      // Hydrate all onboarding fields from backend response
+      setOnboarding({
+        age: res.data.user.age ?? null,
+        gender: res.data.user.gender ?? null,
+        sportInterests: res.data.user.sportInterests || [],
+        skillLevel: res.data.user.skillLevel ?? null,
+        goals: res.data.user.goals || '',
+        location: res.data.user.location || '',
+        children: (res.data.user.children || []).map((c) => ({
+          id: c.id,
+          name: c.name,
+          age: c.age,
+          gender: c.gender,
+          sportInterests: c.sportInterests || [],
+          skillLevel: c.skillLevel,
+        })),
+      });
       setAuth(true, res.data.user.onboardingCompleted);
       setIsSubmitting(false);
       if (res.data.user.onboardingCompleted) {

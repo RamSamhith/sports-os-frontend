@@ -10,6 +10,7 @@ import { SharedLayout } from '@/components/motion/shared-layout';
 import { cn } from '@/lib/utils/cn';
 import { Check, ArrowRight, User, Users } from 'lucide-react';
 import { useAuth, type OnboardingRole } from '@/lib/hooks/use-auth';
+import { saveOnboarding } from '@/lib/api/auth';
 
 type Role = OnboardingRole;
 
@@ -116,6 +117,8 @@ export default function RoleSelectionPage() {
   function handleContinue() {
     if (!selected) return;
     setRole(selected);
+    // Persist role to backend (non-blocking)
+    saveOnboarding({ role: selected }).catch(() => {});
     router.push('/onboarding/wizard');
   }
 

@@ -36,7 +36,7 @@ const DRAFT_KEY = 'sportsos:signup-draft';
 export default function RegisterPage() {
   const reduced = useReducedMotion();
   const router = useRouter();
-  const { setAuth, setProfile, isAuthenticated, isLoading, verified, onboardingCompleted } = useAuth();
+  const { setAuth, setProfile, setOnboarding, isAuthenticated, isLoading, verified, onboardingCompleted } = useAuth();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
@@ -216,6 +216,23 @@ export default function RegisterPage() {
     } catch { /* ignore */ }
 
     setProfile({ name: res.data.user.name, email: res.data.user.email, phone: phone.trim() });
+    // Hydrate any returned onboarding fields from backend response
+    setOnboarding({
+      age: res.data.user.age ?? null,
+      gender: res.data.user.gender ?? null,
+      sportInterests: res.data.user.sportInterests || [],
+      skillLevel: res.data.user.skillLevel ?? null,
+      goals: res.data.user.goals || '',
+      location: res.data.user.location || '',
+      children: (res.data.user.children || []).map((c) => ({
+        id: c.id,
+        name: c.name,
+        age: c.age,
+        gender: c.gender,
+        sportInterests: c.sportInterests || [],
+        skillLevel: c.skillLevel,
+      })),
+    });
     setAuth(true, res.data.user.onboardingCompleted);
     setIsSubmitting(false);
     try { sessionStorage.removeItem(DRAFT_KEY); } catch { /* ignore */ }
