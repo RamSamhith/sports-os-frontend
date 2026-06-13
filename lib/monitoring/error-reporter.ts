@@ -1,12 +1,18 @@
 'use client';
 
 import { useEffect } from 'react';
+import * as Sentry from '@sentry/nextjs';
 
 export function reportClientError(error: Error, context?: Record<string, unknown>) {
   if (typeof window === 'undefined') return;
-  // Placeholder hook for the real reporter. Will be wired to Sentry-style sink in a later phase.
-  // eslint-disable-next-line no-console
-  console.error('[client-error]', error.message, context);
+  Sentry.withScope((scope) => {
+    if (context) {
+      Object.entries(context).forEach(([key, value]) => {
+        scope.setExtra(key, value);
+      });
+    }
+    Sentry.captureException(error);
+  });
 }
 
 export function ClientErrorBoundaryReporter({ error }: { error: Error }) {

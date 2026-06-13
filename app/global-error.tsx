@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react';
 import { Button } from '@/components/ui/button';
+import * as Sentry from '@sentry/nextjs';
 
 export default function GlobalError({
   error,
@@ -11,9 +12,7 @@ export default function GlobalError({
   reset: () => void;
 }) {
   useEffect(() => {
-    // Error reporting hook — client side
-    // eslint-disable-next-line no-console
-    console.error('[GlobalError]', error);
+    Sentry.captureException(error);
   }, [error]);
 
   return (
@@ -35,6 +34,9 @@ export default function GlobalError({
           <p style={{ opacity: 0.7 }}>
             An unexpected error occurred. Please try again. If the problem persists, contact support.
           </p>
+          {error.digest && (
+            <p style={{ opacity: 0.5, fontSize: 12 }}>Error ID: {error.digest}</p>
+          )}
           <div style={{ display: 'flex', justifyContent: 'center', gap: 12 }}>
             <Button onClick={reset} variant="default">
               Try again
