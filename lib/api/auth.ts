@@ -125,3 +125,30 @@ export async function updateProfile(data: UpdateProfileRequest): Promise<ApiResp
   const { patch } = await import('./client');
   return patch<User>('/auth/profile', data);
 }
+
+export interface ForgotPasswordRequest {
+  email: string;
+}
+
+export interface ForgotPasswordResponse {
+  message: string;
+}
+
+export async function forgotPassword(data: ForgotPasswordRequest): Promise<ApiResponse<ForgotPasswordResponse>> {
+  const { post } = await import('./client');
+  return post<ForgotPasswordResponse>('/auth/forgot-password', data);
+}
+
+export interface ResetPasswordRequest {
+  token: string;
+  password: string;
+}
+
+export interface ResetPasswordResponse {
+  message: string;
+}
+
+export async function resetPassword(data: ResetPasswordRequest): Promise<ApiResponse<ResetPasswordResponse>> {
+  const { post } = await import('./client');
+  return post<ResetPasswordResponse>('/auth/reset-password', data);
+}
