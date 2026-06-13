@@ -7,6 +7,8 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Loader2 } from 'lucide-react';
 import { getMyEnquiries } from '@/lib/api/enquiries';
+import { academies } from '@/data/academies';
+import { coaches } from '@/data/coaches';
 import type { Enquiry } from '@/types/domain/enquiry';
 
 const statusColors: Record<string, string> = {
@@ -15,6 +17,13 @@ const statusColors: Record<string, string> = {
   failed: 'bg-red-500/15 text-red-600',
   bounced: 'bg-yellow-500/15 text-yellow-600',
 };
+
+function getTargetName(eq: Enquiry): string {
+  if (eq.targetType === 'academy') {
+    return academies.find((a) => a.id === eq.targetId)?.name ?? 'Academy';
+  }
+  return coaches.find((c) => c.id === eq.targetId)?.name ?? 'Coach';
+}
 
 export default function EnquiriesPage() {
   const [enquiries, setEnquiries] = React.useState<Enquiry[]>([]);
@@ -53,7 +62,7 @@ export default function EnquiriesPage() {
             <div className="min-w-0 flex-1">
               <div className="flex items-center gap-2">
                 <span className="text-foreground text-sm font-medium">
-                  {eq.targetType === 'academy' ? 'Academy' : 'Coach'} Enquiry
+                  {getTargetName(eq)}
                 </span>
                 <Badge variant="secondary" className={statusColors[eq.status] ?? ''}>
                   {eq.status}

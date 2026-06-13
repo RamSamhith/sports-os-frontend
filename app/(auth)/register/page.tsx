@@ -65,34 +65,21 @@ export default function RegisterPage() {
     }
   }, []);
 
-  // Debug: log mount
-  useEffect(() => {
-    console.log('[AUTH DEBUG] RegisterPage mounted');
-    return () => console.log('[AUTH DEBUG] RegisterPage unmounted');
-  }, []);
-
-  // SOLE navigation source for fresh registration and returning users.
-  // The handler only navigates for edit flow (where setAuth is a no-op and
-  // the effect does NOT fire because auth deps don't change).
-  // NEVER put a router.push/replace in both the handler and this effect.
+  // Safety-net redirect: fires when auth state changes but the handler
+  // did NOT navigate (e.g. edit/verify flow where setAuth is a no-op).
+  // The handler is the primary navigation source for fresh registrations.
   useEffect(() => {
     if (isLoading) return;
-    if (isAuthenticated) {
-      console.log('[AUTH DEBUG] RegisterPage effect: isAuthenticated=true, verified:', verified, 'onboardingCompleted:', onboardingCompleted);
-      // Edit flow: user came from verify/signup → suppress redirect
-      const isEditing = typeof window !== 'undefined' && sessionStorage.getItem('sportsos:editing-contact') === 'true';
-      if (isEditing) {
-        console.log('[AUTH DEBUG] RegisterPage effect: edit flow detected, suppressing redirect');
-        sessionStorage.removeItem('sportsos:editing-contact');
-        return;
-      }
-      // MVP: verification skipped — verified is auto-set by setAuth(true)
-      if (!onboardingCompleted) {
-        console.log('[AUTH DEBUG] RegisterPage effect: onboarding not complete, navigating to /onboarding/role');
-        router.replace('/onboarding/role');
-        return;
-      }
-      console.log('[AUTH DEBUG] RegisterPage effect: fully onboarded, navigating to /');
+    if (!isAuthenticated) return;
+    // Edit flow: user came from verify/signup → suppress redirect
+    const isEditing = typeof window !== 'undefined' && sessionStorage.getItem('sportsos:editing-contact') === 'true';
+    if (isEditing) {
+      sessionStorage.removeItem('sportsos:editing-contact');
+      return;
+    }
+    if (!onboardingCompleted) {
+      router.replace('/onboarding/role');
+    } else {
       router.replace('/');
     }
   }, [isLoading, isAuthenticated, verified, onboardingCompleted, router]);
@@ -229,21 +216,15 @@ export default function RegisterPage() {
     } catch { /* ignore */ }
 
     setProfile({ name: res.data.user.name, email: res.data.user.email, phone: phone.trim() });
-    const wasAuthenticated = isAuthenticated;
     setAuth(true, res.data.user.onboardingCompleted);
     setIsSubmitting(false);
-    // Save draft so "Edit phone/email" can restore form state
-    try {
-      sessionStorage.setItem(DRAFT_KEY, JSON.stringify({
-        name: name.trim(),
-        email: email.trim(),
-        phone: phone.trim(),
-      }));
-    } catch {
-      // ignore
-    }
-    if (wasAuthenticated) {
+    try { sessionStorage.removeItem(DRAFT_KEY); } catch { /* ignore */ }
+    // Navigate based on onboarding status from the API response.
+    // New users always go to onboarding; returning users go home.
+    if (res.data.user.onboardingCompleted) {
       router.push('/');
+    } else {
+      router.push('/onboarding/role');
     }
   }
 

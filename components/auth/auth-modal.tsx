@@ -422,21 +422,19 @@ function RegisterView({
   const [touched, setTouched] = useState<Record<string, boolean>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Navigate after auth state change (fresh registration)
-  // The handler only navigates for edit flow — this effect handles everything else
+  // Safety-net redirect: fires when auth state changes but the handler
+  // did NOT navigate (e.g. edit/verify flow where setAuth is a no-op).
   useEffect(() => {
     if (isLoading) return;
-    if (isAuthenticated) {
-      const isEditing = typeof window !== 'undefined' && sessionStorage.getItem('sportsos:editing-contact') === 'true';
-      if (isEditing) {
-        sessionStorage.removeItem('sportsos:editing-contact');
-        return;
-      }
-      // MVP: verification skipped — verified is auto-set by setAuth(true)
-      if (!onboardingCompleted) {
-        router.push('/onboarding/role');
-        return;
-      }
+    if (!isAuthenticated) return;
+    const isEditing = typeof window !== 'undefined' && sessionStorage.getItem('sportsos:editing-contact') === 'true';
+    if (isEditing) {
+      sessionStorage.removeItem('sportsos:editing-contact');
+      return;
+    }
+    if (!onboardingCompleted) {
+      router.push('/onboarding/role');
+    } else {
       onSuccess();
       router.push('/');
     }
@@ -537,13 +535,12 @@ function RegisterView({
       try { localStorage.setItem('sportsos:auth-token', res.data.token); } catch { /* ignore */ }
       const userPhone = res.data.user.phone ?? phone.trim();
       setProfile({ name: res.data.user.name, email: res.data.user.email, phone: userPhone });
-      const wasAuthenticated = isAuthenticated;
       setAuth(true, res.data.user.onboardingCompleted);
       setIsSubmitting(false);
-      if (wasAuthenticated) {
-        router.push('/onboarding/role');
+      onOpenChange(false);
+      if (res.data.user.onboardingCompleted) {
+        router.push('/');
       } else {
-        onOpenChange(false);
         router.push('/onboarding/role');
       }
     } catch {

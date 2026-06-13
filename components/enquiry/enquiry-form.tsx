@@ -38,7 +38,7 @@ function validate(values: EnquiryFormValues): FieldErrors {
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(values.parentEmail)) errors.parentEmail = 'Enter a valid email';
   if (values.parentPhone.replace(/\D/g, '').length < 10) errors.parentPhone = 'Enter a valid phone';
   if (values.sport.trim().length === 0) errors.sport = 'Required';
-  if (values.childAge && Number.isNaN(Number(values.childAge))) errors.childAge = 'Must be a number';
+  if (values.childAge && (Number.isNaN(Number(values.childAge)) || Number(values.childAge) < 3 || Number(values.childAge) > 25)) errors.childAge = 'Age must be between 3 and 25';
   return errors;
 }
 

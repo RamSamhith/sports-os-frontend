@@ -328,7 +328,7 @@ export function AcademyListing() {
               </button>
             </Badge>
           ))}
-          {appliedCount > 1 ? (
+          {appliedCount > 0 ? (
             <Button size="sm" variant="outline" onClick={clearAll}>
               <X className="h-3.5 w-3.5" /> Clear all
             </Button>

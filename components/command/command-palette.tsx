@@ -281,7 +281,7 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
             groups.map(([group, items]) => (
               <div key={group} className="mb-1">
                 <div className="text-muted-foreground px-2 py-1.5 text-[10px] font-semibold tracking-widest uppercase">
-                  {group === 'Navigate' && recent.length > 0 && !query.trim() ? 'Recent' : group}
+                  {group === 'Navigate' && recent.length > 0 && !query.trim() ? 'Recent Searches' : group}
                 </div>
                 <ul>
                   {items.map((r) => {
@@ -347,7 +347,7 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
               Clear recent
             </button>
           ) : (
-            <span>Press / or ⌘K anywhere</span>
+            <span>Type to search, or pick a quick link</span>
           )}
         </div>
       </DialogContent>
