@@ -66,7 +66,7 @@ export function CompareTray() {
           animate={reduced ? undefined : 'show'}
           exit={reduced ? undefined : 'exit'}
           className={cn(
-            'atmosphere-tray border-border bg-card fixed inset-x-3 bottom-safe left-0 right-0 z-[var(--z-sticky)] mx-auto mb-3 flex max-w-3xl items-center gap-3 rounded-2xl border p-3 shadow-[var(--shadow-xl)]',
+            'atmosphere-tray border-border bg-card fixed inset-x-3 bottom-safe z-[var(--z-sticky)] mx-auto mb-3 flex max-w-3xl items-center gap-3 rounded-2xl border p-3 shadow-[var(--shadow-xl)]',
           )}
           role="region"
           aria-label="Compare tray"

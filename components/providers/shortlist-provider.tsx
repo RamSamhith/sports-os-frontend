@@ -188,16 +188,16 @@ export function ShortlistProvider({ children }: ShortlistProviderProps) {
       itemId: string,
       meta: { label: string; sublabel?: string; href: string },
     ) => {
-      let added = false;
-      setItems((prev) => {
-        if (prev.some((i) => i.itemType === itemType && i.itemId === itemId)) return prev;
-        added = true;
-        return [...prev, { id: `${itemType}:${itemId}`, userId: 'guest', itemType, itemId, createdAt: new Date().toISOString() }];
-      });
-      if (added) setExtras((prev) => ({ ...prev, [`${itemType}:${itemId}`]: meta }));
-      return added;
+      const alreadyExists = items.some((i) => i.itemType === itemType && i.itemId === itemId);
+      if (alreadyExists) return false;
+      setItems((prev) => [
+        ...prev,
+        { id: `${itemType}:${itemId}`, userId: 'guest', itemType, itemId, createdAt: new Date().toISOString() },
+      ]);
+      setExtras((prev) => ({ ...prev, [`${itemType}:${itemId}`]: meta }));
+      return true;
     },
-    [],
+    [items],
   );
 
   // Wrapped addWithMeta that also calls API when authenticated

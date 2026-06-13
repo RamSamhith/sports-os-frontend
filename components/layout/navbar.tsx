@@ -123,6 +123,14 @@ export function Navbar() {
                   <p className="text-muted-foreground mb-2 text-xs font-semibold tracking-widest uppercase">
                     Menu
                   </p>
+                  <button
+                    type="button"
+                    onClick={() => { commandPalette.open(); setOpen(false); }}
+                    className="text-muted-foreground hover:text-foreground hover:bg-accent/15 motion-press flex items-center gap-2 rounded-md px-3 py-2 text-sm text-left transition-colors focus-visible:ring-ring focus-visible:ring-2 focus-visible:outline-none"
+                  >
+                    <Search className="h-4 w-4" />
+                    Search
+                  </button>
                   {primaryNav.map((item) => {
                     const active = pathname === item.href || pathname.startsWith(`${item.href}/`);
                     return (

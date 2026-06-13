@@ -150,7 +150,13 @@ export default function LoginPage() {
       setProfile({ name: res.data.user.name, email: res.data.user.email, phone: (res.data.user as unknown as Record<string, unknown>).phone as string ?? '' });
       setAuth(true);
       setIsSubmitting(false);
-      router.replace('/');
+      const onboarded = localStorage.getItem('sportsos:auth-state');
+      const parsed = onboarded ? JSON.parse(onboarded) : null;
+      if (parsed?.onboardingCompleted) {
+        router.replace('/');
+      } else {
+        router.replace('/onboarding/role');
+      }
     } catch {
       setServerError('Network error. Please try again.');
       setIsSubmitting(false);

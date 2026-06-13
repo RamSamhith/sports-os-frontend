@@ -16,7 +16,7 @@ import { fixtureImages } from '@/lib/images';
 import { getCoach } from '@/lib/api/coaches';
 import type { Coach } from '@/types/domain/coach';
 import Link from 'next/link';
-import { Loader2, AlertTriangle } from 'lucide-react';
+import { Loader2, AlertTriangle, Phone, Mail } from 'lucide-react';
 
 export default function CoachDetailPage() {
   const params = useParams();
@@ -133,6 +133,34 @@ export default function CoachDetailPage() {
           </CardContent>
         </Card>
 
+        {(coach.contact.phone || coach.contact.email) && (
+          <div className="mt-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Contact</CardTitle>
+              </CardHeader>
+              <CardContent className="flex flex-col gap-3">
+                {coach.contact.phone && (
+                  <div className="flex items-center gap-3 text-sm">
+                    <Phone className="h-4 w-4 text-muted-foreground" />
+                    <a href={`tel:${coach.contact.phone}`} className="text-foreground hover:underline">
+                      {coach.contact.phone}
+                    </a>
+                  </div>
+                )}
+                {coach.contact.email && (
+                  <div className="flex items-center gap-3 text-sm">
+                    <Mail className="h-4 w-4 text-muted-foreground" />
+                    <a href={`mailto:${coach.contact.email}`} className="text-foreground hover:underline">
+                      {coach.contact.email}
+                    </a>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </div>
+        )}
+
         <div className="mt-6">
           <Card>
             <CardHeader>
@@ -165,15 +193,6 @@ export default function CoachDetailPage() {
                 </div>
               </div>
 
-              <div>
-                <h3 className="text-sm font-semibold text-foreground mb-2">Awards</h3>
-                <p className="text-sm text-muted-foreground">No achievements available yet</p>
-              </div>
-
-              <div>
-                <h3 className="text-sm font-semibold text-foreground mb-2">Athletes Trained</h3>
-                <p className="text-sm text-muted-foreground">No achievements available yet</p>
-              </div>
             </CardContent>
           </Card>
         </div>

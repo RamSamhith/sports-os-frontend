@@ -160,6 +160,7 @@ export function AuthModal({
                   onBack={() => navigateView('choose')}
                   onSwitch={() => navigateView('login')}
                   onSuccess={handleClose}
+                  onOpenChange={onOpenChange}
                   reduced={reduced}
                 />
               )}
@@ -395,6 +396,7 @@ function RegisterView({
   onBack,
   onSwitch,
   onSuccess,
+  onOpenChange,
   reduced,
   custom,
   variants,
@@ -402,6 +404,7 @@ function RegisterView({
   onBack: () => void;
   onSwitch: () => void;
   onSuccess: () => void;
+  onOpenChange: (open: boolean) => void;
   reduced: boolean;
   custom?: number;
   variants?: Variants;
@@ -536,6 +539,9 @@ function RegisterView({
       setAuth(true);
       setIsSubmitting(false);
       if (wasAuthenticated) {
+        router.push('/onboarding/role');
+      } else {
+        onOpenChange(false);
         router.push('/onboarding/role');
       }
     } catch {

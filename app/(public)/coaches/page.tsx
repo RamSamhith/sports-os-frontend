@@ -1,6 +1,7 @@
 import { Container } from '@/components/layout/container';
 import { Section } from '@/components/layout/section';
 import { Breadcrumbs } from '@/components/seo/breadcrumbs';
+import { Suspense } from 'react';
 import { CoachesListing } from '@/components/coaches/coaches-listing';
 
 export const metadata = {
@@ -19,7 +20,17 @@ export default function CoachesPage() {
             Verified coaches across India.
           </p>
         </div>
-        <CoachesListing />
+        <Suspense
+          fallback={
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {Array.from({ length: 6 }).map((_, i) => (
+                <div key={i} className="bg-muted/30 h-48 animate-pulse rounded-xl border border-dashed" />
+              ))}
+            </div>
+          }
+        >
+          <CoachesListing />
+        </Suspense>
       </Container>
     </Section>
   );

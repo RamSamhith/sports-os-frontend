@@ -19,7 +19,7 @@ import { fixtureImages } from '@/lib/images';
 import { getAcademy } from '@/lib/api/academies';
 import type { Academy } from '@/types/domain/academy';
 import Link from 'next/link';
-import { Globe, Mail, Phone, Instagram, Facebook, Youtube, Loader2, AlertTriangle } from 'lucide-react';
+import { Globe, Mail, Phone, Loader2, AlertTriangle } from 'lucide-react';
 
 export default function AcademyDetailPage() {
   const params = useParams();
@@ -195,30 +195,6 @@ export default function AcademyDetailPage() {
 
         <div className="mt-6">
           <Card>
-            <CardContent className="p-4">
-              <div className="space-y-3">
-                <h2 className="text-lg font-semibold text-foreground">Social Links</h2>
-                <div className="grid gap-2 text-sm">
-                  <div className="flex items-center gap-2">
-                    <Instagram className="h-4 w-4 shrink-0 text-muted-foreground" />
-                    <span className="text-muted-foreground">Not Available</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Facebook className="h-4 w-4 shrink-0 text-muted-foreground" />
-                    <span className="text-muted-foreground">Not Available</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Youtube className="h-4 w-4 shrink-0 text-muted-foreground" />
-                    <span className="text-muted-foreground">Not Available</span>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        <div className="mt-6">
-          <Card>
             <CardHeader>
               <CardTitle>Achievements</CardTitle>
               <CardDescription>Championships, awards, and notable milestones</CardDescription>
@@ -280,20 +256,18 @@ export default function AcademyDetailPage() {
                           </div>
                         </div>
                       )}
-                      {academy.createdAt && (
-                        <div>
-                          <h3 className="text-sm font-semibold text-foreground mb-1">Years Operating</h3>
-                          <p className="text-sm text-muted-foreground">
-                            {Math.max(1, new Date().getFullYear() - new Date(academy.createdAt).getFullYear())} years
-                          </p>
-                        </div>
-                      )}
                     </>
-                  ) : (
-                    <p className="text-sm text-muted-foreground">No achievements available yet</p>
-                  )
+                  ) : null
                 })()
               }
+              {academy.createdAt && (
+                <div>
+                  <h3 className="text-sm font-semibold text-foreground mb-1">Years Operating</h3>
+                  <p className="text-sm text-muted-foreground">
+                    {Math.max(1, new Date().getFullYear() - new Date(academy.createdAt).getFullYear())} years
+                  </p>
+                </div>
+              )}
             </CardContent>
           </Card>
         </div>
