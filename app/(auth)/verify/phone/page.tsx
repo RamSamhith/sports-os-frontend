@@ -10,15 +10,14 @@ import { SharedLayout } from '@/components/motion/shared-layout';
 import { OtpInput } from '@/components/ui/otp-input';
 import { Loader2, CheckCircle2, ArrowLeft, Smartphone, RotateCcw } from 'lucide-react';
 import { useAuth } from '@/lib/hooks/use-auth';
+import { verifyOtp, sendOtp } from '@/lib/api/auth';
 
 const FAST = { duration: 0.2, ease: [0.2, 0, 0, 1] as const };
-
-const CODE = '123456';
 
 export default function VerifyPhonePage() {
   const reduced = useReducedMotion();
   const router = useRouter();
-  const { isAuthenticated, isLoading, profile, onboardingCompleted, setVerified: setAuthVerified } = useAuth();
+  const { isAuthenticated, isLoading, profile, onboardingCompleted, setAuth, setProfile, setOnboarding } = useAuth();
   const [otp, setOtp] = useState('');
   const [error, setError] = useState('');
   const [isVerifying, setIsVerifying] = useState(false);
@@ -37,18 +36,50 @@ export default function VerifyPhonePage() {
   }, [resendCooldown]);
 
   const handleVerify = useCallback(async (code: string) => {
+    const email = profile?.email;
+    if (!email) {
+      setError('No email found. Please login again.');
+      return;
+    }
+
     setIsVerifying(true);
     setError('');
-    await new Promise((r) => setTimeout(r, 1200));
-    if (code === CODE) {
-      setAuthVerified(true);
-      setVerified(true);
-    } else {
-      setError('Invalid code. Try 123456 for demo.');
+
+    const res = await verifyOtp({ email, otp: code });
+
+    if (!res.ok) {
+      setError(res.error.message);
       setOtp('');
+      setIsVerifying(false);
+      return;
     }
+
+    // Store token
+    try {
+      localStorage.setItem('sportsos:auth-token', res.data.token);
+    } catch { /* ignore */ }
+
+    setProfile({ name: res.data.user.name, email: res.data.user.email, phone: res.data.user.phone || '' });
+    setOnboarding({
+      age: res.data.user.age ?? null,
+      gender: res.data.user.gender ?? null,
+      sportInterests: res.data.user.sportInterests || [],
+      skillLevel: res.data.user.skillLevel ?? null,
+      goals: res.data.user.goals || '',
+      location: res.data.user.location || '',
+      children: (res.data.user.children || []).map((c) => ({
+        id: c.id,
+        name: c.name,
+        age: c.age,
+        gender: c.gender,
+        sportInterests: c.sportInterests || [],
+        skillLevel: c.skillLevel,
+      })),
+    });
+    setAuth(true, res.data.user.onboardingCompleted);
+    setVerified(true);
     setIsVerifying(false);
-  }, [setAuthVerified]);
+  }, [profile?.email, setAuth, setProfile, setOnboarding]);
 
   useEffect(() => {
     if (otp.length === 6) {
@@ -56,10 +87,13 @@ export default function VerifyPhonePage() {
     }
   }, [otp, handleVerify]);
 
-  function handleResend() {
+  async function handleResend() {
+    const email = profile?.email;
+    if (!email) return;
     setResendCooldown(30);
     setOtp('');
     setError('');
+    await sendOtp({ email });
   }
 
   const screenVariants = {

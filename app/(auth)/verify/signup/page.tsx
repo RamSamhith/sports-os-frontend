@@ -7,71 +7,30 @@ import { Button } from '@/components/ui/button';
 import { useRouter } from 'next/navigation';
 import { SharedLayout } from '@/components/motion/shared-layout';
 import { OtpInput } from '@/components/ui/otp-input';
-import { Loader2, CheckCircle2, ShieldCheck, RotateCcw, Pencil, Mail, Smartphone, MessageCircle } from 'lucide-react';
+import { Loader2, CheckCircle2, ShieldCheck, RotateCcw, Pencil, Mail } from 'lucide-react';
 import { useAuth } from '@/lib/hooks/use-auth';
+import { verifyOtp, sendOtp } from '@/lib/api/auth';
 
 const FAST = { duration: 0.2, ease: [0.2, 0, 0, 1] as const };
-
-const CODE = '123456';
-const DRAFT_KEY = 'sportsos:signup-draft';
-
-type OtpMethod = 'email' | 'sms' | 'whatsapp';
-
-const methodConfig: Record<OtpMethod, { title: string; description: string; resendText: string; icon: typeof Mail }> = {
-  email: {
-    title: 'Verify Your Email',
-    description: 'We sent a 6-digit verification code to',
-    resendText: 'Resend Email Code',
-    icon: Mail,
-  },
-  sms: {
-    title: 'Verify Your Phone',
-    description: 'We sent a 6-digit verification code via SMS to',
-    resendText: 'Resend SMS Code',
-    icon: Smartphone,
-  },
-  whatsapp: {
-    title: 'Verify WhatsApp',
-    description: 'We sent a 6-digit verification code via WhatsApp to',
-    resendText: 'Resend WhatsApp Code',
-    icon: MessageCircle,
-  },
-};
 
 export default function VerifySignupPage() {
   const reduced = useReducedMotion();
   const router = useRouter();
-  const { isAuthenticated, isLoading, profile, verified: authVerified, onboardingCompleted, setVerified } = useAuth();
+  const { isAuthenticated, isLoading, profile, verified: authVerified, onboardingCompleted, setAuth, setProfile, setOnboarding } = useAuth();
   const [otp, setOtp] = useState('');
   const [error, setError] = useState('');
   const [isVerifying, setIsVerifying] = useState(false);
   const [resendCooldown, setResendCooldown] = useState(0);
-  const [otpMethod, setOtpMethod] = useState<OtpMethod>('email');
-  const [destination, setDestination] = useState('');
+  const [email, setEmail] = useState('');
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      const method = sessionStorage.getItem('sportsos:otp-method') as OtpMethod | null;
-      const dest = sessionStorage.getItem('sportsos:otp-destination');
-      if (method && methodConfig[method]) {
-        setOtpMethod(method);
-      }
-      if (dest) {
-        setDestination(dest);
+      const storedEmail = sessionStorage.getItem('sportsos:verify-email');
+      if (storedEmail) {
+        setEmail(storedEmail);
       }
     }
   }, []);
-
-  useEffect(() => {
-    if (isLoading) return;
-    if (!isAuthenticated) {
-      router.replace('/verify/method');
-    } else if (authVerified && onboardingCompleted) {
-      router.replace('/');
-    } else if (authVerified) {
-      router.replace('/onboarding/role');
-    }
-  }, [isLoading, isAuthenticated, authVerified, onboardingCompleted, router]);
 
   useEffect(() => {
     if (resendCooldown <= 0) return;
@@ -80,22 +39,51 @@ export default function VerifySignupPage() {
   }, [resendCooldown]);
 
   const handleVerify = useCallback(async (code: string) => {
+    if (!email) {
+      setError('No email found. Please register again.');
+      return;
+    }
+
     setIsVerifying(true);
     setError('');
-    await new Promise((r) => setTimeout(r, 1200));
-    if (code === CODE) {
-      try {
-        sessionStorage.removeItem(DRAFT_KEY);
-      } catch {
-        // ignore
-      }
-      setVerified(true);
-    } else {
-      setError('Invalid code. Try 123456 for demo.');
+
+    const res = await verifyOtp({ email, otp: code });
+
+    if (!res.ok) {
+      setError(res.error.message);
       setOtp('');
+      setIsVerifying(false);
+      return;
     }
-    setIsVerifying(false);
-  }, [setVerified]);
+
+    // Store token
+    try {
+      localStorage.setItem('sportsos:auth-token', res.data.token);
+    } catch { /* ignore */ }
+
+    setProfile({ name: res.data.user.name, email: res.data.user.email, phone: res.data.user.phone || '' });
+    setOnboarding({
+      age: res.data.user.age ?? null,
+      gender: res.data.user.gender ?? null,
+      sportInterests: res.data.user.sportInterests || [],
+      skillLevel: res.data.user.skillLevel ?? null,
+      goals: res.data.user.goals || '',
+      location: res.data.user.location || '',
+      children: (res.data.user.children || []).map((c) => ({
+        id: c.id,
+        name: c.name,
+        age: c.age,
+        gender: c.gender,
+        sportInterests: c.sportInterests || [],
+        skillLevel: c.skillLevel,
+      })),
+    });
+    setAuth(true, res.data.user.onboardingCompleted);
+
+    try {
+      sessionStorage.removeItem('sportsos:verify-email');
+    } catch { /* ignore */ }
+  }, [email, setAuth, setProfile, setOnboarding]);
 
   useEffect(() => {
     if (otp.length === 6) {
@@ -103,30 +91,16 @@ export default function VerifySignupPage() {
     }
   }, [otp, handleVerify]);
 
-  function handleResend() {
+  async function handleResend() {
+    if (!email) return;
     setResendCooldown(30);
     setOtp('');
     setError('');
+
+    await sendOtp({ email });
   }
 
   function handleEditContact() {
-    // Save current form data to draft before navigating
-    if (profile?.name || profile?.email || profile?.phone) {
-      try {
-        sessionStorage.setItem(DRAFT_KEY, JSON.stringify({
-          name: profile?.name || '',
-          email: profile?.email || '',
-          phone: profile?.phone || '',
-        }));
-      } catch {
-        // ignore
-      }
-    }
-    try {
-      sessionStorage.setItem('sportsos:editing-contact', 'true');
-    } catch {
-      // ignore
-    }
     router.push('/register');
   }
 
@@ -135,8 +109,6 @@ export default function VerifySignupPage() {
     center: { opacity: 1, x: 0, transition: { ...FAST, duration: 0.25 } },
     exit: { opacity: 0, x: reduced ? 0 : -12, transition: { ...FAST, duration: 0.15 } },
   };
-
-  const config = methodConfig[otpMethod];
 
   function handleContinueToRole() {
     router.push('/onboarding/role');
@@ -191,10 +163,10 @@ export default function VerifySignupPage() {
                   <span className="text-primary text-sm font-medium">Verify Your Account</span>
                 </div>
 
-                <h1 className="text-2xl font-bold tracking-tight text-center">{config.title}</h1>
+                <h1 className="text-2xl font-bold tracking-tight text-center">Verify Your Email</h1>
                 <p className="text-muted-foreground mt-1 text-center text-sm">
-                  {config.description}{' '}
-                  <span className="text-foreground font-medium">{destination}</span>
+                  We sent a 6-digit verification code to{' '}
+                  <span className="text-foreground font-medium">{email || 'your email'}</span>
                 </p>
 
                 <div className="mt-6 flex justify-center">
@@ -227,7 +199,7 @@ export default function VerifySignupPage() {
                     disabled={resendCooldown > 0 || isVerifying}
                   >
                     <RotateCcw className="h-4 w-4 mr-1" />
-                    {resendCooldown > 0 ? `Resend in ${resendCooldown}s` : config.resendText}
+                    {resendCooldown > 0 ? `Resend in ${resendCooldown}s` : 'Resend Email Code'}
                   </Button>
                 </div>
 
@@ -249,7 +221,7 @@ export default function VerifySignupPage() {
                     disabled={isVerifying}
                   >
                     <Pencil className="h-3.5 w-3.5" />
-                    Edit phone or email
+                    Edit email
                   </Button>
                 </div>
               </motion.div>

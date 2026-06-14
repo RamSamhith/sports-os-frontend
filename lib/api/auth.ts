@@ -9,8 +9,8 @@ export interface RegisterRequest {
 }
 
 export interface RegisterResponse {
-  user: User;
-  token: string;
+  requiresVerification: boolean;
+  email: string;
 }
 
 export interface LoginRequest {
@@ -23,25 +23,22 @@ export interface LoginResponse {
   token: string;
 }
 
-export interface SendOtpRequest {
-  method: 'email' | 'sms' | 'whatsapp';
-  destination: string;
-}
-
-export interface SendOtpResponse {
-  expiresAt: string;
-  cooldownSeconds: number;
-}
-
 export interface VerifyOtpRequest {
-  method: 'email' | 'sms' | 'whatsapp';
-  destination: string;
-  code: string;
+  email: string;
+  otp: string;
 }
 
 export interface VerifyOtpResponse {
-  verified: boolean;
-  token?: string;
+  user: User;
+  token: string;
+}
+
+export interface ResendOtpRequest {
+  email: string;
+}
+
+export interface ResendOtpResponse {
+  message: string;
 }
 
 export interface OnboardingPayload {
@@ -71,9 +68,9 @@ export async function login(data: LoginRequest): Promise<ApiResponse<LoginRespon
   return post<LoginResponse>('/auth/login', data);
 }
 
-export async function sendOtp(data: SendOtpRequest): Promise<ApiResponse<SendOtpResponse>> {
+export async function sendOtp(data: ResendOtpRequest): Promise<ApiResponse<ResendOtpResponse>> {
   const { post } = await import('./client');
-  return post<SendOtpResponse>('/auth/send-otp', data);
+  return post<ResendOtpResponse>('/auth/resend-otp', data);
 }
 
 export async function verifyOtp(data: VerifyOtpRequest): Promise<ApiResponse<VerifyOtpResponse>> {

@@ -210,39 +210,17 @@ export default function RegisterPage() {
       return;
     }
 
-    // Store token
-    try {
-      localStorage.setItem('sportsos:auth-token', res.data.token);
-    } catch { /* ignore */ }
-
-    setProfile({ name: res.data.user.name, email: res.data.user.email, phone: phone.trim() });
-    // Hydrate any returned onboarding fields from backend response
-    setOnboarding({
-      age: res.data.user.age ?? null,
-      gender: res.data.user.gender ?? null,
-      sportInterests: res.data.user.sportInterests || [],
-      skillLevel: res.data.user.skillLevel ?? null,
-      goals: res.data.user.goals || '',
-      location: res.data.user.location || '',
-      children: (res.data.user.children || []).map((c) => ({
-        id: c.id,
-        name: c.name,
-        age: c.age,
-        gender: c.gender,
-        sportInterests: c.sportInterests || [],
-        skillLevel: c.skillLevel,
-      })),
-    });
-    setAuth(true, res.data.user.onboardingCompleted);
-    setIsSubmitting(false);
-    try { sessionStorage.removeItem(DRAFT_KEY); } catch { /* ignore */ }
-    // Navigate based on onboarding status from the API response.
-    // New users always go to onboarding; returning users go home.
-    if (res.data.user.onboardingCompleted) {
-      router.push('/');
-    } else {
-      router.push('/onboarding/role');
+    // Registration requires email verification
+    if (res.data.requiresVerification) {
+      try {
+        sessionStorage.setItem('sportsos:verify-email', res.data.email);
+      } catch { /* ignore */ }
+      setIsSubmitting(false);
+      router.push('/verify/signup');
+      return;
     }
+
+    setIsSubmitting(false);
   }
 
   const errorId = (field: string) => `register-${field}-error`;

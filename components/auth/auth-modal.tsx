@@ -532,17 +532,18 @@ function RegisterView({
         setIsSubmitting(false);
         return;
       }
-      try { localStorage.setItem('sportsos:auth-token', res.data.token); } catch { /* ignore */ }
-      const userPhone = res.data.user.phone ?? phone.trim();
-      setProfile({ name: res.data.user.name, email: res.data.user.email, phone: userPhone });
-      setAuth(true, res.data.user.onboardingCompleted);
+      // Registration requires email verification
+      if (res.data.requiresVerification) {
+        try {
+          sessionStorage.setItem('sportsos:verify-email', res.data.email);
+        } catch { /* ignore */ }
+        setIsSubmitting(false);
+        onOpenChange(false);
+        router.push('/verify/signup');
+        return;
+      }
       setIsSubmitting(false);
       onOpenChange(false);
-      if (res.data.user.onboardingCompleted) {
-        router.push('/');
-      } else {
-        router.push('/onboarding/role');
-      }
     } catch {
       setServerError('Network error. Please try again.');
       setIsSubmitting(false);
