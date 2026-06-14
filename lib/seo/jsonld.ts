@@ -21,7 +21,7 @@ export function websiteJsonLd(): JsonLd {
     url: siteConfig.url,
     potentialAction: {
       '@type': 'SearchAction',
-      target: `${siteConfig.url}/academies?q={search_term_string}`,
+      target: `${siteConfig.url}/search?q={search_term_string}`,
       'query-input': 'required name=search_term_string',
     },
   };

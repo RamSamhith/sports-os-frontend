@@ -1,195 +1,172 @@
-# Final Readiness Report
+# SportsOS — Final Production Readiness Report
 
-> Generated: 2026-06-12
-
----
-
-## 1. Readiness Scores
-
-| Area | Score | Status |
-|------|-------|--------|
-| Frontend UI | **95%** | Complete — 80+ components, 35+ pages, fully styled |
-| Frontend API Integration | **5%** | 26 functions defined, 0 connected to pages |
-| Backend API | **35%** | 27 endpoints live, 0 compatible with frontend contract |
-| Backend Schema | **20%** | 5 models active, all missing fields required by frontend |
-| Database | **40%** | Connected, seeded with minimal data, wrong schema |
-| Integration | **0%** | Frontend and backend are not connected |
-| Testing | **0%** | Zero test files in entire workspace |
-| Deployment | **50%** | Backend on Render (working), frontend not deployed |
+**Date**: 2026-06-14
+**Build**: Next.js 14.2.18 / Node.js Express backend
+**Build Status**: ✅ PASSED (with warnings)
 
 ---
 
-## 2. What Is Already Working
+## Executive Summary
 
-### Backend (Live at https://sportsos-nodejs.onrender.com)
+SportsOS is a sports academy discovery platform with a polished frontend UI, a functional backend API, and a well-architected admin panel. However, the admin panel is entirely mocked, several security modules are placeholders, and ~84% of coach images are missing. The platform is **NOT production-ready** in its current state.
 
-| Endpoint | Status | Data |
-|----------|--------|------|
-| GET `/` | 200 | "Sports OS API is Running!" |
-| GET `/academies` | 200 | 4 academies |
-| GET `/academies/sport/Cricket` | 200 | 2 academies |
-| GET `/academies/verified/all` | 200 | 3 academies |
-| GET `/academies/distance/20` | 200 | 3 academies |
-| GET `/coaches` | 200 | 0 coaches (empty) |
-| GET `/athletes` | 200 | 3 athletes |
-| POST `/auth/register` | 201 | Creates user |
-| POST `/auth/login` | 401/200 | Validates credentials |
-| CORS | Not configured | — |
-| MongoDB | Connected | 4 academies, 3 athletes |
-
-### Frontend
-
-| Feature | Status |
-|---------|--------|
-| Homepage | Renders with static data |
-| Academy listing (12 academies) | Renders with static data, filters work |
-| Academy detail | Renders with static data, all fields populated |
-| Coach listing (8 coaches) | Renders with static data, search works |
-| Coach detail | Renders with static data, all fields populated |
-| Sports listing (20 sports) | Renders with static data |
-| Sport detail | Renders with static data, pathways shown |
-| Search page | Client-side filtering works |
-| Compare page | Client-side comparison works |
-| Shortlist page | localStorage-based, works |
-| Auth pages (login/register) | UI works, uses setTimeout placeholder |
-| Enquiry form | UI works, shows toast on submit |
-| Profile page | Renders with static data |
-| Children page | localStorage-based, works |
-| Admin pages | Placeholder UI |
-| All themes (4) | Working |
-| All animations | Working |
-| PWA | Configured |
+**Overall Readiness Score: 52/100**
 
 ---
 
-## 3. What Is Missing
+## Critical Issues (Must Fix Before Launch)
 
-### Critical Missing (Blocks MVP Launch)
-
-| # | Missing Item | Impact | Effort to Fix |
-|---|-------------|--------|--------------|
-| 1 | CORS middleware | Frontend cannot call backend | 5 min |
-| 2 | Response envelope (`{ok, data}`) | Frontend cannot parse responses | 30 min |
-| 3 | `_id` → `id` transform | Frontend uses `id` everywhere | 10 min |
-| 4 | Academy model expansion (15+ fields) | Academy pages will be empty/broken | 30 min |
-| 5 | Coach model expansion (15+ fields) | Coach pages will be empty/broken | 20 min |
-| 6 | Academy slug route | Detail pages return 404 | 10 min |
-| 7 | Coach slug route | Detail pages return 404 | 10 min |
-| 8 | Shortlist model rewrite | Shortlist incompatible | 10 min |
-| 9 | Shortlist controller rewrite | Wrong path, wrong schema | 20 min |
-| 10 | Enquiry model + controller | Form submission does nothing | 30 min |
-| 11 | Auth register fix (add token) | Registration doesn't authenticate | 5 min |
-| 12 | Auth login fix (envelope) | Login response unparsable | 5 min |
-| 13 | Seed database (full data) | Pages show empty/wrong data | 30 min |
-| 14 | Frontend auth wiring | Login/register use setTimeout | 30 min |
-| 15 | Frontend academy wiring | Pages use static data | 40 min |
-| 16 | Frontend coach wiring | Pages use static data | 35 min |
-| 17 | Frontend shortlist wiring | Uses localStorage only | 30 min |
-| 18 | Frontend enquiry wiring | Toast only, no submission | 10 min |
-| 19 | `NEXT_PUBLIC_API_URL` config | Frontend doesn't know backend URL | 2 min |
-
-### Medium Missing (Post-MVP)
-
-| # | Missing Item | Impact |
-|---|-------------|--------|
-| 20 | Sports catalog from DB | Sports pages use static data |
-| 21 | Search endpoint | Search uses client-side filtering |
-| 22 | User profile endpoints | Profile/settings pages don't persist |
-| 23 | Children endpoints | Children page uses localStorage |
-| 24 | Recommendations endpoint | Homepage suggestions are client-side |
-| 25 | Reviews/ratings | No UGC |
-| 26 | Admin panel endpoints | Admin pages are placeholder |
-
-### Low Missing (Optional)
-
-| # | Missing Item | Impact |
-|---|-------------|--------|
-| 27 | OTP verification | No email/phone verification |
-| 28 | Forgot password | No password reset |
-| 29 | Onboarding wizard backend | Uses localStorage |
-| 30 | Analytics tracking | No event tracking |
-| 31 | Leads/CRM | No lead pipeline |
-| 32 | Geolocation/nearby | No proximity search |
-| 33 | Rate limiting | No DoS protection |
-| 34 | Input validation | No request validation |
-| 35 | Security headers | No helmet |
-| 36 | Tests | Zero test coverage |
-| 37 | CI/CD pipeline | No automation |
-| 38 | Frontend deployment | Not deployed |
+| # | Issue | File(s) | Impact |
+|---|-------|---------|--------|
+| 1 | **Security modules are placeholders** — CSRF, rate limiting, and HTML sanitization are stub implementations | `lib/security/csrf.ts`, `rate-limit.ts`, `sanitize.ts` | XSS, CSRF, brute-force attacks |
+| 2 | **OTP sending not implemented** — 4 TODOs in authService.js for email/SMS/WhatsApp OTP delivery | `sportsOS-nodejs/services/authService.js:52,116,163` | Users cannot verify accounts |
+| 3 | **Missing images** — 42 coach images and 16+ academy images referenced but don't exist | `public/images/coaches/` (8/50 exist), `public/images/academies/` (12/28+ exist) | Degraded visual experience |
+| 4 | **Admin panel non-functional** — All 11 admin pages use hardcoded static data | `app/(admin)/admin/**/*.tsx` | Admin cannot manage platform |
+| 5 | **No admin user seeding** — No way to create admin users without direct DB access | No seed script | Cannot onboard admins |
+| 6 | **Auth stored in localStorage** — JWT tokens vulnerable to XSS | `components/providers/auth-provider.tsx` | Token theft risk |
+| 7 | **Analytics ingestion stub** — `/api/events` returns `{ ok: true }` without processing | `app/api/events/route.ts` | No analytics data collected |
 
 ---
 
-## 4. What Must Be Fixed Before Launch
+## Medium Issues (Should Fix)
 
-**Minimum for a working product:**
-
-```
-1.  CORS middleware                              (5 min)
-2.  Response envelope wrapper                    (30 min)
-3.  _id → id transform                          (10 min)
-4.  Academy model expansion                     (30 min)
-5.  Coach model expansion                       (20 min)
-6.  Academy slug route                          (10 min)
-7.  Coach slug route                            (10 min)
-8.  Shortlist model + controller rewrite        (30 min)
-9.  Enquiry model + controller                  (30 min)
-10. Auth register fix (add token)               (5 min)
-11. Auth login fix (envelope)                   (5 min)
-12. Seed database with full data                (30 min)
-13. Connect frontend auth pages                 (30 min)
-14. Connect frontend academy pages              (40 min)
-15. Connect frontend coach pages                (35 min)
-16. Connect frontend shortlist                  (30 min)
-17. Connect frontend enquiry form               (10 min)
-18. Configure NEXT_PUBLIC_API_URL               (2 min)
-                                          ─────────────
-                                    Total: ~5.5 hours
-```
-
-**After these 18 fixes, the MVP user journey works:**
-```
-Homepage → Browse Academies → View Academy → Login → Shortlist → Enquire
-           Browse Coaches   → View Coach   → Login → Shortlist → Enquire
-```
+| # | Issue | File(s) | Impact |
+|---|-------|---------|--------|
+| 8 | **Admin settings switches uncontrolled** — No state management or persistence | `app/(admin)/admin/settings/page.tsx` | Settings resets on reload |
+| 9 | **Rating object assumption** — Cards assume `rating` always exists | `academy-card-placeholder.tsx:114`, `coach-card-placeholder.tsx:178` | Potential crash on bad data |
+| 10 | **CSS typo** — `h-3.5 h-3.5` should be `h-3.5 w-3.5` | `academy-listing.tsx:351` | Icon renders with wrong width |
+| 11 | **Rate limiter in-memory** — Won't work across serverless instances | `lib/security/rate-limit.ts` | Rate limiting ineffective in production |
+| 12 | **No athlete admin page** — Backend supports CRUD but no UI | `app/(admin)/admin/` missing `athletes/` | Cannot manage athletes from UI |
+| 13 | **No detail/edit pages** — Only list views exist for admin entities | `app/(admin)/admin/` | No CRUD operations from UI |
 
 ---
 
-## 5. Risk Assessment
+## Low Issues (Known Issues)
 
-| Risk | Likelihood | Impact | Mitigation |
-|------|-----------|--------|-----------|
-| Schema change breaks Render deployment | Medium | High | Test locally before push |
-| Render cold start (503 on first request) | High | Low | Users see loading state, retry works |
-| Seed data doesn't match frontend expectations | Medium | Medium | Use exact structure from `data/academies.ts` |
-| Frontend pages break after API connection | Medium | Medium | Connect one page at a time, test |
-| Slug collisions in academy/coach URLs | Low | Low | Unique index prevents duplicates |
-| CORS misconfiguration | Low | High | Test with browser dev tools |
-| Auth token flow edge cases | Low | Medium | Test register→login→protected page |
+| # | Issue | File(s) | Impact |
+|---|-------|---------|--------|
+| 14 | **5 exhaustive-deps suppressions** — All intentional but should be reviewed periodically | Various | Code quality |
+| 15 | **TailwindCSS ambiguous class warnings** — Custom property references trigger warnings | `navbar.tsx`, motion files | Build warnings only |
+| 16 | **Edge runtime warning** — Analytics route uses edge runtime | `app/api/events/route.ts:3` | Build warning only |
+| 17 | **Legacy backend directory** — `sports-os-backend/` contains duplicate code | `sports-os-backend/` | Code confusion |
+| 18 | **No logout confirmation** — User logged out immediately without confirmation | Auth flow | Minor UX |
 
 ---
 
-## 6. Deployment Status
+## Detailed Audit Results
 
-| Component | URL | Status |
-|-----------|-----|--------|
-| Backend | https://sportsos-nodejs.onrender.com | **RUNNING** — endpoints responding |
-| Frontend | Not deployed | — |
-| Database | MongoDB Atlas (connected) | **CONNECTED** — 4 academies, 3 athletes |
+### 1. Empty States ✅ (Good)
+- `EmptyState` component exists with role="status"
+- Academy listing: handled via AcademyGrid
+- Coaches listing: fully handled with EmptyState
+- Sports listing: fully handled with EmptyState
+- Error states: inline error handling with "Try again" buttons
+
+### 2. Placeholder Content ❌ (Critical)
+- **11 admin pages** all use hardcoded/static data
+- Analytics API route is a stub
+- Security modules are placeholders
+- Settings switches have no persistence
+- Config env.ts has placeholder secrets
+
+### 3. Broken Links ✅ (Good)
+- All nav routes verified — no broken links
+- Admin sidebar links all have matching page files
+- Footer nav links all verified
+
+### 4. Missing Images ❌ (Critical)
+- **Coach images**: 8/50 exist (16% coverage)
+- **Academy images**: 12/28+ exist (~43% coverage)
+- **Sports images**: 20/20 exist (100% coverage)
+- Mitigated by `ImageWithFallback` component (no broken icons)
+
+### 5. Mobile Responsiveness ✅ (Good)
+- Navbar: responsive with mobile Sheet menu
+- Admin shell: responsive grid (1-col mobile, 2-col desktop)
+- Dashboard: responsive grid (1/2/4 columns)
+- All touch targets 44x44px minimum
+- Dialogs: responsive button stacking
+
+### 6. Accessibility ✅ (Good)
+- Skip link implemented
+- ARIA labels on all interactive elements
+- Focus management via Radix UI primitives
+- Keyboard navigation in command palette, OTP input
+- Live regions for dynamic content
+- `aria-hidden` on decorative icons (39 instances)
+
+### 7. Console Errors ✅ (Good)
+- API client has comprehensive try/catch
+- Error boundaries on all layouts
+- Global error page with Sentry integration
+- 404 page implemented
+- Loading state with aria-busy
+
+### 8. Build Health ✅ (Passed)
+- Build compiles successfully
+- 79 pages generated
+- Warnings: TailwindCSS ambiguous classes, exhaustive-deps, edge runtime
+- No TypeScript errors
+- No runtime compilation errors
 
 ---
 
-## 7. Final Assessment
+## Fixes Applied This Session
 
-**The project is 40% complete overall.** The frontend UI is 95% done. The backend API is 35% done. Integration is 0%. The gap between them is bridged by 18 specific fixes totaling ~5.5 hours of work.
+| # | Fix | File(s) | Type |
+|---|-----|---------|------|
+| 1 | Created 6 missing Mongoose model files | `models/Lead.js`, `LeadActivity.js`, `VerificationCase.js`, `Review.js`, `Analytics.js`, `Sport.js` | Backend |
+| 2 | Created admin API controller | `controllers/adminController.js` | Backend |
+| 3 | Mounted `/admin` routes in Express | `index.js` | Backend |
+| 4 | Fixed AdminGuard loading state | `components/auth/admin-guard.tsx` | Frontend |
+| 5 | Added Admin Panel link to navbar | `components/layout/navbar.tsx` | Frontend |
+| 6 | Added `bio` and `achievements` to Coach type | `types/domain/coach.ts` | Types |
+| 7 | Added `bio` and `achievements` to Coach model | `models/Coach.js` | Backend |
+| 8 | Added `bio`, `achievements` to all 52 coaches | `data/coaches.ts` | Data |
+| 9 | Added 2 Madanapalle coaches | `data/coaches.ts` | Data |
+| 10 | Fixed 3 missing phone numbers | `data/coaches.ts` | Data |
+| 11 | Normalized `New Delhi` → `Delhi` | `data/coaches.ts` | Data |
+| 12 | Updated backend seed file | `seeds/seedCoaches.js` | Backend |
 
-**The fastest path to a working product is:**
-1. Fix backend infrastructure (CORS, envelope, ID transform) — 45 min
-2. Expand Academy + Coach models — 50 min
-3. Rewrite 3 controllers (academy, coach, shortlist) — 95 min
-4. Create 2 new files (Enquiry model + controller) — 30 min
-5. Fix auth responses — 10 min
-6. Seed database — 30 min
-7. Connect 6 frontend data sources — 150 min
-8. Configure environment — 2 min
+---
 
-**Total: ~5.5 hours to MVP.**
+## Score Breakdown
+
+| Category | Score | Weight | Weighted |
+|----------|-------|--------|----------|
+| Build Health | 90/100 | 10% | 9.0 |
+| Empty States | 85/100 | 5% | 4.25 |
+| Broken Links | 100/100 | 5% | 5.0 |
+| Mobile Responsiveness | 90/100 | 10% | 9.0 |
+| Accessibility | 85/100 | 10% | 8.5 |
+| Error Handling | 80/100 | 10% | 8.0 |
+| Security | 30/100 | 15% | 4.5 |
+| Admin Functionality | 20/100 | 15% | 3.0 |
+| Data Completeness | 50/100 | 10% | 5.0 |
+| Production Readiness | 40/100 | 10% | 4.0 |
+| **TOTAL** | | **100%** | **60.25** |
+
+**Adjusted Score: 52/100** (rounding down for critical security gaps)
+
+---
+
+## Ship / No Ship Recommendation
+
+### **🚫 NO SHIP**
+
+The platform has strong foundations (UI, accessibility, mobile, error handling) but critical gaps prevent production deployment:
+
+1. **Security**: Placeholder CSRF, rate limiting, and sanitization must be replaced
+2. **Auth**: OTP delivery not implemented — users cannot verify accounts
+3. **Admin**: Panel is entirely mocked — no platform management capability
+4. **Images**: 84% of coach images missing — severely degraded visual experience
+
+**Minimum viable ship requires:**
+- Replace security placeholders with production implementations
+- Implement OTP delivery (at least email)
+- Wire admin pages to backend APIs
+- Generate or source missing images
+- Create admin seed script
+- Move JWT from localStorage to httpOnly cookies
+
+**Estimated effort to ship-ready: 2-3 weeks of focused development.**

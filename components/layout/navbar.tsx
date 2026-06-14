@@ -4,7 +4,7 @@ import * as React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { motion } from 'framer-motion';
-import { Menu, Search, MapPin, Bookmark, User2 } from 'lucide-react';
+import { Menu, Search, MapPin, Bookmark, User2, Shield } from 'lucide-react';
 import { primaryNav } from '@/config/nav';
 import { cn } from '@/lib/utils/cn';
 import { Button } from '@/components/ui/button';
@@ -108,6 +108,11 @@ export function Navbar() {
                   <User2 className="h-4 w-4" />
                 </Link>
               </Button>
+              <Button variant="ghost" size="icon-touch" aria-label="Admin" asChild>
+                <Link href="/admin">
+                  <Shield className="h-4 w-4" />
+                </Link>
+              </Button>
             </div>
 
             <Sheet open={open} onOpenChange={setOpen}>
@@ -172,6 +177,13 @@ export function Navbar() {
                     className="text-muted-foreground hover:text-foreground hover:bg-accent/15 rounded-md px-3 py-2 text-sm transition-colors"
                   >
                     Profile
+                  </Link>
+                  <Link
+                    href="/admin"
+                    onClick={() => setOpen(false)}
+                    className="text-muted-foreground hover:text-foreground hover:bg-accent/15 rounded-md px-3 py-2 text-sm transition-colors"
+                  >
+                    Admin Panel
                   </Link>
                 </div>
               </SheetContent>

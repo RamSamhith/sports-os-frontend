@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { SlidersHorizontal, X, Loader2, AlertTriangle } from 'lucide-react';
+import { X, Loader2, AlertTriangle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { SearchInput } from '@/components/ui/search-input';
 import { Badge } from '@/components/ui/badge';
@@ -14,6 +14,8 @@ import { academyFilterFacilities, academyFilterLevels, verificationStatuses } fr
 import { sportTaxonomy } from '@/lib/constants/sport-taxonomy';
 import { useSearchQuery } from '@/lib/hooks/use-search-query';
 import { getAcademies } from '@/lib/api/academies';
+import { useAnalytics } from '@/lib/hooks/use-analytics';
+import { searchSubmitEvent } from '@/lib/analytics/events';
 import type { Academy } from '@/types/domain/academy';
 
 const sportOptions = sportTaxonomy.map((s) => ({
@@ -51,25 +53,64 @@ export function AcademyListing() {
   const { query, setQuery, debouncedQuery } = useSearchQuery();
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { track } = useAnalytics();
 
-  const [academies, setAcademies] = React.useState<Academy[]>([]);
+  const [allAcademies, setAllAcademies] = React.useState<Academy[]>([]);
+  const [results, setResults] = React.useState<Academy[]>([]);
   const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState<string | null>(null);
+  const [total, setTotal] = React.useState(0);
 
   const [sports, setSports] = React.useState<string[]>(() => readListFromParams(searchParams, 'sport'));
   const [facilities, setFacilities] = React.useState<string[]>(() => readListFromParams(searchParams, 'facility'));
   const [levels, setLevels] = React.useState<string[]>(() => readListFromParams(searchParams, 'level'));
   const [statuses, setStatuses] = React.useState<string[]>(() => readListFromParams(searchParams, 'status'));
 
+  // Fetch all academies on mount for filter counts
+  React.useEffect(() => {
+    let cancelled = false;
+    async function load() {
+      const res = await getAcademies({ pageSize: 100 });
+      if (cancelled) return;
+      if (res.ok) {
+        setAllAcademies(res.data.items);
+      }
+    }
+    load();
+    return () => { cancelled = true; };
+  }, []);
+
+  // Fetch filtered results when search or filters change
   React.useEffect(() => {
     let cancelled = false;
     async function load() {
       setLoading(true);
       setError(null);
-      const res = await getAcademies({ pageSize: 100 });
+      const res = await getAcademies({
+        search: debouncedQuery || undefined,
+        sport: sports.length ? sports.join(',') : undefined,
+        facility: facilities.length ? facilities.join(',') : undefined,
+        level: levels.length ? levels.join(',') : undefined,
+        status: statuses.length ? statuses.join(',') : undefined,
+        pageSize: 100,
+      });
       if (cancelled) return;
       if (res.ok) {
-        setAcademies(res.data.items);
+        setResults(res.data.items);
+        setTotal(res.data.pagination.total);
+        // Fire analytics on search
+        if (debouncedQuery) {
+          track(searchSubmitEvent({
+            query: debouncedQuery,
+            resultsCount: res.data.pagination.total,
+            filters: {
+              sport: sports.length ? sports : undefined,
+              facility: facilities.length ? facilities : undefined,
+              level: levels.length ? levels : undefined,
+              status: statuses.length ? statuses : undefined,
+            },
+          }));
+        }
       } else {
         setError(res.error.message);
       }
@@ -77,38 +118,38 @@ export function AcademyListing() {
     }
     load();
     return () => { cancelled = true; };
-  }, []);
+  }, [debouncedQuery, sports, facilities, levels, statuses, track]);
 
   const dynamicSportOptions = React.useMemo(() =>
     sportOptions.map((o) => ({
       ...o,
-      count: academies.filter((a) => a.sportsOffered.includes(o.value)).length,
+      count: allAcademies.filter((a) => a.sportsOffered.includes(o.value)).length,
     })),
-    [academies]
+    [allAcademies]
   );
 
   const dynamicFacilityOptions = React.useMemo(() =>
     facilityOptions.map((o) => ({
       ...o,
-      count: academies.filter((a) => a.facilities.includes(o.value as never)).length,
+      count: allAcademies.filter((a) => a.facilities.includes(o.value as never)).length,
     })),
-    [academies]
+    [allAcademies]
   );
 
   const dynamicLevelOptions = React.useMemo(() =>
     levelOptions.map((o) => ({
       ...o,
-      count: academies.filter((a) => a.trainingLevels.includes(o.value as never)).length,
+      count: allAcademies.filter((a) => a.trainingLevels.includes(o.value as never)).length,
     })),
-    [academies]
+    [allAcademies]
   );
 
   const dynamicStatusOptions = React.useMemo(() =>
     statusOptions.map((o) => ({
       ...o,
-      count: academies.filter((a) => a.verificationStatus === o.value).length,
+      count: allAcademies.filter((a) => a.verificationStatus === o.value).length,
     })),
-    [academies]
+    [allAcademies]
   );
 
   const appliedCount =
@@ -144,29 +185,6 @@ export function AcademyListing() {
     router.replace(`?${params.toString()}`, { scroll: false });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sports, facilities, levels, statuses]);
-
-  const filtered = React.useMemo(() => {
-    const q = query.trim().toLowerCase();
-    return academies.filter((a) => {
-      if (sports.length && !sports.some((s) => a.sportsOffered.includes(s))) return false;
-      if (facilities.length && !facilities.every((f) => a.facilities.includes(f as never))) return false;
-      if (levels.length && !levels.some((l) => a.trainingLevels.includes(l as never))) return false;
-      if (statuses.length && !statuses.includes(a.verificationStatus)) return false;
-      if (q) {
-        const haystack = [
-          a.name,
-          a.description,
-          a.location.city,
-          a.location.state,
-          ...a.sportsOffered,
-        ]
-          .join(' ')
-          .toLowerCase();
-        if (!haystack.includes(q)) return false;
-      }
-      return true;
-    });
-  }, [query, sports, facilities, levels, statuses, academies]);
 
   const chips: Array<{ key: string; label: string; layoutId?: string; onRemove: () => void }> = [];
   if (query) {
@@ -209,7 +227,7 @@ export function AcademyListing() {
     });
   }
 
-  if (loading) {
+  if (loading && results.length === 0) {
     return (
       <div className="flex flex-col gap-4">
         <SearchInput
@@ -228,7 +246,7 @@ export function AcademyListing() {
     );
   }
 
-  if (error) {
+  if (error && results.length === 0) {
     return (
       <div className="flex flex-col gap-4">
         <SearchInput
@@ -330,18 +348,18 @@ export function AcademyListing() {
           ))}
           {appliedCount > 0 ? (
             <Button size="sm" variant="outline" onClick={clearAll}>
-              <X className="h-3.5 w-3.5" /> Clear all
+              <X className="h-3.5 h-3.5" /> Clear all
             </Button>
           ) : null}
         </div>
       ) : null}
 
       <p className="text-muted-foreground text-sm">
-        {filtered.length} of {academies.length} academies
+        {results.length} of {total || allAcademies.length} academies
       </p>
 
       <AcademyGrid
-        academies={filtered}
+        academies={results}
         onClear={() => {
           setQuery('');
           setSports([]);

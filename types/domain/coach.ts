@@ -19,6 +19,8 @@ export interface Coach {
     phone?: string;
     email?: string;
   };
+  bio?: string;
+  achievements?: string[];
   verificationStatus: VerificationStatus;
   rating: Rating;
   sourceCount: number;

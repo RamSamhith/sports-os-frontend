@@ -108,7 +108,7 @@ function searchAll(q: string): Result[] {
   return results;
 }
 
-const QUICK_NAV: Array<{ id: string; label: string; sublabel: string; href: string }> = [
+const QUICK_NAV = [
   { id: 'q-home', label: 'Home', sublabel: 'Discover the ecosystem', href: '/' },
   { id: 'q-discover', label: 'Discover', sublabel: 'Browse all categories', href: '/discover' },
   { id: 'q-academies', label: 'Academies', sublabel: 'Find the right academy', href: '/academies' },
@@ -246,7 +246,6 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
             spellCheck={false}
             value={query}
             onChange={(e) => setQuery(e.currentTarget.value)}
-            onInput={(e) => setQuery((e.currentTarget as HTMLInputElement).value)}
             onKeyDown={onKeyDown}
             placeholder="Search academies, coaches, sports, or jump to a page…"
             aria-label="Command palette search"

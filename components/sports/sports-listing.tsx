@@ -22,7 +22,7 @@ export function SportsListing() {
         .toLowerCase();
       return haystack.includes(q);
     });
-  }, [query]);
+  }, [query, sports]);
 
   return (
     <div className="flex flex-col gap-4">

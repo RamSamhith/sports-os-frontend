@@ -43,7 +43,14 @@ export function AdminGuard({ children }: { children: React.ReactNode }) {
         </div>
       );
     }
-    return null;
+  }
+
+  if (isAuthorized === null) {
+    return (
+      <div aria-busy="true" aria-label="Verifying admin access" className="flex flex-col gap-6 py-10">
+        <ProfileSkeleton />
+      </div>
+    );
   }
 
   if (!isAuthenticated || isAuthorized !== true) {

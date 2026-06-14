@@ -4,7 +4,7 @@ export function StatusPill({
   status,
   className,
 }: {
-  status: 'new' | 'verified' | 'pending' | 'rejected' | 'suspended' | 'contacted' | 'qualified' | 'trial_scheduled' | 'converted' | 'lost' | 'published' | 'draft';
+  status: 'new' | 'verified' | 'pending' | 'rejected' | 'suspended' | 'contacted' | 'qualified' | 'trial_scheduled' | 'converted' | 'lost' | 'published' | 'draft' | 'unverified';
   className?: string;
 }) {
   const tone = (() => {
