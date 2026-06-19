@@ -1,3 +1,9 @@
 # PJ-RNWG
-Sports OS – Athlete &amp; Academy Discovery Platform
+
+Sports OS – Athlete \& Academy Discovery Platform
 My name is Sowmika
+
+TEAM
+
+1)G.Ram Samhith
+
