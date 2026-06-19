@@ -16,6 +16,7 @@ import { LocationMap } from '@/components/academy/location-map';
 import { VerifiedBadge } from '@/components/trust/verified-badge';
 import { LastUpdated } from '@/components/trust/last-updated';
 import { CertificationIndicator } from '@/components/trust/certification-indicator';
+import { ProtectedLink } from '@/components/auth/protected-link';
 import { ReviewsSection } from '@/components/reviews/reviews-section';
 import { ImageWithFallback } from '@/components/ui/image-with-fallback';
 import { AcademyDetailSkeleton } from '@/components/feedback/skeletons';
@@ -201,7 +202,7 @@ export function AcademyDetailView({ slug }: { slug: string }) {
               </Button>
             )}
             <Button asChild size="lg" className="h-12 px-6">
-              <Link href={`/enquiry/academy/${academy.slug}`}>Enquire</Link>
+              <ProtectedLink href={`/enquiry/academy/${academy.slug}`}>Enquire</ProtectedLink>
             </Button>
             <ShortlistToggle
               itemType="academy"
@@ -543,7 +544,7 @@ export function AcademyDetailView({ slug }: { slug: string }) {
               </Button>
             )}
             <Button asChild className="flex-1 h-12">
-              <Link href={`/enquiry/academy/${academy.slug}`}>Enquire</Link>
+              <ProtectedLink href={`/enquiry/academy/${academy.slug}`}>Enquire</ProtectedLink>
             </Button>
             <ShortlistToggle
               itemType="academy"

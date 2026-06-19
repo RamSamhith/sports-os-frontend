@@ -6,6 +6,7 @@ import { useStorageSync } from '@/lib/hooks/use-storage-sync';
 import { BUILD_HASH } from '@/lib/version';
 import { useAuth } from '@/lib/hooks/use-auth';
 import { getMyShortlistPopulated, addToShortlist, removeFromShortlist } from '@/lib/api/shortlist';
+import { trackShortlistAdd, trackShortlistRemove, trackGuestShortlist } from '@/lib/analytics/events';
 import type { ShortlistItem, ShortlistItemType } from '@/types/domain/shortlist';
 
 const STORAGE_KEY = 'sportsos:shortlist';
@@ -208,8 +209,15 @@ export function ShortlistProvider({ children }: ShortlistProviderProps) {
       meta: { label: string; sublabel?: string; href: string },
     ) => {
       const added = addWithMeta(itemType, itemId, meta);
-      if (added && isAuthenticated && (itemType === 'academy' || itemType === 'coach')) {
-        addToShortlist(itemType, itemId).catch(() => {});
+      if (added) {
+        if (isAuthenticated) {
+          if (itemType === 'academy' || itemType === 'coach') {
+            addToShortlist(itemType, itemId).catch(() => {});
+          }
+          trackShortlistAdd(itemId, itemType, meta.label);
+        } else {
+          trackGuestShortlist(itemId, itemType, meta.label);
+        }
       }
       return added;
     },
@@ -221,6 +229,7 @@ export function ShortlistProvider({ children }: ShortlistProviderProps) {
     (itemType: ShortlistItemType, itemId: string) => {
       const record = items.find((i) => i.itemType === itemType && i.itemId === itemId);
       remove(itemType, itemId);
+      trackShortlistRemove(itemId, itemType);
       if (isAuthenticated && record && !record.id.startsWith(`${itemType}:${itemId}`) && (itemType === 'academy' || itemType === 'coach')) {
         removeFromShortlist(record.id).catch(() => {});
       }

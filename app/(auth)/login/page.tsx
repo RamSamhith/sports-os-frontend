@@ -10,8 +10,9 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { SharedLayout } from '@/components/motion/shared-layout';
 import { useAuth } from '@/lib/hooks/use-auth';
-import { login as apiLogin } from '@/lib/api/auth';
+import { login as apiLogin, sendLoginOtp } from '@/lib/api/auth';
 import { useGoogleAuth, useMicrosoftAuth, handleSocialAuth } from '@/lib/hooks/use-social-auth';
+import { trackGuestStarted, trackOtpLogin } from '@/lib/analytics/events';
 import { Loader2 } from 'lucide-react';
 
 interface FieldErrors {
@@ -32,7 +33,7 @@ const fieldVariants = {
 export default function LoginPage() {
   const reduced = useReducedMotion();
   const router = useRouter();
-  const { setAuth, setProfile, isAuthenticated, isLoading, onboardingCompleted } = useAuth();
+  const { setAuth, setProfile, isAuthenticated, isLoading, onboardingCompleted, enterGuestMode } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errors, setErrors] = useState<FieldErrors>({});
@@ -41,6 +42,8 @@ export default function LoginPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [socialLoading, setSocialLoading] = useState<'google' | 'microsoft' | null>(null);
   const [socialError, setSocialError] = useState<string | null>(null);
+  const [otpLoading, setOtpLoading] = useState(false);
+  const [otpSuccess, setOtpSuccess] = useState(false);
 
   const googleAuth = useGoogleAuth();
   const microsoftAuth = useMicrosoftAuth();
@@ -175,6 +178,68 @@ export default function LoginPage() {
     }
   }
 
+  async function handleOtpLogin() {
+    if (!email.trim()) {
+      setErrors({ email: 'Enter your email to receive a login code' });
+      return;
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      setErrors({ email: 'Enter a valid email address' });
+      return;
+    }
+    setServerError(null);
+    setOtpLoading(true);
+    try {
+      const res = await sendLoginOtp({ email: email.trim() });
+      if (!res.ok) {
+        setServerError(res.error.message);
+        setOtpLoading(false);
+        return;
+      }
+      trackOtpLogin();
+      try {
+        sessionStorage.setItem('sportsos:verify-email', email.trim());
+      } catch { /* ignore */ }
+      setOtpSuccess(true);
+      setOtpLoading(false);
+    } catch {
+      setServerError('Network error. Please try again.');
+      setOtpLoading(false);
+    }
+  }
+
+  function handleGuestContinue() {
+    trackGuestStarted();
+    enterGuestMode();
+    router.replace('/');
+  }
+
+  if (otpSuccess) {
+    return (
+      <SharedLayout layoutId="auth-card">
+        <Card className="w-full max-w-sm">
+          <CardHeader>
+            <CardTitle className="text-2xl">Check your email</CardTitle>
+            <CardDescription>
+              We sent a 6-digit code to <strong>{email}</strong>
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="flex flex-col gap-4">
+            <p className="text-muted-foreground text-sm">
+              Enter the code on the next screen to sign in.
+            </p>
+            <Button onClick={() => router.push('/verify/login-otp')} className="w-full" size="lg">
+              Enter code
+            </Button>
+            <Button variant="ghost" onClick={() => { setOtpSuccess(false); setEmail(''); }} className="w-full">
+              Use a different email
+            </Button>
+          </CardContent>
+        </Card>
+      </SharedLayout>
+    );
+  }
+
   const errorId = (field: string) => `login-${field}-error`;
 
   return (
@@ -219,7 +284,7 @@ export default function LoginPage() {
               transition={{ delay: 0.25 }}
               className="flex flex-col gap-3 mb-4"
             >
-              <Button variant="outline" className="w-full h-12 gap-2.5" size="lg" onClick={handleGoogleLogin} disabled={socialLoading !== null}>
+              <Button variant="outline" className="w-full h-12 gap-2.5" size="lg" onClick={handleGoogleLogin} disabled={socialLoading !== null || isSubmitting}>
                 {socialLoading === 'google' ? (
                   <Loader2 className="h-5 w-5 animate-spin" />
                 ) : (
@@ -227,13 +292,16 @@ export default function LoginPage() {
                 )}
                 Continue with Google
               </Button>
-              <Button variant="outline" className="w-full h-12 gap-2.5" size="lg" onClick={handleMicrosoftLogin} disabled={socialLoading !== null}>
+              <Button variant="outline" className="w-full h-12 gap-2.5" size="lg" onClick={handleMicrosoftLogin} disabled={socialLoading !== null || isSubmitting}>
                 {socialLoading === 'microsoft' ? (
                   <Loader2 className="h-5 w-5 animate-spin" />
                 ) : (
                   <svg className="h-5 w-5" viewBox="0 0 23 23"><path fill="#f35325" d="M1 1h10v10H1z"/><path fill="#81bc06" d="M12 1h10v10H12z"/><path fill="#05a6f0" d="M1 12h10v10H1z"/><path fill="#ffba08" d="M12 12h10v10H12z"/></svg>
                 )}
                 Continue with Microsoft
+              </Button>
+              <Button variant="outline" className="w-full h-12 gap-2.5" size="lg" onClick={handleGuestContinue} disabled={isSubmitting}>
+                Continue as Guest
               </Button>
             </motion.div>
 
@@ -341,6 +409,31 @@ export default function LoginPage() {
               </Button>
             </motion.div>
           </motion.form>
+
+          <div className="relative my-4">
+            <div className="absolute inset-0 flex items-center">
+              <span className="w-full border-t" />
+            </div>
+            <div className="relative flex justify-center text-xs uppercase">
+              <span className="bg-card text-muted-foreground px-2">or</span>
+            </div>
+          </div>
+
+          <Button
+            variant="ghost"
+            className="w-full"
+            onClick={handleOtpLogin}
+            disabled={otpLoading || isSubmitting}
+          >
+            {otpLoading ? (
+              <>
+                <Loader2 className="h-4 w-4 animate-spin" />
+                Sending code…
+              </>
+            ) : (
+              'Continue with OTP'
+            )}
+          </Button>
 
           <p className="text-muted-foreground mt-4 text-center text-xs">
             Don&apos;t have an account?{' '}

@@ -10,6 +10,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { getReviews, createReview, type Review, type ReviewStats } from '@/lib/api/reviews';
 import { useAuth } from '@/lib/hooks/use-auth';
+import { GuestGuard } from '@/components/auth/guest-guard';
 import { toast } from 'sonner';
 
 interface ReviewsSectionProps {
@@ -52,6 +53,10 @@ export function ReviewsSection({ targetType, targetId }: ReviewsSectionProps) {
   }, [loadReviews]);
 
   const handleSubmitReview = async () => {
+    if (!isAuthenticated) {
+      toast.error('Please sign in to submit a review');
+      return;
+    }
     if (formRating === 0) {
       setFormError('Please select a rating');
       return;
@@ -91,10 +96,12 @@ export function ReviewsSection({ targetType, targetId }: ReviewsSectionProps) {
           <CardTitle className="text-lg">
             Reviews {stats ? `(${stats.totalReviews})` : ''}
           </CardTitle>
-          {isAuthenticated && !showForm && (
-            <Button size="sm" onClick={() => setShowForm(true)}>
-              Write a Review
-            </Button>
+          {!showForm && (
+            <GuestGuard actionLabel="Sign in to write a review">
+              <Button size="sm" onClick={() => setShowForm(true)}>
+                Write a Review
+              </Button>
+            </GuestGuard>
           )}
         </div>
       </CardHeader>
@@ -208,10 +215,12 @@ export function ReviewsSection({ targetType, targetId }: ReviewsSectionProps) {
                 <Button variant="outline" onClick={() => setShowForm(false)}>
                   Cancel
                 </Button>
-                <Button onClick={handleSubmitReview} disabled={submitting}>
-                  {submitting ? <Loader2 className="h-4 w-4 animate-spin mr-1" /> : null}
-                  Submit Review
-                </Button>
+                <GuestGuard actionLabel="Sign in to submit your review">
+                  <Button onClick={handleSubmitReview} disabled={submitting}>
+                    {submitting ? <Loader2 className="h-4 w-4 animate-spin mr-1" /> : null}
+                    Submit Review
+                  </Button>
+                </GuestGuard>
               </div>
             </div>
           </div>

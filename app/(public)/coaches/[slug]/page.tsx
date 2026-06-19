@@ -11,6 +11,7 @@ import { Badge } from '@/components/ui/badge';
 import { ShortlistToggle } from '@/components/shortlist/shortlist-toggle';
 import { CompareButton } from '@/components/academies/compare-button';
 import { VerifiedBadge } from '@/components/trust/verified-badge';
+import { ProtectedLink } from '@/components/auth/protected-link';
 import { ImageWithFallback } from '@/components/ui/image-with-fallback';
 import { fixtureImages } from '@/lib/images';
 import { getCoach } from '@/lib/api/coaches';
@@ -116,7 +117,7 @@ export default function CoachDetailPage() {
             </div>
             <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:flex-wrap">
               <Button asChild size="lg">
-                <Link href={`/enquiry/coach/${coach.slug}`}>Request callback</Link>
+                <ProtectedLink href={`/enquiry/coach/${coach.slug}`}>Request callback</ProtectedLink>
               </Button>
               <ShortlistToggle
                 itemType="coach"

@@ -1,5 +1,6 @@
 'use client';
 
+import * as React from 'react';
 import Link from 'next/link';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -8,12 +9,13 @@ import { useAuth } from '@/lib/hooks/use-auth';
 import { useOnboarding } from '@/lib/hooks/use-onboarding';
 import { useChildren } from '@/lib/hooks/use-children';
 import { useAcademySelection } from '@/lib/hooks/use-academy-selection';
+import { ConversionModal } from '@/components/auth/conversion-modal';
 import { getMatchingCriteria } from '@/lib/utils/matching';
 import { sportTaxonomy } from '@/lib/constants/sport-taxonomy';
 import { academies } from '@/data/academies';
 import { coaches } from '@/data/coaches';
 import { MyAcademyCard } from '@/components/profile/my-academy-card';
-import { Pencil, MapPin, Target, Trophy, User, Users, Sparkles, School, Star, ChevronRight, Search, BookOpen } from 'lucide-react';
+import { Pencil, MapPin, Target, Trophy, User, Users, Sparkles, School, Star, ChevronRight, Search, BookOpen, Shield } from 'lucide-react';
 
 function getSportName(slug: string): string {
   return sportTaxonomy.find((s) => s.slug === slug)?.name ?? slug;
@@ -46,11 +48,12 @@ function MatchingCriteriaCard() {
 }
 
 export default function ProfilePage() {
-  const { role } = useAuth();
+  const { role, isGuest, isAuthenticated } = useAuth();
   const { athleteData, parentData, completed } = useOnboarding();
   const { activeChild } = useChildren();
   const { selectedAcademyId } = useAcademySelection();
   const isParent = role === 'parent';
+  const [showUpgrade, setShowUpgrade] = React.useState(false);
 
   const selectedAcademy = selectedAcademyId
     ? academies.find((a) => a.id === selectedAcademyId)
@@ -62,6 +65,32 @@ export default function ProfilePage() {
 
   return (
     <div className="flex flex-col gap-4">
+      {/* Guest Upgrade Banner */}
+      {(isGuest || !isAuthenticated) && (
+        <Card className="border-amber-200 bg-amber-50 dark:border-amber-800 dark:bg-amber-950/30">
+          <CardContent className="flex items-center gap-3 p-4">
+            <div className="bg-amber-100 dark:bg-amber-900/50 grid h-10 w-10 shrink-0 place-items-center rounded-full">
+              <User className="h-5 w-5 text-amber-600 dark:text-amber-400" />
+            </div>
+            <div className="min-w-0 flex-1">
+              <div className="flex items-center gap-2">
+                <p className="text-sm font-semibold">Guest User</p>
+                <Badge variant="secondary" className="text-[10px] bg-amber-100 text-amber-700 dark:bg-amber-900/50 dark:text-amber-300">
+                  <Shield className="h-2.5 w-2.5 mr-0.5" />
+                  Guest
+                </Badge>
+              </div>
+              <p className="text-muted-foreground text-xs">
+                Sign up to save favourites, write reviews, and get personalised recommendations.
+              </p>
+            </div>
+            <Button size="sm" onClick={() => setShowUpgrade(true)}>
+              Upgrade Account
+            </Button>
+          </CardContent>
+        </Card>
+      )}
+
       <Card>
         <CardHeader>
           <div className="flex items-center justify-between">
@@ -80,6 +109,8 @@ export default function ProfilePage() {
           </div>
         </CardHeader>
       </Card>
+
+      <ConversionModal open={showUpgrade} onOpenChange={setShowUpgrade} />
 
       <MatchingCriteriaCard />
 

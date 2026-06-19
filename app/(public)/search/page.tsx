@@ -14,7 +14,8 @@ import { RecentSearches } from '@/components/search/recent-searches';
 import { useRecentSearches } from '@/components/command/recent-searches-store';
 import Link from 'next/link';
 import { TrendingUp, MapPin, Trophy, School, Loader2 } from 'lucide-react';
-import { trackSearch, trackSearchResultClick, trackSportClick, trackCityClick } from '@/lib/analytics/events';
+import { trackSearch, trackSearchResultClick, trackSportClick, trackCityClick, trackGuestSearch } from '@/lib/analytics/events';
+import { useAuth } from '@/lib/hooks/use-auth';
 import { getAcademies } from '@/lib/api/academies';
 import { listSports } from '@/lib/api/sports';
 
@@ -40,6 +41,7 @@ function SearchPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { items: recentItems, push: pushRecent } = useRecentSearches();
+  const { isGuest, isAuthenticated } = useAuth();
 
   const [query, setQuery] = React.useState(() => searchParams.get('q') ?? '');
   const [activeTab, setActiveTab] = React.useState<'all' | 'academies' | 'sports' | 'cities'>('all');
@@ -80,6 +82,9 @@ function SearchPageContent() {
     if (value.trim()) {
       pushRecent(value.trim());
       trackSearch(value.trim(), 0, activeTab);
+      if (isGuest || !isAuthenticated) {
+        trackGuestSearch(value.trim(), 0);
+      }
     }
     const params = new URLSearchParams(searchParams.toString());
     if (value) params.set('q', value);

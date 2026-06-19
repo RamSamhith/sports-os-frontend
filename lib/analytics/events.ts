@@ -126,6 +126,42 @@ export function trackApiError(endpoint: string, statusCode: number, message: str
   track('api_error', { endpoint, status_code: statusCode, message });
 }
 
+// ─── Guest Events ───────────────────────────────────────────
+
+export function trackGuestStarted() {
+  track('guest_started');
+}
+
+export function trackGuestSearch(query: string, resultsCount: number) {
+  track('guest_search', { query, results_count: resultsCount });
+}
+
+export function trackGuestShortlist(itemId: string, itemType: string, itemName: string) {
+  track('guest_shortlist', { item_id: itemId, item_type: itemType, item_name: itemName });
+}
+
+export function trackGuestCompare(itemCount: number) {
+  track('guest_compare', { item_count: itemCount });
+}
+
+export function trackGuestConversion(method: string) {
+  track('guest_conversion', { method });
+}
+
+// ─── Auth Extra Events ──────────────────────────────────────
+
+export function trackForgotPasswordStarted() {
+  track('forgot_password_started');
+}
+
+export function trackPasswordResetSuccess() {
+  track('password_reset_success');
+}
+
+export function trackOtpLogin() {
+  track('otp_login');
+}
+
 // ─── Feedback Events ────────────────────────────────────────
 
 export function trackFeedback(type: string, message: string, page?: string) {

@@ -13,6 +13,7 @@ import { EmptyState } from '@/components/feedback/empty-state';
 import { VerifiedBadge } from '@/components/trust/verified-badge';
 import { fixtureImages } from '@/lib/images';
 import { useCompare } from '@/lib/hooks/use-compare';
+import { ProtectedLink } from '@/components/auth/protected-link';
 import { cn } from '@/lib/utils/cn';
 import { getAcademy } from '@/lib/api/academies';
 import { getCoach } from '@/lib/api/coaches';
@@ -180,7 +181,7 @@ function CompareCard({ slot, onRemove }: { slot: Entity; onRemove: () => void })
         <div className="flex flex-wrap gap-2 pt-1">
           <Button size="sm" variant="default" asChild><Link href={href}>View Details</Link></Button>
           {kind !== 'sport' && (
-            <Button size="sm" variant="outline" asChild><Link href={`/enquiry/${kind}/${(entity as Academy | Coach).slug}`}>Enquire</Link></Button>
+            <Button size="sm" variant="outline" asChild><ProtectedLink href={`/enquiry/${kind}/${(entity as Academy | Coach).slug}`}>Enquire</ProtectedLink></Button>
           )}
         </div>
       </CardContent>

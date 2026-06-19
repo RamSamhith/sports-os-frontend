@@ -7,6 +7,18 @@ import { getMe, logout as apiLogout } from '@/lib/api/auth';
 const STORAGE_KEY = 'sportsos:auth-state';
 const PROFILE_KEY = 'sportsos:profile';
 const ONBOARDING_KEY = 'sportsos:onboarding-data';
+const GUEST_KEY = 'sportsos:is-guest';
+const GUEST_ID_KEY = 'sportsos:guest-id';
+
+const GUEST_STORAGE_KEYS = [
+  'sportsos:shortlist',
+  'sportsos:recent-searches',
+  'sportsos:recently-viewed',
+  'sportsos:compare',
+  'sportsos:preferences',
+  'sportsos:location',
+  'sportsos:theme',
+];
 
 interface PersistedAuthState {
   isAuthenticated: boolean;
@@ -19,6 +31,7 @@ interface PersistedProfile {
   name: string;
   email: string;
   phone: string;
+  authProvider?: 'credentials' | 'google' | 'microsoft';
 }
 
 interface PersistedOnboarding {
@@ -76,6 +89,7 @@ function readProfile(): UserProfile {
       name: typeof parsed.name === 'string' ? parsed.name : '',
       email: typeof parsed.email === 'string' ? parsed.email : '',
       phone: typeof parsed.phone === 'string' ? parsed.phone : '',
+      authProvider: parsed.authProvider,
     };
   } catch {
     return { ...defaultProfile };
@@ -158,6 +172,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [profile, setProfileState] = useState<UserProfile>({ ...defaultProfile });
   const [onboarding, setOnboardingState] = useState<PersistedOnboarding>({ ...defaultOnboarding });
   const [hydrated, setHydrated] = useState(false);
+  const [isGuest, setIsGuest] = useState(false);
 
   // Hydrate from localStorage on mount, then fetch from backend if token exists
   useEffect(() => {
@@ -167,6 +182,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     writeState(migrated);
     setProfileState(readProfile());
     setOnboardingState(readOnboarding());
+
+    // Read guest flag
+    try {
+      const guestFlag = localStorage.getItem(GUEST_KEY);
+      if (guestFlag === 'true' && !migrated.isAuthenticated) {
+        setIsGuest(true);
+      }
+    } catch { /* ignore */ }
+
     setHydrated(true);
 
     // If authenticated, fetch fresh data from backend
@@ -295,14 +319,43 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     });
   }, []);
 
+  const enterGuestMode = useCallback(() => {
+    setIsGuest(true);
+    try {
+      localStorage.setItem(GUEST_KEY, 'true');
+      // Generate a persistent guest ID if one doesn't exist
+      if (!localStorage.getItem(GUEST_ID_KEY)) {
+        const guestId = `guest_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`;
+        localStorage.setItem(GUEST_ID_KEY, guestId);
+      }
+    } catch { /* ignore */ }
+  }, []);
+
+  const convertGuestToUser = useCallback(() => {
+    // Migrate guest data to user session before clearing
+    try {
+      // Guest shortlist, recent searches, recently viewed, preferences, and theme
+      // are already stored in shared localStorage keys that persist across sessions.
+      // The migration is implicit — user data takes over the same keys.
+    } catch { /* ignore */ }
+    setIsGuest(false);
+    try {
+      localStorage.removeItem(GUEST_KEY);
+      localStorage.removeItem(GUEST_ID_KEY);
+    } catch { /* ignore */ }
+  }, []);
+
   const signOut = useCallback(() => {
     // Notify backend to revoke refresh token and clear cookie
     apiLogout().catch(() => {});
     setState({ isAuthenticated: false, role: null, onboardingCompleted: false, verified: false });
     setProfileState({ ...defaultProfile });
     setOnboardingState({ ...defaultOnboarding });
+    setIsGuest(false);
     // Clear all app-specific localStorage keys
     try {
+      localStorage.removeItem(GUEST_KEY);
+      localStorage.removeItem(GUEST_ID_KEY);
       localStorage.removeItem('sportsos:auth-token');
       localStorage.removeItem('sportsos:settings');
       localStorage.removeItem('sportsos:preferences');
@@ -327,6 +380,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     () => ({
       isAuthenticated: state.isAuthenticated,
       isLoading: !hydrated,
+      isGuest,
       role: state.role,
       onboardingCompleted: state.onboardingCompleted,
       verified: state.verified,
@@ -338,9 +392,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setVerified,
       setProfile,
       setOnboarding,
+      enterGuestMode,
+      convertGuestToUser,
       signOut,
     }),
-    [state, hydrated, profile, onboarding, setAuth, setRole, completeOnboarding, setVerified, setProfile, setOnboarding, signOut],
+    [state, hydrated, isGuest, profile, onboarding, setAuth, setRole, completeOnboarding, setVerified, setProfile, setOnboarding, enterGuestMode, convertGuestToUser, signOut],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

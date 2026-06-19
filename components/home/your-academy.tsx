@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import { ProtectedLink } from '@/components/auth/protected-link'
 import { useAcademySelection } from '@/lib/hooks/use-academy-selection'
 import { useAcademyStatus } from '@/lib/hooks/use-academy-status'
 import { Card, CardContent } from '@/components/ui/card'
@@ -60,7 +61,7 @@ export function YourAcademy() {
           <Link href={`/academies/${academy.slug}`}>View Academy</Link>
         </Button>
         <Button size="sm" variant="outline" asChild>
-          <Link href={`/enquiry/academy/${academy.slug}`}>Enquire</Link>
+          <ProtectedLink href={`/enquiry/academy/${academy.slug}`}>Enquire</ProtectedLink>
         </Button>
         <Button size="sm" variant="ghost" asChild>
           <Link href={`/coaches?academy=${academy.slug}`}>View Coaches</Link>

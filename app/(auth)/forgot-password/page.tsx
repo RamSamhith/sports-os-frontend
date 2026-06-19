@@ -1,21 +1,33 @@
 'use client';
 
 import { motion, useReducedMotion, AnimatePresence } from 'framer-motion';
-import { useState, useRef, useEffect } from 'react';
-import { Card, CardContent } from '@/components/ui/card';
+import { useState, useRef, useEffect, Suspense, useCallback } from 'react';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
+import { OtpInput } from '@/components/ui/otp-input';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { SharedLayout } from '@/components/motion/shared-layout';
-import { Loader2, CheckCircle2, ArrowLeft, Mail } from 'lucide-react';
+import { Loader2, CheckCircle2, ArrowLeft, Mail, Shield } from 'lucide-react';
 import { useAuth } from '@/lib/hooks/use-auth';
-import { forgotPassword } from '@/lib/api/auth';
+import { sendForgotPasswordOtp, verifyResetOtp, resetPassword, checkProvider } from '@/lib/api/auth';
+import { trackForgotPasswordStarted, trackPasswordResetSuccess } from '@/lib/analytics/events';
 
 const FAST = { duration: 0.2, ease: [0.2, 0, 0, 1] as const };
 
+type Step = 'email' | 'otp' | 'password' | 'success' | 'oauth-notice';
+
 export default function ForgotPasswordPage() {
+  return (
+    <Suspense fallback={null}>
+      <ForgotPasswordContent />
+    </Suspense>
+  );
+}
+
+function ForgotPasswordContent() {
   const reduced = useReducedMotion();
   const router = useRouter();
   const { isAuthenticated, isLoading } = useAuth();
@@ -23,7 +35,14 @@ export default function ForgotPasswordPage() {
   const [error, setError] = useState('');
   const [touched, setTouched] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [emailSent, setEmailSent] = useState(false);
+  const [step, setStep] = useState<Step>('email');
+  const [otp, setOtp] = useState('');
+  const [resetToken, setResetToken] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [passwordErrors, setPasswordErrors] = useState<Record<string, string>>({});
+  const [oauthProvider, setOauthProvider] = useState<string>('');
+  const [resendCooldown, setResendCooldown] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -32,13 +51,29 @@ export default function ForgotPasswordPage() {
   }, [isLoading, isAuthenticated, router]);
 
   useEffect(() => {
-    if (!emailSent) inputRef.current?.focus();
-  }, [emailSent]);
+    if (step === 'email') inputRef.current?.focus();
+  }, [step]);
+
+  useEffect(() => {
+    if (resendCooldown <= 0) return;
+    const timer = setTimeout(() => setResendCooldown((c) => c - 1), 1000);
+    return () => clearTimeout(timer);
+  }, [resendCooldown]);
 
   function validate(value: string): string {
     if (!value.trim()) return 'Email is required';
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) return 'Enter a valid email address';
     return '';
+  }
+
+  function validatePassword(value: string): Record<string, string> {
+    const errors: Record<string, string> = {};
+    if (value.length < 8) errors.minLength = 'At least 8 characters';
+    if (!/[A-Z]/.test(value)) errors.uppercase = 'One uppercase letter';
+    if (!/[a-z]/.test(value)) errors.lowercase = 'One lowercase letter';
+    if (!/\d/.test(value)) errors.number = 'One number';
+    if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(value)) errors.special = 'One special character';
+    return errors;
   }
 
   function handleBlur() {
@@ -51,24 +86,96 @@ export default function ForgotPasswordPage() {
     if (touched) setError(validate(value));
   }
 
-  async function handleSubmit(e: React.FormEvent) {
+  function getPasswordStrength(): 'weak' | 'medium' | 'strong' {
+    const errors = validatePassword(newPassword);
+    const count = Object.keys(errors).length;
+    if (count <= 1) return 'strong';
+    if (count <= 3) return 'medium';
+    return 'weak';
+  }
+
+  async function handleEmailSubmit(e: React.FormEvent) {
     e.preventDefault();
     setTouched(true);
     const v = validate(email);
     setError(v);
     if (v) return;
 
+    trackForgotPasswordStarted();
     setIsSubmitting(true);
     setError('');
 
-    const result = await forgotPassword({ email: email.toLowerCase().trim() });
+    const providerRes = await checkProvider(email.toLowerCase().trim());
+    if (providerRes.ok && providerRes.data.provider && providerRes.data.provider !== 'credentials') {
+      setOauthProvider(providerRes.data.provider);
+      setStep('otp');
+      setIsSubmitting(false);
+      return;
+    }
 
+    const result = await sendForgotPasswordOtp({ email: email.toLowerCase().trim() });
     setIsSubmitting(false);
 
     if (result.ok) {
-      setEmailSent(true);
+      setStep('otp');
+      setResendCooldown(30);
     } else {
       setError(result.error?.message || 'Something went wrong. Please try again.');
+    }
+  }
+
+  const handleOtpComplete = useCallback(async (code: string) => {
+    if (isSubmitting || code.length !== 6) return;
+    setIsSubmitting(true);
+    setError('');
+
+    const res = await verifyResetOtp({ email: email.toLowerCase().trim(), otp: code });
+    setIsSubmitting(false);
+
+    if (res.ok) {
+      setResetToken(res.data.resetToken);
+      setStep('password');
+    } else {
+      setError(res.error?.message || 'Invalid code. Please try again.');
+      setOtp('');
+    }
+  }, [email, isSubmitting]);
+
+  useEffect(() => {
+    if (otp.length === 6 && step === 'otp') {
+      handleOtpComplete(otp);
+    }
+  }, [otp, step, handleOtpComplete]);
+
+  async function handlePasswordSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    const pwErrors = validatePassword(newPassword);
+    setPasswordErrors(pwErrors);
+    if (Object.keys(pwErrors).length > 0) return;
+
+    if (newPassword !== confirmPassword) {
+      setPasswordErrors((prev) => ({ ...prev, match: 'Passwords do not match' }));
+      return;
+    }
+
+    setIsSubmitting(true);
+    const res = await resetPassword({ token: resetToken, password: newPassword });
+    setIsSubmitting(false);
+
+    if (res.ok) {
+      trackPasswordResetSuccess();
+      setStep('success');
+    } else {
+      setError(res.error?.message || 'Something went wrong. Please try again.');
+    }
+  }
+
+  async function handleResend() {
+    if (resendCooldown > 0) return;
+    const result = await sendForgotPasswordOtp({ email: email.toLowerCase().trim() });
+    if (result.ok) {
+      setResendCooldown(30);
+      setOtp('');
     }
   }
 
@@ -78,12 +185,15 @@ export default function ForgotPasswordPage() {
     exit: { opacity: 0, x: reduced ? 0 : -12, transition: { ...FAST, duration: 0.15 } },
   };
 
+  const strength = getPasswordStrength();
+  const pwErrors = validatePassword(newPassword);
+
   return (
     <SharedLayout layoutId="auth-card">
       <Card className="w-full max-w-sm">
         <CardContent className="pt-6">
           <AnimatePresence mode="wait" initial={false}>
-            {emailSent ? (
+            {step === 'success' ? (
               <motion.div
                 key="success"
                 variants={screenVariants}
@@ -100,34 +210,200 @@ export default function ForgotPasswordPage() {
                 >
                   <CheckCircle2 className="h-7 w-7 text-primary" />
                 </motion.div>
-
-                <h1 className="text-2xl font-bold tracking-tight">Check Your Email</h1>
+                <h1 className="text-2xl font-bold tracking-tight">Password updated</h1>
                 <p className="text-muted-foreground mt-2 text-sm text-pretty">
-                  If an account exists for{' '}
-                  <span className="text-foreground font-medium">{email}</span>, a password reset link
-                  has been sent. Check your inbox.
+                  Your password has been updated successfully. You can now sign in with your new password.
                 </p>
-
+                <Link href="/login" className="mt-6 w-full">
+                  <Button className="w-full gap-2">
+                    <ArrowLeft className="h-4 w-4" />
+                    Back to Login
+                  </Button>
+                </Link>
+              </motion.div>
+            ) : step === 'otp' && oauthProvider ? (
+              <motion.div
+                key="oauth-notice"
+                variants={screenVariants}
+                initial="enter"
+                animate="center"
+                exit="exit"
+                className="flex flex-col items-center text-center"
+              >
+                <motion.div
+                  initial={reduced ? { opacity: 0 } : { scale: 0.8, opacity: 0 }}
+                  animate={reduced ? { opacity: 1 } : { scale: 1, opacity: 1 }}
+                  transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+                  className="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-primary/10"
+                >
+                  <Shield className="h-7 w-7 text-primary" />
+                </motion.div>
+                <h1 className="text-2xl font-bold tracking-tight">Account uses {oauthProvider === 'google' ? 'Google' : 'Microsoft'}</h1>
+                <p className="text-muted-foreground mt-2 text-sm text-pretty">
+                  This account uses {oauthProvider === 'google' ? 'Google' : 'Microsoft'} Sign In. No password reset required.
+                </p>
                 <div className="mt-6 flex w-full flex-col gap-3">
-                  <Link href="/login">
-                    <Button className="w-full gap-2" variant="default">
-                      <ArrowLeft className="h-4 w-4" />
-                      Back to Login
-                    </Button>
-                  </Link>
                   <Button
-                    className="w-full"
-                    variant="ghost"
+                    className="w-full gap-2"
                     onClick={() => {
-                      setEmailSent(false);
-                      setEmail('');
-                      setTouched(false);
-                      setError('');
+                      if (oauthProvider === 'google') {
+                        router.replace('/login');
+                      } else {
+                        router.replace('/login');
+                      }
                     }}
                   >
-                    Reset Another
+                    Continue with {oauthProvider === 'google' ? 'Google' : 'Microsoft'}
+                  </Button>
+                  <Button variant="ghost" className="w-full" onClick={() => { setStep('email'); setOauthProvider(''); setEmail(''); }}>
+                    Use a different email
                   </Button>
                 </div>
+              </motion.div>
+            ) : step === 'otp' ? (
+              <motion.div
+                key="otp"
+                variants={screenVariants}
+                initial="enter"
+                animate="center"
+                exit="exit"
+              >
+                <div className="mb-4 flex items-center justify-center gap-2">
+                  <span className="bg-primary/10 ring-primary/30 relative flex h-8 w-8 items-center justify-center rounded-lg ring-1">
+                    <Mail className="h-4 w-4 text-primary" />
+                  </span>
+                  <span className="text-primary text-sm font-medium">Verify Code</span>
+                </div>
+                <h1 className="text-2xl font-bold tracking-tight text-center">Enter reset code</h1>
+                <p className="text-muted-foreground mt-1 text-center text-sm">
+                  We sent a 6-digit code to <strong>{email}</strong>
+                </p>
+
+                {error && (
+                  <div role="alert" className="rounded-md bg-destructive/10 px-3 py-2 text-sm text-destructive mt-4">
+                    {error}
+                  </div>
+                )}
+
+                <div className="mt-6 flex flex-col items-center gap-4">
+                  <OtpInput value={otp} onChange={setOtp} length={6} disabled={isSubmitting} autoFocus />
+
+                  {isSubmitting && (
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                      Verifying…
+                    </div>
+                  )}
+
+                  <p className="text-sm text-muted-foreground">
+                    Didn&apos;t receive a code?{' '}
+                    {resendCooldown > 0 ? (
+                      <span>Resend in {resendCooldown}s</span>
+                    ) : (
+                      <button onClick={handleResend} className="text-primary font-medium hover:underline">
+                        Resend code
+                      </button>
+                    )}
+                  </p>
+                </div>
+              </motion.div>
+            ) : step === 'password' ? (
+              <motion.div
+                key="password"
+                variants={screenVariants}
+                initial="enter"
+                animate="center"
+                exit="exit"
+              >
+                <div className="mb-4 flex items-center justify-center gap-2">
+                  <span className="bg-primary/10 ring-primary/30 relative flex h-8 w-8 items-center justify-center rounded-lg ring-1">
+                    <Shield className="h-4 w-4 text-primary" />
+                  </span>
+                  <span className="text-primary text-sm font-medium">New Password</span>
+                </div>
+                <h1 className="text-2xl font-bold tracking-tight text-center">Set new password</h1>
+                <p className="text-muted-foreground mt-1 text-center text-sm">
+                  Create a strong password for your account
+                </p>
+
+                {error && (
+                  <div role="alert" className="rounded-md bg-destructive/10 px-3 py-2 text-sm text-destructive mt-4">
+                    {error}
+                  </div>
+                )}
+
+                <form onSubmit={handlePasswordSubmit} className="mt-6 flex flex-col gap-4" noValidate>
+                  <div className="flex flex-col gap-1.5">
+                    <Label htmlFor="new-password">New Password</Label>
+                    <Input
+                      id="new-password"
+                      type="password"
+                      placeholder="At least 8 characters"
+                      value={newPassword}
+                      onChange={(e) => { setNewPassword(e.target.value); setPasswordErrors({}); }}
+                      autoComplete="new-password"
+                      disabled={isSubmitting}
+                    />
+                    {newPassword.length > 0 && (
+                      <div className="mt-1 flex flex-col gap-1">
+                        <div className="flex gap-1">
+                          {(['weak', 'medium', 'strong'] as const).map((level) => (
+                            <div
+                              key={level}
+                              className={`h-1 flex-1 rounded-full ${
+                                (level === 'weak' && strength === 'weak') ||
+                                (level === 'medium' && (strength === 'medium' || strength === 'strong')) ||
+                                (level === 'strong' && strength === 'strong')
+                                  ? level === 'weak' ? 'bg-red-500' : level === 'medium' ? 'bg-amber-500' : 'bg-green-500'
+                                  : 'bg-muted'
+                              }`}
+                            />
+                          ))}
+                        </div>
+                        <div className="flex flex-wrap gap-x-3 gap-y-0.5 text-[10px] text-muted-foreground">
+                          {[
+                            { key: 'minLength', label: '8+ characters' },
+                            { key: 'uppercase', label: 'Uppercase' },
+                            { key: 'lowercase', label: 'Lowercase' },
+                            { key: 'number', label: 'Number' },
+                            { key: 'special', label: 'Special char' },
+                          ].map(({ key, label }) => (
+                            <span key={key} className={pwErrors[key] ? 'text-muted-foreground' : 'text-green-600'}>
+                              {pwErrors[key] ? '○' : '✓'} {label}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="flex flex-col gap-1.5">
+                    <Label htmlFor="confirm-password">Confirm Password</Label>
+                    <Input
+                      id="confirm-password"
+                      type="password"
+                      placeholder="Re-enter password"
+                      value={confirmPassword}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
+                      autoComplete="new-password"
+                      disabled={isSubmitting}
+                    />
+                    {passwordErrors.match && (
+                      <p role="alert" className="text-destructive text-xs">{passwordErrors.match}</p>
+                    )}
+                  </div>
+
+                  <Button type="submit" className="w-full" disabled={isSubmitting}>
+                    {isSubmitting ? (
+                      <>
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                        Updating…
+                      </>
+                    ) : (
+                      'Update Password'
+                    )}
+                  </Button>
+                </form>
               </motion.div>
             ) : (
               <motion.div
@@ -146,10 +422,10 @@ export default function ForgotPasswordPage() {
 
                 <h1 className="text-2xl font-bold tracking-tight text-center">Forgot password?</h1>
                 <p className="text-muted-foreground mt-1 text-center text-sm">
-                  Enter your email and we&apos;ll send you a reset link
+                  Enter your email and we&apos;ll send you a reset code
                 </p>
 
-                <form onSubmit={handleSubmit} className="mt-6 flex flex-col gap-4" noValidate>
+                <form onSubmit={handleEmailSubmit} className="mt-6 flex flex-col gap-4" noValidate>
                   <div className="flex flex-col gap-1.5">
                     <Label htmlFor="forgot-email">Email</Label>
                     <Input
@@ -179,7 +455,7 @@ export default function ForgotPasswordPage() {
                         Sending…
                       </>
                     ) : (
-                      'Send Reset Link'
+                      'Send Reset Code'
                     )}
                   </Button>
                 </form>

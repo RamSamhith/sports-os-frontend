@@ -13,7 +13,8 @@ const settingsNav: ReadonlyArray<{ label: string; href: string; description: str
   { label: 'Location', href: '/settings/location', description: 'City, GPS, search radius' },
   { label: 'Notifications', href: '/settings/notifications', description: 'Email, WhatsApp, push' },
   { label: 'Privacy', href: '/settings/privacy', description: 'Data, sharing, visibility' },
-  { label: 'Session', href: '/settings/session', description: 'Account, sign out' },
+  { label: 'Security', href: '/settings/security', description: 'Password, email, phone, 2FA' },
+  { label: 'Session', href: '/settings/session', description: 'Devices, active sessions' },
   { label: 'Motion', href: '/settings/motion', description: 'Reduce animations' },
 ];
 

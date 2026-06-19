@@ -9,6 +9,8 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Loader2 } from 'lucide-react';
 import { createEnquiry, type EnquiryCreatePayload } from '@/lib/api/enquiries';
+import { useAuth } from '@/lib/hooks/use-auth';
+import { GuestGuard } from '@/components/auth/guest-guard';
 
 type FieldErrors = Partial<Record<keyof EnquiryFormValues, string>>;
 
@@ -62,6 +64,7 @@ export function EnquiryForm({
   defaultSport?: string;
 }) {
   const router = useRouter();
+  const { isGuest, isAuthenticated } = useAuth();
   const [values, setValues] = React.useState<EnquiryFormValues>({
     ...initialValues,
     sport: defaultSport ?? '',
@@ -200,9 +203,17 @@ export function EnquiryForm({
         />
       </Field>
       <div className="flex justify-end gap-2">
-        <Button type="submit" disabled={isSubmitting}>
-          {isSubmitting ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Submit enquiry'}
-        </Button>
+        {isGuest || !isAuthenticated ? (
+          <GuestGuard>
+            <Button type="button">
+              Submit enquiry
+            </Button>
+          </GuestGuard>
+        ) : (
+          <Button type="submit" disabled={isSubmitting}>
+            {isSubmitting ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Submit enquiry'}
+          </Button>
+        )}
       </div>
     </form>
   );

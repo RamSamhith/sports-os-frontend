@@ -4,6 +4,8 @@ import * as React from 'react';
 import { CompareContext, type CompareContextValue, type CompareItem, type CompareItemMeta } from '@/lib/hooks/use-compare';
 import { useStorageSync } from '@/lib/hooks/use-storage-sync';
 import { BUILD_HASH } from '@/lib/version';
+import { useAuth } from '@/lib/hooks/use-auth';
+import { trackCompareAdd, trackCompareRemove, trackGuestCompare } from '@/lib/analytics/events';
 import { academies } from '@/data/academies';
 import { academiesById } from '@/data/academies';
 import { academiesBySlug } from '@/data/academies';
@@ -139,6 +141,7 @@ function writePersisted(items: PersistedItem[]) {
 }
 
 export function CompareProvider({ children }: { children: React.ReactNode }) {
+  const { isGuest, isAuthenticated } = useAuth();
   const [items, setItems] = React.useState<CompareItem[]>([]);
   const [extras, setExtras] = React.useState<Record<string, CompareItemMeta>>({});
   const [hydrated, setHydrated] = React.useState(false);
@@ -240,14 +243,20 @@ export function CompareProvider({ children }: { children: React.ReactNode }) {
         // Prefer fresh metadata from the source fixtures; only fall back
         // to the caller-supplied meta if the entity is unknown.
         const fresh = resolveMeta(entityType, id);
+        const label = fresh?.label ?? meta.label;
         setExtras((prev) => ({
           ...prev,
           [`${entityType}:${id}`]: fresh ?? meta,
         }));
+        if (isGuest || !isAuthenticated) {
+          trackGuestCompare(items.length + 1);
+        } else {
+          trackCompareAdd(id, entityType, label);
+        }
       }
       return added;
     },
-    [],
+    [items.length, isGuest, isAuthenticated],
   );
 
   const remove = React.useCallback<CompareContextValue['remove']>((entityType, id) => {
@@ -257,6 +266,7 @@ export function CompareProvider({ children }: { children: React.ReactNode }) {
       delete next[`${entityType}:${id}`];
       return next;
     });
+    trackCompareRemove(id, entityType);
   }, []);
 
   const clear = React.useCallback(() => {

@@ -8,6 +8,7 @@ export interface UserProfile {
   name: string;
   email: string;
   phone: string;
+  authProvider?: 'credentials' | 'google' | 'microsoft';
 }
 
 export interface AuthChild {
@@ -24,6 +25,8 @@ export interface AuthContextValue {
   isAuthenticated: boolean;
   /** Loading / hydrating state — true until localStorage has been read. */
   isLoading: boolean;
+  /** Whether the user is in guest mode. */
+  isGuest: boolean;
 
   /** Selected role from onboarding, or null if not yet chosen. */
   role: OnboardingRole | null;
@@ -58,6 +61,10 @@ export interface AuthContextValue {
   setProfile: (profile: Partial<UserProfile>) => void;
   /** Update onboarding data from backend response. */
   setOnboarding: (data: Partial<AuthContextValue['onboarding']>) => void;
+  /** Enter guest mode. */
+  enterGuestMode: () => void;
+  /** Convert guest to registered user (migration). */
+  convertGuestToUser: () => void;
   /** Clear all auth state and redirect. */
   signOut: () => void;
 }
