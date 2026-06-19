@@ -24,7 +24,7 @@ export function RecentSearches({
           key={q}
           type="button"
           onClick={() => onSelect?.(q)}
-          className="border-border/60 bg-card/40 hover:bg-accent/10 rounded-full border px-2.5 py-0.5 text-xs transition-colors"
+          className="border-border/60 bg-card/40 hover:bg-accent/10 rounded-full border px-3 py-1.5 text-xs transition-colors min-h-[44px] flex items-center"
         >
           {q}
         </button>

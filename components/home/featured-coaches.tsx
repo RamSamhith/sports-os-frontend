@@ -6,7 +6,8 @@ import { Container } from '@/components/layout/container';
 import { Section } from '@/components/layout/section';
 import { CoachCardPlaceholder } from '@/components/coaches/coach-card-placeholder';
 import { getCoaches } from '@/lib/api/coaches';
-import { Users, Loader2 } from 'lucide-react';
+import { Users } from 'lucide-react';
+import { CoachCardSkeleton } from '@/components/feedback/skeletons';
 import type { Coach } from '@/types/domain/coach';
 
 export function FeaturedCoaches() {
@@ -39,13 +40,15 @@ export function FeaturedCoaches() {
             <h2 className="text-2xl font-semibold tracking-tight md:text-3xl">Featured coaches</h2>
             <p className="text-muted-foreground text-sm">Top-rated, verified coaches.</p>
           </div>
-          <Link href="/coaches" className="text-muted-foreground hover:text-foreground text-sm">
+          <Link href="/coaches" className="text-muted-foreground hover:text-foreground text-sm min-h-[44px] flex items-center">
             View all →
           </Link>
         </div>
         {loading ? (
-          <div className="flex items-center justify-center py-12">
-            <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+          <div className="grid grid-cols-1 items-start gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            {Array.from({ length: 3 }).map((_, i) => (
+              <CoachCardSkeleton key={i} />
+            ))}
           </div>
         ) : featured.length === 0 ? (
           <div className="text-muted-foreground flex flex-col items-center gap-3 rounded-xl border border-dashed py-12 text-center">

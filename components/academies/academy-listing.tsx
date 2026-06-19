@@ -2,21 +2,24 @@
 
 import * as React from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { X, Loader2, AlertTriangle } from 'lucide-react';
+import { X, AlertTriangle } from 'lucide-react';
+import { FullPageSkeleton, AcademyCardSkeleton } from '@/components/feedback/skeletons';
 import { Button } from '@/components/ui/button';
 import { SearchInput } from '@/components/ui/search-input';
 import { Badge } from '@/components/ui/badge';
 import { FilterDrawer } from '@/components/filters/filter-drawer';
 import { FilterGroup } from '@/components/filters/filter-group';
 import { Separator } from '@/components/ui/separator';
-import { AcademyGrid } from '@/components/academies/academy-grid';
+import { AcademyCardPlaceholder } from '@/components/academies/academy-card-placeholder';
+import { EmptyState } from '@/components/feedback/empty-state';
 import { academyFilterFacilities, academyFilterLevels, verificationStatuses } from '@/lib/constants/filters';
 import { sportTaxonomy } from '@/lib/constants/sport-taxonomy';
 import { useSearchQuery } from '@/lib/hooks/use-search-query';
 import { getAcademies } from '@/lib/api/academies';
-import { useAnalytics } from '@/lib/hooks/use-analytics';
-import { searchSubmitEvent } from '@/lib/analytics/events';
+import { trackSearch } from '@/lib/analytics/events';
 import type { Academy } from '@/types/domain/academy';
+
+const PAGE_SIZE = 12;
 
 const sportOptions = sportTaxonomy.map((s) => ({
   value: s.slug,
@@ -53,13 +56,16 @@ export function AcademyListing() {
   const { query, setQuery, debouncedQuery } = useSearchQuery();
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { track } = useAnalytics();
 
   const [allAcademies, setAllAcademies] = React.useState<Academy[]>([]);
   const [results, setResults] = React.useState<Academy[]>([]);
   const [loading, setLoading] = React.useState(true);
+  const [loadingMore, setLoadingMore] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
   const [total, setTotal] = React.useState(0);
+  const [page, setPage] = React.useState(1);
+  const [hasMore, setHasMore] = React.useState(true);
+  const sentinelRef = React.useRef<HTMLDivElement>(null);
 
   const [sports, setSports] = React.useState<string[]>(() => readListFromParams(searchParams, 'sport'));
   const [facilities, setFacilities] = React.useState<string[]>(() => readListFromParams(searchParams, 'facility'));
@@ -70,7 +76,7 @@ export function AcademyListing() {
   React.useEffect(() => {
     let cancelled = false;
     async function load() {
-      const res = await getAcademies({ pageSize: 100 });
+      const res = await getAcademies({ pageSize: 200 });
       if (cancelled) return;
       if (res.ok) {
         setAllAcademies(res.data.items);
@@ -80,36 +86,30 @@ export function AcademyListing() {
     return () => { cancelled = true; };
   }, []);
 
-  // Fetch filtered results when search or filters change
+  // Fetch filtered results when search or filters change (reset to page 1)
   React.useEffect(() => {
     let cancelled = false;
     async function load() {
       setLoading(true);
       setError(null);
+      setPage(1);
+      setHasMore(true);
       const res = await getAcademies({
         search: debouncedQuery || undefined,
         sport: sports.length ? sports.join(',') : undefined,
         facility: facilities.length ? facilities.join(',') : undefined,
         level: levels.length ? levels.join(',') : undefined,
         status: statuses.length ? statuses.join(',') : undefined,
-        pageSize: 100,
+        page: 1,
+        pageSize: PAGE_SIZE,
       });
       if (cancelled) return;
       if (res.ok) {
         setResults(res.data.items);
         setTotal(res.data.pagination.total);
-        // Fire analytics on search
+        setHasMore(res.data.items.length < (res.data.pagination.total ?? 0));
         if (debouncedQuery) {
-          track(searchSubmitEvent({
-            query: debouncedQuery,
-            resultsCount: res.data.pagination.total,
-            filters: {
-              sport: sports.length ? sports : undefined,
-              facility: facilities.length ? facilities : undefined,
-              level: levels.length ? levels : undefined,
-              status: statuses.length ? statuses : undefined,
-            },
-          }));
+          trackSearch(debouncedQuery, res.data.pagination.total, 'academies');
         }
       } else {
         setError(res.error.message);
@@ -118,7 +118,51 @@ export function AcademyListing() {
     }
     load();
     return () => { cancelled = true; };
-  }, [debouncedQuery, sports, facilities, levels, statuses, track]);
+  }, [debouncedQuery, sports, facilities, levels, statuses]);
+
+  // Load more on intersection
+  React.useEffect(() => {
+    if (loading || !hasMore || loadingMore) return;
+    const sentinel = sentinelRef.current;
+    if (!sentinel) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && hasMore && !loadingMore) {
+          setPage((p) => p + 1);
+        }
+      },
+      { rootMargin: '200px' }
+    );
+    observer.observe(sentinel);
+    return () => observer.disconnect();
+  }, [loading, hasMore, loadingMore]);
+
+  // Fetch next page when page increments
+  React.useEffect(() => {
+    if (page === 1 || loading) return;
+    let cancelled = false;
+    async function loadMore() {
+      setLoadingMore(true);
+      const res = await getAcademies({
+        search: debouncedQuery || undefined,
+        sport: sports.length ? sports.join(',') : undefined,
+        facility: facilities.length ? facilities.join(',') : undefined,
+        level: levels.length ? levels.join(',') : undefined,
+        status: statuses.length ? statuses.join(',') : undefined,
+        page,
+        pageSize: PAGE_SIZE,
+      });
+      if (cancelled) return;
+      if (res.ok) {
+        setResults((prev) => [...prev, ...res.data.items]);
+        setHasMore(res.data.items.length === PAGE_SIZE);
+      }
+      setLoadingMore(false);
+    }
+    loadMore();
+    return () => { cancelled = true; };
+  }, [page]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const dynamicSportOptions = React.useMemo(() =>
     sportOptions.map((o) => ({
@@ -238,10 +282,7 @@ export function AcademyListing() {
           size="lg"
           disabled
         />
-        <div className="flex items-center justify-center py-12">
-          <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
-          <span className="ml-2 text-sm text-muted-foreground">Loading academies…</span>
-        </div>
+        <FullPageSkeleton />
       </div>
     );
   }
@@ -333,16 +374,16 @@ export function AcademyListing() {
             <Badge
               key={c.key}
               variant="secondary"
-              className="gap-1 pr-1"
+              className="gap-1 pr-1 min-h-[32px] flex items-center"
               data-layout-id={c.layoutId}
             >
               {c.label}
               <button
                 onClick={c.onRemove}
-                className="text-muted-foreground hover:text-foreground"
+                className="text-muted-foreground hover:text-foreground p-1 -m-1 rounded"
                 aria-label={`Remove filter ${c.label}`}
               >
-                <X className="h-3 w-3" />
+                <X className="h-3.5 w-3.5" />
               </button>
             </Badge>
           ))}
@@ -358,16 +399,30 @@ export function AcademyListing() {
         {results.length} of {total || allAcademies.length} academies
       </p>
 
-      <AcademyGrid
-        academies={results}
-        onClear={() => {
-          setQuery('');
-          setSports([]);
-          setFacilities([]);
-          setLevels([]);
-          setStatuses([]);
-        }}
-      />
+      {results.length === 0 ? (
+        <EmptyState
+          icon={<AlertTriangle className="h-5 w-5" />}
+          title="No academies found"
+          description="Try expanding your search or removing some filters."
+          action={
+            <Button size="sm" variant="outline" onClick={clearAll}>
+              Clear filters
+            </Button>
+          }
+        />
+      ) : (
+        <div className="grid grid-cols-1 items-start gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {results.map((academy, i) => (
+            <AcademyCardPlaceholder key={academy.id} academy={academy} priority={i < 3} />
+          ))}
+          {loadingMore &&
+            Array.from({ length: 3 }).map((_, i) => (
+              <AcademyCardSkeleton key={`loading-${i}`} />
+            ))}
+        </div>
+      )}
+
+      {hasMore && <div ref={sentinelRef} className="h-4" />}
     </div>
   );
 }

@@ -17,6 +17,7 @@ interface EnquiryFormValues {
   parentEmail: string;
   parentPhone: string;
   sport: string;
+  intent: 'trial' | 'contact' | 'callback' | 'enrollment_interest' | 'whatsapp';
   childName?: string;
   childAge?: string;
   message?: string;
@@ -27,10 +28,19 @@ const initialValues: EnquiryFormValues = {
   parentEmail: '',
   parentPhone: '',
   sport: '',
+  intent: 'trial',
   childName: '',
   childAge: '',
   message: '',
 };
+
+const intentOptions = [
+  { value: 'trial', label: 'Book a Trial Session', description: 'Schedule a free trial class' },
+  { value: 'contact', label: 'Request a Call', description: 'Get a phone call from the academy' },
+  { value: 'whatsapp', label: 'WhatsApp', description: 'Connect via WhatsApp message' },
+  { value: 'callback', label: 'Request Callback', description: 'We\'ll call you at a convenient time' },
+  { value: 'enrollment_interest', label: 'Enrollment Interest', description: 'Show interest in enrolling' },
+] as const;
 
 function validate(values: EnquiryFormValues): FieldErrors {
   const errors: FieldErrors = {};
@@ -76,7 +86,7 @@ export function EnquiryForm({
     const payload: EnquiryCreatePayload = {
       targetType,
       targetId,
-      intent: 'trial',
+      intent: values.intent,
       parentInfo: {
         name: values.parentName.trim(),
         email: values.parentEmail.trim(),
@@ -121,6 +131,28 @@ export function EnquiryForm({
           {serverError}
         </div>
       )}
+
+      {/* Intent Selection */}
+      <div className="flex flex-col gap-2">
+        <Label>How would you like to connect?</Label>
+        <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-5">
+          {intentOptions.map((option) => (
+            <button
+              key={option.value}
+              type="button"
+              onClick={() => set('intent', option.value)}
+              className={`border-border/60 rounded-lg border p-3 text-left transition-colors ${
+                values.intent === option.value
+                  ? 'border-primary bg-primary/5 ring-1 ring-primary'
+                  : 'bg-card/40 hover:border-foreground/20'
+              }`}
+            >
+              <p className="text-sm font-medium">{option.label}</p>
+              <p className="text-muted-foreground mt-0.5 text-[11px]">{option.description}</p>
+            </button>
+          ))}
+        </div>
+      </div>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <Field label="Parent name" error={errors.parentName} fieldName="parentName">

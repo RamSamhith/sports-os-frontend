@@ -19,5 +19,9 @@ export async function listSports(params?: {
 
 export async function getSport(slug: string): Promise<ApiResponse<Sport>> {
   const { get } = await import('./client');
-  return get<Sport>(`/sports/${slug}`);
+  const res = await get<Sport | { sport: Sport }>(`/sports/${slug}`);
+  if (res.ok && 'sport' in res.data) {
+    return { ok: true, data: res.data.sport };
+  }
+  return res as ApiResponse<Sport>;
 }

@@ -4,50 +4,109 @@ import * as React from 'react';
 import Link from 'next/link';
 import { Container } from '@/components/layout/container';
 import { Section } from '@/components/layout/section';
-import { AcademyCardPlaceholder } from '@/components/academies/academy-card-placeholder';
 import { getAcademies } from '@/lib/api/academies';
-import { School, Loader2 } from 'lucide-react';
+import { School, ChevronLeft, ChevronRight } from 'lucide-react';
+import { AcademyCardSkeleton } from '@/components/feedback/skeletons';
+import { AcademyCardPlaceholder } from '@/components/academies/academy-card-placeholder';
+import { Button } from '@/components/ui/button';
 import type { Academy } from '@/types/domain/academy';
 
 export function FeaturedAcademies() {
   const [academies, setAcademies] = React.useState<Academy[]>([]);
   const [loading, setLoading] = React.useState(true);
+  const scrollRef = React.useRef<HTMLDivElement>(null);
+  const [canScrollLeft, setCanScrollLeft] = React.useState(false);
+  const [canScrollRight, setCanScrollRight] = React.useState(true);
+
+  const checkScroll = React.useCallback(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    setCanScrollLeft(el.scrollLeft > 0);
+    setCanScrollRight(el.scrollLeft < el.scrollWidth - el.clientWidth - 1);
+  }, []);
+
+  React.useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    checkScroll();
+    el.addEventListener('scroll', checkScroll, { passive: true });
+    window.addEventListener('resize', checkScroll);
+    return () => {
+      el.removeEventListener('scroll', checkScroll);
+      window.removeEventListener('resize', checkScroll);
+    };
+  }, [checkScroll, loading]);
+
+  const scroll = (direction: 'left' | 'right') => {
+    const el = scrollRef.current;
+    if (!el) return;
+    const cardWidth = 320;
+    el.scrollBy({ left: direction === 'left' ? -cardWidth : cardWidth, behavior: 'smooth' });
+  };
 
   React.useEffect(() => {
     let cancelled = false;
     async function load() {
       const res = await getAcademies({ pageSize: 100 });
       if (cancelled) return;
-      if (res.ok) {
-        setAcademies(res.data.items);
+
+      if (!res.ok) {
+        setLoading(false);
+        return;
       }
+
+      const featured = [...res.data.items]
+        .sort((a, b) => b.rating.average - a.rating.average)
+        .slice(0, 8);
+
+      setAcademies(featured);
       setLoading(false);
     }
     load();
     return () => { cancelled = true; };
   }, []);
 
-  const featured = [...academies]
-    .sort((a, b) => b.rating.average - a.rating.average)
-    .slice(0, 3);
-
   return (
-    <Section>
+    <Section spacing="sm">
       <Container size="lg">
-        <div className="mb-6 flex items-end justify-between gap-4">
+        <div className="mb-4 flex items-end justify-between gap-4">
           <div>
-            <h2 className="text-2xl font-semibold tracking-tight md:text-3xl">Featured academies</h2>
-            <p className="text-muted-foreground text-sm">Top-rated, verified academies.</p>
+            <h2 className="text-xl font-semibold tracking-tight md:text-2xl">Recommended academies</h2>
+            <p className="text-muted-foreground text-xs">Top-rated, verified academies across India.</p>
           </div>
-          <Link href="/academies" className="text-muted-foreground hover:text-foreground text-sm">
-            View all →
-          </Link>
+          <div className="flex items-center gap-1">
+            <Link href="/academies" className="text-muted-foreground hover:text-foreground mr-2 text-xs min-h-[44px] flex items-center">
+              View all →
+            </Link>
+            <Button
+              variant="outline"
+              size="icon-touch"
+              onClick={() => scroll('left')}
+              disabled={!canScrollLeft}
+              aria-label="Scroll left"
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </Button>
+            <Button
+              variant="outline"
+              size="icon-touch"
+              onClick={() => scroll('right')}
+              disabled={!canScrollRight}
+              aria-label="Scroll right"
+            >
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+          </div>
         </div>
         {loading ? (
-          <div className="flex items-center justify-center py-12">
-            <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+          <div className="flex gap-4 overflow-hidden">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <div key={i} className="w-[300px] shrink-0">
+                <AcademyCardSkeleton />
+              </div>
+            ))}
           </div>
-        ) : featured.length === 0 ? (
+        ) : academies.length === 0 ? (
           <div className="text-muted-foreground flex flex-col items-center gap-3 rounded-xl border border-dashed py-12 text-center">
             <School className="h-10 w-10 opacity-40" />
             <div>
@@ -56,9 +115,15 @@ export function FeaturedAcademies() {
             </div>
           </div>
         ) : (
-          <div className="grid grid-cols-1 items-start gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {featured.map((academy, i) => (
-              <AcademyCardPlaceholder key={academy.id} academy={academy} priority={i === 0} />
+          <div
+            ref={scrollRef}
+            className="flex gap-4 overflow-x-auto pb-2 scrollbar-none"
+            style={{ scrollSnapType: 'x mandatory' }}
+          >
+            {academies.map((academy, i) => (
+              <div key={academy.id} className="w-[300px] shrink-0" style={{ scrollSnapAlign: 'start' }}>
+                <AcademyCardPlaceholder academy={academy} priority={i === 0} />
+              </div>
             ))}
           </div>
         )}

@@ -15,7 +15,7 @@ export function EnquirySuccess() {
       </CardHeader>
       <CardContent className="flex justify-center gap-2">
         <Button asChild>
-          <Link href="/discover">Keep exploring</Link>
+          <Link href="/academies">Browse Academies</Link>
         </Button>
         <Button asChild variant="outline">
           <Link href="/profile/enquiries">

@@ -4,34 +4,15 @@ import * as React from 'react';
 import Image, { type ImageProps } from 'next/image';
 import { cn } from '@/lib/utils/cn';
 import { Skeleton } from '@/components/ui/skeleton';
+import { cloudinarySrcSet, isCloudinaryConfigured } from '@/lib/images/cloudinary';
 
 export interface ImageWithFallbackProps extends Omit<ImageProps, 'src' | 'alt'> {
   src?: string | null;
   alt: string;
-  /**
-   * Custom fallback rendered when `src` is missing or fails to load.
-   * Defaults to a gradient surface with the alt text as a label.
-   */
   fallback?: React.ReactNode;
-  /**
-   * If true, shows a skeleton behind the image while it loads.
-   * Recommended to prevent CLS on first paint.
-   */
   showSkeleton?: boolean;
 }
 
-/**
- * Robust image with graceful degradation.
- *
- * Hierarchy (priority high → low):
- *  1. `next/image` with the given `src`
- *  2. `fallback` (e.g. sport-specific placeholder)
- *  3. Inline gradient + alt label
- *
- * Prevents broken-image icons and runtime errors from `next/image`,
- * keeps a stable aspect ratio (parent controls dimensions), and shows
- * a skeleton during load to avoid CLS.
- */
 export function ImageWithFallback({
   src,
   alt,
@@ -64,6 +45,15 @@ export function ImageWithFallback({
     );
   }
 
+  // Build Cloudinary srcset if configured and src is a public ID (not full URL)
+  const isCloudinary = isCloudinaryConfigured() && src && !src.startsWith('http');
+  const cloudinary = isCloudinary
+    ? cloudinarySrcSet(src, [400, 800, 1200, 1600], { quality: 'auto', format: 'auto' })
+    : null;
+
+  const imgSrc = cloudinary?.src || src;
+  const blurData = cloudinary?.blurDataURL;
+
   return (
     <div className="absolute inset-0">
       {showSkeleton && !loaded ? (
@@ -71,8 +61,11 @@ export function ImageWithFallback({
       ) : null}
       <Image
         {...props}
-        src={src as string}
+        src={imgSrc as string}
         alt={alt}
+        placeholder={blurData ? 'blur' : 'empty'}
+        blurDataURL={blurData || "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIGZpbGw9IiNmM2Y0ZjYiLz48L3N2Zz4="}
+        sizes={props.sizes || '(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw'}
         onError={() => setErrored(true)}
         onLoad={() => setLoaded(true)}
         className={cn(

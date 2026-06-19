@@ -5,6 +5,7 @@ import { Bookmark, BookmarkCheck } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { useShortlist } from '@/lib/hooks/use-shortlist';
+import { trackShortlistAdd, trackShortlistRemove } from '@/lib/analytics/events';
 import type { ShortlistItemType } from '@/types/domain/shortlist';
 
 export interface ShortlistToggleProps {
@@ -40,9 +41,11 @@ export function ShortlistToggle({
       onClick={() => {
         if (active) {
           remove(itemType, itemId);
+          trackShortlistRemove(itemId, itemType);
           toast(`Removed ${label} from shortlist`);
         } else {
           addWithMeta(itemType, itemId, { label, sublabel, href });
+          trackShortlistAdd(itemId, itemType, label);
           toast.success(`Saved ${label} to shortlist`);
         }
       }}

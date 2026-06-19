@@ -74,13 +74,13 @@ async function doRefresh(): Promise<boolean> {
 async function ensureRefresh(): Promise<string> {
   if (!isRefreshing) {
     isRefreshing = true;
-    refreshPromise = doRefresh();
+    refreshPromise = doRefresh().finally(() => {
+      isRefreshing = false;
+      refreshPromise = null;
+    });
   }
 
-  const success = await refreshPromise;
-
-  isRefreshing = false;
-  refreshPromise = null;
+  const success = await refreshPromise!;
 
   if (!success) {
     onRefreshFailed(new Error('Refresh failed'));

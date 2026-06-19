@@ -4,6 +4,7 @@ import * as React from 'react';
 import { GitCompare } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useCompare } from '@/lib/hooks/use-compare';
+import { trackCompareAdd, trackCompareRemove } from '@/lib/analytics/events';
 import { toast } from 'sonner';
 
 interface CompareButtonProps {
@@ -29,6 +30,7 @@ export function CompareButton({ entityType, id, label, sublabel, href }: Compare
   const onClick = () => {
     if (active) {
       remove(entityType, id);
+      trackCompareRemove(id, entityType);
       toast(`Removed from compare`);
     } else if (canAdd(entityType, id)) {
       addWithMeta(entityType, id, {
@@ -36,6 +38,7 @@ export function CompareButton({ entityType, id, label, sublabel, href }: Compare
         sublabel,
         href: href ?? '#',
       });
+      trackCompareAdd(id, entityType, label ?? id);
       toast.success('Added to compare');
     } else {
       toast.error(`You can compare up to ${maxItems} items.`);

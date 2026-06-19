@@ -22,6 +22,8 @@ import { Atmosphere } from '@/components/theme/atmosphere';
 import { VersionCheck } from '@/components/providers/version-check';
 import { ServiceWorkerRegistration } from '@/components/providers/sw-register';
 import { UpdateBanner } from '@/components/providers/update-banner';
+import { PostHogProvider } from '@/components/providers/posthog-provider';
+import { FeedbackWidget } from '@/components/feedback/feedback-widget';
 import './globals.css';
 
 const inter = Inter({
@@ -146,11 +148,14 @@ export default function RootLayout({ children }: { children: ReactNode }) {
                     <ShortlistProvider>
                       <CompareProvider>
                         <AnalyticsProvider>
-                          {children}
-                          <ConsentBanner />
-                          <Toaster />
-                          <UpdateBanner />
-                          <WebVitalsReporter />
+                          <PostHogProvider>
+                            {children}
+                            <ConsentBanner />
+                            <Toaster />
+                            <UpdateBanner />
+                            <WebVitalsReporter />
+                            <FeedbackWidget />
+                          </PostHogProvider>
                         </AnalyticsProvider>
                       </CompareProvider>
                     </ShortlistProvider>

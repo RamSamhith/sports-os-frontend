@@ -91,6 +91,14 @@
     @apply bg-background/60 backdrop-blur-xl backdrop-saturate-150;
   }
 
+  .scrollbar-none {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-none::-webkit-scrollbar {
+    display: none;
+  }
+
   .grain::after {
     content: '';
     position: absolute;

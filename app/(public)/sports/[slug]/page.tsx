@@ -5,23 +5,33 @@ import { Breadcrumbs } from '@/components/seo/breadcrumbs';
 import { PathwaySection } from '@/components/sports/pathway-section';
 import { SportDisclaimer } from '@/components/sports/sport-disclaimer';
 import { notFound } from 'next/navigation';
-import { sportBySlug, sports } from '@/data/sports';
 import { competitionsBySport } from '@/data/competitions';
 import { siteConfig } from '@/config/site';
 
-export function generateStaticParams() {
-  return sports.map((sport) => ({ slug: sport.slug }));
+async function getSport(slug: string) {
+  const API_BASE = process.env.BACKEND_URL || 'http://localhost:3000';
+  try {
+    const res = await fetch(`${API_BASE}/sports/${slug}`, {
+      next: { revalidate: 3600 },
+    });
+    if (!res.ok) return null;
+    const json = await res.json();
+    return json.ok ? json.data : null;
+  } catch {
+    return null;
+  }
 }
 
-export function generateMetadata({ params }: { params: { slug: string } }): Metadata {
-  const sport = sportBySlug(params.slug);
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  const { slug } = await params;
+  const sport = await getSport(slug);
   if (!sport) {
     notFound();
     return {};
   }
 
   const title = `${sport.name} — Sports Pathway & Competitions`;
-  const description = sport.description.slice(0, 155);
+  const description = (sport.description || '').slice(0, 155);
   const url = `${siteConfig.url}/sports/${sport.slug}`;
 
   return {
@@ -43,11 +53,12 @@ export function generateMetadata({ params }: { params: { slug: string } }): Meta
   };
 }
 
-export default function SportDetailPage({ params }: { params: { slug: string } }) {
-  const sport = sportBySlug(params.slug);
+export default async function SportDetailPage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
+  const sport = await getSport(slug);
   if (!sport) notFound();
 
-  const { slug, name, explorationGuidance } = sport;
+  const { slug: sportSlug, name, explorationGuidance } = sport;
   const ageRange = explorationGuidance?.ageSuitability;
   const ageText =
     ageRange?.min !== undefined && ageRange?.max !== undefined
@@ -55,7 +66,7 @@ export default function SportDetailPage({ params }: { params: { slug: string } }
       : ageRange?.min !== undefined
         ? `Ages ${ageRange.min}+`
         : null;
-  const competitions = competitionsBySport(slug);
+  const competitions = competitionsBySport(sportSlug);
 
   return (
     <Section>
@@ -80,7 +91,7 @@ export default function SportDetailPage({ params }: { params: { slug: string } }
         <div className="mt-8 grid grid-cols-1 gap-8 md:grid-cols-3">
           <div className="md:col-span-2">
             <PathwaySection
-              sportSlug={slug}
+              sportSlug={sportSlug}
               sportName={name}
               competitions={competitions}
             />

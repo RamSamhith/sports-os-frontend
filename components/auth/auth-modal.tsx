@@ -1,15 +1,18 @@
 'use client';
 
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { motion, useReducedMotion, AnimatePresence, type Variants } from 'framer-motion';
 import { useRouter } from 'next/navigation';
+import * as Dialog from '@radix-ui/react-dialog';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/lib/hooks/use-auth';
 import { login as apiLogin, register as apiRegister } from '@/lib/api/auth';
-import { Loader2, ArrowLeft } from 'lucide-react';
+import { useGoogleAuth, useMicrosoftAuth, handleSocialAuth } from '@/lib/hooks/use-social-auth';
+import { trackLogin, trackSignup, trackOAuthAttempt, trackOAuthSuccess, trackOAuthError } from '@/lib/analytics/events';
+import { Loader2, ArrowLeft, X } from 'lucide-react';
 import { ease, duration } from '@/components/motion/constants';
 
 type ModalView = 'choose' | 'login' | 'register';
@@ -44,7 +47,6 @@ const cardVariants = {
   },
 };
 
-/** Directional slide for view transitions — slides right on forward, left on back. */
 const viewVariants = {
   enter: (direction: number) => ({
     opacity: 0,
@@ -81,106 +83,177 @@ export function AuthModal({
   const { setAuth, setProfile } = useAuth();
   const [view, setView] = useState<ModalView>(defaultView);
   const [direction, setDirection] = useState(1);
+  const [socialError, setSocialError] = useState<string | null>(null);
+  const [socialLoading, setSocialLoading] = useState<'google' | 'microsoft' | null>(null);
 
-  // Reset view when modal opens
+  const googleAuth = useGoogleAuth();
+  const microsoftAuth = useMicrosoftAuth();
+
   useEffect(() => {
     if (open) {
       setView(defaultView);
       setDirection(1);
+      setSocialError(null);
     }
   }, [open, defaultView]);
+
+  useEffect(() => {
+    if (open && googleAuth.loaded && view === 'choose') {
+      googleAuth.initialize((credential) => {
+        setSocialLoading('google');
+        handleSocialAuth('google', credential, {
+          setAuth,
+          setProfile,
+          onSuccess: () => {
+            trackOAuthSuccess('google');
+            trackLogin('google');
+            onOpenChange(false);
+            setSocialLoading(null);
+          },
+          onError: (msg) => { trackOAuthError('google', msg); setSocialError(msg); setSocialLoading(null); },
+        });
+      });
+    }
+  }, [open, googleAuth.loaded, view]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleClose = useCallback(() => {
     onOpenChange(false);
   }, [onOpenChange]);
-
-  const handleGuest = useCallback(() => {
-    onOpenChange(false);
-    router.push('/');
-  }, [onOpenChange, router]);
 
   const navigateView = useCallback((next: ModalView) => {
     setDirection(next === 'choose' ? -1 : 1);
     setView(next);
   }, []);
 
-  if (!open) return null;
+  const handleGoogleLogin = async () => {
+    if (!googleAuth.loaded) {
+      setSocialError('Google Sign-In is loading. Please try again.');
+      return;
+    }
+    trackOAuthAttempt('google');
+    googleAuth.prompt();
+  };
+
+  const handleMicrosoftLogin = async () => {
+    setSocialLoading('microsoft');
+    trackOAuthAttempt('microsoft');
+    const idToken = await microsoftAuth.login();
+    if (idToken) {
+      await handleSocialAuth('microsoft', idToken, {
+        setAuth,
+        setProfile,
+        onSuccess: () => {
+          trackOAuthSuccess('microsoft');
+          trackLogin('microsoft');
+          onOpenChange(false);
+          setSocialLoading(null);
+        },
+        onError: (msg) => { trackOAuthError('microsoft', msg); setSocialError(msg); setSocialLoading(null); },
+      });
+    } else {
+      setSocialLoading(null);
+    }
+  };
 
   return (
-    <AnimatePresence>
-      {open && (
-        <motion.div
-          className="fixed inset-0 z-[var(--z-modal)] flex items-center justify-center p-4"
-          variants={reduced ? undefined : overlayVariants}
-          initial="hidden"
-          animate="visible"
-          exit="exit"
-        >
-          {/* Backdrop */}
+    <Dialog.Root open={open} onOpenChange={onOpenChange}>
+      <Dialog.Portal>
+        <Dialog.Overlay asChild>
           <motion.div
-            className="absolute inset-0 bg-background/80 backdrop-blur-sm"
-            onClick={handleClose}
+            className="fixed inset-0 z-[var(--z-modal)] bg-background/80 backdrop-blur-sm"
+            variants={reduced ? undefined : overlayVariants}
+            initial="hidden"
+            animate="visible"
+            exit="exit"
           />
-
-          {/* Card */}
+        </Dialog.Overlay>
+        <Dialog.Content asChild>
           <motion.div
-            className="relative z-10 w-full max-w-sm"
+            className="fixed inset-0 z-[var(--z-modal)] flex items-center justify-center p-4"
             variants={reduced ? undefined : cardVariants}
             initial="hidden"
             animate="visible"
             exit="exit"
           >
-            <AnimatePresence mode="wait" custom={direction}>
-              {view === 'choose' && (
-                <ChooseView
-                  key="choose"
-                  custom={direction}
-                  variants={reduced ? undefined : viewVariants}
-                  onSelect={(v) => navigateView(v)}
-                  onGuest={handleGuest}
-                  reduced={reduced}
-                />
-              )}
-              {view === 'login' && (
-                <LoginView
-                  key="login"
-                  custom={direction}
-                  variants={reduced ? undefined : viewVariants}
-                  onBack={() => navigateView('choose')}
-                  onSwitch={() => navigateView('register')}
-                  onSuccess={handleClose}
-                  reduced={reduced}
-                />
-              )}
-              {view === 'register' && (
-                <RegisterView
-                  key="register"
-                  custom={direction}
-                  variants={reduced ? undefined : viewVariants}
-                  onBack={() => navigateView('choose')}
-                  onSwitch={() => navigateView('login')}
-                  onSuccess={handleClose}
-                  onOpenChange={onOpenChange}
-                  reduced={reduced}
-                />
-              )}
-            </AnimatePresence>
+            <Dialog.Title className="sr-only">Authentication</Dialog.Title>
+            <Dialog.Description className="sr-only">Sign in or create an account</Dialog.Description>
+            <Dialog.Close asChild>
+              <button
+                className="absolute top-4 right-4 z-10 text-muted-foreground hover:text-foreground p-2 min-h-[44px] min-w-[44px] flex items-center justify-center"
+                aria-label="Close"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </Dialog.Close>
+
+            <div className="relative z-10 w-full max-w-sm">
+              <AnimatePresence mode="wait" custom={direction}>
+                {view === 'choose' && (
+                  <ChooseView
+                    key="choose"
+                    custom={direction}
+                    variants={reduced ? undefined : viewVariants}
+                    onSelect={(v) => navigateView(v)}
+                    onGoogle={handleGoogleLogin}
+                    onMicrosoft={handleMicrosoftLogin}
+                    googleLoaded={googleAuth.loaded}
+                    microsoftLoaded={microsoftAuth.loaded}
+                    socialLoading={socialLoading}
+                    socialError={socialError}
+                    reduced={reduced}
+                  />
+                )}
+                {view === 'login' && (
+                  <LoginView
+                    key="login"
+                    custom={direction}
+                    variants={reduced ? undefined : viewVariants}
+                    onBack={() => navigateView('choose')}
+                    onSwitch={() => navigateView('register')}
+                    onSuccess={handleClose}
+                    reduced={reduced}
+                  />
+                )}
+                {view === 'register' && (
+                  <RegisterView
+                    key="register"
+                    custom={direction}
+                    variants={reduced ? undefined : viewVariants}
+                    onBack={() => navigateView('choose')}
+                    onSwitch={() => navigateView('login')}
+                    onSuccess={handleClose}
+                    onOpenChange={onOpenChange}
+                    reduced={reduced}
+                  />
+                )}
+              </AnimatePresence>
+            </div>
           </motion.div>
-        </motion.div>
-      )}
-    </AnimatePresence>
+        </Dialog.Content>
+      </Dialog.Portal>
+    </Dialog.Root>
   );
 }
 
 function ChooseView({
   onSelect,
-  onGuest,
+  onGoogle,
+  onMicrosoft,
+  googleLoaded,
+  microsoftLoaded,
+  socialLoading,
+  socialError,
   reduced,
   custom,
   variants,
 }: {
   onSelect: (view: ModalView) => void;
-  onGuest: () => void;
+  onGoogle: () => void;
+  onMicrosoft: () => void;
+  googleLoaded: boolean;
+  microsoftLoaded: boolean;
+  socialLoading: 'google' | 'microsoft' | null;
+  socialError: string | null;
   reduced: boolean;
   custom?: number;
   variants?: Variants;
@@ -190,32 +263,68 @@ function ChooseView({
     <Card>
       <CardHeader className="text-center">
         <CardTitle className="text-xl">Welcome to SportsOS</CardTitle>
-        <CardDescription>Sign in or create an account to get started</CardDescription>
+        <CardDescription>Find and book sports academies near you</CardDescription>
       </CardHeader>
       <CardContent className="flex flex-col gap-3">
+        {socialError && (
+          <div className="rounded-md bg-destructive/10 px-3 py-2 text-sm text-destructive">
+            {socialError}
+          </div>
+        )}
+
         <motion.div variants={reduced ? undefined : formFieldVariants} initial="hidden" animate="visible">
-          <Button className="w-full" size="lg" onClick={() => onSelect('login')}>
-            Sign In
+          <Button
+            className="w-full h-12 gap-2.5"
+            size="lg"
+            variant="outline"
+            onClick={onGoogle}
+            disabled={socialLoading !== null}
+          >
+            {socialLoading === 'google' ? (
+              <Loader2 className="h-5 w-5 animate-spin" />
+            ) : (
+              <svg className="h-5 w-5" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+            )}
+            Continue with Google
           </Button>
         </motion.div>
+
         <motion.div variants={reduced ? undefined : formFieldVariants} initial="hidden" animate="visible" transition={{ delay: 0.05 }}>
-          <Button variant="outline" className="w-full" size="lg" onClick={() => onSelect('register')}>
-            Create Account
+          <Button
+            className="w-full h-12 gap-2.5"
+            size="lg"
+            variant="outline"
+            onClick={onMicrosoft}
+            disabled={socialLoading !== null}
+          >
+            {socialLoading === 'microsoft' ? (
+              <Loader2 className="h-5 w-5 animate-spin" />
+            ) : (
+              <svg className="h-5 w-5" viewBox="0 0 23 23"><path fill="#f35325" d="M1 1h10v10H1z"/><path fill="#81bc06" d="M12 1h10v10H12z"/><path fill="#05a6f0" d="M1 12h10v10H1z"/><path fill="#ffba08" d="M12 12h10v10H12z"/></svg>
+            )}
+            Continue with Microsoft
           </Button>
         </motion.div>
+
         <div className="relative my-2">
           <div className="absolute inset-0 flex items-center">
             <span className="w-full border-t" />
           </div>
           <div className="relative flex justify-center text-xs uppercase">
-            <span className="bg-card text-muted-foreground px-2">Or</span>
+            <span className="bg-card text-muted-foreground px-2">or</span>
           </div>
         </div>
+
         <motion.div variants={reduced ? undefined : formFieldVariants} initial="hidden" animate="visible" transition={{ delay: 0.1 }}>
-          <Button variant="ghost" className="w-full" size="lg" onClick={onGuest}>
-            Continue as Guest
+          <Button className="w-full h-12" size="lg" onClick={() => onSelect('login')}>
+            Sign in with Email
           </Button>
         </motion.div>
+
+        <p className="text-muted-foreground text-center text-xs mt-2">
+          Don&apos;t have an account?{' '}
+          <button onClick={() => onSelect('register')} className="text-foreground font-medium hover:underline">Sign up</button>
+        </p>
       </CardContent>
     </Card>
     </motion.div>
@@ -271,11 +380,8 @@ function LoginView({
     const fe = validateField(field, value);
     setErrors((prev) => {
       const next = { ...prev };
-      if (fe[field as keyof FieldErrors]) {
-        next[field as keyof FieldErrors] = fe[field as keyof FieldErrors];
-      } else {
-        delete next[field as keyof FieldErrors];
-      }
+      if (fe[field as keyof FieldErrors]) next[field as keyof FieldErrors] = fe[field as keyof FieldErrors];
+      else delete next[field as keyof FieldErrors];
       return next;
     });
   }
@@ -287,11 +393,8 @@ function LoginView({
       const fe = validateField(field, value);
       setErrors((prev) => {
         const next = { ...prev };
-        if (fe[field as keyof FieldErrors]) {
-          next[field as keyof FieldErrors] = fe[field as keyof FieldErrors];
-        } else {
-          delete next[field as keyof FieldErrors];
-        }
+        if (fe[field as keyof FieldErrors]) next[field as keyof FieldErrors] = fe[field as keyof FieldErrors];
+        else delete next[field as keyof FieldErrors];
         return next;
       });
     }
@@ -316,6 +419,7 @@ function LoginView({
       const userPhone = res.data.user.phone ?? '';
       setProfile({ name: res.data.user.name, email: res.data.user.email, phone: userPhone });
       setAuth(true, res.data.user.onboardingCompleted);
+      trackLogin('email');
       setIsSubmitting(false);
       onSuccess();
     } catch {
@@ -343,7 +447,7 @@ function LoginView({
       <CardContent>
         <form onSubmit={handleSubmit} className="flex flex-col gap-4" noValidate>
           {serverError && (
-            <div className="rounded-md bg-destructive/10 px-3 py-2 text-sm text-destructive">
+            <div role="alert" className="rounded-md bg-destructive/10 px-3 py-2 text-sm text-destructive">
               {serverError}
             </div>
           )}
@@ -359,6 +463,7 @@ function LoginView({
               aria-invalid={!!errors.email}
               aria-describedby={errors.email ? errorId('email') : undefined}
               disabled={isSubmitting}
+              autoComplete="email"
             />
             {errors.email && <p id={errorId('email')} role="alert" className="text-destructive text-xs">{errors.email}</p>}
           </motion.div>
@@ -374,11 +479,12 @@ function LoginView({
               aria-invalid={!!errors.password}
               aria-describedby={errors.password ? errorId('password') : undefined}
               disabled={isSubmitting}
+              autoComplete="current-password"
             />
             {errors.password && <p id={errorId('password')} role="alert" className="text-destructive text-xs">{errors.password}</p>}
           </motion.div>
           <motion.div variants={reduced ? undefined : formFieldVariants} initial="hidden" animate="visible" transition={{ delay: 0.15 }}>
-            <Button type="submit" className="w-full" disabled={isSubmitting}>
+            <Button type="submit" className="w-full h-11" disabled={isSubmitting}>
               {isSubmitting ? <><Loader2 className="h-4 w-4 animate-spin" /> Signing in…</> : 'Sign in'}
             </Button>
           </motion.div>
@@ -410,7 +516,7 @@ function RegisterView({
   custom?: number;
   variants?: Variants;
 }) {
-  const { setAuth, setProfile, isAuthenticated, verified, onboardingCompleted, isLoading } = useAuth();
+  const { setAuth, setProfile, isAuthenticated, onboardingCompleted, isLoading } = useAuth();
   const router = useRouter();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -422,8 +528,6 @@ function RegisterView({
   const [touched, setTouched] = useState<Record<string, boolean>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Safety-net redirect: fires when auth state changes but the handler
-  // did NOT navigate (e.g. edit/verify flow where setAuth is a no-op).
   useEffect(() => {
     if (isLoading) return;
     if (!isAuthenticated) return;
@@ -438,7 +542,7 @@ function RegisterView({
       onSuccess();
       router.push('/');
     }
-  }, [isLoading, isAuthenticated, verified, onboardingCompleted, router, onSuccess]);
+  }, [isLoading, isAuthenticated, onboardingCompleted, router, onSuccess]);
 
   function validate(): FieldErrors {
     const e: FieldErrors = {};
@@ -488,11 +592,8 @@ function RegisterView({
     const fe = validateField(field, value);
     setErrors((prev) => {
       const next = { ...prev };
-      if (fe[field as keyof FieldErrors]) {
-        next[field as keyof FieldErrors] = fe[field as keyof FieldErrors];
-      } else {
-        delete next[field as keyof FieldErrors];
-      }
+      if (fe[field as keyof FieldErrors]) next[field as keyof FieldErrors] = fe[field as keyof FieldErrors];
+      else delete next[field as keyof FieldErrors];
       return next;
     });
   }
@@ -507,11 +608,8 @@ function RegisterView({
       const fe = validateField(field, value);
       setErrors((prev) => {
         const next = { ...prev };
-        if (fe[field as keyof FieldErrors]) {
-          next[field as keyof FieldErrors] = fe[field as keyof FieldErrors];
-        } else {
-          delete next[field as keyof FieldErrors];
-        }
+        if (fe[field as keyof FieldErrors]) next[field as keyof FieldErrors] = fe[field as keyof FieldErrors];
+        else delete next[field as keyof FieldErrors];
         return next;
       });
     }
@@ -532,11 +630,9 @@ function RegisterView({
         setIsSubmitting(false);
         return;
       }
-      // Registration requires email verification
       if (res.data.requiresVerification) {
-        try {
-          sessionStorage.setItem('sportsos:verify-email', res.data.email);
-        } catch { /* ignore */ }
+        try { sessionStorage.setItem('sportsos:verify-email', res.data.email); } catch { /* ignore */ }
+        trackSignup('email');
         setIsSubmitting(false);
         onOpenChange(false);
         router.push('/verify/signup');
@@ -569,7 +665,7 @@ function RegisterView({
       <CardContent>
         <form onSubmit={handleSubmit} className="flex flex-col gap-4" noValidate>
           {serverError && (
-            <div className="rounded-md bg-destructive/10 px-3 py-2 text-sm text-destructive">
+            <div role="alert" className="rounded-md bg-destructive/10 px-3 py-2 text-sm text-destructive">
               {serverError}
             </div>
           )}
@@ -584,6 +680,7 @@ function RegisterView({
               aria-invalid={!!errors.name}
               aria-describedby={errors.name ? errorId('name') : undefined}
               disabled={isSubmitting}
+              autoComplete="name"
             />
             {errors.name && <p id={errorId('name')} role="alert" className="text-destructive text-xs">{errors.name}</p>}
           </motion.div>
@@ -599,6 +696,7 @@ function RegisterView({
               aria-invalid={!!errors.email}
               aria-describedby={errors.email ? errorId('email') : undefined}
               disabled={isSubmitting}
+              autoComplete="email"
             />
             {errors.email && <p id={errorId('email')} role="alert" className="text-destructive text-xs">{errors.email}</p>}
           </motion.div>
@@ -607,7 +705,7 @@ function RegisterView({
             <Input
               id="modal-reg-phone"
               type="tel"
-              placeholder="+91 98765 43210"
+              placeholder="98765 43210"
               value={phone}
               onChange={(e) => handleChange('phone', e.target.value)}
               onBlur={(e) => handleBlur('phone', e.target.value)}
@@ -631,6 +729,7 @@ function RegisterView({
               aria-invalid={!!errors.password}
               aria-describedby={errors.password ? errorId('password') : undefined}
               disabled={isSubmitting}
+              autoComplete="new-password"
             />
             {errors.password && <p id={errorId('password')} role="alert" className="text-destructive text-xs">{errors.password}</p>}
           </motion.div>
@@ -644,13 +743,14 @@ function RegisterView({
               onChange={(e) => handleChange('confirmPassword', e.target.value)}
               onBlur={(e) => handleBlur('confirmPassword', e.target.value)}
               aria-invalid={!!errors.confirmPassword}
-              aria-describedby={errors.confirmPassword ? errorId('confirmPassword') : undefined}
+              aria-describedby={errors.confirmPassword ? errorId('confirm') : undefined}
               disabled={isSubmitting}
+              autoComplete="new-password"
             />
-            {errors.confirmPassword && <p id={errorId('confirmPassword')} role="alert" className="text-destructive text-xs">{errors.confirmPassword}</p>}
+            {errors.confirmPassword && <p id={errorId('confirm')} role="alert" className="text-destructive text-xs">{errors.confirmPassword}</p>}
           </motion.div>
           <motion.div variants={reduced ? undefined : formFieldVariants} initial="hidden" animate="visible" transition={{ delay: 0.17 }}>
-            <Button type="submit" className="w-full" disabled={isSubmitting}>
+            <Button type="submit" className="w-full h-11" disabled={isSubmitting}>
               {isSubmitting ? <><Loader2 className="h-4 w-4 animate-spin" /> Creating account…</> : 'Create account'}
             </Button>
           </motion.div>

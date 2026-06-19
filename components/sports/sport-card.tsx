@@ -7,7 +7,31 @@ import { Card } from '@/components/ui/card';
 import { CompareButton } from '@/components/academies/compare-button';
 import { fixtureImages } from '@/lib/images';
 import { ease, duration } from '@/components/motion/constants';
+import { Check } from 'lucide-react';
 import type { Sport } from '@/types/domain/sport';
+
+const sportBenefits: Record<string, string[]> = {
+  cricket: ['Teamwork', 'Hand-eye coordination', 'Fitness'],
+  football: ['Stamina', 'Speed', 'Team spirit'],
+  badminton: ['Agility', 'Reflexes', 'Endurance'],
+  tennis: ['Coordination', 'Speed', 'Core strength'],
+  'table-tennis': ['Reflexes', 'Hand-eye coordination', 'Wrist flexibility'],
+  swimming: ['Full body workout', 'Lung capacity', 'Flexibility'],
+  athletics: ['Speed', 'Power', 'Discipline'],
+  wrestling: ['Full-body strength', 'Grip strength', 'Endurance'],
+  boxing: ['Speed', 'Power', 'Core stability'],
+  karate: ['Flexibility', 'Discipline', 'Speed'],
+  judo: ['Balance', 'Coordination', 'Mental discipline'],
+  kabaddi: ['Strength', 'Lung capacity', 'Tactical awareness'],
+  hockey: ['Stamina', 'Agility', 'Stick-handling'],
+  chess: ['Focus', 'Pattern recognition', 'Memory'],
+  skating: ['Balance', 'Leg strength', 'Flexibility'],
+  archery: ['Steady hand', 'Core stability', 'Visual focus'],
+  shooting: ['Composure', 'Steady hand', 'Visual focus'],
+  yoga: ['Flexibility', 'Balance', 'Breath control'],
+  gymnastics: ['Flexibility', 'Spatial awareness', 'Strength'],
+  basketball: ['Height coordination', 'Agility', 'Endurance'],
+};
 
 export function SportCard({ sport }: { sport: Sport }) {
   const reduced = useReducedMotion();
@@ -21,6 +45,8 @@ export function SportCard({ sport }: { sport: Sport }) {
       : ageRange?.min !== undefined
         ? `Ages ${ageRange.min}+`
         : null;
+
+  const benefits = sportBenefits[slug] ?? [];
 
   return (
     <motion.div
@@ -67,6 +93,16 @@ export function SportCard({ sport }: { sport: Sport }) {
             {description}
           </Link>
         ) : null}
+        {benefits.length > 0 && (
+          <div className="flex flex-wrap gap-x-3 gap-y-1">
+            {benefits.map((benefit) => (
+              <span key={benefit} className="flex items-center gap-1 text-[11px] text-muted-foreground">
+                <Check className="h-3 w-3 text-primary/70" />
+                {benefit}
+              </span>
+            ))}
+          </div>
+        )}
         {ageText ? (
           <span className="text-muted-foreground text-[10px] tracking-widest uppercase">
             {ageText}

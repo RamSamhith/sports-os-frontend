@@ -4,11 +4,9 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { motion, useReducedMotion } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import { SearchBar } from '@/components/search/search-bar';
 import { AuroraBackground } from '@/components/layout/aurora-background';
 import { TrackedCTA } from '@/components/analytics/tracked-cta';
-import { LocationPicker } from '@/components/location/location-picker';
 import { ease } from '@/components/motion/constants';
 
 const staggerContainer = {
@@ -42,10 +40,9 @@ export function Hero() {
   };
 
   return (
-    <section className="relative isolate overflow-hidden py-20 md:py-32 ambient-shimmer">
+    <section className="relative isolate overflow-hidden py-12 md:py-20 ambient-shimmer">
       <AuroraBackground />
 
-      {/* Subtle diagonal field lines — sports identity accent */}
       <div aria-hidden className="pointer-events-none absolute inset-0 -z-10">
         <div className="bg-primary/[0.04] absolute -left-20 top-0 h-[180%] w-px origin-top -rotate-[22deg]" />
         <div className="bg-primary/[0.03] absolute -right-20 top-0 h-[180%] w-px origin-top rotate-[22deg]" />
@@ -68,15 +65,15 @@ export function Hero() {
 
           <motion.h1
             variants={reduced ? undefined : fadeUp}
-            className="mt-6 text-4xl font-semibold tracking-tight md:text-6xl"
+            className="mt-5 text-3xl font-semibold tracking-tight md:text-5xl"
             style={{ textWrap: 'balance' }}
           >
-            Discover, compare, and connect with the right sports ecosystem.
+            Find the right sports ecosystem for you.
           </motion.h1>
 
           <motion.p
             variants={reduced ? undefined : { hidden: { opacity: 0, y: 10 }, show: { opacity: 1, y: 0, transition: { duration: 0.45, ease: ease.standard, delay: 0.06 } } }}
-            className="text-muted-foreground mt-4 max-w-xl md:text-lg"
+            className="text-muted-foreground mt-3 max-w-xl text-base md:text-lg"
             style={{ textWrap: 'balance' }}
           >
             Academies, coaches, and pathways across India — in one trusted place.
@@ -87,18 +84,9 @@ export function Hero() {
           initial={reduced ? false : 'hidden'}
           animate="show"
           variants={reduced ? undefined : { hidden: { opacity: 0, y: 12 }, show: { opacity: 1, y: 0, transition: { duration: 0.5, ease: ease.standard, delay: 0.12 } } }}
-          className="mt-8 w-full max-w-xl"
+          className="mt-6 w-full max-w-xl"
         >
-          <SearchBar onSearch={handleSearch} placeholder="Search by sport, city, or academy name…" />
-        </motion.div>
-
-        <motion.div
-          initial={reduced ? false : { opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.18 }}
-          className="mt-4"
-        >
-          <LocationPicker />
+          <SearchBar onSearch={handleSearch} placeholder="Search academies, sports, cities…" />
         </motion.div>
 
         <motion.div
@@ -106,16 +94,13 @@ export function Hero() {
           animate="show"
           variants={reduced ? undefined : staggerContainer}
           transition={{ delay: 0.2 }}
-          className="mt-8 flex flex-wrap items-center justify-center gap-3"
+          className="mt-4"
         >
           <TrackedCTA event="home.cta_click" properties={{ cta: 'explore-academies' }} asChild>
-            <Link href="/academies" className="gap-2">
-              Explore academies <ArrowRight className="h-4 w-4" />
+            <Link href="/academies" className="inline-flex items-center gap-2 rounded-lg bg-primary px-5 py-3 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 min-h-[44px]">
+              Explore Academies <ArrowRight className="h-4 w-4" />
             </Link>
           </TrackedCTA>
-          <Button asChild variant="outline">
-            <Link href="/discover">Discover</Link>
-          </Button>
         </motion.div>
       </div>
     </section>

@@ -2,7 +2,8 @@
 
 import * as React from 'react';
 import Link from 'next/link';
-import { GitCompare, X, Star, Navigation, MapPin } from 'lucide-react';
+import { GitCompare, X, Star, MapPin } from 'lucide-react';
+import { CompareTableSkeleton } from '@/components/feedback/skeletons';
 import { toast } from 'sonner';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -13,9 +14,9 @@ import { VerifiedBadge } from '@/components/trust/verified-badge';
 import { fixtureImages } from '@/lib/images';
 import { useCompare } from '@/lib/hooks/use-compare';
 import { cn } from '@/lib/utils/cn';
-import { academiesById, academiesBySlug } from '@/data/academies';
-import { coachesById, coachesBySlug } from '@/data/coaches';
-import { sportsById, sportsBySlug } from '@/data/sports';
+import { getAcademy } from '@/lib/api/academies';
+import { getCoach } from '@/lib/api/coaches';
+import { getSport } from '@/lib/api/sports';
 import type { Academy } from '@/types/domain/academy';
 import type { Coach } from '@/types/domain/coach';
 import type { Sport } from '@/types/domain/sport';
@@ -25,21 +26,6 @@ type Entity =
   | { kind: 'coach'; entity: Coach }
   | { kind: 'sport'; entity: Sport };
 
-function resolve(entityType: 'academy' | 'coach' | 'sport', id: string): Entity | null {
-  if (entityType === 'academy') {
-    const a = academiesById(id) ?? academiesBySlug(id);
-    return a ? { kind: 'academy', entity: a } : null;
-  }
-  if (entityType === 'coach') {
-    const c = coachesById(id) ?? coachesBySlug(id);
-    return c ? { kind: 'coach', entity: c } : null;
-  }
-  const s = sportsById(id) ?? sportsBySlug(id);
-  return s ? { kind: 'sport', entity: s } : null;
-}
-
-/** Grid columns for the side-by-side cards. We expose one Tailwind class
- *  per count so the JIT engine can see them. `count` is clamped to 1–4. */
 const cardGridClassFor: Record<number, string> = {
   1: 'grid-cols-1',
   2: 'grid-cols-1 sm:grid-cols-2',
@@ -49,10 +35,52 @@ const cardGridClassFor: Record<number, string> = {
 
 export function CompareView() {
   const { items, remove, clear, maxItems, minItems, hydrated } = useCompare();
+  const [resolved, setResolved] = React.useState<Entity[]>([]);
+  const [loading, setLoading] = React.useState(true);
 
-  if (!hydrated) {
+  React.useEffect(() => {
+    if (!hydrated || items.length === 0) {
+      setResolved([]);
+      setLoading(false);
+      return;
+    }
+
+    let cancelled = false;
+    async function resolveAll() {
+      const results: Entity[] = [];
+      await Promise.all(
+        items.map(async (it) => {
+          try {
+            if (it.entityType === 'academy') {
+              const res = await getAcademy(it.id);
+              if (!cancelled && res.ok) results.push({ kind: 'academy', entity: res.data });
+            } else if (it.entityType === 'coach') {
+              const res = await getCoach(it.id);
+              if (!cancelled && res.ok) results.push({ kind: 'coach', entity: res.data });
+            } else {
+              const res = await getSport(it.id);
+              if (!cancelled && res.ok) results.push({ kind: 'sport', entity: res.data });
+            }
+          } catch { /* skip failed items */ }
+        })
+      );
+      if (!cancelled) {
+        setResolved(results);
+        setLoading(false);
+      }
+    }
+    resolveAll();
+    return () => { cancelled = true; };
+  }, [items, hydrated]);
+
+  if (!hydrated || loading) {
     return (
-      <div className="bg-muted/30 h-40 animate-pulse rounded-xl border border-dashed" aria-hidden />
+      <div className="flex flex-col gap-4">
+        <div className="flex items-center justify-between">
+          <h1 className="text-3xl font-semibold tracking-tight md:text-4xl">Compare</h1>
+        </div>
+        <CompareTableSkeleton />
+      </div>
     );
   }
 
@@ -63,31 +91,16 @@ export function CompareView() {
         title="Nothing to compare yet"
         description="Tap the compare button on any academy, coach, or sport to add them here."
         action={
-          <div className="flex flex-wrap gap-2">
-            <Button asChild size="lg">
-              <Link href="/academies">Explore Academies</Link>
-            </Button>
-            <Button asChild variant="outline" size="lg">
-              <Link href="/coaches">Explore Coaches</Link>
-            </Button>
-            <Button asChild variant="outline" size="lg">
-              <Link href="/sports">Explore Sports</Link>
-            </Button>
-          </div>
+          <Button asChild>
+            <Link href="/academies">Explore Academies</Link>
+          </Button>
         }
       />
     );
   }
 
-  const resolved = items
-    .map((it) => resolve(it.entityType, it.id))
-    .filter((x): x is Entity => x !== null);
-
-  // The actual number of items in the comparison. Clamped so the grid
-  // class lookup never returns undefined.
   const count = Math.max(1, Math.min(maxItems, resolved.length));
   const cardGrid = cardGridClassFor[count];
-
   const belowMinimum = resolved.length < minItems;
 
   return (
@@ -100,10 +113,7 @@ export function CompareView() {
       </header>
 
       {belowMinimum ? (
-        <div
-          className="border-info/30 bg-info/10 text-info-foreground/90 rounded-lg border px-3 py-2 text-sm"
-          role="status"
-        >
+        <div className="border-info/30 bg-info/10 text-info-foreground/90 rounded-lg border px-3 py-2 text-sm" role="status">
           Add at least {minItems} items to see the side-by-side comparison.
         </div>
       ) : null}
@@ -112,15 +122,7 @@ export function CompareView() {
         <p className="text-muted-foreground text-sm">
           {resolved.length} of {maxItems} selected
         </p>
-        <Button
-          variant="ghost"
-          className="min-h-[44px] min-w-[44px]"
-          onClick={() => {
-            clear();
-            toast('Cleared compare');
-          }}
-          aria-label="Clear all compare items"
-        >
+        <Button variant="ghost" className="min-h-[44px] min-w-[44px]" onClick={() => { clear(); toast('Cleared compare'); }} aria-label="Clear all compare items">
           <X className="h-4 w-4" /> Clear all
         </Button>
       </div>
@@ -131,10 +133,7 @@ export function CompareView() {
             key={`${slot.kind}-${slot.entity.id}`}
             slot={slot}
             onRemove={() => {
-              const name =
-                slot.kind === 'sport'
-                  ? (slot.entity as Sport).name
-                  : (slot.entity as Academy | Coach).name;
+              const name = slot.kind === 'sport' ? (slot.entity as Sport).name : (slot.entity as Academy | Coach).name;
               remove(slot.kind, slot.entity.id);
               toast(`Removed ${name} from compare`);
             }}
@@ -149,97 +148,41 @@ export function CompareView() {
 
 function CompareCard({ slot, onRemove }: { slot: Entity; onRemove: () => void }) {
   const { kind, entity } = slot;
-  const href =
-    kind === 'academy'
-      ? `/academies/${(entity as Academy).slug}`
-      : kind === 'coach'
-        ? `/coaches/${(entity as Coach).slug}`
-        : `/sports/${(entity as Sport).slug}`;
-  const imageSrc =
-    kind === 'academy'
-      ? ((entity as Academy).coverImage ?? fixtureImages.academies[(entity as Academy).id])
-      : kind === 'coach'
-        ? ((entity as Coach).avatar ?? fixtureImages.coaches[(entity as Coach).id])
-        : ((entity as Sport).coverImage ?? fixtureImages.sports[(entity as Sport).id]);
-  const sublabel =
-    kind === 'academy'
-      ? `${(entity as Academy).location.city}, ${(entity as Academy).location.state}`
-      : kind === 'coach'
-        ? `${(entity as Coach).location.city} · ${(entity as Coach).experienceYears}+ yrs`
-        : (entity as Sport).category;
+  const href = kind === 'academy' ? `/academies/${(entity as Academy).slug}` : kind === 'coach' ? `/coaches/${(entity as Coach).slug}` : `/sports/${(entity as Sport).slug}`;
+  const imageSrc = kind === 'academy' ? ((entity as Academy).coverImage ?? fixtureImages.academies[(entity as Academy).id]) : kind === 'coach' ? ((entity as Coach).avatar ?? fixtureImages.coaches[(entity as Coach).id]) : ((entity as Sport).coverImage ?? fixtureImages.sports[(entity as Sport).id]);
+  const sublabel = kind === 'academy' ? `${(entity as Academy).location.city}, ${(entity as Academy).location.state}` : kind === 'coach' ? `${(entity as Coach).location.city} · ${(entity as Coach).experienceYears}+ yrs` : (entity as Sport).category;
 
   return (
     <Card className="overflow-hidden">
       <div className="bg-muted/40 relative aspect-[16/10] w-full">
-        <ImageWithFallback
-          src={imageSrc}
-          alt={`${sublabel} cover`}
-          fill
-          sizes="(max-width: 768px) 100vw, 33vw"
-          className="object-cover"
-        />
+        <ImageWithFallback src={imageSrc} alt={`${sublabel} cover`} fill sizes="(max-width: 768px) 100vw, 33vw" className="object-cover" />
         {kind !== 'sport' ? (
           <div className="absolute top-3 left-3">
             <VerifiedBadge status={(entity as Academy | Coach).verificationStatus} />
           </div>
         ) : null}
-        <button
-          type="button"
-          onClick={onRemove}
-          className="bg-card/90 hover:bg-card text-foreground focus-visible:ring-ring focus-visible:ring-2 focus-visible:outline-none absolute top-3 right-3 grid h-8 w-8 place-items-center rounded-full shadow"
-          aria-label={`Remove ${kind} from compare`}
-        >
+        <button type="button" onClick={onRemove} className="bg-card/90 hover:bg-card text-foreground focus-visible:ring-ring focus-visible:ring-2 focus-visible:outline-none absolute top-3 right-3 grid h-11 w-11 place-items-center rounded-full shadow" aria-label={`Remove ${kind} from compare`}>
           <X className="h-3.5 w-3.5" />
         </button>
       </div>
       <CardContent className="flex flex-col gap-2 p-4">
         <Link href={href} className="hover:underline">
-          <h3 className="line-clamp-1 font-semibold">
-            {kind === 'sport' ? (entity as Sport).name : (entity as Academy | Coach).name}
-          </h3>
+          <h3 className="line-clamp-1 font-semibold">{kind === 'sport' ? (entity as Sport).name : (entity as Academy | Coach).name}</h3>
         </Link>
         <p className="text-muted-foreground line-clamp-1 text-xs capitalize">{sublabel}</p>
-        {kind === 'academy' ? (
+        {(kind === 'academy' || kind === 'coach') && (
           <div className="flex items-center gap-1 text-xs">
             <Star aria-hidden className="fill-rating text-rating h-3.5 w-3.5" />
-            <span className="font-semibold">{(entity as Academy).rating.average.toFixed(1)}</span>
-            <span className="text-muted-foreground">({(entity as Academy).rating.count})</span>
-          </div>
-        ) : null}
-        {kind === 'coach' ? (
-          <div className="flex items-center gap-1 text-xs">
-            <Star aria-hidden className="fill-rating text-rating h-3.5 w-3.5" />
-            <span className="font-semibold">{(entity as Coach).rating.average.toFixed(1)}</span>
-            <span className="text-muted-foreground">({(entity as Coach).rating.count})</span>
-          </div>
-        ) : null}
-        {kind === 'academy' && (
-          <div className="flex flex-wrap gap-2 pt-1">
-            <Button size="sm" variant="default" asChild>
-              <Link href={href}>View Details</Link>
-            </Button>
-            <Button size="sm" variant="outline" asChild>
-              <Link href={`/enquiry/academy/${(entity as Academy).slug}`}>Enquire Now</Link>
-            </Button>
+            <span className="font-semibold">{(entity as Academy | Coach).rating.average.toFixed(1)}</span>
+            <span className="text-muted-foreground">({(entity as Academy | Coach).rating.count})</span>
           </div>
         )}
-        {kind === 'coach' && (
-          <div className="flex flex-wrap gap-2 pt-1">
-            <Button size="sm" variant="default" asChild>
-              <Link href={href}>View Profile</Link>
-            </Button>
-            <Button size="sm" variant="outline" asChild>
-              <Link href={`/enquiry/coach/${(entity as Coach).slug}`}>Enquire Now</Link>
-            </Button>
-          </div>
-        )}
-        {kind === 'sport' && (
-          <div className="pt-1">
-            <Button size="sm" variant="default" asChild>
-              <Link href={href}>View Details</Link>
-            </Button>
-          </div>
-        )}
+        <div className="flex flex-wrap gap-2 pt-1">
+          <Button size="sm" variant="default" asChild><Link href={href}>View Details</Link></Button>
+          {kind !== 'sport' && (
+            <Button size="sm" variant="outline" asChild><Link href={`/enquiry/${kind}/${(entity as Academy | Coach).slug}`}>Enquire</Link></Button>
+          )}
+        </div>
       </CardContent>
     </Card>
   );
@@ -253,133 +196,44 @@ interface ComparisonRow {
 
 function ComparisonTable({ slots }: { slots: Entity[] }) {
   const rows: ComparisonRow[] = [];
-
-  const anyAcademyOrCoach = slots.some((s) => s.kind === 'academy' || s.kind === 'coach');
   const anyAcademy = slots.some((s) => s.kind === 'academy');
   const anyCoach = slots.some((s) => s.kind === 'coach');
   const anySport = slots.some((s) => s.kind === 'sport');
 
-  if (anyAcademyOrCoach) {
-    rows.push({
-      key: 'rating',
-      label: 'Rating',
-      values: slots.map((s) => {
-        if (s.kind === 'sport') return '—';
-        return (s.entity as Academy | Coach).rating.average.toFixed(1);
-      }),
-    });
-    rows.push({
-      key: 'verification',
-      label: 'Verification',
-      values: slots.map((s) => {
-        if (s.kind === 'sport') return '—';
-        return (s.entity as Academy | Coach).verificationStatus === 'verified'
-          ? 'Verified'
-          : (s.entity as Academy | Coach).verificationStatus === 'pending'
-            ? 'Pending'
-            : 'Rejected';
-      }),
-    });
+  if (anyAcademy || anyCoach) {
+    rows.push({ key: 'rating', label: 'Rating', values: slots.map((s) => s.kind === 'sport' ? '—' : (s.entity as Academy | Coach).rating.average.toFixed(1)) });
+    rows.push({ key: 'verification', label: 'Verification', values: slots.map((s) => s.kind === 'sport' ? '—' : (s.entity as Academy | Coach).verificationStatus) });
   }
-
   if (anySport) {
-    rows.push({
-      key: 'category',
-      label: 'Category',
-      values: slots.map((s) => (s.kind === 'sport' ? (s.entity as Sport).category : '—')),
-    });
-    rows.push({
-      key: 'age',
-      label: 'Age range',
-      values: slots.map((s) => {
-        if (s.kind !== 'sport') return '—';
-        const r = (s.entity as Sport).explorationGuidance?.ageSuitability;
-        if (r?.min !== undefined && r?.max !== undefined) return `${r.min}–${r.max}`;
-        if (r?.min !== undefined) return `${r.min}+`;
-        return '—';
-      }),
-    });
+    rows.push({ key: 'category', label: 'Category', values: slots.map((s) => s.kind === 'sport' ? (s.entity as Sport).category : '—') });
+    rows.push({ key: 'age', label: 'Age range', values: slots.map((s) => { if (s.kind !== 'sport') return '—'; const r = (s.entity as Sport).explorationGuidance?.ageSuitability; return r?.min !== undefined && r?.max !== undefined ? `${r.min}–${r.max}` : r?.min !== undefined ? `${r.min}+` : '—'; }) });
   }
-
-  rows.push({
-    key: 'sports',
-    label: 'Sports',
-    values: slots.map((s) => {
-      if (s.kind === 'academy') return (s.entity as Academy).sportsOffered.join(', ');
-      if (s.kind === 'coach') return (s.entity as Coach).sportsCoached.join(', ');
-      return (s.entity as Sport).name;
-    }),
-  });
-
+  rows.push({ key: 'sports', label: 'Sports', values: slots.map((s) => s.kind === 'academy' ? (s.entity as Academy).sportsOffered.join(', ') : s.kind === 'coach' ? (s.entity as Coach).sportsCoached.join(', ') : (s.entity as Sport).name) });
   if (anyAcademy) {
-    rows.push({
-      key: 'facilities',
-      label: 'Facilities',
-      values: slots.map((s) =>
-        s.kind === 'academy' ? (s.entity as Academy).facilities.join(', ') : '—',
-      ),
-    });
-    rows.push({
-      key: 'levels',
-      label: 'Training levels',
-      values: slots.map((s) =>
-        s.kind === 'academy' ? (s.entity as Academy).trainingLevels.join(', ') : '—',
-      ),
-    });
+    rows.push({ key: 'facilities', label: 'Facilities', values: slots.map((s) => s.kind === 'academy' ? (s.entity as Academy).facilities.join(', ') : '—') });
+    rows.push({ key: 'levels', label: 'Training levels', values: slots.map((s) => s.kind === 'academy' ? (s.entity as Academy).trainingLevels.join(', ') : '—') });
   }
-
   if (anyCoach) {
-    rows.push({
-      key: 'specialization',
-      label: 'Specialisation',
-      values: slots.map((s) =>
-        s.kind === 'coach' ? (s.entity as Coach).specialization.join(', ') : '—',
-      ),
-    });
+    rows.push({ key: 'specialization', label: 'Specialisation', values: slots.map((s) => s.kind === 'coach' ? (s.entity as Coach).specialization.join(', ') : '—') });
   }
 
   return (
-    <div
-      className="border-border bg-card mt-4 overflow-x-auto rounded-xl border"
-      role="region"
-      aria-label="Comparison details"
-    >
-      <table
-        className="w-full min-w-[640px] text-sm"
-        style={{ tableLayout: 'auto' }}
-      >
+    <div className="border-border bg-card mt-4 overflow-x-auto rounded-xl border" role="region" aria-label="Comparison details">
+      <table className="w-full min-w-[640px] text-sm" style={{ tableLayout: 'auto' }}>
         <thead className="bg-card sticky top-0 z-[1]">
           <tr className="border-border border-b">
-            <th
-              scope="col"
-              className="text-muted-foreground bg-card p-3 text-left text-xs font-medium tracking-widest uppercase"
-            >
-              Attribute
-            </th>
+            <th scope="col" className="text-muted-foreground bg-card p-3 text-left text-xs font-medium tracking-widest uppercase">Attribute</th>
             {slots.map((s) => (
-              <th
-                key={`${s.kind}-${s.entity.id}-h`}
-                scope="col"
-                className="bg-card p-3 text-left text-xs font-semibold"
-              >
-                {sLabel(s)}
-              </th>
+              <th key={`${s.kind}-${s.entity.id}-h`} scope="col" className="bg-card p-3 text-left text-xs font-semibold">{s.entity.name}</th>
             ))}
           </tr>
         </thead>
         <tbody>
           {rows.map((row) => (
             <tr key={row.key} className="border-border/40 border-b last:border-0">
-              <th
-                scope="row"
-                className="text-muted-foreground p-3 text-left text-xs tracking-wide uppercase"
-              >
-                {row.label}
-              </th>
+              <th scope="row" className="text-muted-foreground p-3 text-left text-xs tracking-wide uppercase">{row.label}</th>
               {row.values.map((v, i) => (
-                <td key={`${row.key}-${i}`} className="p-3 align-top text-sm">
-                  {v}
-                </td>
+                <td key={`${row.key}-${i}`} className="p-3 align-top text-sm">{v}</td>
               ))}
             </tr>
           ))}
@@ -387,9 +241,4 @@ function ComparisonTable({ slots }: { slots: Entity[] }) {
       </table>
     </div>
   );
-}
-
-function sLabel(s: Entity): string {
-  if (s.kind === 'sport') return s.entity.name;
-  return s.entity.name;
 }

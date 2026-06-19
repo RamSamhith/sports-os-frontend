@@ -6,7 +6,7 @@ import { Container } from '@/components/layout/container';
 import { Section } from '@/components/layout/section';
 import { EnquiryForm } from '@/components/enquiry/enquiry-form';
 import { Breadcrumbs } from '@/components/seo/breadcrumbs';
-import { Loader2 } from 'lucide-react';
+import { ProfileSkeleton } from '@/components/feedback/skeletons';
 import { getAcademy } from '@/lib/api/academies';
 import { getCoach } from '@/lib/api/coaches';
 
@@ -48,9 +48,7 @@ export default function EnquiryPage() {
     return (
       <Section>
         <Container size="md">
-          <div className="flex items-center justify-center py-12">
-            <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
-          </div>
+          <ProfileSkeleton />
         </Container>
       </Section>
     );

@@ -16,7 +16,8 @@ import { fixtureImages } from '@/lib/images';
 import { getCoach } from '@/lib/api/coaches';
 import type { Coach } from '@/types/domain/coach';
 import Link from 'next/link';
-import { Loader2, AlertTriangle, Phone, Mail } from 'lucide-react';
+import { AlertTriangle, Phone, Mail } from 'lucide-react';
+import { CoachDetailSkeleton } from '@/components/feedback/skeletons';
 
 export default function CoachDetailPage() {
   const params = useParams();
@@ -47,10 +48,7 @@ export default function CoachDetailPage() {
     return (
       <Section>
         <Container>
-          <div className="flex items-center justify-center py-24">
-            <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-            <span className="ml-3 text-muted-foreground">Loading coach…</span>
-          </div>
+          <CoachDetailSkeleton />
         </Container>
       </Section>
     );

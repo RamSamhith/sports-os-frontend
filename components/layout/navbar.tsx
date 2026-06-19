@@ -53,7 +53,7 @@ export function Navbar() {
                   aria-current={active ? 'page' : undefined}
                   className={cn(
                     'text-muted-foreground hover:text-foreground hover:bg-accent/15 focus-visible:ring-ring',
-                    'motion-press relative rounded-md px-3 py-1.5 text-sm',
+                    'motion-press relative rounded-md px-3 py-2 text-sm min-h-[44px] flex items-center',
                     'focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-background focus-visible:outline-none',
                     active && 'text-foreground',
                   )}
@@ -131,7 +131,7 @@ export function Navbar() {
                   <button
                     type="button"
                     onClick={() => { commandPalette.open(); setOpen(false); }}
-                    className="text-muted-foreground hover:text-foreground hover:bg-accent/15 motion-press flex items-center gap-2 rounded-md px-3 py-2 text-sm text-left transition-colors focus-visible:ring-ring focus-visible:ring-2 focus-visible:outline-none"
+                    className="text-muted-foreground hover:text-foreground hover:bg-accent/15 motion-press flex items-center gap-2 rounded-md px-3 py-2.5 text-sm text-left transition-colors focus-visible:ring-ring focus-visible:ring-2 focus-visible:outline-none min-h-[44px]"
                   >
                     <Search className="h-4 w-4" />
                     Search
@@ -145,7 +145,7 @@ export function Navbar() {
                         onClick={() => setOpen(false)}
                         aria-current={active ? 'page' : undefined}
                         className={cn(
-                          'text-muted-foreground hover:text-foreground hover:bg-accent/15 motion-press rounded-md px-3 py-2 text-sm',
+                          'text-muted-foreground hover:text-foreground hover:bg-accent/15 motion-press rounded-md px-3 py-2.5 text-sm min-h-[44px] flex items-center',
                           'focus-visible:ring-ring focus-visible:ring-2 focus-visible:outline-none',
                           active && 'text-foreground bg-accent/10',
                         )}
@@ -167,21 +167,21 @@ export function Navbar() {
                   <Link
                     href="/shortlist"
                     onClick={() => setOpen(false)}
-                    className="text-muted-foreground hover:text-foreground hover:bg-accent/15 rounded-md px-3 py-2 text-sm transition-colors"
+                    className="text-muted-foreground hover:text-foreground hover:bg-accent/15 rounded-md px-3 py-2.5 text-sm transition-colors min-h-[44px] flex items-center"
                   >
                     Shortlist
                   </Link>
                   <Link
                     href="/profile"
                     onClick={() => setOpen(false)}
-                    className="text-muted-foreground hover:text-foreground hover:bg-accent/15 rounded-md px-3 py-2 text-sm transition-colors"
+                    className="text-muted-foreground hover:text-foreground hover:bg-accent/15 rounded-md px-3 py-2.5 text-sm transition-colors min-h-[44px] flex items-center"
                   >
                     Profile
                   </Link>
                   <Link
                     href="/admin"
                     onClick={() => setOpen(false)}
-                    className="text-muted-foreground hover:text-foreground hover:bg-accent/15 rounded-md px-3 py-2 text-sm transition-colors"
+                    className="text-muted-foreground hover:text-foreground hover:bg-accent/15 rounded-md px-3 py-2.5 text-sm transition-colors min-h-[44px] flex items-center"
                   >
                     Admin Panel
                   </Link>

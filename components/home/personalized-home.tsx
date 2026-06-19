@@ -1,35 +1,48 @@
 'use client'
 
-import { useMemo, useEffect } from 'react'
+import { useMemo, useEffect, useState } from 'react'
 import { useAuth } from '@/lib/hooks/use-auth'
 import { useOnboarding } from '@/lib/hooks/use-onboarding'
 import { useChildren } from '@/lib/hooks/use-children'
 import { useRecentlyViewed } from '@/lib/hooks/use-recently-viewed'
-import { useAcademySelection } from '@/lib/hooks/use-academy-selection'
-import { getSuggestedAcademies, getSuggestedCoaches, logMatchingAudit } from '@/lib/utils/matching'
-import { academies } from '@/data/academies'
-import { coaches } from '@/data/coaches'
+import { getSuggestedAcademies, logMatchingAudit } from '@/lib/utils/matching'
+import { getAcademies } from '@/lib/api/academies'
+import { getCoaches } from '@/lib/api/coaches'
 import type { OnboardingData, SkillLevel } from '@/lib/hooks/use-onboarding'
 import { MatchingExplanation } from './matching-explanation'
 import { SuggestedAcademies } from './suggested-academies'
-import { SuggestedCoaches } from './suggested-coaches'
 import { RecentlyViewed } from './recently-viewed'
 import { ContinueExploring } from './continue-exploring'
 import { YourAcademy } from './your-academy'
 import { Section } from '@/components/layout/section'
 import { Container } from '@/components/layout/container'
 
-const USER_LAT = 12.9716
-const USER_LNG = 77.5946
-
 export function PersonalizedHome() {
   const { role } = useAuth()
   const { data: onboarding, completed, hydrated } = useOnboarding()
   const { activeChild } = useChildren()
   const { recentAcademies, recentCoaches } = useRecentlyViewed()
-  const { selectedAcademyId } = useAcademySelection()
+  const [apiAcademies, setApiAcademies] = useState<any[]>([])
+  const [apiCoaches, setApiCoaches] = useState<any[]>([])
 
-  // For parent role, merge active child data into onboarding for recommendations
+  useEffect(() => {
+    let cancelled = false
+    async function load() {
+      const [academiesRes, coachesRes] = await Promise.all([
+        getAcademies({ pageSize: 200 }),
+        getCoaches({ pageSize: 200 }),
+      ])
+      if (cancelled) return
+      if (academiesRes.ok) setApiAcademies(academiesRes.data.items)
+      if (coachesRes.ok) setApiCoaches(coachesRes.data.items)
+    }
+    load()
+    return () => { cancelled = true }
+  }, [])
+
+  const USER_LAT = 12.9716
+  const USER_LNG = 77.5946
+
   const effectiveOnboarding = useMemo<OnboardingData | null>(() => {
     if (!onboarding || !completed) return null
     if (role !== 'parent' || !activeChild || !onboarding.parent) return onboarding
@@ -47,43 +60,33 @@ export function PersonalizedHome() {
   const suggestions = useMemo(
     () => {
       if (!effectiveOnboarding) {
-        return { academies: { primary: [], fallback: [], hasExactMatch: false }, coaches: { primary: [], fallback: [], hasExactMatch: false } }
+        return { academies: { primary: [], fallback: [], hasExactMatch: false } }
       }
       return {
-        academies: getSuggestedAcademies(academies, effectiveOnboarding, USER_LAT, USER_LNG, 6),
-        coaches: getSuggestedCoaches(coaches, effectiveOnboarding, USER_LAT, USER_LNG, 4),
+        academies: getSuggestedAcademies(apiAcademies, effectiveOnboarding, USER_LAT, USER_LNG, 6),
       }
     },
-    [effectiveOnboarding]
+    [effectiveOnboarding, apiAcademies]
   )
 
-  const { academies: suggestedAcademies, coaches: suggestedCoaches } = suggestions
-
-  const academyCoaches = useMemo(
-    () => selectedAcademyId ? coaches.filter((c) => c.academyId === selectedAcademyId) : [],
-    [selectedAcademyId]
-  )
-
-  // Debug audit: log matching source and results
-  useEffect(() => {
-    if (completed && effectiveOnboarding) {
-      logMatchingAudit(effectiveOnboarding, academies, coaches)
-    }
-  }, [completed, effectiveOnboarding, role, activeChild])
-
-  if (!hydrated || !completed || !effectiveOnboarding) return null
+  const { academies: suggestedAcademies } = suggestions
 
   const lastAcademy = recentAcademies[0]
   const lastCoach = recentCoaches[0]
   const showContinueExploring = lastAcademy || lastCoach
   const showRecentlyViewed = recentAcademies.length > 0 || recentCoaches.length > 0
 
+  useEffect(() => {
+    if (completed && effectiveOnboarding && apiAcademies.length > 0) {
+      logMatchingAudit(effectiveOnboarding, apiAcademies, apiCoaches)
+    }
+  }, [completed, effectiveOnboarding, role, activeChild, apiAcademies, apiCoaches])
+
+  if (!hydrated || !completed || !effectiveOnboarding) return null
+
   const hasContent =
     suggestedAcademies.primary.length > 0 ||
     suggestedAcademies.fallback.length > 0 ||
-    academyCoaches.length > 0 ||
-    suggestedCoaches.primary.length > 0 ||
-    suggestedCoaches.fallback.length > 0 ||
     showContinueExploring ||
     showRecentlyViewed
 
@@ -124,41 +127,6 @@ export function PersonalizedHome() {
               academies={suggestedAcademies.fallback}
               title="Explore More Academies"
               viewAllHref="/academies"
-            />
-          </Container>
-        </Section>
-      )}
-
-      {academyCoaches.length > 0 && (
-        <Section>
-          <Container size="lg">
-            <SuggestedCoaches
-              coaches={academyCoaches}
-              title="Coaches at Your Academy"
-            />
-          </Container>
-        </Section>
-      )}
-
-      {!selectedAcademyId && suggestedCoaches.primary.length > 0 && (
-        <Section>
-          <Container size="lg">
-            <SuggestedCoaches
-              coaches={suggestedCoaches.primary}
-              title="Coaches For You"
-              viewAllHref="/coaches"
-            />
-          </Container>
-        </Section>
-      )}
-
-      {!selectedAcademyId && !suggestedCoaches.hasExactMatch && suggestedCoaches.fallback.length > 0 && (
-        <Section>
-          <Container size="lg">
-            <SuggestedCoaches
-              coaches={suggestedCoaches.fallback}
-              title="Coaches in Your Area"
-              viewAllHref="/coaches"
             />
           </Container>
         </Section>

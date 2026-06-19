@@ -2,22 +2,24 @@
 
 import * as React from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { X, Loader2, AlertTriangle } from 'lucide-react';
+import { X, AlertTriangle } from 'lucide-react';
+import { FullPageSkeleton, CoachCardSkeleton } from '@/components/feedback/skeletons';
 import { SearchInput } from '@/components/ui/search-input';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { FilterDrawer } from '@/components/filters/filter-drawer';
 import { FilterGroup } from '@/components/filters/filter-group';
 import { Separator } from '@/components/ui/separator';
-import { CoachGrid } from '@/components/coaches/coach-grid';
+import { CoachCardPlaceholder } from '@/components/coaches/coach-card-placeholder';
 import { EmptyState } from '@/components/feedback/empty-state';
 import { Inbox } from 'lucide-react';
 import { useSearchQuery } from '@/lib/hooks/use-search-query';
 import { getCoaches } from '@/lib/api/coaches';
 import { sportTaxonomy } from '@/lib/constants/sport-taxonomy';
-import { useAnalytics } from '@/lib/hooks/use-analytics';
-import { searchSubmitEvent } from '@/lib/analytics/events';
+import { trackSearch } from '@/lib/analytics/events';
 import type { Coach } from '@/types/domain/coach';
+
+const PAGE_SIZE = 12;
 
 const sportOptions = sportTaxonomy.map((s) => ({
   value: s.slug,
@@ -43,13 +45,16 @@ export function CoachesListing() {
   const { query, setQuery, debouncedQuery } = useSearchQuery();
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { track } = useAnalytics();
 
   const [allCoaches, setAllCoaches] = React.useState<Coach[]>([]);
   const [results, setResults] = React.useState<Coach[]>([]);
   const [loading, setLoading] = React.useState(true);
+  const [loadingMore, setLoadingMore] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
   const [total, setTotal] = React.useState(0);
+  const [page, setPage] = React.useState(1);
+  const [hasMore, setHasMore] = React.useState(true);
+  const sentinelRef = React.useRef<HTMLDivElement>(null);
 
   const [sports, setSports] = React.useState<string[]>(() => readListFromParams(searchParams, 'sport'));
   const [cities, setCities] = React.useState<string[]>(() => readListFromParams(searchParams, 'city'));
@@ -59,7 +64,7 @@ export function CoachesListing() {
   React.useEffect(() => {
     let cancelled = false;
     async function load() {
-      const res = await getCoaches({ pageSize: 100 });
+      const res = await getCoaches({ pageSize: 200 });
       if (cancelled) return;
       if (res.ok) {
         setAllCoaches(res.data.items);
@@ -69,33 +74,29 @@ export function CoachesListing() {
     return () => { cancelled = true; };
   }, []);
 
-  // Fetch filtered results when search or filters change
+  // Fetch filtered results when search or filters change (reset to page 1)
   React.useEffect(() => {
     let cancelled = false;
     async function load() {
       setLoading(true);
       setError(null);
+      setPage(1);
+      setHasMore(true);
       const res = await getCoaches({
         search: debouncedQuery || undefined,
         sport: sports.length ? sports.join(',') : undefined,
         city: cities.length ? cities.join(',') : undefined,
         experienceYears: experience.length ? experience[0] : undefined,
-        pageSize: 100,
+        page: 1,
+        pageSize: PAGE_SIZE,
       });
       if (cancelled) return;
       if (res.ok) {
         setResults(res.data.items);
         setTotal(res.data.pagination.total);
+        setHasMore(res.data.items.length < (res.data.pagination.total ?? 0));
         if (debouncedQuery) {
-          track(searchSubmitEvent({
-            query: debouncedQuery,
-            resultsCount: res.data.pagination.total,
-            filters: {
-              sport: sports.length ? sports : undefined,
-              city: cities.length ? cities : undefined,
-              experience: experience.length ? experience : undefined,
-            },
-          }));
+          trackSearch(debouncedQuery, res.data.pagination.total, 'coaches');
         }
       } else {
         setError(res.error.message);
@@ -104,7 +105,50 @@ export function CoachesListing() {
     }
     load();
     return () => { cancelled = true; };
-  }, [debouncedQuery, sports, cities, experience, track]);
+  }, [debouncedQuery, sports, cities, experience]);
+
+  // Load more on intersection
+  React.useEffect(() => {
+    if (loading || !hasMore || loadingMore) return;
+    const sentinel = sentinelRef.current;
+    if (!sentinel) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && hasMore && !loadingMore) {
+          setPage((p) => p + 1);
+        }
+      },
+      { rootMargin: '200px' }
+    );
+    observer.observe(sentinel);
+    return () => observer.disconnect();
+  }, [loading, hasMore, loadingMore]);
+
+  // Fetch next page when page increments
+  React.useEffect(() => {
+    if (page === 1 || loading) return;
+    let cancelled = false;
+    async function loadMore() {
+      setLoadingMore(true);
+      const res = await getCoaches({
+        search: debouncedQuery || undefined,
+        sport: sports.length ? sports.join(',') : undefined,
+        city: cities.length ? cities.join(',') : undefined,
+        experienceYears: experience.length ? experience[0] : undefined,
+        page,
+        pageSize: PAGE_SIZE,
+      });
+      if (cancelled) return;
+      if (res.ok) {
+        setResults((prev) => [...prev, ...res.data.items]);
+        setHasMore(res.data.items.length === PAGE_SIZE);
+      }
+      setLoadingMore(false);
+    }
+    loadMore();
+    return () => { cancelled = true; };
+  }, [page]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Dynamic filter counts from all coaches
   const dynamicSportOptions = React.useMemo(() =>
@@ -190,10 +234,7 @@ export function CoachesListing() {
           size="lg"
           disabled
         />
-        <div className="flex items-center justify-center py-12">
-          <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
-          <span className="ml-2 text-sm text-muted-foreground">Loading coaches…</span>
-        </div>
+        <FullPageSkeleton />
       </div>
     );
   }
@@ -274,14 +315,14 @@ export function CoachesListing() {
       {chips.length > 0 ? (
         <div className="flex flex-wrap items-center gap-2">
           {chips.map((c) => (
-            <Badge key={c.key} variant="secondary" className="gap-1 pr-1">
+            <Badge key={c.key} variant="secondary" className="gap-1 pr-1 min-h-[32px] flex items-center">
               {c.label}
               <button
                 onClick={c.onRemove}
-                className="text-muted-foreground hover:text-foreground"
+                className="text-muted-foreground hover:text-foreground p-1 -m-1 rounded"
                 aria-label={`Remove filter ${c.label}`}
               >
-                <X className="h-3 w-3" />
+                <X className="h-3.5 w-3.5" />
               </button>
             </Badge>
           ))}
@@ -309,8 +350,18 @@ export function CoachesListing() {
           }
         />
       ) : (
-        <CoachGrid coaches={results} onClear={clearAll} />
+        <div className="grid grid-cols-1 items-start gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {results.map((coach, i) => (
+            <CoachCardPlaceholder key={coach.id} coach={coach} />
+          ))}
+          {loadingMore &&
+            Array.from({ length: 3 }).map((_, i) => (
+              <CoachCardSkeleton key={`loading-${i}`} />
+            ))}
+        </div>
       )}
+
+      {hasMore && <div ref={sentinelRef} className="h-4" />}
     </div>
   );
 }

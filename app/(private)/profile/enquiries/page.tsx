@@ -5,7 +5,7 @@ import { MessageCircle } from 'lucide-react';
 import { EmptyState } from '@/components/feedback/empty-state';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Loader2 } from 'lucide-react';
+import { ShortlistSkeleton } from '@/components/feedback/skeletons';
 import { getMyEnquiries } from '@/lib/api/enquiries';
 import { academies } from '@/data/academies';
 import { coaches } from '@/data/coaches';
@@ -39,7 +39,7 @@ export default function EnquiriesPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-12">
-        <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+        <ShortlistSkeleton />
       </div>
     );
   }
