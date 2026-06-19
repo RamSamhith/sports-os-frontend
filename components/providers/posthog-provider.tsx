@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, Suspense } from 'react';
 import { usePathname, useSearchParams } from 'next/navigation';
 
 const POSTHOG_KEY = process.env.NEXT_PUBLIC_POSTHOG_KEY;
@@ -10,7 +10,6 @@ export function PostHogProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (!POSTHOG_KEY || typeof window === 'undefined') return;
 
-    // Load PostHog
     (function (c: any, a: any) {
       c[a] = c[a] || function () {
         (c[a].q = c[a].q || []).push(arguments);
@@ -35,17 +34,27 @@ export function PostHogProvider({ children }: { children: React.ReactNode }) {
     return () => { script.remove(); };
   }, []);
 
-  // Track page views
+  return (
+    <>
+      <Suspense fallback={null}>
+        <PostHogPageTracker />
+      </Suspense>
+      {children}
+    </>
+  );
+}
+
+function PostHogPageTracker() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
   useEffect(() => {
-    if (!POSTHOG_KEY || !(window as any).posthog) return;
+    if (!POSTHOG_KEY || typeof window === 'undefined' || !(window as any).posthog) return;
     const url = pathname + (searchParams.toString() ? `?${searchParams.toString()}` : '');
     (window as any).posthog.capture('$pageview', { $current_url: url });
   }, [pathname, searchParams]);
 
-  return <>{children}</>;
+  return null;
 }
 
 export function track(event: string, properties?: Record<string, any>) {

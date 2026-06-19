@@ -1,6 +1,7 @@
 'use client';
 
 import * as React from 'react';
+import { Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { SearchInput } from '@/components/ui/search-input';
 import { AcademyListing } from '@/components/academies/academy-listing';
@@ -12,12 +13,30 @@ import { Breadcrumbs } from '@/components/seo/breadcrumbs';
 import { RecentSearches } from '@/components/search/recent-searches';
 import { useRecentSearches } from '@/components/command/recent-searches-store';
 import Link from 'next/link';
-import { TrendingUp, MapPin, Trophy, School } from 'lucide-react';
+import { TrendingUp, MapPin, Trophy, School, Loader2 } from 'lucide-react';
 import { trackSearch, trackSearchResultClick, trackSportClick, trackCityClick } from '@/lib/analytics/events';
 import { getAcademies } from '@/lib/api/academies';
 import { listSports } from '@/lib/api/sports';
 
 export default function SearchPage() {
+  return (
+    <Suspense
+      fallback={
+        <Section spacing="sm">
+          <Container size="lg">
+            <div className="flex justify-center py-16">
+              <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+            </div>
+          </Container>
+        </Section>
+      }
+    >
+      <SearchPageContent />
+    </Suspense>
+  );
+}
+
+function SearchPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { items: recentItems, push: pushRecent } = useRecentSearches();

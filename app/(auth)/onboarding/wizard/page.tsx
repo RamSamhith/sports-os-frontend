@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -33,6 +33,14 @@ const GENDER_OPTIONS = [
 ];
 
 export default function OnboardingWizardPage() {
+  return (
+    <Suspense fallback={null}>
+      <OnboardingWizardContent />
+    </Suspense>
+  );
+}
+
+function OnboardingWizardContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const isEdit = searchParams.get('edit') === 'true';
