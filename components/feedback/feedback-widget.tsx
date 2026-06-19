@@ -5,6 +5,7 @@ import { MessageSquare, X, Send } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { trackFeedback } from '@/lib/analytics/events';
+import { GuestGuard } from '@/components/auth/guest-guard';
 
 type FeedbackType = 'bug' | 'suggestion' | 'academy_request' | 'other';
 
@@ -34,6 +35,7 @@ export function FeedbackWidget() {
   };
 
   return (
+    <GuestGuard actionLabel="Sign in to send feedback">
     <>
       {/* Floating button */}
       <Button
@@ -110,5 +112,6 @@ export function FeedbackWidget() {
         )}
       </AnimatePresence>
     </>
+    </GuestGuard>
   );
 }

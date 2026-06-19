@@ -23,7 +23,7 @@ export interface User {
   email: string;
   phone?: string;
   avatar?: string;
-  authProvider?: 'credentials' | 'google' | 'microsoft';
+  authProvider?: 'credentials' | 'google' | 'microsoft' | 'guest';
   lastLoginAt?: string;
   onboardingCompleted?: boolean;
   // Onboarding profile fields (persisted to backend)

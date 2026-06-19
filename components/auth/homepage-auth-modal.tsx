@@ -11,12 +11,13 @@ import { useAuth } from '@/lib/hooks/use-auth';
  * - Shows after a short delay so the page renders first
  */
 export function HomepageAuthModal() {
-  const { isAuthenticated, isLoading } = useAuth();
+  const { isAuthenticated, isGuest, isLoading } = useAuth();
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
     if (isLoading) return;
     if (isAuthenticated) return;
+    if (isGuest) return;
 
     // Check if user already dismissed this session
     const dismissed = sessionStorage.getItem('sportsos:auth-modal-dismissed');
@@ -27,7 +28,7 @@ export function HomepageAuthModal() {
     }, 1200);
 
     return () => clearTimeout(timer);
-  }, [isLoading, isAuthenticated]);
+  }, [isLoading, isAuthenticated, isGuest]);
 
   function handleClose(nextOpen: boolean) {
     if (!nextOpen) {

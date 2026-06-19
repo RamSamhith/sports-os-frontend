@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
+import { GuestGuard } from '@/components/auth/guest-guard';
 
 const STORAGE_KEY = 'sportsos:notifications';
 
@@ -86,6 +87,7 @@ export default function SettingsNotificationsPage() {
   }
 
   return (
+    <GuestGuard actionLabel="Sign in to manage notifications">
     <div className="flex flex-col gap-6">
       <header className="flex flex-col gap-1">
         <h2 className="text-2xl font-semibold tracking-tight">Notifications</h2>
@@ -133,5 +135,6 @@ export default function SettingsNotificationsPage() {
         </CardContent>
       </Card>
     </div>
+    </GuestGuard>
   );
 }

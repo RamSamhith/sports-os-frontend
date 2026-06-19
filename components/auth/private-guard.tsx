@@ -7,18 +7,20 @@ import { ProfileSkeleton } from '@/components/feedback/skeletons';
 
 export function PrivateGuard({ children }: { children: React.ReactNode }) {
   const router = useRouter();
-  const { isAuthenticated, isLoading, onboardingCompleted, role } = useAuth();
+  const { isAuthenticated, isGuest, isLoading, onboardingCompleted, role } = useAuth();
   const hydratedOnce = useRef(false);
 
   useEffect(() => {
     if (isLoading) return;
     hydratedOnce.current = true;
+    // Allow guests through — they see a limited profile view
+    if (isGuest) return;
     if (!isAuthenticated) {
       router.replace('/welcome');
     } else if (!onboardingCompleted) {
       router.replace(role ? '/onboarding/wizard' : '/onboarding/role');
     }
-  }, [isLoading, isAuthenticated, onboardingCompleted, role, router]);
+  }, [isLoading, isAuthenticated, isGuest, onboardingCompleted, role, router]);
 
   if (isLoading) {
     if (!hydratedOnce.current) {
@@ -30,6 +32,9 @@ export function PrivateGuard({ children }: { children: React.ReactNode }) {
     }
     return null;
   }
+
+  // Guests see a limited profile — allow through
+  if (isGuest) return <>{children}</>;
 
   if (!isAuthenticated || !onboardingCompleted) {
     return null;

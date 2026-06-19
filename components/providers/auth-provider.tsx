@@ -31,7 +31,7 @@ interface PersistedProfile {
   name: string;
   email: string;
   phone: string;
-  authProvider?: 'credentials' | 'google' | 'microsoft';
+  authProvider?: 'credentials' | 'google' | 'microsoft' | 'guest';
 }
 
 interface PersistedOnboarding {
@@ -188,6 +188,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const guestFlag = localStorage.getItem(GUEST_KEY);
       if (guestFlag === 'true' && !migrated.isAuthenticated) {
         setIsGuest(true);
+        // Restore guest profile if not already set
+        const storedProfile = readProfile();
+        if (!storedProfile.name || storedProfile.authProvider !== 'guest') {
+          const guestProfile: UserProfile = {
+            name: 'Guest User',
+            email: '',
+            phone: '',
+            authProvider: 'guest',
+          };
+          setProfileState(guestProfile);
+          writeProfile(guestProfile);
+        }
       }
     } catch { /* ignore */ }
 
@@ -320,14 +332,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const enterGuestMode = useCallback(() => {
+    const guestId = `guest_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`;
+    const guestProfile: UserProfile = {
+      name: 'Guest User',
+      email: '',
+      phone: '',
+      authProvider: 'guest',
+    };
     setIsGuest(true);
+    setProfileState(guestProfile);
     try {
       localStorage.setItem(GUEST_KEY, 'true');
-      // Generate a persistent guest ID if one doesn't exist
-      if (!localStorage.getItem(GUEST_ID_KEY)) {
-        const guestId = `guest_${Date.now()}_${Math.random().toString(36).slice(2, 9)}`;
-        localStorage.setItem(GUEST_ID_KEY, guestId);
-      }
+      localStorage.setItem(GUEST_ID_KEY, guestId);
+      localStorage.setItem(PROFILE_KEY, JSON.stringify(guestProfile));
     } catch { /* ignore */ }
   }, []);
 

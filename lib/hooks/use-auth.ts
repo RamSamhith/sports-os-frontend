@@ -8,7 +8,7 @@ export interface UserProfile {
   name: string;
   email: string;
   phone: string;
-  authProvider?: 'credentials' | 'google' | 'microsoft';
+  authProvider?: 'credentials' | 'google' | 'microsoft' | 'guest';
 }
 
 export interface AuthChild {

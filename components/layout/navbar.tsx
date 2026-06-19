@@ -16,6 +16,7 @@ import { useCommandPalette } from '@/components/command/command-palette-provider
 import { ThemeCycleButton } from '@/components/theme/theme-toggle';
 import { LocationPicker } from '@/components/location/location-picker';
 import { useLocation } from '@/lib/hooks/use-location';
+import { useAuth } from '@/lib/hooks/use-auth';
 
 export function Navbar() {
   const pathname = usePathname();
@@ -23,6 +24,7 @@ export function Navbar() {
   const [locationOpen, setLocationOpen] = React.useState(false);
   const commandPalette = useCommandPalette();
   const { location } = useLocation();
+  const { isGuest, profile } = useAuth();
   const [mounted, setMounted] = React.useState(false);
   React.useEffect(() => setMounted(true), []);
 
@@ -103,11 +105,20 @@ export function Navbar() {
                 </Link>
               </Button>
               <ThemeCycleButton />
-              <Button variant="ghost" size="icon-touch" aria-label="Profile" asChild>
-                <Link href="/profile">
-                  <User2 className="h-4 w-4" />
-                </Link>
-              </Button>
+              {isGuest ? (
+                <Button variant="ghost" size="icon-touch" aria-label="Guest User" asChild>
+                  <Link href="/profile" className="flex items-center gap-1.5">
+                    <User2 className="h-4 w-4" />
+                    <span className="text-xs font-medium hidden lg:inline">Guest</span>
+                  </Link>
+                </Button>
+              ) : (
+                <Button variant="ghost" size="icon-touch" aria-label="Profile" asChild>
+                  <Link href="/profile">
+                    <User2 className="h-4 w-4" />
+                  </Link>
+                </Button>
+              )}
               <Button variant="ghost" size="icon-touch" aria-label="Admin" asChild>
                 <Link href="/admin">
                   <Shield className="h-4 w-4" />
@@ -174,9 +185,10 @@ export function Navbar() {
                   <Link
                     href="/profile"
                     onClick={() => setOpen(false)}
-                    className="text-muted-foreground hover:text-foreground hover:bg-accent/15 rounded-md px-3 py-2.5 text-sm transition-colors min-h-[44px] flex items-center"
+                    className="text-muted-foreground hover:text-foreground hover:bg-accent/15 rounded-md px-3 py-2.5 text-sm transition-colors min-h-[44px] flex items-center gap-2"
                   >
-                    Profile
+                    <User2 className="h-4 w-4" />
+                    {isGuest ? 'Guest User' : 'Profile'}
                   </Link>
                   <Link
                     href="/admin"

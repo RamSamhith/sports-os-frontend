@@ -11,7 +11,7 @@ import { Button } from '@/components/ui/button';
 import { useAuth } from '@/lib/hooks/use-auth';
 import { login as apiLogin, register as apiRegister } from '@/lib/api/auth';
 import { useGoogleAuth, useMicrosoftAuth, handleSocialAuth } from '@/lib/hooks/use-social-auth';
-import { trackLogin, trackSignup, trackOAuthAttempt, trackOAuthSuccess, trackOAuthError } from '@/lib/analytics/events';
+import { trackLogin, trackSignup, trackOAuthAttempt, trackOAuthSuccess, trackOAuthError, trackGuestStarted } from '@/lib/analytics/events';
 import { Loader2, ArrowLeft, X } from 'lucide-react';
 import { ease, duration } from '@/components/motion/constants';
 
@@ -80,7 +80,7 @@ export function AuthModal({
 }) {
   const reduced = !!useReducedMotion();
   const router = useRouter();
-  const { setAuth, setProfile } = useAuth();
+  const { setAuth, setProfile, enterGuestMode } = useAuth();
   const [view, setView] = useState<ModalView>(defaultView);
   const [direction, setDirection] = useState(1);
   const [socialError, setSocialError] = useState<string | null>(null);
@@ -155,6 +155,13 @@ export function AuthModal({
     }
   };
 
+  const handleGuestContinue = useCallback(() => {
+    trackGuestStarted();
+    enterGuestMode();
+    onOpenChange(false);
+    router.replace('/');
+  }, [enterGuestMode, onOpenChange, router]);
+
   return (
     <Dialog.Root open={open} onOpenChange={onOpenChange}>
       <Dialog.Portal>
@@ -196,6 +203,7 @@ export function AuthModal({
                     onSelect={(v) => navigateView(v)}
                     onGoogle={handleGoogleLogin}
                     onMicrosoft={handleMicrosoftLogin}
+                    onGuest={handleGuestContinue}
                     googleLoaded={googleAuth.loaded}
                     microsoftLoaded={microsoftAuth.loaded}
                     socialLoading={socialLoading}
@@ -239,6 +247,7 @@ function ChooseView({
   onSelect,
   onGoogle,
   onMicrosoft,
+  onGuest,
   googleLoaded,
   microsoftLoaded,
   socialLoading,
@@ -250,6 +259,7 @@ function ChooseView({
   onSelect: (view: ModalView) => void;
   onGoogle: () => void;
   onMicrosoft: () => void;
+  onGuest: () => void;
   googleLoaded: boolean;
   microsoftLoaded: boolean;
   socialLoading: 'google' | 'microsoft' | null;
@@ -318,6 +328,12 @@ function ChooseView({
         <motion.div variants={reduced ? undefined : formFieldVariants} initial="hidden" animate="visible" transition={{ delay: 0.1 }}>
           <Button className="w-full h-12" size="lg" onClick={() => onSelect('login')}>
             Sign in with Email
+          </Button>
+        </motion.div>
+
+        <motion.div variants={reduced ? undefined : formFieldVariants} initial="hidden" animate="visible" transition={{ delay: 0.15 }}>
+          <Button className="w-full h-12" size="lg" variant="ghost" onClick={onGuest}>
+            Continue as Guest
           </Button>
         </motion.div>
 
