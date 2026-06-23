@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { Container } from '@/components/layout/container';
 import { Section } from '@/components/layout/section';
 import { getAcademies } from '@/lib/api/academies';
-import { MapPin, ChevronRight, ChevronLeft } from 'lucide-react';
+import { MapPin, ChevronRight, ChevronLeft, AlertTriangle } from 'lucide-react';
 import { CityCarouselSkeleton } from '@/components/feedback/skeletons';
 import { Button } from '@/components/ui/button';
 import type { Academy } from '@/types/domain/academy';
@@ -20,6 +20,7 @@ interface CityData {
 export function CitiesSection() {
   const [cities, setCities] = React.useState<CityData[]>([]);
   const [loading, setLoading] = React.useState(true);
+  const [error, setError] = React.useState<string | null>(null);
   const scrollRef = React.useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = React.useState(false);
   const [canScrollRight, setCanScrollRight] = React.useState(true);
@@ -43,14 +44,14 @@ export function CitiesSection() {
     };
   }, [checkScroll, loading]);
 
-  React.useEffect(() => {
-    let cancelled = false;
-    async function load() {
+  const loadCities = React.useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
       const res = await getAcademies({ pageSize: 200 });
-      if (cancelled) return;
 
       if (!res.ok) {
-        setLoading(false);
+        setError(res.error.message);
         return;
       }
 
@@ -76,11 +77,16 @@ export function CitiesSection() {
         .slice(0, 10);
 
       setCities(cityData);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to load cities');
+    } finally {
       setLoading(false);
     }
-    load();
-    return () => { cancelled = true; };
   }, []);
+
+  React.useEffect(() => {
+    loadCities();
+  }, [loadCities]);
 
   const scroll = (direction: 'left' | 'right') => {
     const el = scrollRef.current;
@@ -93,6 +99,29 @@ export function CitiesSection() {
       <Section spacing="sm">
         <Container size="lg">
           <CityCarouselSkeleton />
+        </Container>
+      </Section>
+    );
+  }
+
+  if (error) {
+    return (
+      <Section spacing="sm">
+        <Container size="lg">
+          <div className="mb-4">
+            <h2 className="text-xl font-semibold tracking-tight md:text-2xl">Explore by city</h2>
+            <p className="text-muted-foreground text-xs">Find academies in your city.</p>
+          </div>
+          <div className="flex flex-col items-center gap-3 rounded-xl border border-dashed py-12 text-center">
+            <AlertTriangle className="h-10 w-10 text-destructive/40" />
+            <div>
+              <p className="text-foreground font-medium">Failed to load cities</p>
+              <p className="text-sm text-muted-foreground">{error}</p>
+            </div>
+            <Button size="sm" variant="outline" onClick={loadCities}>
+              Try again
+            </Button>
+          </div>
         </Container>
       </Section>
     );

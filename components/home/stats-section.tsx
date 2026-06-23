@@ -7,6 +7,8 @@ import { Section } from '@/components/layout/section';
 import { getAcademies } from '@/lib/api/academies';
 import { listSports } from '@/lib/api/sports';
 import { StatsSkeleton } from '@/components/feedback/skeletons';
+import { AlertTriangle } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 function formatCount(n: number) {
   return new Intl.NumberFormat('en-IN').format(n);
@@ -21,18 +23,19 @@ interface Stat {
 export function StatsSection() {
   const [stats, setStats] = React.useState<Stat[]>([]);
   const [loading, setLoading] = React.useState(true);
+  const [error, setError] = React.useState<string | null>(null);
 
-  React.useEffect(() => {
-    let cancelled = false;
-    async function load() {
+  const loadStats = React.useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
       const [academiesRes, sportsRes] = await Promise.all([
         getAcademies({ pageSize: 200 }),
         listSports({ status: 'published', limit: 100 }),
       ]);
-      if (cancelled) return;
 
-      const academyCount = academiesRes.ok ? academiesRes.data.pagination.total ?? academiesRes.data.items.length : 0;
-      const sportCount = sportsRes.ok ? sportsRes.data.pagination.total ?? sportsRes.data.items.length : 0;
+      const academyCount = academiesRes.ok ? academiesRes.data.pagination?.total ?? academiesRes.data.items.length : 0;
+      const sportCount = sportsRes.ok ? (sportsRes.data as any).pagination?.total ?? sportsRes.data.items.length : 0;
 
       const cities = new Set<string>();
       if (academiesRes.ok) {
@@ -45,17 +48,41 @@ export function StatsSection() {
         { label: 'Cities', value: formatCount(cities.size), href: '/search' },
         { label: 'Coaches', value: formatCount(Math.floor(academyCount * 2.5)), href: '/academies' },
       ]);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to load stats');
+    } finally {
       setLoading(false);
     }
-    load();
-    return () => { cancelled = true; };
   }, []);
+
+  React.useEffect(() => {
+    loadStats();
+  }, [loadStats]);
 
   if (loading) {
     return (
       <Section spacing="sm">
         <Container size="lg">
           <StatsSkeleton />
+        </Container>
+      </Section>
+    );
+  }
+
+  if (error) {
+    return (
+      <Section spacing="sm">
+        <Container size="lg">
+          <div className="flex flex-col items-center gap-3 rounded-xl border border-dashed py-12 text-center">
+            <AlertTriangle className="h-10 w-10 text-destructive/40" />
+            <div>
+              <p className="text-foreground font-medium">Failed to load stats</p>
+              <p className="text-sm text-muted-foreground">{error}</p>
+            </div>
+            <Button size="sm" variant="outline" onClick={loadStats}>
+              Try again
+            </Button>
+          </div>
         </Container>
       </Section>
     );

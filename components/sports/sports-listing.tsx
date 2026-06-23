@@ -1,7 +1,7 @@
 'use client';
 
 import * as React from 'react';
-import { X, Loader2 } from 'lucide-react';
+import { X, Loader2, AlertTriangle } from 'lucide-react';
 import { SearchInput } from '@/components/ui/search-input';
 import { Button } from '@/components/ui/button';
 import { SportGrid } from '@/components/sports/sport-grid';
@@ -15,18 +15,25 @@ export function SportsListing() {
   const { query, setQuery, debouncedQuery } = useSearchQuery();
   const [allSports, setAllSports] = React.useState<Sport[]>([]);
   const [loading, setLoading] = React.useState(true);
+  const [error, setError] = React.useState<string | null>(null);
 
-  React.useEffect(() => {
-    let cancelled = false;
-    async function load() {
+  const loadSports = React.useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
       const res = await listSports({ status: 'published', limit: 100 });
-      if (cancelled) return;
       if (res.ok) setAllSports(res.data.items);
+      else setError(res.error.message);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to load sports');
+    } finally {
       setLoading(false);
     }
-    load();
-    return () => { cancelled = true; };
   }, []);
+
+  React.useEffect(() => {
+    loadSports();
+  }, [loadSports]);
 
   const filtered = React.useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -53,6 +60,32 @@ export function SportsListing() {
         </div>
         <div className="flex justify-center py-8">
           <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex flex-col gap-4">
+        <div>
+          <SearchInput
+            value=""
+            onValueChange={() => {}}
+            label="Search sports"
+            placeholder="Search sports by name or category…"
+            size="lg"
+          />
+        </div>
+        <div className="flex flex-col items-center gap-3 rounded-xl border border-dashed py-12 text-center">
+          <AlertTriangle className="h-10 w-10 text-destructive/40" />
+          <div>
+            <p className="text-foreground font-medium">Failed to load sports</p>
+            <p className="text-sm text-muted-foreground">{error}</p>
+          </div>
+          <Button size="sm" variant="outline" onClick={loadSports}>
+            Try again
+          </Button>
         </div>
       </div>
     );

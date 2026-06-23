@@ -24,17 +24,22 @@ export function PersonalizedHome() {
   const { recentAcademies, recentCoaches } = useRecentlyViewed()
   const [apiAcademies, setApiAcademies] = useState<any[]>([])
   const [apiCoaches, setApiCoaches] = useState<any[]>([])
+  const [apiError, setApiError] = useState<string | null>(null)
 
   useEffect(() => {
     let cancelled = false
     async function load() {
-      const [academiesRes, coachesRes] = await Promise.all([
-        getAcademies({ pageSize: 200 }),
-        getCoaches({ pageSize: 200 }),
-      ])
-      if (cancelled) return
-      if (academiesRes.ok) setApiAcademies(academiesRes.data.items)
-      if (coachesRes.ok) setApiCoaches(coachesRes.data.items)
+      try {
+        const [academiesRes, coachesRes] = await Promise.all([
+          getAcademies({ pageSize: 200 }),
+          getCoaches({ pageSize: 200 }),
+        ])
+        if (cancelled) return
+        if (academiesRes.ok) setApiAcademies(academiesRes.data.items)
+        if (coachesRes.ok) setApiCoaches(coachesRes.data.items)
+      } catch (err) {
+        if (!cancelled) setApiError(err instanceof Error ? err.message : 'Failed to load')
+      }
     }
     load()
     return () => { cancelled = true }

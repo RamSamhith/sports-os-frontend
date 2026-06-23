@@ -52,7 +52,7 @@ const nextConfig = {
               "style-src 'self' 'unsafe-inline'",
               "img-src 'self' https: data: blob:",
               "font-src 'self' https://fonts.gstatic.com",
-              "connect-src 'self' https://*.ingest.sentry.io https://sentry.io https://us.i.posthog.com",
+              "connect-src 'self' https://*.ingest.sentry.io https://sentry.io https://us.i.posthog.com https://sportsos-nodejs.onrender.com",
               "frame-ancestors 'none'",
               "base-uri 'self'",
               "form-action 'self'",

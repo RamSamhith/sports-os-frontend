@@ -97,6 +97,10 @@ async function ensureRefresh(): Promise<string> {
   return newToken;
 }
 
+// ─── Timeout ─────────────────────────────────────────────────
+
+const REQUEST_TIMEOUT_MS = 10_000;
+
 // ─── Core Request Function ───────────────────────────────────
 
 async function request<T>(
@@ -118,8 +122,13 @@ async function request<T>(
     Object.assign(headers, options.headers);
   }
 
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+
   try {
-    const res = await fetch(url, { ...options, headers, credentials: 'include' });
+    console.log(`[API] ${options.method ?? 'GET'} ${url}`);
+    const res = await fetch(url, { ...options, headers, credentials: 'include', signal: controller.signal });
+    clearTimeout(timeoutId);
 
     if (res.status === 204) {
       return { ok: true, data: undefined as T };
@@ -203,13 +212,20 @@ async function request<T>(
       };
     }
 
-    return { ok: true, data: json.data ?? json };
+    clearTimeout(timeoutId);
+    const data = json.data ?? json;
+    console.log(`[API] OK ${options.method ?? 'GET'} ${url}`, { status: res.status });
+    return { ok: true, data };
   } catch (err) {
+    clearTimeout(timeoutId);
+    const message = err instanceof Error ? err.message : 'Network request failed';
+    const isAbort = err instanceof DOMException && err.name === 'AbortError';
+    console.error(`[API] FAILED ${options.method ?? 'GET'} ${url}:`, isAbort ? 'Request timed out (10s)' : message);
     return {
       ok: false,
       error: {
-        code: 'NETWORK_ERROR',
-        message: err instanceof Error ? err.message : 'Network request failed',
+        code: isAbort ? 'TIMEOUT' : 'NETWORK_ERROR',
+        message: isAbort ? 'Request timed out. Please try again.' : message,
       },
     };
   }

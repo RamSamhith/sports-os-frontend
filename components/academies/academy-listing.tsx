@@ -94,27 +94,32 @@ export function AcademyListing() {
       setError(null);
       setPage(1);
       setHasMore(true);
-      const res = await getAcademies({
-        search: debouncedQuery || undefined,
-        sport: sports.length ? sports.join(',') : undefined,
-        facility: facilities.length ? facilities.join(',') : undefined,
-        level: levels.length ? levels.join(',') : undefined,
-        status: statuses.length ? statuses.join(',') : undefined,
-        page: 1,
-        pageSize: PAGE_SIZE,
-      });
-      if (cancelled) return;
-      if (res.ok) {
-        setResults(res.data.items);
-        setTotal(res.data.pagination.total);
-        setHasMore(res.data.items.length < (res.data.pagination.total ?? 0));
-        if (debouncedQuery) {
-          trackSearch(debouncedQuery, res.data.pagination.total, 'academies');
+      try {
+        const res = await getAcademies({
+          search: debouncedQuery || undefined,
+          sport: sports.length ? sports.join(',') : undefined,
+          facility: facilities.length ? facilities.join(',') : undefined,
+          level: levels.length ? levels.join(',') : undefined,
+          status: statuses.length ? statuses.join(',') : undefined,
+          page: 1,
+          pageSize: PAGE_SIZE,
+        });
+        if (cancelled) return;
+        if (res.ok) {
+          setResults(res.data.items);
+          setTotal(res.data.pagination.total);
+          setHasMore(res.data.items.length < (res.data.pagination.total ?? 0));
+          if (debouncedQuery) {
+            trackSearch(debouncedQuery, res.data.pagination.total, 'academies');
+          }
+        } else {
+          setError(res.error.message);
         }
-      } else {
-        setError(res.error.message);
+      } catch (err) {
+        if (!cancelled) setError(err instanceof Error ? err.message : 'Failed to load academies');
+      } finally {
+        if (!cancelled) setLoading(false);
       }
-      setLoading(false);
     }
     load();
     return () => { cancelled = true; };
