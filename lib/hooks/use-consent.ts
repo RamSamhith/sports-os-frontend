@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import type { ConsentCategory } from '@/types/domain/consent';
 
 export interface ConsentState {
@@ -37,7 +37,11 @@ function readStored(): ConsentState {
 }
 
 export function useConsent() {
-  const [state, setState] = useState<ConsentState>(() => readStored());
+  const [state, setState] = useState<ConsentState>(initial);
+
+  useEffect(() => {
+    setState(readStored());
+  }, []);
 
   const set = useCallback((category: ConsentCategory, granted: boolean) => {
     setState((prev) => {

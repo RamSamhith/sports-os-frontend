@@ -40,12 +40,17 @@ export function ReviewsSection({ targetType, targetId }: ReviewsSectionProps) {
 
   const loadReviews = React.useCallback(async () => {
     setLoading(true);
-    const res = await getReviews(targetType, targetId, { sort: sortBy, limit: 50 });
-    if (res.ok) {
-      setReviews(res.data.reviews);
-      setStats(res.data.stats);
+    try {
+      const res = await getReviews(targetType, targetId, { sort: sortBy, limit: 50 });
+      if (res.ok) {
+        setReviews(res.data.reviews);
+        setStats(res.data.stats);
+      }
+    } catch {
+      // network error — leave reviews empty
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   }, [targetType, targetId, sortBy]);
 
   React.useEffect(() => {

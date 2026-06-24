@@ -45,12 +45,17 @@ export default function AdminCoachesPage() {
         setError(res.error.message);
       }
       setLoading(false);
+    }).catch(() => {
+      if (!cancelled) {
+        setError('Failed to load coaches');
+        setLoading(false);
+      }
     });
     return () => { cancelled = true; };
   }, []);
 
   if (error) {
-    return <ErrorState description={error} onRetry={() => { setError(null); setLoading(true); getAdminCoaches().then((res) => { if (res.ok) setCoaches(res.data.items.map((c) => ({ ...c, id: c.id || (c as unknown as { _id: string })._id }))); else setError(res.error.message); setLoading(false); }); }} />;
+    return <ErrorState description={error} onRetry={() => { setError(null); setLoading(true); getAdminCoaches().then((res) => { if (res.ok) setCoaches(res.data.items.map((c) => ({ ...c, id: c.id || (c as unknown as { _id: string })._id }))); else setError(res.error.message); setLoading(false); }).catch(() => { setError('Failed to load coaches'); setLoading(false); }); }} />;
   }
 
   return (

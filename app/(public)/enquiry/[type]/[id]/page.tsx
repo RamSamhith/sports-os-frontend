@@ -21,17 +21,25 @@ export default function EnquiryPage() {
 
   React.useEffect(() => {
     if (type !== 'academy' && type !== 'coach') { setNotFound(true); return; }
+    let cancelled = false;
 
     const fetchTarget = async () => {
-      const res = type === 'academy' ? await getAcademy(slug) : await getCoach(slug);
-      if (res.ok && res.data) {
-        setTarget({ name: (res.data as any).name, id: res.data.id });
-      } else {
-        setNotFound(true);
+      try {
+        const res = type === 'academy' ? await getAcademy(slug) : await getCoach(slug);
+        if (cancelled) return;
+        if (res.ok && res.data) {
+          setTarget({ name: (res.data as { name: string }).name, id: res.data.id });
+        } else {
+          setNotFound(true);
+        }
+      } catch {
+        if (!cancelled) setNotFound(true);
+      } finally {
+        if (!cancelled) setLoading(false);
       }
-      setLoading(false);
     };
     fetchTarget();
+    return () => { cancelled = true; };
   }, [type, slug]);
 
   if (notFound) {

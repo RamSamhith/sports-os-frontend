@@ -44,12 +44,17 @@ export default function AdminAcademiesPage() {
         setError(res.error.message);
       }
       setLoading(false);
+    }).catch(() => {
+      if (!cancelled) {
+        setError('Failed to load academies');
+        setLoading(false);
+      }
     });
     return () => { cancelled = true; };
   }, []);
 
   if (error) {
-    return <ErrorState description={error} onRetry={() => { setError(null); setLoading(true); getAdminAcademies().then((res) => { if (res.ok) setAcademies(res.data.items.map((a) => ({ ...a, id: a.id || (a as unknown as { _id: string })._id }))); else setError(res.error.message); setLoading(false); }); }} />;
+    return <ErrorState description={error} onRetry={() => { setError(null); setLoading(true); getAdminAcademies().then((res) => { if (res.ok) setAcademies(res.data.items.map((a) => ({ ...a, id: a.id || (a as unknown as { _id: string })._id }))); else setError(res.error.message); setLoading(false); }).catch(() => { setError('Failed to load academies'); setLoading(false); }); }} />;
   }
 
   return (

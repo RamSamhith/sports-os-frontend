@@ -149,21 +149,27 @@ export function AcademyListing() {
     let cancelled = false;
     async function loadMore() {
       setLoadingMore(true);
-      const res = await getAcademies({
-        search: debouncedQuery || undefined,
-        sport: sports.length ? sports.join(',') : undefined,
-        facility: facilities.length ? facilities.join(',') : undefined,
-        level: levels.length ? levels.join(',') : undefined,
-        status: statuses.length ? statuses.join(',') : undefined,
-        page,
-        pageSize: PAGE_SIZE,
-      });
-      if (cancelled) return;
-      if (res.ok) {
-        setResults((prev) => [...prev, ...res.data.items]);
-        setHasMore(res.data.items.length === PAGE_SIZE);
+      try {
+        const res = await getAcademies({
+          search: debouncedQuery || undefined,
+          sport: sports.length ? sports.join(',') : undefined,
+          facility: facilities.length ? facilities.join(',') : undefined,
+          level: levels.length ? levels.join(',') : undefined,
+          status: statuses.length ? statuses.join(',') : undefined,
+          page,
+          pageSize: PAGE_SIZE,
+        });
+        if (cancelled) return;
+        if (res.ok) {
+          setResults((prev) => [...prev, ...res.data.items]);
+          setHasMore(res.data.items.length === PAGE_SIZE);
+        }
+      } catch {
+        // network error — stop infinite scroll
+        if (!cancelled) setHasMore(false);
+      } finally {
+        if (!cancelled) setLoadingMore(false);
       }
-      setLoadingMore(false);
     }
     loadMore();
     return () => { cancelled = true; };

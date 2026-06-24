@@ -1,3 +1,5 @@
+'use client'
+
 import { useCallback, useEffect, useState } from 'react'
 
 export type AcademyUserStatus = 'interested' | 'shortlisted' | 'selected'
@@ -37,9 +39,10 @@ function saveMap(map: AcademyStatusMap): void {
 }
 
 export function useAcademyStatus() {
-  const [map, setMap] = useState<AcademyStatusMap>(loadMap)
+  const [map, setMap] = useState<AcademyStatusMap>({})
 
   useEffect(() => {
+    setMap(loadMap())
     const handler = () => setMap(loadMap())
     window.addEventListener('storage', handler)
     return () => window.removeEventListener('storage', handler)

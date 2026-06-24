@@ -1,3 +1,5 @@
+'use client'
+
 import { useCallback, useEffect, useState } from 'react'
 
 interface AcademySelectionState {
@@ -38,9 +40,10 @@ function saveState(state: AcademySelectionState): void {
 }
 
 export function useAcademySelection() {
-  const [state, setState] = useState<AcademySelectionState>(loadState)
+  const [state, setState] = useState<AcademySelectionState>({ selectedAcademyId: null, selectedAt: null })
 
   useEffect(() => {
+    setState(loadState())
     const handler = () => setState(loadState())
     window.addEventListener('storage', handler)
     return () => window.removeEventListener('storage', handler)

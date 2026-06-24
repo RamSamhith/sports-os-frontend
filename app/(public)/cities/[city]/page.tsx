@@ -46,28 +46,32 @@ export default function CityPage() {
     let cancelled = false;
     async function load() {
       setLoading(true);
-      const [academiesRes, coachesRes] = await Promise.all([
-        getAcademies({ pageSize: 200 }),
-        getCoaches({ pageSize: 200 }),
-      ]);
-      if (cancelled) return;
+      try {
+        const [academiesRes, coachesRes] = await Promise.all([
+          getAcademies({ pageSize: 200 }),
+          getCoaches({ pageSize: 200 }),
+        ]);
+        if (cancelled) return;
 
-      if (academiesRes.ok) {
-        setAllAcademies(academiesRes.data.items);
-        const cityAcademies = academiesRes.data.items.filter(
-          (a) => a.location.city.toLowerCase() === cityName.toLowerCase()
-        );
-        setAcademies(cityAcademies);
+        if (academiesRes.ok) {
+          setAllAcademies(academiesRes.data.items);
+          const cityAcademies = academiesRes.data.items.filter(
+            (a) => a.location.city.toLowerCase() === cityName.toLowerCase()
+          );
+          setAcademies(cityAcademies);
+        }
+
+        if (coachesRes.ok) {
+          const cityCoaches = coachesRes.data.items.filter(
+            (c) => c.location.city.toLowerCase() === cityName.toLowerCase()
+          );
+          setCoaches(cityCoaches);
+        }
+      } catch {
+        // network error — leave arrays empty
+      } finally {
+        if (!cancelled) setLoading(false);
       }
-
-      if (coachesRes.ok) {
-        const cityCoaches = coachesRes.data.items.filter(
-          (c) => c.location.city.toLowerCase() === cityName.toLowerCase()
-        );
-        setCoaches(cityCoaches);
-      }
-
-      setLoading(false);
     }
     load();
     return () => { cancelled = true; };

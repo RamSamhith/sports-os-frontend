@@ -131,20 +131,26 @@ export function CoachesListing() {
     let cancelled = false;
     async function loadMore() {
       setLoadingMore(true);
-      const res = await getCoaches({
-        search: debouncedQuery || undefined,
-        sport: sports.length ? sports.join(',') : undefined,
-        city: cities.length ? cities.join(',') : undefined,
-        experienceYears: experience.length ? experience[0] : undefined,
-        page,
-        pageSize: PAGE_SIZE,
-      });
-      if (cancelled) return;
-      if (res.ok) {
-        setResults((prev) => [...prev, ...res.data.items]);
-        setHasMore(res.data.items.length === PAGE_SIZE);
+      try {
+        const res = await getCoaches({
+          search: debouncedQuery || undefined,
+          sport: sports.length ? sports.join(',') : undefined,
+          city: cities.length ? cities.join(',') : undefined,
+          experienceYears: experience.length ? experience[0] : undefined,
+          page,
+          pageSize: PAGE_SIZE,
+        });
+        if (cancelled) return;
+        if (res.ok) {
+          setResults((prev) => [...prev, ...res.data.items]);
+          setHasMore(res.data.items.length === PAGE_SIZE);
+        }
+      } catch {
+        // network error — stop infinite scroll
+        if (!cancelled) setHasMore(false);
+      } finally {
+        if (!cancelled) setLoadingMore(false);
       }
-      setLoadingMore(false);
     }
     loadMore();
     return () => { cancelled = true; };

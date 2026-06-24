@@ -12,17 +12,19 @@ export const AnalyticsContext = createContext<AnalyticsContextValue | null>(null
 export function AnalyticsProvider({ children }: { children: ReactNode }) {
   const { consent, set: setConsentCategory } = useConsent();
   const clientRef = useRef<ReturnType<typeof createAnalyticsClient> | null>(null);
+  const consentRef = useRef(consent);
   const [ready, setReady] = useState(false);
+
+  consentRef.current = consent;
 
   useEffect(() => {
     clientRef.current = createAnalyticsClient({
       endpoint: publicEnv.analyticsEndpoint || '/api/events',
       enabled: publicEnv.analyticsEnabled,
-      getConsent: () => ({ analytics: consent.analytics }),
+      getConsent: () => ({ analytics: consentRef.current.analytics }),
     });
     setReady(true);
     return () => clientRef.current?.dispose();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const track = useCallback<AnalyticsContextValue['track']>((input) => {

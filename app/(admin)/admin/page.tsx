@@ -30,12 +30,17 @@ export default function AdminDashboardPage() {
         setError(res.error.message);
       }
       setLoading(false);
+    }).catch(() => {
+      if (!cancelled) {
+        setError('Failed to load dashboard stats');
+        setLoading(false);
+      }
     });
     return () => { cancelled = true; };
   }, []);
 
   if (error) {
-    return <ErrorState description={error} onRetry={() => { setError(null); setLoading(true); getDashboardStats().then((res) => { if (res.ok) setStats(res.data); else setError(res.error.message); setLoading(false); }); }} />;
+    return <ErrorState description={error} onRetry={() => { setError(null); setLoading(true); getDashboardStats().then((res) => { if (res.ok) setStats(res.data); else setError(res.error.message); setLoading(false); }).catch(() => { setError('Failed to load dashboard stats'); setLoading(false); }); }} />;
   }
 
   return (

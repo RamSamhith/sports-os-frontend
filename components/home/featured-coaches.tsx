@@ -17,12 +17,17 @@ export function FeaturedCoaches() {
   React.useEffect(() => {
     let cancelled = false;
     async function load() {
-      const res = await getCoaches({ pageSize: 100 });
-      if (cancelled) return;
-      if (res.ok) {
-        setCoaches(res.data.items);
+      try {
+        const res = await getCoaches({ pageSize: 100 });
+        if (cancelled) return;
+        if (res.ok) {
+          setCoaches(res.data.items);
+        }
+      } catch {
+        // network error — leave coaches empty
+      } finally {
+        if (!cancelled) setLoading(false);
       }
-      setLoading(false);
     }
     load();
     return () => { cancelled = true; };

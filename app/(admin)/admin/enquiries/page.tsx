@@ -44,12 +44,17 @@ export default function AdminEnquiriesPage() {
         setError(res.error.message);
       }
       setLoading(false);
+    }).catch(() => {
+      if (!cancelled) {
+        setError('Failed to load enquiries');
+        setLoading(false);
+      }
     });
     return () => { cancelled = true; };
   }, []);
 
   if (error) {
-    return <ErrorState description={error} onRetry={() => { setError(null); setLoading(true); getAdminEnquiries().then((res) => { if (res.ok) setEnquiries(res.data.map((e) => ({ ...e, id: e.id || (e as unknown as { _id: string })._id }))); else setError(res.error.message); setLoading(false); }); }} />;
+    return <ErrorState description={error} onRetry={() => { setError(null); setLoading(true); getAdminEnquiries().then((res) => { if (res.ok) setEnquiries(res.data.map((e) => ({ ...e, id: e.id || (e as unknown as { _id: string })._id }))); else setError(res.error.message); setLoading(false); }).catch(() => { setError('Failed to load enquiries'); setLoading(false); }); }} />;
   }
 
   return (

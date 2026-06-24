@@ -42,12 +42,17 @@ export default function AdminUsersPage() {
         setError(res.error.message);
       }
       setLoading(false);
+    }).catch(() => {
+      if (!cancelled) {
+        setError('Failed to load users');
+        setLoading(false);
+      }
     });
     return () => { cancelled = true; };
   }, []);
 
   if (error) {
-    return <ErrorState description={error} onRetry={() => { setError(null); setLoading(true); getUsers().then((res) => { if (res.ok) setUsers(res.data.items); else setError(res.error.message); setLoading(false); }); }} />;
+    return <ErrorState description={error} onRetry={() => { setError(null); setLoading(true); getUsers().then((res) => { if (res.ok) setUsers(res.data.items); else setError(res.error.message); setLoading(false); }).catch(() => { setError('Failed to load users'); setLoading(false); }); }} />;
   }
 
   return (

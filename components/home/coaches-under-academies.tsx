@@ -24,33 +24,37 @@ export function CoachesUnderAcademies() {
   React.useEffect(() => {
     let cancelled = false;
     async function load() {
-      const academiesRes = await getAcademies({ pageSize: 3 });
-      if (cancelled) return;
+      try {
+        const academiesRes = await getAcademies({ pageSize: 3 });
+        if (cancelled) return;
 
-      if (!academiesRes.ok) {
-        setLoading(false);
-        return;
-      }
+        if (!academiesRes.ok) {
+          return;
+        }
 
-      const topAcademies = [...academiesRes.data.items]
-        .sort((a, b) => b.rating.average - a.rating.average)
-        .slice(0, 3);
-
-      const coachesRes = await getCoaches({ pageSize: 100 });
-      if (cancelled) return;
-
-      const allCoaches = coachesRes.ok ? coachesRes.data.items : [];
-
-      const result = topAcademies.map((academy) => ({
-        ...academy,
-        coaches: allCoaches
-          .filter((c) => c.academyId === academy.id)
+        const topAcademies = [...academiesRes.data.items]
           .sort((a, b) => b.rating.average - a.rating.average)
-          .slice(0, 2),
-      }));
+          .slice(0, 3);
 
-      setAcademiesWithCoaches(result);
-      setLoading(false);
+        const coachesRes = await getCoaches({ pageSize: 100 });
+        if (cancelled) return;
+
+        const allCoaches = coachesRes.ok ? coachesRes.data.items : [];
+
+        const result = topAcademies.map((academy) => ({
+          ...academy,
+          coaches: allCoaches
+            .filter((c) => c.academyId === academy.id)
+            .sort((a, b) => b.rating.average - a.rating.average)
+            .slice(0, 2),
+        }));
+
+        setAcademiesWithCoaches(result);
+      } catch {
+        // network error — leave empty
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
     }
     load();
     return () => { cancelled = true; };

@@ -1,3 +1,5 @@
+'use client'
+
 import { useCallback, useEffect, useState } from 'react'
 
 export type RecentlyViewedType = 'academy' | 'coach'
@@ -35,9 +37,12 @@ function saveItems(items: RecentlyViewedItem[]): void {
 }
 
 export function useRecentlyViewed() {
-  const [items, setItems] = useState<RecentlyViewedItem[]>(loadItems)
+  const [items, setItems] = useState<RecentlyViewedItem[]>([])
+  const [hydrated, setHydrated] = useState(false)
 
   useEffect(() => {
+    setItems(loadItems())
+    setHydrated(true)
     const handler = () => setItems(loadItems())
     window.addEventListener('storage', handler)
     return () => window.removeEventListener('storage', handler)

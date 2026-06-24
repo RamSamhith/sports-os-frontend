@@ -35,7 +35,7 @@ export function StatsSection() {
       ]);
 
       const academyCount = academiesRes.ok ? academiesRes.data.pagination?.total ?? academiesRes.data.items.length : 0;
-      const sportCount = sportsRes.ok ? (sportsRes.data as any).pagination?.total ?? sportsRes.data.items.length : 0;
+      const sportCount = sportsRes.ok ? sportsRes.data.pagination?.total ?? sportsRes.data.items.length : 0;
 
       const cities = new Set<string>();
       if (academiesRes.ok) {

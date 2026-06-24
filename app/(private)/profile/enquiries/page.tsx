@@ -30,10 +30,15 @@ export default function EnquiriesPage() {
   const [loading, setLoading] = React.useState(true);
 
   React.useEffect(() => {
+    let cancelled = false;
     getMyEnquiries().then((res) => {
+      if (cancelled) return;
       if (res.ok) setEnquiries(res.data);
       setLoading(false);
+    }).catch(() => {
+      if (!cancelled) setLoading(false);
     });
+    return () => { cancelled = true; };
   }, []);
 
   if (loading) {

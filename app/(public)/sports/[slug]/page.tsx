@@ -7,24 +7,16 @@ import { SportDisclaimer } from '@/components/sports/sport-disclaimer';
 import { notFound } from 'next/navigation';
 import { competitionsBySport } from '@/data/competitions';
 import { siteConfig } from '@/config/site';
+import { getSport } from '@/lib/api/sports';
 
-async function getSport(slug: string) {
-  const API_BASE = process.env.BACKEND_URL || 'http://localhost:3000';
-  try {
-    const res = await fetch(`${API_BASE}/sports/${slug}`, {
-      next: { revalidate: 3600 },
-    });
-    if (!res.ok) return null;
-    const json = await res.json();
-    return json.ok ? json.data : null;
-  } catch {
-    return null;
-  }
+async function fetchSport(slug: string) {
+  const res = await getSport(slug);
+  return res.ok ? res.data : null;
 }
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
-  const sport = await getSport(slug);
+  const sport = await fetchSport(slug);
   if (!sport) {
     notFound();
     return {};
@@ -55,7 +47,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
 export default async function SportDetailPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const sport = await getSport(slug);
+  const sport = await fetchSport(slug);
   if (!sport) notFound();
 
   const { slug: sportSlug, name, explorationGuidance } = sport;
