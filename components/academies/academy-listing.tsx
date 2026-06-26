@@ -52,7 +52,7 @@ function readListFromParams(params: URLSearchParams, key: string): string[] {
     .filter(Boolean);
 }
 
-export function AcademyListing() {
+export function AcademyListing({ hideSearch = false }: { hideSearch?: boolean } = {}) {
   const { query, setQuery, debouncedQuery } = useSearchQuery();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -285,14 +285,16 @@ export function AcademyListing() {
   if (loading && results.length === 0) {
     return (
       <div className="flex flex-col gap-4">
-        <SearchInput
-          value=""
-          onValueChange={() => {}}
-          label="Search academies"
-          placeholder="Search academies by name, city, or sport…"
-          size="lg"
-          disabled
-        />
+        {!hideSearch && (
+          <SearchInput
+            value=""
+            onValueChange={() => {}}
+            label="Search academies"
+            placeholder="Search academies by name, city, or sport…"
+            size="lg"
+            disabled
+          />
+        )}
         <FullPageSkeleton />
       </div>
     );
@@ -301,14 +303,16 @@ export function AcademyListing() {
   if (error && results.length === 0) {
     return (
       <div className="flex flex-col gap-4">
-        <SearchInput
-          value=""
-          onValueChange={() => {}}
-          label="Search academies"
-          placeholder="Search academies by name, city, or sport…"
-          size="lg"
-          disabled
-        />
+        {!hideSearch && (
+          <SearchInput
+            value=""
+            onValueChange={() => {}}
+            label="Search academies"
+            placeholder="Search academies by name, city, or sport…"
+            size="lg"
+            disabled
+          />
+        )}
         <div className="flex flex-col items-center justify-center gap-3 rounded-xl border border-dashed py-12 text-center">
           <AlertTriangle className="h-10 w-10 text-destructive/40" />
           <div>
@@ -325,61 +329,63 @@ export function AcademyListing() {
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-        <div className="flex-1">
-          <SearchInput
-            value={query}
-            onValueChange={setQuery}
-            label="Search academies"
-            placeholder="Search academies by name, city, or sport…"
-            size="lg"
-          />
+      {!hideSearch && (
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+          <div className="flex-1">
+            <SearchInput
+              value={query}
+              onValueChange={setQuery}
+              label="Search academies"
+              placeholder="Search academies by name, city, or sport…"
+              size="lg"
+            />
+          </div>
+          <FilterDrawer
+            appliedCount={sports.length + facilities.length + levels.length + statuses.length}
+            onClear={() => {
+              setSports([]);
+              setFacilities([]);
+              setLevels([]);
+              setStatuses([]);
+            }}
+          >
+            <FilterGroup
+              title="Sport"
+              options={dynamicSportOptions}
+              selected={sports}
+              onChange={setSports}
+              maxHeight="200px"
+              layoutIdPrefix="filter-sport"
+            />
+            <Separator />
+            <FilterGroup
+              title="Facility"
+              options={dynamicFacilityOptions}
+              selected={facilities}
+              onChange={setFacilities}
+              layoutIdPrefix="filter-facility"
+            />
+            <Separator />
+            <FilterGroup
+              title="Training level"
+              options={dynamicLevelOptions}
+              selected={levels}
+              onChange={setLevels}
+              layoutIdPrefix="filter-level"
+            />
+            <Separator />
+            <FilterGroup
+              title="Verification"
+              options={dynamicStatusOptions}
+              selected={statuses}
+              onChange={setStatuses}
+              layoutIdPrefix="filter-status"
+            />
+          </FilterDrawer>
         </div>
-        <FilterDrawer
-          appliedCount={sports.length + facilities.length + levels.length + statuses.length}
-          onClear={() => {
-            setSports([]);
-            setFacilities([]);
-            setLevels([]);
-            setStatuses([]);
-          }}
-        >
-          <FilterGroup
-            title="Sport"
-            options={dynamicSportOptions}
-            selected={sports}
-            onChange={setSports}
-            maxHeight="200px"
-            layoutIdPrefix="filter-sport"
-          />
-          <Separator />
-          <FilterGroup
-            title="Facility"
-            options={dynamicFacilityOptions}
-            selected={facilities}
-            onChange={setFacilities}
-            layoutIdPrefix="filter-facility"
-          />
-          <Separator />
-          <FilterGroup
-            title="Training level"
-            options={dynamicLevelOptions}
-            selected={levels}
-            onChange={setLevels}
-            layoutIdPrefix="filter-level"
-          />
-          <Separator />
-          <FilterGroup
-            title="Verification"
-            options={dynamicStatusOptions}
-            selected={statuses}
-            onChange={setStatuses}
-            layoutIdPrefix="filter-status"
-          />
-        </FilterDrawer>
-      </div>
+      )}
 
-      {chips.length > 0 ? (
+      {!hideSearch && chips.length > 0 ? (
         <div className="flex flex-wrap items-center gap-2">
           {chips.map((c) => (
             <Badge

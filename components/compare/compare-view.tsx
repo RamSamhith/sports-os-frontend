@@ -11,7 +11,6 @@ import { Badge } from '@/components/ui/badge';
 import { ImageWithFallback } from '@/components/ui/image-with-fallback';
 import { EmptyState } from '@/components/feedback/empty-state';
 import { VerifiedBadge } from '@/components/trust/verified-badge';
-import { fixtureImages } from '@/lib/images';
 import { useCompare } from '@/lib/hooks/use-compare';
 import { ProtectedLink } from '@/components/auth/protected-link';
 import { cn } from '@/lib/utils/cn';
@@ -38,6 +37,7 @@ export function CompareView() {
   const { items, remove, clear, maxItems, minItems, hydrated } = useCompare();
   const [resolved, setResolved] = React.useState<Entity[]>([]);
   const [loading, setLoading] = React.useState(true);
+  const [failedCount, setFailedCount] = React.useState(0);
 
   React.useEffect(() => {
     if (!hydrated || items.length === 0) {
@@ -49,24 +49,31 @@ export function CompareView() {
     let cancelled = false;
     async function resolveAll() {
       const results: Entity[] = [];
+      let failures = 0;
       await Promise.all(
         items.map(async (it) => {
           try {
             if (it.entityType === 'academy') {
               const res = await getAcademy(it.id);
               if (!cancelled && res.ok) results.push({ kind: 'academy', entity: res.data });
+              else if (!cancelled && !res.ok) failures++;
             } else if (it.entityType === 'coach') {
               const res = await getCoach(it.id);
               if (!cancelled && res.ok) results.push({ kind: 'coach', entity: res.data });
+              else if (!cancelled && !res.ok) failures++;
             } else {
               const res = await getSport(it.id);
               if (!cancelled && res.ok) results.push({ kind: 'sport', entity: res.data });
+              else if (!cancelled && !res.ok) failures++;
             }
-          } catch { /* skip failed items */ }
+          } catch {
+            if (!cancelled) failures++;
+          }
         })
       );
       if (!cancelled) {
         setResolved(results);
+        setFailedCount(failures);
         setLoading(false);
       }
     }
@@ -119,6 +126,12 @@ export function CompareView() {
         </div>
       ) : null}
 
+      {failedCount > 0 ? (
+        <div className="border-destructive/30 bg-destructive/10 text-destructive-foreground/90 rounded-lg border px-3 py-2 text-sm" role="alert">
+          {failedCount} item{failedCount > 1 ? 's' : ''} could not be loaded and were skipped.
+        </div>
+      ) : null}
+
       <div className="flex items-center justify-between">
         <p className="text-muted-foreground text-sm">
           {resolved.length} of {maxItems} selected
@@ -150,7 +163,7 @@ export function CompareView() {
 function CompareCard({ slot, onRemove }: { slot: Entity; onRemove: () => void }) {
   const { kind, entity } = slot;
   const href = kind === 'academy' ? `/academies/${(entity as Academy).slug}` : kind === 'coach' ? `/coaches/${(entity as Coach).slug}` : `/sports/${(entity as Sport).slug}`;
-  const imageSrc = kind === 'academy' ? ((entity as Academy).coverImage ?? fixtureImages.academies[(entity as Academy).id]) : kind === 'coach' ? ((entity as Coach).avatar ?? fixtureImages.coaches[(entity as Coach).id]) : ((entity as Sport).coverImage ?? fixtureImages.sports[(entity as Sport).id]);
+  const imageSrc = kind === 'academy' ? ((entity as Academy).coverImage ?? '') : kind === 'coach' ? ((entity as Coach).avatar ?? '') : ((entity as Sport).coverImage ?? '');
   const sublabel = kind === 'academy' ? `${(entity as Academy).location.city}, ${(entity as Academy).location.state}` : kind === 'coach' ? `${(entity as Coach).location.city} · ${(entity as Coach).experienceYears}+ yrs` : (entity as Sport).category;
 
   return (

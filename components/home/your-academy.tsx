@@ -4,20 +4,29 @@ import Link from 'next/link'
 import { ProtectedLink } from '@/components/auth/protected-link'
 import { useAcademySelection } from '@/lib/hooks/use-academy-selection'
 import { useAcademyStatus } from '@/lib/hooks/use-academy-status'
+import { getAcademyById } from '@/lib/api/academies'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { MapPin, Star, ChevronRight } from 'lucide-react'
-import { academies } from '@/data/academies'
+import { useEffect, useState } from 'react'
+import type { Academy } from '@/types/domain/academy'
 
 export function YourAcademy() {
   const { selectedAcademyId } = useAcademySelection()
   const { getStatus } = useAcademyStatus()
+  const [academy, setAcademy] = useState<Academy | null>(null)
 
-  if (!selectedAcademyId) return null
+  useEffect(() => {
+    if (!selectedAcademyId) { setAcademy(null); return; }
+    let cancelled = false
+    getAcademyById(selectedAcademyId).then((res) => {
+      if (!cancelled && res.ok) setAcademy(res.data)
+    }).catch(() => {})
+    return () => { cancelled = true }
+  }, [selectedAcademyId])
 
-  const academy = academies.find((a) => a.id === selectedAcademyId)
-  if (!academy) return null
+  if (!selectedAcademyId || !academy) return null
 
   const status = getStatus(academy.id)
   const ratingAvg = typeof academy.rating === 'number'
@@ -62,9 +71,6 @@ export function YourAcademy() {
         </Button>
         <Button size="sm" variant="outline" asChild>
           <ProtectedLink href={`/enquiry/academy/${academy.slug}`}>Enquire</ProtectedLink>
-        </Button>
-        <Button size="sm" variant="ghost" asChild>
-          <Link href={`/coaches?academy=${academy.slug}`}>View Coaches</Link>
         </Button>
       </div>
     </section>

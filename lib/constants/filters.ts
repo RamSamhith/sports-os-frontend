@@ -27,13 +27,9 @@ export const academyFilterLevels: FilterOption<TrainingLevel>[] = [
 ];
 
 export const sportCategories: FilterOption<SportCategory>[] = [
-  { value: 'team', label: 'Team' },
-  { value: 'individual', label: 'Individual' },
-  { value: 'combat', label: 'Combat' },
-  { value: 'racquet', label: 'Racquet' },
-  { value: 'aquatic', label: 'Aquatic' },
-  { value: 'athletics', label: 'Athletics' },
-  { value: 'other', label: 'Other' },
+  { value: 'Indoor', label: 'Indoor' },
+  { value: 'Outdoor', label: 'Outdoor' },
+  { value: 'Both', label: 'Both' },
 ];
 
 export const verificationStatuses = [

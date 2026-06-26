@@ -266,3 +266,36 @@ export async function deleteAccount(data: DeleteAccountRequest): Promise<ApiResp
   const { del } = await import('./client');
   return del<{ message: string }>('/auth/account', data);
 }
+
+// ─── Preferences & Consent Sync ──────────────────────────────
+
+export interface SyncPreferencesRequest {
+  favoriteSports?: string[];
+  city?: string;
+  radius?: number;
+  skillLevel?: string;
+  goals?: string;
+  notifications?: boolean;
+  language?: string;
+}
+
+export async function syncPreferences(data: SyncPreferencesRequest): Promise<ApiResponse<User>> {
+  const { patch } = await import('./client');
+  return patch<User>('/auth/profile', { preferences: data });
+}
+
+export interface SyncConsentRequest {
+  analytics?: boolean;
+  marketing?: boolean;
+  whatsapp?: boolean;
+}
+
+export async function syncConsent(data: SyncConsentRequest): Promise<ApiResponse<User>> {
+  const { patch } = await import('./client');
+  return patch<User>('/auth/profile', { consent: data });
+}
+
+export async function syncTheme(themePreference: string): Promise<ApiResponse<User>> {
+  const { patch } = await import('./client');
+  return patch<User>('/auth/profile', { themePreference });
+}

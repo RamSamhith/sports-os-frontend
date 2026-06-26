@@ -64,7 +64,7 @@ export default function manifest(): MetadataRoute.Manifest {
         name: 'Compare',
         short_name: 'Compare',
         url: '/compare',
-        description: 'Compare academies and coaches side by side',
+        description: 'Compare academies side by side',
       },
       {
         name: 'My Shortlist',

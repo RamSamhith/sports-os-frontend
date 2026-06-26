@@ -1,7 +1,7 @@
 'use client';
 
 import * as React from 'react';
-import { Star, ThumbsUp, ChevronDown, Loader2, User } from 'lucide-react';
+import { Star, ThumbsUp, Loader2, User } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -10,7 +10,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { getReviews, createReview, type Review, type ReviewStats } from '@/lib/api/reviews';
 import { useAuth } from '@/lib/hooks/use-auth';
-import { GuestGuard } from '@/components/auth/guest-guard';
+import { ConversionModal } from '@/components/auth/conversion-modal';
 import { toast } from 'sonner';
 
 interface ReviewsSectionProps {
@@ -29,9 +29,11 @@ export function ReviewsSection({ targetType, targetId }: ReviewsSectionProps) {
   const [reviews, setReviews] = React.useState<Review[]>([]);
   const [stats, setStats] = React.useState<ReviewStats | null>(null);
   const [loading, setLoading] = React.useState(true);
+  const [loadError, setLoadError] = React.useState(false);
   const [sortBy, setSortBy] = React.useState<string>('-createdAt');
   const [showForm, setShowForm] = React.useState(false);
   const [submitting, setSubmitting] = React.useState(false);
+  const [showConversion, setShowConversion] = React.useState(false);
 
   const [formRating, setFormRating] = React.useState(0);
   const [formTitle, setFormTitle] = React.useState('');
@@ -40,6 +42,7 @@ export function ReviewsSection({ targetType, targetId }: ReviewsSectionProps) {
 
   const loadReviews = React.useCallback(async () => {
     setLoading(true);
+    setLoadError(false);
     try {
       const res = await getReviews(targetType, targetId, { sort: sortBy, limit: 50 });
       if (res.ok) {
@@ -47,7 +50,7 @@ export function ReviewsSection({ targetType, targetId }: ReviewsSectionProps) {
         setStats(res.data.stats);
       }
     } catch {
-      // network error — leave reviews empty
+      setLoadError(true);
     } finally {
       setLoading(false);
     }
@@ -56,6 +59,15 @@ export function ReviewsSection({ targetType, targetId }: ReviewsSectionProps) {
   React.useEffect(() => {
     loadReviews();
   }, [loadReviews]);
+
+  const handleOpenForm = () => {
+    if (authLoading) return;
+    if (!isAuthenticated) {
+      setShowConversion(true);
+      return;
+    }
+    setShowForm(true);
+  };
 
   const handleSubmitReview = async () => {
     if (!isAuthenticated) {
@@ -75,7 +87,7 @@ export function ReviewsSection({ targetType, targetId }: ReviewsSectionProps) {
       rating: formRating,
       title: formTitle.trim() || undefined,
       text: formText.trim() || undefined,
-      parentName: profile.name,
+      parentName: profile?.name,
     });
 
     if (res.ok) {
@@ -102,11 +114,9 @@ export function ReviewsSection({ targetType, targetId }: ReviewsSectionProps) {
             Reviews {stats ? `(${stats.totalReviews})` : ''}
           </CardTitle>
           {!showForm && (
-            <GuestGuard actionLabel="Sign in to write a review">
-              <Button size="sm" onClick={() => setShowForm(true)}>
-                Write a Review
-              </Button>
-            </GuestGuard>
+            <Button size="sm" onClick={handleOpenForm}>
+              Write a Review
+            </Button>
           )}
         </div>
       </CardHeader>
@@ -220,12 +230,10 @@ export function ReviewsSection({ targetType, targetId }: ReviewsSectionProps) {
                 <Button variant="outline" onClick={() => setShowForm(false)}>
                   Cancel
                 </Button>
-                <GuestGuard actionLabel="Sign in to submit your review">
-                  <Button onClick={handleSubmitReview} disabled={submitting}>
-                    {submitting ? <Loader2 className="h-4 w-4 animate-spin mr-1" /> : null}
-                    Submit Review
-                  </Button>
-                </GuestGuard>
+                <Button onClick={handleSubmitReview} disabled={submitting}>
+                  {submitting ? <Loader2 className="h-4 w-4 animate-spin mr-1" /> : null}
+                  Submit Review
+                </Button>
               </div>
             </div>
           </div>
@@ -235,6 +243,11 @@ export function ReviewsSection({ targetType, targetId }: ReviewsSectionProps) {
         {loading ? (
           <div className="flex justify-center py-8">
             <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+          </div>
+        ) : loadError ? (
+          <div className="py-8 text-center">
+            <p className="text-destructive text-sm font-medium">Failed to load reviews</p>
+            <Button variant="ghost" size="sm" className="mt-2" onClick={loadReviews}>Retry</Button>
           </div>
         ) : reviews.length === 0 ? (
           <div className="text-muted-foreground py-8 text-center text-sm">
@@ -292,6 +305,12 @@ export function ReviewsSection({ targetType, targetId }: ReviewsSectionProps) {
           </div>
         )}
       </CardContent>
+
+      <ConversionModal
+        open={showConversion}
+        onOpenChange={setShowConversion}
+        actionLabel="Sign in to write a review"
+      />
     </Card>
   );
 }

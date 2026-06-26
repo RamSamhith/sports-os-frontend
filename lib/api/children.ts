@@ -6,6 +6,7 @@ export interface CreateChildRequest {
   age: number;
   gender?: 'male' | 'female' | 'other' | 'prefer_not_to_say';
   sportInterests?: string[];
+  skillLevel?: string;
 }
 
 export interface UpdateChildRequest {
@@ -13,24 +14,25 @@ export interface UpdateChildRequest {
   age?: number;
   gender?: 'male' | 'female' | 'other' | 'prefer_not_to_say';
   sportInterests?: string[];
+  skillLevel?: string;
 }
 
 export async function getChildren(): Promise<ApiResponse<Child[]>> {
   const { get } = await import('./client');
-  return get<Child[]>('/children');
+  return get<Child[]>('/auth/children');
 }
 
 export async function createChild(data: CreateChildRequest): Promise<ApiResponse<Child>> {
   const { post } = await import('./client');
-  return post<Child>('/children', data);
+  return post<Child>('/auth/children', data);
 }
 
 export async function updateChild(id: string, data: UpdateChildRequest): Promise<ApiResponse<Child>> {
   const { patch } = await import('./client');
-  return patch<Child>(`/children/${id}`, data);
+  return patch<Child>(`/auth/children/${id}`, data);
 }
 
-export async function deleteChild(id: string): Promise<ApiResponse<void>> {
+export async function deleteChild(id: string): Promise<ApiResponse<{ message: string }>> {
   const { del } = await import('./client');
-  return del<void>(`/children/${id}`);
+  return del<{ message: string }>(`/auth/children/${id}`);
 }

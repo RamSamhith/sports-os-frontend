@@ -127,7 +127,13 @@ export default function CoachDetailPage() {
                 href={`/coaches/${coach.slug}`}
                 labelText="Save"
               />
-              <CompareButton entityType="coach" id={coach.id} />
+              <CompareButton
+                entityType="coach"
+                slug={coach.slug}
+                label={coach.name}
+                sublabel={`${coach.location.city} · ${coach.experienceYears}+ yrs`}
+                href={`/coaches/${coach.slug}`}
+              />
             </div>
           </CardContent>
         </Card>

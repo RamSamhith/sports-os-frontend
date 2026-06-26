@@ -47,7 +47,6 @@ export const metadata: Metadata = {
   keywords: [
     'sports',
     'academies',
-    'coaches',
     'India',
     'sports discovery',
     'athlete development',
@@ -119,6 +118,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           dangerouslySetInnerHTML={{ __html: themeBootstrap }}
         />
         {/* PWA Meta Tags */}
+        <link rel="manifest" href="/manifest.webmanifest" />
         <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
         <link rel="icon" type="image/png" sizes="32x32" href="/icons/icon-32.png" />
         <link rel="icon" type="image/png" sizes="16x16" href="/icons/icon-16.png" />

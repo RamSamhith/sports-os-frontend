@@ -1,23 +1,14 @@
 'use client';
 
 import * as React from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { X } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { useCompare } from '@/lib/hooks/use-compare';
 import { cn } from '@/lib/utils/cn';
-import { traySlideVariants, chipVariants, ease, duration } from '@/components/motion/constants';
-import { academiesById, academiesBySlug } from '@/data/academies';
-import { coachesById, coachesBySlug } from '@/data/coaches';
-import { sportsById, sportsBySlug } from '@/data/sports';
-
-function lookup(entityType: 'academy' | 'coach' | 'sport', id: string) {
-  if (entityType === 'academy') return academiesById(id) ?? academiesBySlug(id);
-  if (entityType === 'coach') return coachesById(id) ?? coachesBySlug(id);
-  return sportsById(id) ?? sportsBySlug(id);
-}
+import { traySlideVariants, chipVariants } from '@/components/motion/constants';
 
 function getCompareLabel(items: Array<{ entityType: string; id: string }>): string {
   if (items.length === 0) return 'Compare Selected';
@@ -37,12 +28,14 @@ function getCompareLabel(items: Array<{ entityType: string; id: string }>): stri
 export function CompareTray() {
   const { items, remove, clear, minItems, extras } = useCompare();
   const router = useRouter();
+  const pathname = usePathname();
   const reduced = useReducedMotion();
   const [mounted, setMounted] = React.useState(false);
   React.useEffect(() => setMounted(true), []);
 
   if (!mounted) return null;
 
+  const isComparePage = pathname === '/compare';
   const canCompare = items.length >= minItems;
   const compareLabel = getCompareLabel(items);
 
@@ -59,7 +52,7 @@ export function CompareTray() {
 
   return (
     <AnimatePresence>
-      {items.length > 0 && (
+      {items.length > 0 && !isComparePage && (
         <motion.div
           variants={reduced ? undefined : traySlideVariants}
           initial={reduced ? undefined : 'hidden'}
@@ -74,14 +67,9 @@ export function CompareTray() {
           <div className="flex flex-1 items-center gap-2 overflow-x-auto min-w-0">
             <AnimatePresence mode="popLayout">
               {items.map((item) => {
-                const entity = lookup(item.entityType, item.id);
                 const meta = extras[`${item.entityType}:${item.id}`];
-                const label = meta?.label ?? entity?.name ?? item.id;
-                const sublabel =
-                  meta?.sublabel ??
-                  (entity && 'location' in entity && entity.location
-                    ? `${entity.location.city}`
-                    : (entity && 'category' in entity && entity.category) || '');
+                const label = meta?.label ?? item.id;
+                const sublabel = meta?.sublabel ?? '';
                 return (
                   <motion.span
                     key={`${item.entityType}-${item.id}`}

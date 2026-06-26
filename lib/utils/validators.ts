@@ -26,10 +26,29 @@ export const slugSchema = z
   .max(120)
   .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, 'Invalid slug');
 
+// Password validation matching backend: min 8 chars, uppercase, lowercase, digit
+export function validatePassword(value: string): string {
+  if (!value) return 'Password is required';
+  if (value.length < 8) return 'Password must be at least 8 characters';
+  if (!/[A-Z]/.test(value)) return 'Password must contain at least one uppercase letter';
+  if (!/[a-z]/.test(value)) return 'Password must contain at least one lowercase letter';
+  if (!/\d/.test(value)) return 'Password must contain at least one number';
+  return '';
+}
+
+export function getPasswordErrors(value: string): Record<string, string> {
+  const errors: Record<string, string> = {};
+  if (value.length < 8) errors.minLength = 'At least 8 characters';
+  if (!/[A-Z]/.test(value)) errors.uppercase = 'One uppercase letter';
+  if (!/[a-z]/.test(value)) errors.lowercase = 'One lowercase letter';
+  if (!/\d/.test(value)) errors.number = 'One number';
+  return errors;
+}
+
 export const enquiryFormSchema = z.object({
   targetType: z.enum(['academy', 'coach']),
   targetId: z.string().min(1),
-  intent: z.enum(['contact', 'callback', 'trial', 'enrollment_interest']),
+  intent: z.enum(['contact', 'callback', 'trial', 'enrollment_interest', 'whatsapp']),
   parentName: z.string().min(2).max(80),
   parentEmail: emailSchema,
   parentPhone: phoneSchema,

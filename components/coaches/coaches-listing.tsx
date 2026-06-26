@@ -41,7 +41,7 @@ function readListFromParams(params: URLSearchParams, key: string): string[] {
     .filter(Boolean);
 }
 
-export function CoachesListing() {
+export function CoachesListing({ hideSearch = false }: { hideSearch?: boolean } = {}) {
   const { query, setQuery, debouncedQuery } = useSearchQuery();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -232,14 +232,16 @@ export function CoachesListing() {
   if (loading && results.length === 0) {
     return (
       <div className="flex flex-col gap-4">
-        <SearchInput
-          value=""
-          onValueChange={() => {}}
-          label="Search coaches"
-          placeholder="Search coaches by name, city, or sport…"
-          size="lg"
-          disabled
-        />
+        {!hideSearch && (
+          <SearchInput
+            value=""
+            onValueChange={() => {}}
+            label="Search coaches"
+            placeholder="Search coaches by name, city, or sport…"
+            size="lg"
+            disabled
+          />
+        )}
         <FullPageSkeleton />
       </div>
     );
@@ -248,14 +250,16 @@ export function CoachesListing() {
   if (error && results.length === 0) {
     return (
       <div className="flex flex-col gap-4">
-        <SearchInput
-          value=""
-          onValueChange={() => {}}
-          label="Search coaches"
-          placeholder="Search coaches by name, city, or sport…"
-          size="lg"
-          disabled
-        />
+        {!hideSearch && (
+          <SearchInput
+            value=""
+            onValueChange={() => {}}
+            label="Search coaches"
+            placeholder="Search coaches by name, city, or sport…"
+            size="lg"
+            disabled
+          />
+        )}
         <div className="flex flex-col items-center justify-center gap-3 rounded-xl border border-dashed py-12 text-center">
           <AlertTriangle className="h-10 w-10 text-destructive/40" />
           <div>
@@ -272,73 +276,77 @@ export function CoachesListing() {
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-        <div className="flex-1">
-          <SearchInput
-            value={query}
-            onValueChange={setQuery}
-            label="Search coaches"
-            placeholder="Search coaches by name, city, or sport…"
-            size="lg"
-          />
-        </div>
-        <FilterDrawer
-          appliedCount={sports.length + cities.length + experience.length}
-          onClear={() => {
-            setSports([]);
-            setCities([]);
-            setExperience([]);
-          }}
-        >
-          <FilterGroup
-            title="Sport"
-            options={dynamicSportOptions}
-            selected={sports}
-            onChange={setSports}
-            maxHeight="200px"
-            layoutIdPrefix="filter-coach-sport"
-          />
-          <Separator />
-          <FilterGroup
-            title="City"
-            options={dynamicCityOptions}
-            selected={cities}
-            onChange={setCities}
-            maxHeight="200px"
-            layoutIdPrefix="filter-coach-city"
-          />
-          <Separator />
-          <FilterGroup
-            title="Experience"
-            options={dynamicExperienceOptions}
-            selected={experience}
-            onChange={setExperience}
-            layoutIdPrefix="filter-coach-experience"
-          />
-        </FilterDrawer>
-      </div>
+      {!hideSearch && (
+        <>
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+            <div className="flex-1">
+              <SearchInput
+                value={query}
+                onValueChange={setQuery}
+                label="Search coaches"
+                placeholder="Search coaches by name, city, or sport…"
+                size="lg"
+              />
+            </div>
+            <FilterDrawer
+              appliedCount={sports.length + cities.length + experience.length}
+              onClear={() => {
+                setSports([]);
+                setCities([]);
+                setExperience([]);
+              }}
+            >
+              <FilterGroup
+                title="Sport"
+                options={dynamicSportOptions}
+                selected={sports}
+                onChange={setSports}
+                maxHeight="200px"
+                layoutIdPrefix="filter-coach-sport"
+              />
+              <Separator />
+              <FilterGroup
+                title="City"
+                options={dynamicCityOptions}
+                selected={cities}
+                onChange={setCities}
+                maxHeight="200px"
+                layoutIdPrefix="filter-coach-city"
+              />
+              <Separator />
+              <FilterGroup
+                title="Experience"
+                options={dynamicExperienceOptions}
+                selected={experience}
+                onChange={setExperience}
+                layoutIdPrefix="filter-coach-experience"
+              />
+            </FilterDrawer>
+          </div>
 
-      {chips.length > 0 ? (
-        <div className="flex flex-wrap items-center gap-2">
-          {chips.map((c) => (
-            <Badge key={c.key} variant="secondary" className="gap-1 pr-1 min-h-[32px] flex items-center">
-              {c.label}
-              <button
-                onClick={c.onRemove}
-                className="text-muted-foreground hover:text-foreground p-1 -m-1 rounded"
-                aria-label={`Remove filter ${c.label}`}
-              >
-                <X className="h-3.5 w-3.5" />
-              </button>
-            </Badge>
-          ))}
-          {appliedCount > 0 ? (
-            <Button size="sm" variant="outline" onClick={clearAll}>
-              <X className="h-3.5 h-3.5" /> Clear all
-            </Button>
+          {chips.length > 0 ? (
+            <div className="flex flex-wrap items-center gap-2">
+              {chips.map((c) => (
+                <Badge key={c.key} variant="secondary" className="gap-1 pr-1 min-h-[32px] flex items-center">
+                  {c.label}
+                  <button
+                    onClick={c.onRemove}
+                    className="text-muted-foreground hover:text-foreground p-1 -m-1 rounded"
+                    aria-label={`Remove filter ${c.label}`}
+                  >
+                    <X className="h-3.5 w-3.5" />
+                  </button>
+                </Badge>
+              ))}
+              {appliedCount > 0 ? (
+                <Button size="sm" variant="outline" onClick={clearAll}>
+                  <X className="h-3.5 h-3.5" /> Clear all
+                </Button>
+              ) : null}
+            </div>
           ) : null}
-        </div>
-      ) : null}
+        </>
+      )}
 
       <p className="text-muted-foreground text-sm">
         {results.length} of {total || allCoaches.length} coaches

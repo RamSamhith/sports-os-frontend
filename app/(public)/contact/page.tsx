@@ -40,9 +40,9 @@ export default function ContactPage() {
           </section>
 
           <section>
-            <h2 className="text-lg font-semibold">Academy &amp; Coach Partnerships</h2>
+            <h2 className="text-lg font-semibold">Academy Partnerships</h2>
             <p>
-              Want to list your academy or coaching programme on SportsOS? We welcome
+              Want to list your academy on SportsOS? We welcome
               partnerships with verified sports providers across India. Reach out to
               discuss listing options and verification.
             </p>

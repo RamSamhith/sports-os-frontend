@@ -76,7 +76,7 @@ export function Hero() {
             className="text-muted-foreground mt-3 max-w-xl text-base md:text-lg"
             style={{ textWrap: 'balance' }}
           >
-            Academies, coaches, and pathways across India — in one trusted place.
+            Academies, sports, and pathways across India — in one trusted place.
           </motion.p>
         </motion.div>
 

@@ -35,7 +35,7 @@ const sportBenefits: Record<string, string[]> = {
 
 export function SportCard({ sport }: { sport: Sport }) {
   const reduced = useReducedMotion();
-  const { slug, name, category, coverImage, description, explorationGuidance, id } = sport;
+  const { slug, name, sportType, coverImage, shortDescription, explorationGuidance, id } = sport;
   const imageSrc = coverImage ?? fixtureImages.sports[id];
   const initial = name.charAt(0);
   const ageRange = explorationGuidance?.ageSuitability;
@@ -46,7 +46,7 @@ export function SportCard({ sport }: { sport: Sport }) {
         ? `Ages ${ageRange.min}+`
         : null;
 
-  const benefits = sportBenefits[slug] ?? [];
+  const benefits = sport.physicalBenefits?.slice(0, 3) ?? sportBenefits[slug] ?? [];
 
   return (
     <motion.div
@@ -75,22 +75,22 @@ export function SportCard({ sport }: { sport: Sport }) {
             <Link href={`/sports/${slug}`} className="hover:underline">
               <h3 className="line-clamp-1 text-base font-semibold tracking-tight">{name}</h3>
             </Link>
-            <div className="text-muted-foreground text-xs capitalize">{category}</div>
+            <div className="text-muted-foreground text-xs capitalize">{sportType}</div>
           </div>
           <CompareButton
             entityType="sport"
-            id={id}
+            slug={slug}
             label={name}
-            sublabel={category}
+            sublabel={sportType}
             href={`/sports/${slug}`}
           />
         </div>
-        {description ? (
+        {shortDescription ? (
           <Link
             href={`/sports/${slug}`}
             className="text-muted-foreground line-clamp-2 text-xs text-pretty hover:text-foreground/80"
           >
-            {description}
+            {shortDescription}
           </Link>
         ) : null}
         {benefits.length > 0 && (

@@ -5,9 +5,9 @@ import type { Enquiry } from '@/types/domain/enquiry';
 export interface EnquiryCreatePayload {
   targetType: 'academy' | 'coach';
   targetId: string;
-  intent?: string;
+  intent?: 'contact' | 'callback' | 'trial' | 'enrollment_interest' | 'whatsapp';
   parentInfo: { name: string; email: string; phone: string };
-  childInfo?: { name: string; age: number };
+  childInfo?: { name: string; age?: number };
   sportInterest: string;
   message?: string;
 }

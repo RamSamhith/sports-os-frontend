@@ -25,9 +25,9 @@ import type { Child } from '@/lib/hooks/use-children';
 interface ChildFormDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onSubmit: (data: { name: string; age: number; sport: string; skillLevel?: string }) => void;
+  onSubmit: (data: { name: string; age: number; sportInterests: string[]; skillLevel?: string }) => void;
   child?: Child | null;
-  defaultData?: { name?: string; age?: number; sport?: string; skillLevel?: string };
+  defaultData?: { name?: string; age?: number; sportInterests?: string[]; skillLevel?: string };
 }
 
 const skillLevels = ['Beginner', 'Intermediate', 'Advanced', 'Competitive'];
@@ -45,12 +45,12 @@ export function ChildFormDialog({ open, onOpenChange, onSubmit, child, defaultDa
       if (child) {
         setName(child.name);
         setAge(String(child.age));
-        setSport(child.sport);
+        setSport(child.sportInterests?.[0] ?? '');
         setSkillLevel(child.skillLevel ?? '');
       } else if (defaultData) {
         setName(defaultData.name ?? '');
         setAge(defaultData.age ? String(defaultData.age) : '');
-        setSport(defaultData.sport ?? '');
+        setSport(defaultData.sportInterests?.[0] ?? '');
         setSkillLevel(defaultData.skillLevel ?? '');
       } else {
         setName('');
@@ -81,7 +81,7 @@ export function ChildFormDialog({ open, onOpenChange, onSubmit, child, defaultDa
     onSubmit({
       name: name.trim(),
       age: Number(age),
-      sport,
+      sportInterests: sport ? [sport] : [],
       skillLevel: skillLevel || undefined,
     });
     onOpenChange(false);

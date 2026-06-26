@@ -13,7 +13,6 @@ import { ConversionModal } from '@/components/auth/conversion-modal';
 import { getMatchingCriteria } from '@/lib/utils/matching';
 import { sportTaxonomy } from '@/lib/constants/sport-taxonomy';
 import { academies } from '@/data/academies';
-import { coaches } from '@/data/coaches';
 import { MyAcademyCard } from '@/components/profile/my-academy-card';
 import { Pencil, MapPin, Target, Trophy, User, Users, Sparkles, School, Star, ChevronRight, Search, BookOpen, Shield } from 'lucide-react';
 
@@ -58,10 +57,6 @@ export default function ProfilePage() {
   const selectedAcademy = selectedAcademyId
     ? academies.find((a) => a.id === selectedAcademyId)
     : null;
-
-  const academyCoaches = selectedAcademyId
-    ? coaches.filter((c) => c.academyId === selectedAcademyId)
-    : [];
 
   return (
     <div className="flex flex-col gap-4">
@@ -191,9 +186,11 @@ export default function ProfilePage() {
             </div>
             {activeChild && (
               <div className="flex flex-wrap gap-1.5">
-                <Badge key={activeChild.sport} variant="secondary" className="text-xs">
-                  {getSportName(activeChild.sport)}
-                </Badge>
+                {activeChild.sportInterests?.map((slug) => (
+                  <Badge key={slug} variant="secondary" className="text-xs">
+                    {getSportName(slug)}
+                  </Badge>
+                ))}
               </div>
             )}
             {!activeChild && parentData.sportInterests.length > 0 && (
@@ -231,54 +228,6 @@ export default function ProfilePage() {
                 </Link>
               </Button>
             </div>
-          </CardContent>
-        </Card>
-      )}
-
-      {selectedAcademy && academyCoaches.length > 0 && (
-        <Card>
-          <CardHeader className="pb-3">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <School className="text-primary h-4 w-4" />
-                <CardTitle className="text-base">My Coaches</CardTitle>
-              </div>
-              <Badge variant="secondary" className="text-xs">{academyCoaches.length}</Badge>
-            </div>
-            <CardDescription className="text-xs">
-              At {selectedAcademy.name}
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-2">
-            {academyCoaches.slice(0, 3).map((coach) => (
-              <Link
-                key={coach.id}
-                href={`/coaches/${coach.slug}`}
-                className="flex items-center gap-3 rounded-lg p-2 hover:bg-accent transition-colors"
-              >
-                <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-muted text-xs font-semibold">
-                  {coach.name.split(' ').map((n) => n[0]).join('').slice(0, 2)}
-                </div>
-                <div className="min-w-0 flex-1">
-                  <p className="text-sm font-medium line-clamp-1">{coach.name}</p>
-                  <p className="text-xs text-muted-foreground line-clamp-1">
-                    {coach.specialization.slice(0, 2).join(', ')}
-                  </p>
-                </div>
-                <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                  <Star className="h-3 w-3 fill-amber-400 text-amber-400" />
-                  {coach.rating.average.toFixed(1)}
-                </div>
-                <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground" />
-              </Link>
-            ))}
-            {academyCoaches.length > 3 && (
-              <Button variant="ghost" size="sm" asChild className="w-full">
-                <Link href={`/coaches?academy=${selectedAcademy.slug}`}>
-                  View all {academyCoaches.length} coaches
-                </Link>
-              </Button>
-            )}
           </CardContent>
         </Card>
       )}

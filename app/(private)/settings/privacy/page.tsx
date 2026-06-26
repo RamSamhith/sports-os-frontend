@@ -3,6 +3,9 @@
 import { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
+import { syncConsent } from '@/lib/api/auth';
+import { useAuth } from '@/lib/hooks/use-auth';
+import { toast } from 'sonner';
 
 const STORAGE_KEY = 'sportsos:privacy';
 
@@ -65,6 +68,7 @@ function Row({
 }
 
 export default function SettingsPrivacyPage() {
+  const { isAuthenticated, isGuest } = useAuth();
   const [settings, setSettings] = useState<PrivacyState>({
     profileVisibility: true,
     analyticsConsent: true,
@@ -77,12 +81,22 @@ export default function SettingsPrivacyPage() {
     setHydrated(true);
   }, []);
 
-  function toggle(key: keyof PrivacyState) {
-    setSettings((prev) => {
-      const next = { ...prev, [key]: !prev[key] };
-      writePrivacy(next);
-      return next;
-    });
+  async function toggle(key: keyof PrivacyState) {
+    const next = { ...settings, [key]: !settings[key] };
+    setSettings(next);
+    writePrivacy(next);
+
+    // Sync consent to backend if authenticated
+    if (isAuthenticated && !isGuest) {
+      const res = await syncConsent({
+        analytics: next.analyticsConsent,
+        marketing: false,
+        whatsapp: true,
+      });
+      if (!res.ok) {
+        toast.error('Failed to sync privacy settings');
+      }
+    }
   }
 
   return (
@@ -102,7 +116,7 @@ export default function SettingsPrivacyPage() {
         <CardContent className="flex flex-col gap-3">
           <Row
             label="Profile visibility"
-            description="Allow coaches and academies to see your profile."
+            description="Allow academies to see your profile."
             checked={settings.profileVisibility}
             onCheckedChange={() => toggle('profileVisibility')}
             disabled={!hydrated}

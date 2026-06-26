@@ -6,7 +6,7 @@ import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
   title: 'About',
-  description: 'About SportsOS – the discovery platform for sports academies, coaches, and programmes across India.',
+  description: 'About SportsOS – the discovery platform for sports academies and programmes across India.',
 };
 
 export default function AboutPage() {
@@ -26,7 +26,7 @@ export default function AboutPage() {
             <p>
               SportsOS is on a mission to make sports discovery accessible, transparent, and
               empowering for every athlete and parent in India. We believe every child deserves
-              the chance to find the right academy, the right coach, and the right pathway to
+              the chance to find the right academy and the right pathway to
               pursue their sporting dreams.
             </p>
           </section>
@@ -35,7 +35,7 @@ export default function AboutPage() {
             <h2 className="text-lg font-semibold">What We Do</h2>
             <p>
               SportsOS is a discovery platform that connects athletes and parents with sports
-              academies, coaches, and programmes across India. We provide search, comparison,
+              academies, and programmes across India. We provide search, comparison,
               and enquiry tools so you can make informed decisions about your sporting journey.
             </p>
           </section>
@@ -43,7 +43,7 @@ export default function AboutPage() {
           <section>
             <h2 className="text-lg font-semibold">How It Works</h2>
             <p>
-              Browse and discover academies and coaches in your area. Compare options side by
+              Browse and discover academies in your area. Compare options side by
               side across ratings, facilities, training levels, and sports offered. When you
               find the right fit, send an enquiry directly through the platform.
             </p>
@@ -68,9 +68,9 @@ export default function AboutPage() {
           </section>
 
           <section>
-            <h2 className="text-lg font-semibold">For Academies &amp; Coaches</h2>
+            <h2 className="text-lg font-semibold">For Academies</h2>
             <p>
-              List your academy or coaching programme on SportsOS to reach athletes and parents
+              List your academy on SportsOS to reach athletes and parents
               actively searching for sports opportunities. Build trust through verified
               listings and responsive enquiries.
             </p>

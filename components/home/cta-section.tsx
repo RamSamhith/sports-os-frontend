@@ -22,7 +22,7 @@ export function CtaSection() {
               Build your shortlist, your way
             </h2>
             <p className="text-muted-foreground mx-auto mt-3 max-w-md text-sm text-pretty">
-              Save academies, coaches, and sports. Compare side by side. Connect when you&apos;re ready.
+              Save academies and sports. Compare side by side. Connect when you&apos;re ready.
             </p>
             <div className="mt-7 flex justify-center gap-3">
               <Button asChild>

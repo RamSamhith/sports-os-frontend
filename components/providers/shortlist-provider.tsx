@@ -5,7 +5,12 @@ import { ShortlistContext, type ShortlistContextValue } from '@/lib/hooks/use-sh
 import { useStorageSync } from '@/lib/hooks/use-storage-sync';
 import { BUILD_HASH } from '@/lib/version';
 import { useAuth } from '@/lib/hooks/use-auth';
-import { getMyShortlistPopulated, addToShortlist, removeFromShortlist } from '@/lib/api/shortlist';
+import {
+  getMyShortlistPopulated,
+  addToShortlist,
+  removeFromShortlistBySlug,
+  clearShortlist,
+} from '@/lib/api/shortlist';
 import { trackShortlistAdd, trackShortlistRemove, trackGuestShortlist } from '@/lib/analytics/events';
 import type { ShortlistItem, ShortlistItemType } from '@/types/domain/shortlist';
 
@@ -74,7 +79,6 @@ export function ShortlistProvider({ children }: ShortlistProviderProps) {
   const [hydrated, setHydrated] = React.useState(false);
   const [populatedData, setPopulatedData] = React.useState<Record<string, Record<string, unknown>>>({});
 
-  // On mount / auth change: hydrate from localStorage, then fetch from API if authenticated
   React.useEffect(() => {
     const persisted = readPersisted();
     setItems(persisted.map(toContextItem));
@@ -89,21 +93,36 @@ export function ShortlistProvider({ children }: ShortlistProviderProps) {
       getMyShortlistPopulated().then((res) => {
         if (res.ok) {
           const apiItems: ShortlistItem[] = res.data.map((it: any) => ({
-            id: it.id,
+            id: `${it.itemType}:${it.itemId}`,
             userId: it.userId,
             itemType: it.itemType,
             itemId: it.itemId,
             createdAt: it.createdAt,
           }));
-          setItems(apiItems);
-          // Build populated data map and extras from API data
+
+          const apiKeys = new Set(apiItems.map(i => `${i.itemType}:${i.itemId}`));
+          const unsyncedGuest = persisted.filter(p => !apiKeys.has(`${p.itemType}:${p.itemId}`));
+
+          for (const g of unsyncedGuest) {
+            if (g.itemType === 'academy' || g.itemType === 'coach') {
+              addToShortlist(g.itemType, g.itemId).catch(() => {});
+            }
+          }
+
+          const merged = [
+            ...apiItems,
+            ...unsyncedGuest.map(p => toContextItem(p)),
+          ];
+          setItems(merged);
+
           const popMap: Record<string, Record<string, unknown>> = {};
           const extrasMap: Record<string, { label: string; sublabel?: string; href: string }> = {};
           for (const it of res.data) {
+            const key = `${it.itemType}:${it.itemId}`;
             if (it.data) {
-              popMap[`${it.itemType}:${it.itemId}`] = it.data;
+              popMap[key] = it.data;
               const d = it.data as any;
-              extrasMap[`${it.itemType}:${it.itemId}`] = {
+              extrasMap[key] = {
                 label: d.name ?? it.itemId,
                 sublabel: it.itemType === 'academy'
                   ? `${d.location?.city ?? ''}, ${d.location?.state ?? ''}`
@@ -114,6 +133,12 @@ export function ShortlistProvider({ children }: ShortlistProviderProps) {
               };
             }
           }
+          for (const p of unsyncedGuest) {
+            const key = `${p.itemType}:${p.itemId}`;
+            if (!extrasMap[key]) {
+              extrasMap[key] = { label: p.label, sublabel: p.sublabel, href: p.href };
+            }
+          }
           setPopulatedData(popMap);
           setExtras(extrasMap);
         }
@@ -121,7 +146,6 @@ export function ShortlistProvider({ children }: ShortlistProviderProps) {
     }
   }, [isAuthenticated]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Persist to localStorage on every change (for offline/guest fallback)
   React.useEffect(() => {
     if (!hydrated) return;
     const persisted: PersistedItem[] = items.map((it) => ({
@@ -135,7 +159,6 @@ export function ShortlistProvider({ children }: ShortlistProviderProps) {
     writePersisted(persisted);
   }, [items, extras, hydrated]);
 
-  // Multi-tab sync
   useStorageSync(STORAGE_KEY, (raw) => {
     if (isAuthenticated) return;
     if (raw == null) { setItems([]); setExtras({}); return; }
@@ -201,7 +224,6 @@ export function ShortlistProvider({ children }: ShortlistProviderProps) {
     [items],
   );
 
-  // Wrapped addWithMeta that also calls API when authenticated
   const addWithMetaAndSync = React.useCallback(
     (
       itemType: ShortlistItemType,
@@ -224,26 +246,31 @@ export function ShortlistProvider({ children }: ShortlistProviderProps) {
     [addWithMeta, isAuthenticated],
   );
 
-  // Wrapped remove that also calls API when authenticated
   const removeAndSync = React.useCallback(
     (itemType: ShortlistItemType, itemId: string) => {
-      const record = items.find((i) => i.itemType === itemType && i.itemId === itemId);
       remove(itemType, itemId);
       trackShortlistRemove(itemId, itemType);
-      if (isAuthenticated && record && !record.id.startsWith(`${itemType}:${itemId}`) && (itemType === 'academy' || itemType === 'coach')) {
-        removeFromShortlist(record.id).catch(() => {});
+      if (isAuthenticated && (itemType === 'academy' || itemType === 'coach')) {
+        removeFromShortlistBySlug(itemType, itemId).catch(() => {});
       }
     },
-    [remove, isAuthenticated, items],
+    [remove, isAuthenticated],
   );
+
+  const clearAndSync = React.useCallback(() => {
+    clear();
+    if (isAuthenticated) {
+      clearShortlist().catch(() => {});
+    }
+  }, [clear, isAuthenticated]);
 
   const value = React.useMemo<ShortlistContextValue & {
     extras: typeof extras;
     addWithMeta: typeof addWithMetaAndSync;
     populatedData: typeof populatedData;
   }>(
-    () => ({ items, has, add, remove: removeAndSync, clear, extras, addWithMeta: addWithMetaAndSync, populatedData }),
-    [items, has, add, removeAndSync, clear, extras, addWithMetaAndSync, populatedData],
+    () => ({ items, has, add, remove: removeAndSync, clear: clearAndSync, extras, addWithMeta: addWithMetaAndSync, populatedData }),
+    [items, has, add, removeAndSync, clearAndSync, extras, addWithMetaAndSync, populatedData],
   );
 
   return <ShortlistContext.Provider value={value}>{children}</ShortlistContext.Provider>;

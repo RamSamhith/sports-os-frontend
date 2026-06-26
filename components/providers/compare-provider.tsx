@@ -6,15 +6,6 @@ import { useStorageSync } from '@/lib/hooks/use-storage-sync';
 import { BUILD_HASH } from '@/lib/version';
 import { useAuth } from '@/lib/hooks/use-auth';
 import { trackCompareAdd, trackCompareRemove, trackGuestCompare } from '@/lib/analytics/events';
-import { academies } from '@/data/academies';
-import { academiesById } from '@/data/academies';
-import { academiesBySlug } from '@/data/academies';
-import { coaches } from '@/data/coaches';
-import { coachesById } from '@/data/coaches';
-import { coachesBySlug } from '@/data/coaches';
-import { sports } from '@/data/sports';
-import { sportsById } from '@/data/sports';
-import { sportsBySlug } from '@/data/sports';
 
 const STORAGE_KEY = 'sportsos:compare';
 
@@ -29,43 +20,7 @@ interface PersistedItem {
   label: string;
   sublabel?: string;
   href: string;
-  /** Original addition timestamp; preserved across writes so order is stable. */
   addedAt: string;
-}
-
-/** Resolve display metadata for an item directly from the source fixtures.
- * Used on hydration to repair persisted state that was written before the
- * add-with-meta path was used. */
-function resolveMeta(entityType: CompareItem['entityType'], id: string): CompareItemMeta | null {
-  if (entityType === 'academy') {
-    const a = academiesById(id) ?? academiesBySlug(id);
-    if (!a) return null;
-    return {
-      label: a.name,
-      sublabel: `${a.location.city}, ${a.location.state}`,
-      href: `/academies/${a.slug}`,
-    };
-  }
-  if (entityType === 'coach') {
-    const c = coachesById(id) ?? coachesBySlug(id);
-    if (!c) return null;
-    return {
-      label: c.name,
-      sublabel: `${c.location.city} · ${c.experienceYears}+ yrs`,
-      href: `/coaches/${c.slug}`,
-    };
-  }
-  const s = sportsById(id) ?? sportsBySlug(id);
-  if (!s) return null;
-  return { label: s.name, sublabel: s.category, href: `/sports/${s.slug}` };
-}
-
-function buildValidKeys(): Set<string> {
-  const keys = new Set<string>();
-  for (const a of academies) keys.add(`academy:${a.id}`);
-  for (const c of coaches) keys.add(`coach:${c.id}`);
-  for (const s of sports) keys.add(`sport:${s.id}`);
-  return keys;
 }
 
 interface PersistedEnvelope {
@@ -86,10 +41,8 @@ function applyFromRaw(
   let parsed: PersistedItem[] = [];
   try {
     const data = JSON.parse(raw);
-    // Support both versioned envelope and legacy plain-array format.
     if (data && typeof data === 'object' && Array.isArray(data.items) && typeof data.version === 'string') {
       if (data.version !== BUILD_HASH) {
-        // Stale deployment — clear persisted compare state.
         window.localStorage.removeItem(STORAGE_KEY);
         setItems([]);
         setExtras({});
@@ -111,17 +64,11 @@ function applyFromRaw(
       typeof i.entityType === 'string' &&
       typeof i.label === 'string',
   );
-  // Provider-level cleanup: drop ids that no longer match a fixture.
-  const valid = buildValidKeys();
-  parsed = parsed.filter((p) => valid.has(`${p.entityType}:${p.id}`));
 
   setItems(parsed.map(({ entityType, id }) => ({ entityType, id })));
   const extrasMap: Record<string, CompareItemMeta> = {};
   for (const p of parsed) {
-    // Always prefer the freshest metadata from the source fixtures so the
-    // tray never shows a stale label after a refresh.
-    const fresh = resolveMeta(p.entityType, p.id);
-    extrasMap[`${p.entityType}:${p.id}`] = fresh ?? {
+    extrasMap[`${p.entityType}:${p.id}`] = {
       label: p.label,
       sublabel: p.sublabel,
       href: p.href,
@@ -151,9 +98,6 @@ export function CompareProvider({ children }: { children: React.ReactNode }) {
     setHydrated(true);
   }, []);
 
-  // Persist on every change once hydrated. We refresh `addedAt` for items
-  // that have never been persisted, but keep the original timestamp for
-  // items that already have one — so the user-visible order is stable.
   React.useEffect(() => {
     if (!hydrated) return;
     let persisted: PersistedItem[];
@@ -196,10 +140,14 @@ export function CompareProvider({ children }: { children: React.ReactNode }) {
     writePersisted(persisted);
   }, [items, extras, hydrated]);
 
-  // Multi-tab sync.
-  useStorageSync(STORAGE_KEY, (raw) => {
-    applyFromRaw(raw, setItems, setExtras);
-  });
+  const onStorageSync = React.useCallback(
+    (raw: string | null) => {
+      applyFromRaw(raw, setItems, setExtras);
+    },
+    [], // setItems and setExtras are stable React state setters
+  );
+
+  useStorageSync(STORAGE_KEY, onStorageSync);
 
   const canAdd = React.useCallback(
     (entityType: CompareItem['entityType'], id: string) =>
@@ -220,12 +168,6 @@ export function CompareProvider({ children }: { children: React.ReactNode }) {
         if (prev.some((i) => i.entityType === item.entityType && i.id === item.id)) return prev;
         return [...prev, item];
       });
-      // Repair metadata from source fixtures immediately so the tray shows
-      // the right label even if no meta was passed in.
-      const fresh = resolveMeta(item.entityType, item.id);
-      if (fresh) {
-        setExtras((prev) => ({ ...prev, [`${item.entityType}:${item.id}`]: fresh }));
-      }
     },
     [],
   );
@@ -240,18 +182,14 @@ export function CompareProvider({ children }: { children: React.ReactNode }) {
         return [...prev, { entityType, id }];
       });
       if (added) {
-        // Prefer fresh metadata from the source fixtures; only fall back
-        // to the caller-supplied meta if the entity is unknown.
-        const fresh = resolveMeta(entityType, id);
-        const label = fresh?.label ?? meta.label;
         setExtras((prev) => ({
           ...prev,
-          [`${entityType}:${id}`]: fresh ?? meta,
+          [`${entityType}:${id}`]: meta,
         }));
         if (isGuest || !isAuthenticated) {
           trackGuestCompare(items.length + 1);
         } else {
-          trackCompareAdd(id, entityType, label);
+          trackCompareAdd(id, entityType, meta.label);
         }
       }
       return added;
@@ -260,13 +198,25 @@ export function CompareProvider({ children }: { children: React.ReactNode }) {
   );
 
   const remove = React.useCallback<CompareContextValue['remove']>((entityType, id) => {
-    setItems((prev) => prev.filter((i) => !(i.entityType === entityType && i.id === id)));
+    let wasPresent = false;
+    setItems((prev) => {
+      const filtered = prev.filter((i) => {
+        if (i.entityType === entityType && i.id === id) {
+          wasPresent = true;
+          return false;
+        }
+        return true;
+      });
+      return filtered;
+    });
     setExtras((prev) => {
       const next = { ...prev };
       delete next[`${entityType}:${id}`];
       return next;
     });
-    trackCompareRemove(id, entityType);
+    if (wasPresent) {
+      trackCompareRemove(id, entityType);
+    }
   }, []);
 
   const clear = React.useCallback(() => {

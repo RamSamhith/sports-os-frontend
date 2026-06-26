@@ -5,6 +5,7 @@ import { Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { SearchInput } from '@/components/ui/search-input';
 import { AcademyListing } from '@/components/academies/academy-listing';
+import { CoachesListing } from '@/components/coaches/coaches-listing';
 import { SportsListing } from '@/components/sports/sports-listing';
 import { Container } from '@/components/layout/container';
 import { Section } from '@/components/layout/section';
@@ -14,7 +15,7 @@ import { RecentSearches } from '@/components/search/recent-searches';
 import { useRecentSearches } from '@/components/command/recent-searches-store';
 import Link from 'next/link';
 import { TrendingUp, MapPin, Trophy, School, Loader2 } from 'lucide-react';
-import { trackSearch, trackSearchResultClick, trackSportClick, trackCityClick, trackGuestSearch } from '@/lib/analytics/events';
+import { trackSearch, trackSportClick, trackCityClick, trackGuestSearch } from '@/lib/analytics/events';
 import { useAuth } from '@/lib/hooks/use-auth';
 import { getAcademies } from '@/lib/api/academies';
 import { listSports } from '@/lib/api/sports';
@@ -44,7 +45,7 @@ function SearchPageContent() {
   const { isGuest, isAuthenticated } = useAuth();
 
   const [query, setQuery] = React.useState(() => searchParams.get('q') ?? '');
-  const [activeTab, setActiveTab] = React.useState<'all' | 'academies' | 'sports' | 'cities'>('all');
+  const [activeTab, setActiveTab] = React.useState<'all' | 'academies' | 'coaches' | 'sports'>('all');
   const [trendingSports, setTrendingSports] = React.useState<string[]>([]);
   const [topCities, setTopCities] = React.useState<string[]>([]);
 
@@ -102,7 +103,7 @@ function SearchPageContent() {
   };
 
   const handleTabChange = (tab: string) => {
-    setActiveTab(tab as 'all' | 'academies' | 'sports' | 'cities');
+    setActiveTab(tab as 'all' | 'academies' | 'coaches' | 'sports');
   };
 
   const recentQueries = recentItems.map((r) => r.query);
@@ -219,29 +220,33 @@ function SearchPageContent() {
             <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4">
               <TabsTrigger value="all">All</TabsTrigger>
               <TabsTrigger value="academies">Academies</TabsTrigger>
+              <TabsTrigger value="coaches">Coaches</TabsTrigger>
               <TabsTrigger value="sports">Sports</TabsTrigger>
-              <TabsTrigger value="cities">Cities</TabsTrigger>
             </TabsList>
             <TabsContent value="all" className="mt-4">
               <div className="flex flex-col gap-6">
                 <section>
                   <h2 className="text-sm font-semibold mb-2">Academies</h2>
-                  <AcademyListing />
+                  <AcademyListing hideSearch />
+                </section>
+                <section>
+                  <h2 className="text-sm font-semibold mb-2">Coaches</h2>
+                  <CoachesListing hideSearch />
                 </section>
                 <section>
                   <h2 className="text-sm font-semibold mb-2">Sports</h2>
-                  <SportsListing />
+                  <SportsListing hideSearch />
                 </section>
               </div>
             </TabsContent>
             <TabsContent value="academies" className="mt-4">
-              <AcademyListing />
+              <AcademyListing hideSearch />
+            </TabsContent>
+            <TabsContent value="coaches" className="mt-4">
+              <CoachesListing hideSearch />
             </TabsContent>
             <TabsContent value="sports" className="mt-4">
-              <SportsListing />
-            </TabsContent>
-            <TabsContent value="cities" className="mt-4">
-              <AcademyListing />
+              <SportsListing hideSearch />
             </TabsContent>
           </Tabs>
         )}

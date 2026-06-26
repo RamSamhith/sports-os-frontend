@@ -14,6 +14,7 @@ import { useAuth } from '@/lib/hooks/use-auth';
 import { register as apiRegister } from '@/lib/api/auth';
 import { useGoogleAuth, useMicrosoftAuth, handleSocialAuth } from '@/lib/hooks/use-social-auth';
 import { trackGuestStarted } from '@/lib/analytics/events';
+import { validatePassword } from '@/lib/utils/validators';
 
 interface FieldErrors {
   name?: string;
@@ -117,8 +118,9 @@ export default function RegisterPage() {
 
     if (!password) {
       e.password = 'Password is required';
-    } else if (password.length < 8) {
-      e.password = 'Password must be at least 8 characters';
+    } else {
+      const pwErr = validatePassword(password);
+      if (pwErr) e.password = pwErr;
     }
 
     if (!confirmPassword) {
@@ -146,8 +148,8 @@ export default function RegisterPage() {
         if (digits.length !== 10) e.phone = 'Phone number must be exactly 10 digits';
       }
     } else if (field === 'password') {
-      if (!value) e.password = 'Password is required';
-      else if (value.length < 8) e.password = 'Password must be at least 8 characters';
+      const pwErr = validatePassword(value);
+      if (pwErr) e.password = pwErr;
       if (confirmPassword && value !== confirmPassword) e.confirmPassword = 'Passwords do not match';
     } else if (field === 'confirmPassword') {
       if (!value) e.confirmPassword = 'Please confirm your password';

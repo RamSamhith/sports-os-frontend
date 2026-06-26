@@ -5,11 +5,12 @@ import { useRouter } from 'next/navigation';
 import { Search, X, CornerDownLeft, ArrowUp, ArrowDown, History } from 'lucide-react';
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { academies } from '@/data/academies';
-import { coaches } from '@/data/coaches';
-import { sports } from '@/data/sports';
-import { useRecentSearches, type RecentQuery } from './recent-searches-store';
+import { getAcademies } from '@/lib/api/academies';
+import { listSports } from '@/lib/api/sports';
+import { useRecentSearches } from './recent-searches-store';
 import { cn } from '@/lib/utils/cn';
+import type { Academy } from '@/types/domain/academy';
+import type { Sport } from '@/types/domain/sport';
 
 interface CommandPaletteProps {
   open: boolean;
@@ -18,7 +19,7 @@ interface CommandPaletteProps {
 
 interface Result {
   id: string;
-  group: 'Academies' | 'Coaches' | 'Sports' | 'Navigate';
+  group: 'Academies' | 'Sports' | 'Navigate';
   label: string;
   sublabel?: string;
   href?: string;
@@ -33,7 +34,11 @@ function matches(haystack: string, q: string): number {
   return 0;
 }
 
-function searchAll(q: string): Result[] {
+function buildResults(
+  q: string,
+  academies: Academy[],
+  sports: Sport[],
+): Result[] {
   if (!q) return [];
   const lower = q.toLowerCase();
   const results: Array<Result & { score: number }> = [];
@@ -41,43 +46,30 @@ function searchAll(q: string): Result[] {
   for (const a of academies) {
     const score = Math.max(
       matches(a.name, lower),
-      matches(a.location.city, lower),
-      matches(a.location.state, lower),
+      matches(a.location?.city ?? '', lower),
+      matches(a.location?.state ?? '', lower),
       ...a.sportsOffered.map((s) => matches(s, lower)),
     );
     if (score > 0) {
       results.push({
-        id: `academy:${a.id}`,
+        id: `academy:${a.id ?? a.slug}`,
         group: 'Academies',
         label: a.name,
-        sublabel: `${a.location.city}, ${a.location.state}`,
+        sublabel: `${a.location?.city ?? ''}, ${a.location?.state ?? ''}`,
         href: `/academies/${a.slug}`,
         score,
       });
     }
   }
-  for (const c of coaches) {
+
+  for (const s of sports) {
     const score = Math.max(
-      matches(c.name, lower),
-      matches(c.location.city, lower),
-      ...c.sportsCoached.map((s) => matches(s, lower)),
+      matches(s.name, lower),
+      matches(s.category ?? '', lower),
     );
     if (score > 0) {
       results.push({
-        id: `coach:${c.id}`,
-        group: 'Coaches',
-        label: c.name,
-        sublabel: `${c.location.city} · ${c.experienceYears}+ yrs`,
-        href: `/coaches/${c.slug}`,
-        score,
-      });
-    }
-  }
-  for (const s of sports) {
-    const score = Math.max(matches(s.name, lower), matches(s.category, lower));
-    if (score > 0) {
-      results.push({
-        id: `sport:${s.id}`,
+        id: `sport:${s.id ?? s.slug}`,
         group: 'Sports',
         label: s.name,
         sublabel: s.category,
@@ -87,14 +79,10 @@ function searchAll(q: string): Result[] {
     }
   }
 
-  // Navigation quick actions
   const navItems: Array<{ id: string; label: string; href: string; sublabel: string }> = [
-    { id: 'nav-home', label: 'Home', href: '/', sublabel: 'Discover the ecosystem' },
-    { id: 'nav-discover', label: 'Discover', href: '/discover', sublabel: 'Browse all categories' },
-    { id: 'nav-academies', label: 'Academies', href: '/academies', sublabel: 'Find the right academy' },
-    { id: 'nav-coaches', label: 'Coaches', href: '/coaches', sublabel: 'Verified coaches across India' },
+    { id: 'nav-home', label: 'Home', href: '/', sublabel: 'Back to homepage' },
+    { id: 'nav-academies', label: 'Academies', href: '/academies', sublabel: 'Find sports academies near you' },
     { id: 'nav-sports', label: 'Sports', href: '/sports', sublabel: 'Explore sports and pathways' },
-    { id: 'nav-shortlist', label: 'Shortlist', href: '/shortlist', sublabel: 'Your saved items' },
     { id: 'nav-compare', label: 'Compare', href: '/compare', sublabel: 'Side-by-side comparison' },
   ];
   for (const n of navItems) {
@@ -109,12 +97,9 @@ function searchAll(q: string): Result[] {
 }
 
 const QUICK_NAV = [
-  { id: 'q-home', label: 'Home', sublabel: 'Discover the ecosystem', href: '/' },
-  { id: 'q-discover', label: 'Discover', sublabel: 'Browse all categories', href: '/discover' },
-  { id: 'q-academies', label: 'Academies', sublabel: 'Find the right academy', href: '/academies' },
-  { id: 'q-coaches', label: 'Coaches', sublabel: 'Verified coaches across India', href: '/coaches' },
+  { id: 'q-home', label: 'Home', sublabel: 'Back to homepage', href: '/' },
+  { id: 'q-academies', label: 'Academies', sublabel: 'Find sports academies near you', href: '/academies' },
   { id: 'q-sports', label: 'Sports', sublabel: 'Explore sports and pathways', href: '/sports' },
-  { id: 'q-shortlist', label: 'Shortlist', sublabel: 'Your saved items', href: '/shortlist' },
   { id: 'q-compare', label: 'Compare', sublabel: 'Side-by-side comparison', href: '/compare' },
 ];
 
@@ -125,45 +110,57 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
   const { items: recent, push: pushRecent, clear: clearRecent, hydrated } = useRecentSearches();
   const inputRef = React.useRef<HTMLInputElement>(null);
   const listRef = React.useRef<HTMLDivElement>(null);
+  const [academies, setAcademies] = React.useState<Academy[]>([]);
+  const [sports, setSports] = React.useState<Sport[]>([]);
+  const [dataLoaded, setDataLoaded] = React.useState(false);
 
-  // Reset on close
+  React.useEffect(() => {
+    if (!open || dataLoaded) return;
+    let cancelled = false;
+    Promise.all([
+      getAcademies({ pageSize: 200 }).catch(() => null),
+      listSports({ status: 'published', limit: 100 }).catch(() => null),
+    ]).then(([acadRes, sportRes]) => {
+      if (cancelled) return;
+      if (acadRes?.ok) setAcademies(acadRes.data.items);
+      if (sportRes?.ok) setSports(sportRes.data.items);
+      setDataLoaded(true);
+    });
+    return () => { cancelled = true; };
+  }, [open, dataLoaded]);
+
   React.useEffect(() => {
     if (!open) {
       setQuery('');
       setHighlight(0);
     } else {
-      // Focus input shortly after open
       const t = setTimeout(() => inputRef.current?.focus(), 30);
       return () => clearTimeout(t);
     }
   }, [open]);
 
-  // Build the result list: when query is empty, show recent + quick nav; otherwise search.
   const results = React.useMemo<Result[]>(() => {
     const q = query.trim();
     if (!q) {
       const recents: Result[] = recent.slice(0, 5).map((r) => ({
         id: `recent:${r.query}`,
-        group: 'Navigate',
+        group: 'Navigate' as const,
         label: r.query,
         sublabel: 'Recent',
-        action: () => {
-          setQuery(r.query);
-        },
+        action: () => setQuery(r.query),
       }));
       const quick: Result[] = QUICK_NAV.map((n) => ({
         id: n.id,
-        group: 'Navigate',
+        group: 'Navigate' as const,
         label: n.label,
         sublabel: n.sublabel,
         href: n.href,
       }));
       return [...recents, ...quick];
     }
-    return searchAll(q);
-  }, [query, recent]);
+    return buildResults(q, academies, sports);
+  }, [query, recent, academies, sports]);
 
-  // Group results by group, preserving the order of first appearance.
   const groups = React.useMemo(() => {
     const map = new Map<string, Result[]>();
     for (const r of results) {
@@ -174,14 +171,10 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
     return Array.from(map.entries());
   }, [results]);
 
-  // Flat list for keyboard navigation
   const flat = React.useMemo(() => results, [results]);
 
-  React.useEffect(() => {
-    setHighlight(0);
-  }, [query]);
+  React.useEffect(() => { setHighlight(0); }, [query]);
 
-  // Scroll highlighted item into view
   React.useEffect(() => {
     const el = listRef.current?.querySelector<HTMLElement>(`[data-result-index="${highlight}"]`);
     el?.scrollIntoView({ block: 'nearest' });
@@ -189,10 +182,7 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
 
   const select = React.useCallback(
     (r: Result) => {
-      if (r.action) {
-        r.action();
-        return;
-      }
+      if (r.action) { r.action(); return; }
       if (r.href) {
         if (query.trim().length > 0) pushRecent(query);
         onOpenChange(false);
@@ -223,14 +213,11 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
         className="max-w-2xl gap-0 overflow-hidden p-0 sm:rounded-2xl [&_[data-dialog-close]]:hidden"
-        onOpenAutoFocus={(e) => {
-          e.preventDefault();
-          inputRef.current?.focus();
-        }}
+        onOpenAutoFocus={(e) => { e.preventDefault(); inputRef.current?.focus(); }}
       >
         <DialogTitle className="sr-only">Command palette</DialogTitle>
         <DialogDescription className="sr-only">
-          Search academies, coaches, sports, and quick navigation actions.
+          Search academies, sports, and quick navigation actions.
         </DialogDescription>
 
         <div className="border-border/60 flex items-center gap-3 border-b px-4 py-3">
@@ -247,31 +234,19 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
             value={query}
             onChange={(e) => setQuery(e.currentTarget.value)}
             onKeyDown={onKeyDown}
-            placeholder="Search academies, coaches, sports, or jump to a page…"
+            placeholder="Search academies, sports, or jump to a page…"
             aria-label="Command palette search"
             className="placeholder:text-muted-foreground/70 text-foreground h-9 w-full bg-transparent text-sm outline-none"
           />
           <kbd className="border-border/60 bg-muted/40 text-muted-foreground hidden items-center gap-1 rounded border px-1.5 py-0.5 font-mono text-[10px] tracking-wide md:inline-flex">
             Esc
           </kbd>
-          <Button
-            variant="ghost"
-            size="icon-sm"
-            className="md:hidden"
-            onClick={() => onOpenChange(false)}
-            aria-label="Close command palette"
-          >
+          <Button variant="ghost" size="icon-sm" className="md:hidden" onClick={() => onOpenChange(false)} aria-label="Close command palette">
             <X className="h-4 w-4" />
           </Button>
         </div>
 
-        <div
-          ref={listRef}
-          role="listbox"
-          aria-label="Search results"
-          aria-live="polite"
-          className="max-h-[60dvh] overflow-y-auto p-2"
-        >
+        <div ref={listRef} role="listbox" aria-label="Search results" aria-live="polite" className="max-h-[60dvh] overflow-y-auto p-2">
           {flat.length === 0 ? (
             <div className="text-muted-foreground px-3 py-8 text-center text-sm">
               {query.trim() ? `No results for "${query.trim()}".` : 'Type to search.'}
@@ -298,21 +273,15 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
                           className={cn(
                             'flex w-full items-center justify-between gap-3 rounded-md px-2 py-2 text-left text-sm transition-colors',
                             'focus-visible:ring-ring focus-visible:ring-2 focus-visible:outline-none',
-                            isActive
-                              ? 'bg-accent/15 text-foreground'
-                              : 'text-foreground/90 hover:bg-accent/10',
+                            isActive ? 'bg-accent/15 text-foreground' : 'text-foreground/90 hover:bg-accent/10',
                           )}
                         >
                           <span className="flex min-w-0 flex-col">
                             <span className="truncate font-medium">{r.label}</span>
-                            {r.sublabel ? (
-                              <span className="text-muted-foreground truncate text-xs">{r.sublabel}</span>
-                            ) : null}
+                            {r.sublabel ? <span className="text-muted-foreground truncate text-xs">{r.sublabel}</span> : null}
                           </span>
                           <span className="text-muted-foreground flex shrink-0 items-center gap-1 text-[10px] tracking-widest uppercase">
-                            {group === 'Navigate' && recent.length > 0 && !query.trim() ? (
-                              <History aria-hidden className="h-3 w-3" />
-                            ) : null}
+                            {group === 'Navigate' && recent.length > 0 && !query.trim() ? <History aria-hidden className="h-3 w-3" /> : null}
                             {isActive ? <CornerDownLeft aria-hidden className="h-3 w-3" /> : null}
                           </span>
                         </button>
@@ -327,24 +296,11 @@ export function CommandPalette({ open, onOpenChange }: CommandPaletteProps) {
 
         <div className="border-border/60 text-muted-foreground flex items-center justify-between border-t px-4 py-2 text-[10px] tracking-wide">
           <div className="flex items-center gap-3">
-            <span className="inline-flex items-center gap-1">
-              <ArrowUp aria-hidden className="h-3 w-3" />
-              <ArrowDown aria-hidden className="h-3 w-3" />
-              navigate
-            </span>
-            <span className="inline-flex items-center gap-1">
-              <CornerDownLeft aria-hidden className="h-3 w-3" />
-              select
-            </span>
+            <span className="inline-flex items-center gap-1"><ArrowUp aria-hidden className="h-3 w-3" /><ArrowDown aria-hidden className="h-3 w-3" /> navigate</span>
+            <span className="inline-flex items-center gap-1"><CornerDownLeft aria-hidden className="h-3 w-3" /> select</span>
           </div>
           {hydrated && recent.length > 0 && !query.trim() ? (
-            <button
-              type="button"
-              onClick={clearRecent}
-              className="hover:text-foreground"
-            >
-              Clear recent
-            </button>
+            <button type="button" onClick={clearRecent} className="hover:text-foreground">Clear recent</button>
           ) : (
             <span>Type to search, or pick a quick link</span>
           )}

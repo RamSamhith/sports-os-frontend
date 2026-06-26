@@ -9,7 +9,8 @@ import { toast } from 'sonner';
 
 interface CompareButtonProps {
   entityType: 'academy' | 'coach' | 'sport';
-  id: string;
+  /** Entity slug used as the unique identifier in compare state. */
+  slug: string;
   label?: string;
   sublabel?: string;
   href?: string;
@@ -18,27 +19,25 @@ interface CompareButtonProps {
 /**
  * CompareButton — single-button compare toggle for detail pages.
  *
- * Looks up the entity in the source fixtures to fetch a label/sublabel/href
- * if none were provided. The CompareProvider repairs metadata on hydration,
- * so even bare `add()` calls end up with a label — but passing meta here
- * means the user sees the right label instantly without a flash.
+ * The `slug` prop is the entity's URL slug, stored as the unique key in
+ * compare state and used to resolve entity data on the compare page.
  */
-export function CompareButton({ entityType, id, label, sublabel, href }: CompareButtonProps) {
+export function CompareButton({ entityType, slug, label, sublabel, href }: CompareButtonProps) {
   const { has, addWithMeta, remove, canAdd, maxItems } = useCompare();
-  const active = has(entityType, id);
+  const active = has(entityType, slug);
 
   const onClick = () => {
     if (active) {
-      remove(entityType, id);
-      trackCompareRemove(id, entityType);
+      remove(entityType, slug);
+      trackCompareRemove(slug, entityType);
       toast(`Removed from compare`);
-    } else if (canAdd(entityType, id)) {
-      addWithMeta(entityType, id, {
-        label: label ?? id,
+    } else if (canAdd(entityType, slug)) {
+      addWithMeta(entityType, slug, {
+        label: label ?? slug,
         sublabel,
         href: href ?? '#',
       });
-      trackCompareAdd(id, entityType, label ?? id);
+      trackCompareAdd(slug, entityType, label ?? slug);
       toast.success('Added to compare');
     } else {
       toast.error(`You can compare up to ${maxItems} items.`);

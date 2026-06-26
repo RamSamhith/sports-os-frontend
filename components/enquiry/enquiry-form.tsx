@@ -101,7 +101,7 @@ export function EnquiryForm({
     if (values.childName?.trim()) {
       payload.childInfo = {
         name: values.childName.trim(),
-        age: values.childAge ? Number(values.childAge) : 0,
+        ...(values.childAge ? { age: Number(values.childAge) } : {}),
       };
     }
 

@@ -126,7 +126,6 @@ async function request<T>(
   const timeoutId = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
 
   try {
-    console.log(`[API] ${options.method ?? 'GET'} ${url}`);
     const res = await fetch(url, { ...options, headers, credentials: 'include', signal: controller.signal });
     clearTimeout(timeoutId);
 
@@ -214,13 +213,11 @@ async function request<T>(
 
     clearTimeout(timeoutId);
     const data = json.data ?? json;
-    console.log(`[API] OK ${options.method ?? 'GET'} ${url}`, { status: res.status });
     return { ok: true, data };
   } catch (err) {
     clearTimeout(timeoutId);
     const message = err instanceof Error ? err.message : 'Network request failed';
     const isAbort = err instanceof DOMException && err.name === 'AbortError';
-    console.error(`[API] FAILED ${options.method ?? 'GET'} ${url}:`, isAbort ? 'Request timed out (10s)' : message);
     return {
       ok: false,
       error: {

@@ -2,8 +2,8 @@ export const siteConfig = {
   name: 'SportsOS',
   tagline: "India's Sports Discovery Ecosystem",
   description:
-    'Discover, compare, evaluate, and shortlist sports academies, coaches, and pathways across India.',
-  url: process.env.NEXT_PUBLIC_SITE_URL ?? 'https://sportsos.example.com',
+    'Discover, compare, evaluate, and shortlist sports academies and pathways across India.',
+  url: process.env.NEXT_PUBLIC_SITE_URL ?? 'https://sportsos.in',
   locale: 'en_IN',
   twitter: '@sportsos',
   organization: {

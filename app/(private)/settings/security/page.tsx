@@ -40,6 +40,7 @@ export default function AccountSecurityPage() {
   const [deleting, setDeleting] = useState(false);
 
   const isOAuth = profile.authProvider === 'google' || profile.authProvider === 'microsoft';
+  const isGuest = profile.authProvider === 'guest';
 
   async function handleChangePassword(e: React.FormEvent) {
     e.preventDefault();
@@ -126,7 +127,7 @@ export default function AccountSecurityPage() {
               <p className="text-sm font-medium">Authentication Method</p>
               <div className="flex items-center gap-2 mt-0.5">
                 <Badge variant="secondary" className="text-xs capitalize">
-                  {profile.authProvider === 'google' ? 'Google' : profile.authProvider === 'microsoft' ? 'Microsoft' : 'Email & Password'}
+                  {profile.authProvider === 'google' ? 'Google' : profile.authProvider === 'microsoft' ? 'Microsoft' : profile.authProvider === 'guest' ? 'Guest' : 'Email & Password'}
                 </Badge>
               </div>
             </div>
@@ -144,6 +145,8 @@ export default function AccountSecurityPage() {
           <CardDescription>
             {isOAuth
               ? `This account uses ${profile.authProvider === 'google' ? 'Google' : 'Microsoft'} Sign In. Password change is not available.`
+              : isGuest
+              ? 'Guest accounts do not have a password. Create a full account to set a password.'
               : 'Update your account password.'}
           </CardDescription>
         </CardHeader>
@@ -151,6 +154,10 @@ export default function AccountSecurityPage() {
           {isOAuth ? (
             <p className="text-muted-foreground text-sm">
               Your account is secured via {profile.authProvider === 'google' ? 'Google' : 'Microsoft'}. No password management needed.
+            </p>
+          ) : isGuest ? (
+            <p className="text-muted-foreground text-sm">
+              You are using a guest account. Create a full account to manage your password.
             </p>
           ) : (
             <form onSubmit={handleChangePassword} className="flex flex-col gap-4" noValidate>

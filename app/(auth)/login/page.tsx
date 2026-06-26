@@ -13,6 +13,7 @@ import { useAuth } from '@/lib/hooks/use-auth';
 import { login as apiLogin, sendLoginOtp } from '@/lib/api/auth';
 import { useGoogleAuth, useMicrosoftAuth, handleSocialAuth } from '@/lib/hooks/use-social-auth';
 import { trackGuestStarted, trackOtpLogin } from '@/lib/analytics/events';
+import { validatePassword } from '@/lib/utils/validators';
 import { Loader2 } from 'lucide-react';
 
 interface FieldErrors {
@@ -73,8 +74,8 @@ export default function LoginPage() {
     const e: FieldErrors = {};
     if (!email.trim()) e.email = 'Email is required';
     else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) e.email = 'Enter a valid email address';
-    if (!password) e.password = 'Password is required';
-    else if (password.length < 8) e.password = 'Password must be at least 8 characters';
+    const pwErr = validatePassword(password);
+    if (pwErr) e.password = pwErr;
     return e;
   }
 
@@ -84,8 +85,8 @@ export default function LoginPage() {
       if (!value.trim()) e.email = 'Email is required';
       else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) e.email = 'Enter a valid email address';
     } else if (field === 'password') {
-      if (!value) e.password = 'Password is required';
-      else if (value.length < 8) e.password = 'Password must be at least 8 characters';
+      const pwErr = validatePassword(value);
+      if (pwErr) e.password = pwErr;
     }
     return e;
   }
@@ -133,6 +134,11 @@ export default function LoginPage() {
     try {
       const res = await apiLogin({ email: email.trim(), password });
       if (!res.ok) {
+        if (res.error.code === 'EMAIL_NOT_VERIFIED') {
+          try { sessionStorage.setItem('sportsos:verify-email', email.trim()); } catch { /* ignore */ }
+          router.push('/verify/signup');
+          return;
+        }
         setServerError(res.error.message);
         setIsSubmitting(false);
         return;

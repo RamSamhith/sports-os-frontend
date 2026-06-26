@@ -52,7 +52,7 @@ export function AcademyCardPlaceholder({ academy, priority = false, distance }: 
     canAdd: canAddToCompare,
     maxItems,
   } = useCompare();
-  const isCompared = hasCompare('academy', id);
+  const isCompared = hasCompare('academy', slug);
 
   return (
     <motion.div
@@ -135,10 +135,10 @@ export function AcademyCardPlaceholder({ academy, priority = false, distance }: 
               e.preventDefault();
               e.stopPropagation();
               if (isCompared) {
-                removeFromCompare('academy', id);
+                removeFromCompare('academy', slug);
                 toast(`Removed ${name} from compare`);
-              } else if (canAddToCompare('academy', id)) {
-                addToCompare('academy', id, {
+              } else if (canAddToCompare('academy', slug)) {
+                addToCompare('academy', slug, {
                   label: name,
                   sublabel: `${location.city}, ${location.state}`,
                   href: `/academies/${slug}`,

@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { Container } from '@/components/layout/container';
 import { Section } from '@/components/layout/section';
 import { Breadcrumbs } from '@/components/seo/breadcrumbs';
+import { SportDetailView } from '@/components/sports/sport-detail-view';
 import { PathwaySection } from '@/components/sports/pathway-section';
 import { SportDisclaimer } from '@/components/sports/sport-disclaimer';
 import { notFound } from 'next/navigation';
@@ -23,7 +24,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   }
 
   const title = `${sport.name} — Sports Pathway & Competitions`;
-  const description = (sport.description || '').slice(0, 155);
+  const description = (sport.shortDescription || '').slice(0, 155);
   const url = `${siteConfig.url}/sports/${sport.slug}`;
 
   return {
@@ -50,14 +51,7 @@ export default async function SportDetailPage({ params }: { params: Promise<{ sl
   const sport = await fetchSport(slug);
   if (!sport) notFound();
 
-  const { slug: sportSlug, name, explorationGuidance } = sport;
-  const ageRange = explorationGuidance?.ageSuitability;
-  const ageText =
-    ageRange?.min !== undefined && ageRange?.max !== undefined
-      ? `Ages ${ageRange.min}–${ageRange.max}`
-      : ageRange?.min !== undefined
-        ? `Ages ${ageRange.min}+`
-        : null;
+  const { slug: sportSlug, name } = sport;
   const competitions = competitionsBySport(sportSlug);
 
   return (
@@ -71,24 +65,17 @@ export default async function SportDetailPage({ params }: { params: Promise<{ sl
           ]}
           className="mb-4"
         />
-        <h1 className="text-3xl font-semibold tracking-tight md:text-4xl">{name}</h1>
-        {ageText ? (
-          <p className="text-muted-foreground mt-1 text-sm">{ageText}</p>
-        ) : (
-          <p className="text-muted-foreground mt-1 text-sm">
-            Pathway, competitions, and exploration guidance.
-          </p>
-        )}
 
-        <div className="mt-8 grid grid-cols-1 gap-8 md:grid-cols-3">
+        <div className="mt-4 grid grid-cols-1 gap-8 md:grid-cols-3">
           <div className="md:col-span-2">
+            <SportDetailView sport={sport} />
+          </div>
+          <div className="flex flex-col gap-6">
             <PathwaySection
               sportSlug={sportSlug}
               sportName={name}
               competitions={competitions}
             />
-          </div>
-          <div>
             <SportDisclaimer />
           </div>
         </div>

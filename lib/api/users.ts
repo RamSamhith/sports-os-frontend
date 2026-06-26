@@ -12,10 +12,10 @@ export interface UpdateUserRequest {
 
 export async function getMe(): Promise<ApiResponse<User>> {
   const { get } = await import('./client');
-  return get<User>('/users/me');
+  return get<User>('/auth/me');
 }
 
 export async function updateMe(data: UpdateUserRequest): Promise<ApiResponse<User>> {
   const { patch } = await import('./client');
-  return patch<User>('/users/me', data);
+  return patch<User>('/auth/profile', data);
 }

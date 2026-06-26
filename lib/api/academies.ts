@@ -27,3 +27,7 @@ export async function getAcademies(params?: AcademyFilterParams): Promise<ApiRes
 export async function getAcademy(slug: string): Promise<ApiResponse<Academy>> {
   return get<Academy>(`/academies/by-slug/${slug}`);
 }
+
+export async function getAcademyById(id: string): Promise<ApiResponse<Academy>> {
+  return get<Academy>(`/academies/${id}`);
+}

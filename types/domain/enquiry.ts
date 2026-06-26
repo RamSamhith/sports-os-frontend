@@ -4,7 +4,8 @@ export type EnquiryIntent =
   | 'contact'
   | 'callback'
   | 'trial'
-  | 'enrollment_interest';
+  | 'enrollment_interest'
+  | 'whatsapp';
 
 export type EnquiryStatus = 'submitted' | 'delivered' | 'failed' | 'bounced';
 
@@ -14,6 +15,7 @@ export interface Enquiry {
   childId?: string;
   targetType: EnquiryTargetType;
   targetId: string;
+  targetName?: string;
   intent: EnquiryIntent;
   parentInfo: {
     name: string;
@@ -22,7 +24,7 @@ export interface Enquiry {
   };
   childInfo?: {
     name: string;
-    age: number;
+    age?: number;
   };
   sportInterest: string;
   message?: string;

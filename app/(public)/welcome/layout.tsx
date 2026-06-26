@@ -4,10 +4,10 @@ import { siteConfig } from '@/config/site';
 
 export const metadata: Metadata = {
   title: 'Welcome',
-  description: 'Join SportsOS — the premium platform for athletes and parents to find academies, discover coaches, explore sports, and compare options.',
+  description: 'Join SportsOS — the premium platform for athletes and parents to find academies, explore sports, and compare options.',
   openGraph: {
     title: `Welcome · ${siteConfig.name}`,
-    description: 'Join SportsOS — the premium platform for athletes and parents to find academies, discover coaches, explore sports, and compare options.',
+    description: 'Join SportsOS — the premium platform for athletes and parents to find academies, explore sports, and compare options.',
     url: siteConfig.url,
     siteName: siteConfig.name,
     type: 'website',
@@ -16,7 +16,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: `Welcome · ${siteConfig.name}`,
-    description: 'Join SportsOS — the premium platform for athletes and parents to find academies, discover coaches, explore sports, and compare options.',
+    description: 'Join SportsOS — the premium platform for athletes and parents to find academies, explore sports, and compare options.',
   },
 };
 

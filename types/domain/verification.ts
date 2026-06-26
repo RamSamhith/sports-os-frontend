@@ -1,4 +1,3 @@
-import type { ModerationStatus } from './review';
 import type { VerificationEvidence } from './academy';
 
 export type VerificationCaseStatus =

@@ -134,7 +134,7 @@ export function CoachCardPlaceholder({ coach }: { coach: Coach }) {
           <div className="flex shrink-0 items-center gap-1.5">
             <CompareButton
               entityType="coach"
-              id={id}
+              slug={slug}
               label={name}
               sublabel={sublabel}
               href={`/coaches/${slug}`}

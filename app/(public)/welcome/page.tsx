@@ -8,12 +8,11 @@ import Link from 'next/link';
 import { AuthModal } from '@/components/auth/auth-modal';
 import { useAuth } from '@/lib/hooks/use-auth';
 import { useRouter } from 'next/navigation';
-import { Search, Users, Trophy, ArrowRightLeft, ArrowRight } from 'lucide-react';
+import { Search, Trophy, ArrowRightLeft, ArrowRight } from 'lucide-react';
 import { ease, duration } from '@/components/motion/constants';
 
 const features = [
   { title: 'Find Academies', description: 'Discover top-rated sports academies near you', href: '/academies', icon: Search },
-  { title: 'Discover Coaches', description: 'Connect with certified coaches across sports', href: '/coaches', icon: Users },
   { title: 'Explore Sports', description: 'Explore 20+ sports and find your passion', href: '/sports', icon: Trophy },
   { title: 'Compare Options', description: 'Side-by-side comparison for confident decisions', href: '/compare', icon: ArrowRightLeft },
 ];
@@ -114,7 +113,7 @@ export default function WelcomePage() {
               className="text-muted-foreground mx-auto max-w-xl text-lg sm:text-xl"
               style={{ textWrap: 'balance' }}
             >
-              Find academies, discover coaches, explore sports, and compare
+              Find academies, explore sports, and compare
               options — all in one trusted platform.
             </motion.p>
           </motion.div>

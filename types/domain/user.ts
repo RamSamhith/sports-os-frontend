@@ -8,6 +8,13 @@ export interface UserPreferences {
   location?: LocationSummary;
   defaultRadiusKm?: Radius;
   defaultSportInterests?: string[]; // sport slugs
+  favoriteSports?: string[];
+  city?: string;
+  radius?: number;
+  skillLevel?: string;
+  goals?: string;
+  notifications?: boolean;
+  language?: string;
 }
 
 export interface ConsentFlags {
@@ -25,6 +32,8 @@ export interface User {
   avatar?: string;
   authProvider?: 'credentials' | 'google' | 'microsoft' | 'guest';
   lastLoginAt?: string;
+  isVerified?: boolean;
+  phoneVerified?: boolean;
   onboardingCompleted?: boolean;
   // Onboarding profile fields (persisted to backend)
   age?: number | null;

@@ -13,6 +13,7 @@ import type { Coach } from '@/types/domain/coach';
 export function FeaturedCoaches() {
   const [coaches, setCoaches] = React.useState<Coach[]>([]);
   const [loading, setLoading] = React.useState(true);
+  const [loadError, setLoadError] = React.useState(false);
 
   React.useEffect(() => {
     let cancelled = false;
@@ -24,7 +25,7 @@ export function FeaturedCoaches() {
           setCoaches(res.data.items);
         }
       } catch {
-        // network error — leave coaches empty
+        if (!cancelled) setLoadError(true);
       } finally {
         if (!cancelled) setLoading(false);
       }
@@ -54,6 +55,14 @@ export function FeaturedCoaches() {
             {Array.from({ length: 3 }).map((_, i) => (
               <CoachCardSkeleton key={i} />
             ))}
+          </div>
+        ) : loadError ? (
+          <div className="text-muted-foreground flex flex-col items-center gap-3 rounded-xl border border-dashed py-12 text-center">
+            <Users className="h-10 w-10 opacity-40" />
+            <div>
+              <p className="text-foreground font-medium">Failed to load coaches</p>
+              <p className="text-sm">Please try again later.</p>
+            </div>
           </div>
         ) : featured.length === 0 ? (
           <div className="text-muted-foreground flex flex-col items-center gap-3 rounded-xl border border-dashed py-12 text-center">

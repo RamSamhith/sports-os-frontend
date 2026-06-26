@@ -23,7 +23,7 @@ export function SearchSection() {
     <Section spacing="sm">
       <Container size="lg">
         <div className="flex flex-col gap-3">
-          <SearchBar onSearch={handleSearch} placeholder="Search academies, coaches, sports, cities…" />
+          <SearchBar onSearch={handleSearch} placeholder="Search academies, sports, cities…" />
           <RecentSearches
             queries={recentQueries}
             onSelect={(q) => router.push(`/search?q=${encodeURIComponent(q)}`)}

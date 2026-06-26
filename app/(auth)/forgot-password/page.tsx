@@ -14,6 +14,7 @@ import { Loader2, CheckCircle2, ArrowLeft, Mail, Shield } from 'lucide-react';
 import { useAuth } from '@/lib/hooks/use-auth';
 import { sendForgotPasswordOtp, verifyResetOtp, resetPassword, checkProvider } from '@/lib/api/auth';
 import { trackForgotPasswordStarted, trackPasswordResetSuccess } from '@/lib/analytics/events';
+import { validatePassword, getPasswordErrors } from '@/lib/utils/validators';
 
 const FAST = { duration: 0.2, ease: [0.2, 0, 0, 1] as const };
 
@@ -66,16 +67,6 @@ function ForgotPasswordContent() {
     return '';
   }
 
-  function validatePassword(value: string): Record<string, string> {
-    const errors: Record<string, string> = {};
-    if (value.length < 8) errors.minLength = 'At least 8 characters';
-    if (!/[A-Z]/.test(value)) errors.uppercase = 'One uppercase letter';
-    if (!/[a-z]/.test(value)) errors.lowercase = 'One lowercase letter';
-    if (!/\d/.test(value)) errors.number = 'One number';
-    if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(value)) errors.special = 'One special character';
-    return errors;
-  }
-
   function handleBlur() {
     setTouched(true);
     setError(validate(email));
@@ -87,10 +78,10 @@ function ForgotPasswordContent() {
   }
 
   function getPasswordStrength(): 'weak' | 'medium' | 'strong' {
-    const errors = validatePassword(newPassword);
+    const errors = getPasswordErrors(newPassword);
     const count = Object.keys(errors).length;
-    if (count <= 1) return 'strong';
-    if (count <= 3) return 'medium';
+    if (count === 0) return 'strong';
+    if (count <= 1) return 'medium';
     return 'weak';
   }
 
@@ -149,7 +140,7 @@ function ForgotPasswordContent() {
 
   async function handlePasswordSubmit(e: React.FormEvent) {
     e.preventDefault();
-    const pwErrors = validatePassword(newPassword);
+    const pwErrors = getPasswordErrors(newPassword);
     setPasswordErrors(pwErrors);
     if (Object.keys(pwErrors).length > 0) return;
 
@@ -186,7 +177,7 @@ function ForgotPasswordContent() {
   };
 
   const strength = getPasswordStrength();
-  const pwErrors = validatePassword(newPassword);
+  const pwErrors = getPasswordErrors(newPassword);
 
   return (
     <SharedLayout layoutId="auth-card">

@@ -16,9 +16,11 @@ import {
 } from '@/components/ui/select';
 import { useAuth } from '@/lib/hooks/use-auth';
 import { useOnboarding } from '@/lib/hooks/use-onboarding';
+import { syncPreferences } from '@/lib/api/auth';
 import { sportTaxonomy } from '@/lib/constants/sport-taxonomy';
 import { RADIUS_OPTIONS } from '@/lib/constants/radii';
-import { CheckCircle2, Pencil } from 'lucide-react';
+import { CheckCircle2, Loader2, Pencil } from 'lucide-react';
+import { toast } from 'sonner';
 
 const STORAGE_KEY = 'sportsos:preferences';
 const SKILL_LEVELS = [
@@ -77,6 +79,7 @@ export default function PreferencesPage() {
   const [touched, setTouched] = useState<Record<string, boolean>>({});
   const [hydrated, setHydrated] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     const stored = readPreferences();
@@ -151,7 +154,7 @@ export default function PreferencesPage() {
     });
   }
 
-  function handleSave() {
+  async function handleSave() {
     setTouched({ city: true });
     const validationErrors = validate();
     setErrors(validationErrors);
@@ -165,7 +168,26 @@ export default function PreferencesPage() {
       goals: goals.trim(),
     };
     writePreferences(prefs);
-    setSaved(true);
+
+    // Sync to backend if authenticated
+    setSaving(true);
+    const res = await syncPreferences({
+      favoriteSports: sports,
+      city: city.trim(),
+      radius,
+      skillLevel,
+      goals: goals.trim(),
+      notifications: true,
+    });
+    setSaving(false);
+
+    if (res.ok) {
+      setSaved(true);
+      toast.success('Preferences saved');
+    } else {
+      setSaved(true);
+      toast.success('Preferences saved locally');
+    }
   }
 
   return (
@@ -308,7 +330,8 @@ export default function PreferencesPage() {
               Saved
             </span>
           )}
-          <Button onClick={handleSave} disabled={!hydrated}>
+          <Button onClick={handleSave} disabled={!hydrated || saving}>
+            {saving ? <Loader2 className="h-4 w-4 animate-spin mr-1" /> : null}
             Save
           </Button>
         </div>

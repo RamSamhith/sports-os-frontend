@@ -8,7 +8,7 @@ import { Pencil, Trash2 } from 'lucide-react';
 export function ChildCard({
   name,
   age,
-  sport,
+  sportInterests,
   skillLevel,
   isActive,
   onEdit,
@@ -16,12 +16,13 @@ export function ChildCard({
 }: {
   name: string;
   age: number;
-  sport: string;
+  sportInterests?: string[];
   skillLevel?: string;
   isActive?: boolean;
   onEdit?: () => void;
   onRemove?: () => void;
 }) {
+  const sportLabel = sportInterests?.length ? sportInterests[0] : 'No sport';
   return (
     <Card className={isActive ? 'ring-primary/40 ring-2' : undefined}>
       <CardHeader className="pb-3">
@@ -55,7 +56,7 @@ export function ChildCard({
         </div>
       </CardHeader>
       <CardContent className="flex flex-wrap gap-1.5">
-        <Badge variant="secondary">{sport}</Badge>
+        <Badge variant="secondary">{sportLabel}</Badge>
         {skillLevel && <Badge variant="outline">{skillLevel}</Badge>}
       </CardContent>
     </Card>

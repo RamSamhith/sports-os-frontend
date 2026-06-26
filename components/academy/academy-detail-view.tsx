@@ -214,7 +214,7 @@ export function AcademyDetailView({ slug }: { slug: string }) {
             />
             <CompareButton
               entityType="academy"
-              id={academy.id}
+              slug={academy.slug}
               label={academy.name}
               sublabel={`${academy.location.city}, ${academy.location.state}`}
               href={`/academies/${academy.slug}`}

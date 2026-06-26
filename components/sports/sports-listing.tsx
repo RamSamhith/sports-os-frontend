@@ -11,7 +11,7 @@ import { useSearchQuery } from '@/lib/hooks/use-search-query';
 import { listSports } from '@/lib/api/sports';
 import type { Sport } from '@/types/domain/sport';
 
-export function SportsListing() {
+export function SportsListing({ hideSearch = false }: { hideSearch?: boolean } = {}) {
   const { query, setQuery, debouncedQuery } = useSearchQuery();
   const [allSports, setAllSports] = React.useState<Sport[]>([]);
   const [loading, setLoading] = React.useState(true);
@@ -39,7 +39,7 @@ export function SportsListing() {
     const q = query.trim().toLowerCase();
     if (!q) return allSports;
     return allSports.filter((s) => {
-      const haystack = [s.name, s.category, ...(s.description ? [s.description] : [])]
+      const haystack = [s.name, s.category, s.shortDescription ?? '']
         .join(' ')
         .toLowerCase();
       return haystack.includes(q);
@@ -49,15 +49,17 @@ export function SportsListing() {
   if (loading) {
     return (
       <div className="flex flex-col gap-4">
-        <div>
-          <SearchInput
-            value=""
-            onValueChange={() => {}}
-            label="Search sports"
-            placeholder="Search sports by name or category…"
-            size="lg"
-          />
-        </div>
+        {!hideSearch && (
+          <div>
+            <SearchInput
+              value=""
+              onValueChange={() => {}}
+              label="Search sports"
+              placeholder="Search sports by name or category…"
+              size="lg"
+            />
+          </div>
+        )}
         <div className="flex justify-center py-8">
           <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
         </div>
@@ -68,15 +70,17 @@ export function SportsListing() {
   if (error) {
     return (
       <div className="flex flex-col gap-4">
-        <div>
-          <SearchInput
-            value=""
-            onValueChange={() => {}}
-            label="Search sports"
-            placeholder="Search sports by name or category…"
-            size="lg"
-          />
-        </div>
+        {!hideSearch && (
+          <div>
+            <SearchInput
+              value=""
+              onValueChange={() => {}}
+              label="Search sports"
+              placeholder="Search sports by name or category…"
+              size="lg"
+            />
+          </div>
+        )}
         <div className="flex flex-col items-center gap-3 rounded-xl border border-dashed py-12 text-center">
           <AlertTriangle className="h-10 w-10 text-destructive/40" />
           <div>
@@ -93,15 +97,17 @@ export function SportsListing() {
 
   return (
     <div className="flex flex-col gap-4">
-      <div>
-        <SearchInput
-          value={query}
-          onValueChange={setQuery}
-          label="Search sports"
-          placeholder="Search sports by name or category…"
-          size="lg"
-        />
-      </div>
+      {!hideSearch && (
+        <div>
+          <SearchInput
+            value={query}
+            onValueChange={setQuery}
+            label="Search sports"
+            placeholder="Search sports by name or category…"
+            size="lg"
+          />
+        </div>
+      )}
 
       <p className="text-muted-foreground text-sm">
         {filtered.length} of {allSports.length} sports

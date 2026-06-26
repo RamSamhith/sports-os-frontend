@@ -2,12 +2,15 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import { useStorageSync } from './use-storage-sync';
+import { getChildren, createChild as apiCreateChild, updateChild as apiUpdateChild, deleteChild as apiDeleteChild } from '@/lib/api/children';
+import { useAuth } from './use-auth';
 
 export interface Child {
   id: string;
   name: string;
   age: number;
-  sport: string;
+  gender?: string;
+  sportInterests: string[];
   skillLevel?: string;
   createdAt: string;
 }
@@ -31,8 +34,7 @@ function readChildren(): Child[] {
         typeof c === 'object' &&
         typeof c.id === 'string' &&
         typeof c.name === 'string' &&
-        typeof c.age === 'number' &&
-        typeof c.sport === 'string',
+        typeof c.age === 'number',
     );
   } catch {
     return [];
@@ -68,16 +70,45 @@ function writeActiveChild(id: string | null) {
 }
 
 export function useChildren() {
+  const { isAuthenticated, isGuest } = useAuth();
   const [children, setChildren] = useState<Child[]>([]);
   const [activeChildId, setActiveChildId] = useState<string | null>(null);
   const [hydrated, setHydrated] = useState(false);
 
-  // Hydrate from localStorage
+  // Hydrate from localStorage on mount
   useEffect(() => {
     setChildren(readChildren());
     setActiveChildId(readActiveChild());
     setHydrated(true);
   }, []);
+
+  // Load from backend when authenticated (non-guest)
+  useEffect(() => {
+    if (!hydrated || !isAuthenticated || isGuest) return;
+    let cancelled = false;
+    getChildren().then((res) => {
+      if (cancelled || !res.ok) return;
+      const backendChildren: Child[] = (res.data || []).map((c) => {
+        const child = c as unknown as Record<string, unknown>;
+        return {
+          id: String(child.id || ''),
+          name: String(child.name || ''),
+          age: Number(child.age) || 0,
+          gender: child.gender ? String(child.gender) : undefined,
+          skillLevel: child.skillLevel ? String(child.skillLevel) : undefined,
+          sportInterests: Array.isArray(child.sportInterests) ? child.sportInterests.map(String) : [],
+          createdAt: new Date().toISOString(),
+        };
+      });
+      if (backendChildren.length > 0) {
+        setChildren(backendChildren);
+        writeChildren(backendChildren);
+      }
+    }).catch(() => {
+      // Non-critical — localStorage fallback is already hydrated
+    });
+    return () => { cancelled = true; };
+  }, [hydrated, isAuthenticated, isGuest]);
 
   // Sync active child if it was removed
   useEffect(() => {
@@ -105,36 +136,92 @@ export function useChildren() {
   useStorageSync(CHILDREN_KEY, handleExternalChange);
 
   const addChild = useCallback(
-    (data: Omit<Child, 'id' | 'createdAt'>) => {
-      const child: Child = {
-        ...data,
+    async (data: { name: string; age: number; sport?: string; skillLevel?: string; sportInterests?: string[] }) => {
+      // Optimistic local update
+      const localChild: Child = {
         id: generateId(),
+        name: data.name,
+        age: data.age,
+        sportInterests: data.sportInterests || (data.sport ? [data.sport] : []),
+        skillLevel: data.skillLevel,
         createdAt: new Date().toISOString(),
       };
-      const next = [...children, child];
+      const next = [...children, localChild];
       setChildren(next);
       writeChildren(next);
+
       // Auto-select first child
       if (next.length === 1) {
-        setActiveChildId(child.id);
-        writeActiveChild(child.id);
+        setActiveChildId(localChild.id);
+        writeActiveChild(localChild.id);
       }
-      return child;
+
+      // Sync to backend if authenticated
+      if (isAuthenticated && !isGuest) {
+        const res = await apiCreateChild({
+          name: data.name,
+          age: data.age,
+          sportInterests: data.sportInterests || (data.sport ? [data.sport] : []),
+          skillLevel: data.skillLevel,
+        });
+        if (res.ok) {
+          // Replace local ID with backend ID
+          const backendData = res.data as unknown as Record<string, unknown>;
+          const backendChild: Child = {
+            id: String(backendData.id || ''),
+            name: data.name,
+            age: data.age,
+            sportInterests: data.sportInterests || (data.sport ? [data.sport] : []),
+            skillLevel: data.skillLevel,
+            createdAt: new Date().toISOString(),
+          };
+          const updated = next.map((c) => (c.id === localChild.id ? backendChild : c));
+          setChildren(updated);
+          writeChildren(updated);
+          if (activeChildId === localChild.id) {
+            setActiveChildId(backendChild.id);
+            writeActiveChild(backendChild.id);
+          }
+          return backendChild;
+        }
+      }
+
+      return localChild;
     },
-    [children],
+    [children, activeChildId, isAuthenticated, isGuest],
   );
 
   const updateChild = useCallback(
-    (id: string, data: Partial<Omit<Child, 'id' | 'createdAt'>>) => {
-      const next = children.map((c) => (c.id === id ? { ...c, ...data } : c));
+    async (id: string, data: { name?: string; age?: number; sport?: string; skillLevel?: string; sportInterests?: string[] }) => {
+      // Optimistic local update
+      const next = children.map((c) =>
+        c.id === id
+          ? {
+              ...c,
+              ...data,
+              sportInterests: data.sportInterests || (data.sport ? [data.sport] : c.sportInterests),
+            }
+          : c,
+      );
       setChildren(next);
       writeChildren(next);
+
+      // Sync to backend if authenticated
+      if (isAuthenticated && !isGuest) {
+        await apiUpdateChild(id, {
+          name: data.name,
+          age: data.age,
+          sportInterests: data.sportInterests || (data.sport ? [data.sport] : undefined),
+          skillLevel: data.skillLevel,
+        });
+      }
     },
-    [children],
+    [children, isAuthenticated, isGuest],
   );
 
   const removeChild = useCallback(
-    (id: string) => {
+    async (id: string) => {
+      // Optimistic local update
       const next = children.filter((c) => c.id !== id);
       setChildren(next);
       writeChildren(next);
@@ -143,8 +230,13 @@ export function useChildren() {
         setActiveChildId(nextActive);
         writeActiveChild(nextActive);
       }
+
+      // Sync to backend if authenticated
+      if (isAuthenticated && !isGuest) {
+        await apiDeleteChild(id);
+      }
     },
-    [children, activeChildId],
+    [children, activeChildId, isAuthenticated, isGuest],
   );
 
   const setActiveChild = useCallback(

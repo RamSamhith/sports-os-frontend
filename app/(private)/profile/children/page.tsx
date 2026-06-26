@@ -33,11 +33,11 @@ export default function ChildrenPage() {
     return null;
   }
 
-  function handleAdd(data: { name: string; age: number; sport: string; skillLevel?: string }) {
+  function handleAdd(data: { name: string; age: number; sportInterests: string[]; skillLevel?: string }) {
     addChild(data);
   }
 
-  function handleEdit(data: { name: string; age: number; sport: string; skillLevel?: string }) {
+  function handleEdit(data: { name: string; age: number; sportInterests: string[]; skillLevel?: string }) {
     if (editingChild) {
       updateChild(editingChild.id, data);
       setEditingChild(null);
@@ -55,7 +55,7 @@ export default function ChildrenPage() {
     ? {
         name: parentData.childName,
         age: parentData.childAge,
-        sport: parentData.sportInterests[0] ?? '',
+        sportInterests: parentData.sportInterests.length > 0 ? [parentData.sportInterests[0]] : [],
         skillLevel: parentData.skillLevel,
       }
     : undefined;
@@ -87,7 +87,7 @@ export default function ChildrenPage() {
               key={child.id}
               name={child.name}
               age={child.age}
-              sport={child.sport}
+              sportInterests={child.sportInterests}
               skillLevel={child.skillLevel}
               isActive={child.id === activeChildId}
               onEdit={() => {

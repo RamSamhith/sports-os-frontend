@@ -6,7 +6,9 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/lib/hooks/use-auth';
-import { CheckCircle2 } from 'lucide-react';
+import { updateProfile } from '@/lib/api/auth';
+import { CheckCircle2, Loader2 } from 'lucide-react';
+import { toast } from 'sonner';
 
 interface ProfileErrors {
   name?: string;
@@ -23,6 +25,7 @@ export default function SettingsProfilePage() {
   const [touched, setTouched] = useState<Record<string, boolean>>({});
   const [hydrated, setHydrated] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     setName(profile.name);
@@ -38,12 +41,6 @@ export default function SettingsProfilePage() {
       e.name = 'Name is required';
     } else if (name.trim().length < 2) {
       e.name = 'Name must be at least 2 characters';
-    }
-
-    if (!email.trim()) {
-      e.email = 'Email is required';
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      e.email = 'Enter a valid email address';
     }
 
     if (!phone.trim()) {
@@ -64,9 +61,6 @@ export default function SettingsProfilePage() {
     if (field === 'name') {
       if (!value.trim()) e.name = 'Name is required';
       else if (value.trim().length < 2) e.name = 'Name must be at least 2 characters';
-    } else if (field === 'email') {
-      if (!value.trim()) e.email = 'Email is required';
-      else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) e.email = 'Enter a valid email address';
     } else if (field === 'phone') {
       if (!value.trim()) {
         e.phone = 'Phone number is required';
@@ -97,7 +91,6 @@ export default function SettingsProfilePage() {
 
   function handleChange(field: string, value: string) {
     if (field === 'name') setName(value);
-    else if (field === 'email') setEmail(value);
     else if (field === 'phone') setPhone(value);
 
     setSaved(false);
@@ -116,7 +109,7 @@ export default function SettingsProfilePage() {
     }
   }
 
-  function handleSave() {
+  async function handleSave() {
     setTouched({ name: true, email: true, phone: true });
 
     const validationErrors = validate();
@@ -124,12 +117,23 @@ export default function SettingsProfilePage() {
 
     if (Object.keys(validationErrors).length > 0) return;
 
-    setProfile({
+    setSaving(true);
+    const res = await updateProfile({
       name: name.trim(),
-      email: email.trim(),
       phone: phone.trim(),
     });
-    setSaved(true);
+    setSaving(false);
+
+    if (res.ok) {
+      setProfile({
+        name: name.trim(),
+        phone: phone.trim(),
+      });
+      setSaved(true);
+      toast.success('Profile updated');
+    } else {
+      toast.error(res.error.message);
+    }
   }
 
   const errorId = (field: string) => `settings-profile-${field}-error`;
@@ -178,17 +182,13 @@ export default function SettingsProfilePage() {
                 type="email"
                 placeholder="you@example.com"
                 value={email}
-                onChange={(e) => handleChange('email', e.target.value)}
-                onBlur={(e) => handleBlur('email', e.target.value)}
-                aria-invalid={!!errors.email}
-                aria-describedby={errors.email ? errorId('email') : undefined}
-                disabled={!hydrated}
+                disabled
+                readOnly
+                aria-describedby="settings-email-readonly-hint"
               />
-              {errors.email && (
-                <p id={errorId('email')} role="alert" className="text-destructive text-xs">
-                  {errors.email}
-                </p>
-              )}
+              <p id="settings-email-readonly-hint" className="text-muted-foreground text-xs">
+                Email cannot be changed here. Contact support to update your email.
+              </p>
             </div>
 
             <div className="flex flex-col gap-1.5">
@@ -219,7 +219,8 @@ export default function SettingsProfilePage() {
                 Saved
               </span>
             )}
-            <Button onClick={handleSave} disabled={!hydrated}>
+            <Button onClick={handleSave} disabled={!hydrated || saving}>
+              {saving ? <Loader2 className="h-4 w-4 animate-spin mr-1" /> : null}
               Save
             </Button>
           </div>

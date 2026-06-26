@@ -7,8 +7,8 @@ import { useChildren } from '@/lib/hooks/use-children'
 import { useRecentlyViewed } from '@/lib/hooks/use-recently-viewed'
 import { getSuggestedAcademies, logMatchingAudit } from '@/lib/utils/matching'
 import { getAcademies } from '@/lib/api/academies'
-import { getCoaches } from '@/lib/api/coaches'
 import type { OnboardingData, SkillLevel } from '@/lib/hooks/use-onboarding'
+import type { Academy } from '@/types/domain/academy'
 import { MatchingExplanation } from './matching-explanation'
 import { SuggestedAcademies } from './suggested-academies'
 import { RecentlyViewed } from './recently-viewed'
@@ -17,26 +17,35 @@ import { YourAcademy } from './your-academy'
 import { Section } from '@/components/layout/section'
 import { Container } from '@/components/layout/container'
 
+const DEFAULT_LAT = 28.6139
+const DEFAULT_LNG = 77.209
+
 export function PersonalizedHome() {
   const { role } = useAuth()
   const { data: onboarding, completed, hydrated } = useOnboarding()
   const { activeChild } = useChildren()
   const { recentAcademies, recentCoaches } = useRecentlyViewed()
-  const [apiAcademies, setApiAcademies] = useState<any[]>([])
-  const [apiCoaches, setApiCoaches] = useState<any[]>([])
+  const [apiAcademies, setApiAcademies] = useState<Academy[]>([])
   const [apiError, setApiError] = useState<string | null>(null)
+  const [coords, setCoords] = useState<{ lat: number; lng: number }>({ lat: DEFAULT_LAT, lng: DEFAULT_LNG })
+
+  useEffect(() => {
+    if (typeof navigator !== 'undefined' && navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (pos) => setCoords({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
+        () => {},
+        { timeout: 5000 },
+      )
+    }
+  }, [])
 
   useEffect(() => {
     let cancelled = false
     async function load() {
       try {
-        const [academiesRes, coachesRes] = await Promise.all([
-          getAcademies({ pageSize: 200 }),
-          getCoaches({ pageSize: 200 }),
-        ])
+        const academiesRes = await getAcademies({ pageSize: 200 })
         if (cancelled) return
         if (academiesRes.ok) setApiAcademies(academiesRes.data.items)
-        if (coachesRes.ok) setApiCoaches(coachesRes.data.items)
       } catch (err) {
         if (!cancelled) setApiError(err instanceof Error ? err.message : 'Failed to load')
       }
@@ -44,9 +53,6 @@ export function PersonalizedHome() {
     load()
     return () => { cancelled = true }
   }, [])
-
-  const USER_LAT = 12.9716
-  const USER_LNG = 77.5946
 
   const effectiveOnboarding = useMemo<OnboardingData | null>(() => {
     if (!onboarding || !completed) return null
@@ -56,7 +62,7 @@ export function PersonalizedHome() {
         ...onboarding.parent,
         childName: activeChild.name,
         childAge: activeChild.age,
-        sportInterests: [activeChild.sport],
+        sportInterests: activeChild.sportInterests,
         skillLevel: (activeChild.skillLevel as SkillLevel) ?? onboarding.parent.skillLevel,
       },
     }
@@ -68,24 +74,23 @@ export function PersonalizedHome() {
         return { academies: { primary: [], fallback: [], hasExactMatch: false } }
       }
       return {
-        academies: getSuggestedAcademies(apiAcademies, effectiveOnboarding, USER_LAT, USER_LNG, 6),
+        academies: getSuggestedAcademies(apiAcademies, effectiveOnboarding, coords.lat, coords.lng, 6),
       }
     },
-    [effectiveOnboarding, apiAcademies]
+    [effectiveOnboarding, apiAcademies, coords]
   )
 
   const { academies: suggestedAcademies } = suggestions
 
   const lastAcademy = recentAcademies[0]
-  const lastCoach = recentCoaches[0]
-  const showContinueExploring = lastAcademy || lastCoach
-  const showRecentlyViewed = recentAcademies.length > 0 || recentCoaches.length > 0
+  const showContinueExploring = !!lastAcademy
+  const showRecentlyViewed = recentAcademies.length > 0
 
   useEffect(() => {
     if (completed && effectiveOnboarding && apiAcademies.length > 0) {
-      logMatchingAudit(effectiveOnboarding, apiAcademies, apiCoaches)
+      logMatchingAudit(effectiveOnboarding, apiAcademies, [])
     }
-  }, [completed, effectiveOnboarding, role, activeChild, apiAcademies, apiCoaches])
+  }, [completed, effectiveOnboarding, role, activeChild, apiAcademies])
 
   if (!hydrated || !completed || !effectiveOnboarding) return null
 
@@ -140,7 +145,7 @@ export function PersonalizedHome() {
       {showContinueExploring && (
         <Section>
           <Container size="lg">
-            <ContinueExploring lastAcademy={lastAcademy} lastCoach={lastCoach} />
+            <ContinueExploring lastAcademy={lastAcademy} lastCoach={recentCoaches[0]} />
           </Container>
         </Section>
       )}

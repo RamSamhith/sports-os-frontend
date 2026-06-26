@@ -45,7 +45,7 @@ export default function SettingsLocationPage() {
       <header className="flex flex-col gap-1">
         <h2 className="text-2xl font-semibold tracking-tight">Location</h2>
         <p className="text-muted-foreground text-sm text-pretty">
-          Set your location to find nearby academies, coaches, and events.
+          Set your location to find nearby academies and events.
         </p>
       </header>
 
@@ -131,7 +131,7 @@ export default function SettingsLocationPage() {
         <CardHeader>
           <CardTitle>Search radius</CardTitle>
           <CardDescription>
-            How far to search for academies and coaches from your location.
+            How far to search for academies from your location.
           </CardDescription>
         </CardHeader>
         <CardContent>

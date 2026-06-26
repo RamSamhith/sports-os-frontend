@@ -7,8 +7,6 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { ShortlistSkeleton } from '@/components/feedback/skeletons';
 import { getMyEnquiries } from '@/lib/api/enquiries';
-import { academies } from '@/data/academies';
-import { coaches } from '@/data/coaches';
 import type { Enquiry } from '@/types/domain/enquiry';
 
 const statusColors: Record<string, string> = {
@@ -19,10 +17,12 @@ const statusColors: Record<string, string> = {
 };
 
 function getTargetName(eq: Enquiry): string {
-  if (eq.targetType === 'academy') {
-    return academies.find((a) => a.id === eq.targetId)?.name ?? 'Academy';
+  // Use the targetName populated by the backend on creation
+  const raw = eq as unknown as Record<string, unknown>;
+  if (raw.targetName) {
+    return String(raw.targetName);
   }
-  return coaches.find((c) => c.id === eq.targetId)?.name ?? 'Coach';
+  return eq.targetType === 'academy' ? 'Academy' : eq.targetType;
 }
 
 export default function EnquiriesPage() {
@@ -54,7 +54,7 @@ export default function EnquiriesPage() {
       <EmptyState
         icon={<MessageCircle className="h-5 w-5" />}
         title="No enquiries yet"
-        description="When you contact an academy or coach, your enquiries will appear here."
+        description="When you contact an academy, your enquiries will appear here."
       />
     );
   }

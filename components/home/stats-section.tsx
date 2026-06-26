@@ -46,7 +46,6 @@ export function StatsSection() {
         { label: 'Academies', value: formatCount(academyCount), href: '/academies' },
         { label: 'Sports', value: formatCount(sportCount), href: '/sports' },
         { label: 'Cities', value: formatCount(cities.size), href: '/search' },
-        { label: 'Coaches', value: formatCount(Math.floor(academyCount * 2.5)), href: '/academies' },
       ]);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load stats');
@@ -91,7 +90,7 @@ export function StatsSection() {
   return (
     <Section spacing="sm">
       <Container size="lg">
-        <div className="grid grid-cols-2 gap-2 md:grid-cols-4">
+        <div className="grid grid-cols-3 gap-2 md:grid-cols-3">
           {stats.map((s) => (
             <Link
               key={s.label}

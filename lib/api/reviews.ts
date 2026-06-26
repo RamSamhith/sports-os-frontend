@@ -9,14 +9,15 @@ export interface Review {
   rating: number;
   title?: string;
   text?: string;
-  comment?: string;
   photos: string[];
   parentName?: string;
   childAge?: number;
   sport?: string;
   relationship: 'parent' | 'athlete' | 'other';
   helpfulCount: number;
+  reportedCount: number;
   isVerified: boolean;
+  moderationStatus: 'pending' | 'approved' | 'rejected';
   createdAt: string;
 }
 

@@ -7,10 +7,10 @@ import { siteConfig } from '@/config/site';
 
 export const metadata: Metadata = {
   title: 'Discover',
-  description: 'Explore the sports ecosystem across India — academies, coaches, and sports pathways.',
+  description: 'Explore the sports ecosystem across India — academies and sports pathways.',
   openGraph: {
     title: `Discover · ${siteConfig.name}`,
-    description: 'Explore the sports ecosystem across India — academies, coaches, and sports pathways.',
+    description: 'Explore the sports ecosystem across India — academies and sports pathways.',
     url: `${siteConfig.url}/discover`,
     siteName: siteConfig.name,
     type: 'website',
@@ -19,7 +19,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: `Discover · ${siteConfig.name}`,
-    description: 'Explore the sports ecosystem across India — academies, coaches, and sports pathways.',
+    description: 'Explore the sports ecosystem across India — academies and sports pathways.',
   },
 };
 
@@ -33,10 +33,9 @@ export default function DiscoverPage() {
             Explore the sports ecosystem across India.
           </p>
         </div>
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           {[
             { href: '/academies', title: 'Academies', cta: 'Explore Academies', desc: 'Find sports academies near you.' },
-            { href: '/coaches', title: 'Coaches', cta: 'Explore Coaches', desc: 'Discover verified coaches.' },
             { href: '/sports', title: 'Sports', cta: 'Explore Sports', desc: 'Explore sports and pathways.' },
           ].map((c) => (
             <Link key={c.href} href={c.href}>

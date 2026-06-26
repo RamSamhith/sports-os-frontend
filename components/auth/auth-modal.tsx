@@ -12,6 +12,7 @@ import { useAuth } from '@/lib/hooks/use-auth';
 import { login as apiLogin, register as apiRegister } from '@/lib/api/auth';
 import { useGoogleAuth, useMicrosoftAuth, handleSocialAuth } from '@/lib/hooks/use-social-auth';
 import { trackLogin, trackSignup, trackOAuthAttempt, trackOAuthSuccess, trackOAuthError, trackGuestStarted } from '@/lib/analytics/events';
+import { validatePassword } from '@/lib/utils/validators';
 import { Loader2, ArrowLeft, X } from 'lucide-react';
 import { ease, duration } from '@/components/motion/constants';
 
@@ -363,6 +364,7 @@ function LoginView({
   variants?: Variants;
 }) {
   const { setAuth, setProfile } = useAuth();
+  const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errors, setErrors] = useState<FieldErrors>({});
@@ -374,8 +376,8 @@ function LoginView({
     const e: FieldErrors = {};
     if (!email.trim()) e.email = 'Email is required';
     else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) e.email = 'Enter a valid email address';
-    if (!password) e.password = 'Password is required';
-    else if (password.length < 8) e.password = 'Password must be at least 8 characters';
+    const pwErr = validatePassword(password);
+    if (pwErr) e.password = pwErr;
     return e;
   }
 
@@ -385,8 +387,8 @@ function LoginView({
       if (!value.trim()) e.email = 'Email is required';
       else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) e.email = 'Enter a valid email address';
     } else if (field === 'password') {
-      if (!value) e.password = 'Password is required';
-      else if (value.length < 8) e.password = 'Password must be at least 8 characters';
+      const pwErr = validatePassword(value);
+      if (pwErr) e.password = pwErr;
     }
     return e;
   }
@@ -427,6 +429,13 @@ function LoginView({
     try {
       const res = await apiLogin({ email: email.trim(), password });
       if (!res.ok) {
+        if (res.error.code === 'EMAIL_NOT_VERIFIED') {
+          try { sessionStorage.setItem('sportsos:verify-email', email.trim()); } catch { /* ignore */ }
+          setIsSubmitting(false);
+          onSuccess();
+          router.push('/verify/signup');
+          return;
+        }
         setServerError(res.error.message);
         setIsSubmitting(false);
         return;
@@ -572,7 +581,10 @@ function RegisterView({
       if (digits.length !== 10) e.phone = 'Phone number must be exactly 10 digits';
     }
     if (!password) e.password = 'Password is required';
-    else if (password.length < 8) e.password = 'Password must be at least 8 characters';
+    else {
+      const pwErr = validatePassword(password);
+      if (pwErr) e.password = pwErr;
+    }
     if (!confirmPassword) e.confirmPassword = 'Please confirm your password';
     else if (confirmPassword !== password) e.confirmPassword = 'Passwords do not match';
     return e;
@@ -593,8 +605,8 @@ function RegisterView({
         if (digits.length !== 10) e.phone = 'Phone number must be exactly 10 digits';
       }
     } else if (field === 'password') {
-      if (!value) e.password = 'Password is required';
-      else if (value.length < 8) e.password = 'Password must be at least 8 characters';
+      const pwErr = validatePassword(value);
+      if (pwErr) e.password = pwErr;
       if (confirmPassword && value !== confirmPassword) e.confirmPassword = 'Passwords do not match';
     } else if (field === 'confirmPassword') {
       if (!value) e.confirmPassword = 'Please confirm';
