@@ -300,7 +300,7 @@ export async function syncTheme(themePreference: string): Promise<ApiResponse<Us
   return patch<User>('/auth/profile', { themePreference });
 }
 
-// ─── OAuth (Google / Microsoft) ─────────────────────────────
+// ─── OAuth (Google) ────────────────────────────────────────
 
 export interface OAuthResponse {
   user: User;
@@ -310,9 +310,4 @@ export interface OAuthResponse {
 export async function signInWithGoogle(idToken: string): Promise<ApiResponse<OAuthResponse>> {
   const { post } = await import('./client');
   return post<OAuthResponse>('/auth/google', { idToken });
-}
-
-export async function signInWithMicrosoft(idToken: string): Promise<ApiResponse<OAuthResponse>> {
-  const { post } = await import('./client');
-  return post<OAuthResponse>('/auth/microsoft', { idToken });
 }

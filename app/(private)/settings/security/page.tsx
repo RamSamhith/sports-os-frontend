@@ -39,7 +39,7 @@ export default function AccountSecurityPage() {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [deleting, setDeleting] = useState(false);
 
-  const isOAuth = profile.authProvider === 'google' || profile.authProvider === 'microsoft';
+  const isOAuth = profile.authProvider === 'google';
   const isGuest = profile.authProvider === 'guest';
 
   async function handleChangePassword(e: React.FormEvent) {
@@ -127,7 +127,7 @@ export default function AccountSecurityPage() {
               <p className="text-sm font-medium">Authentication Method</p>
               <div className="flex items-center gap-2 mt-0.5">
                 <Badge variant="secondary" className="text-xs capitalize">
-                  {profile.authProvider === 'google' ? 'Google' : profile.authProvider === 'microsoft' ? 'Microsoft' : profile.authProvider === 'guest' ? 'Guest' : 'Email & Password'}
+                  {profile.authProvider === 'google' ? 'Google' : profile.authProvider === 'guest' ? 'Guest' : 'Email & Password'}
                 </Badge>
               </div>
             </div>
@@ -144,7 +144,7 @@ export default function AccountSecurityPage() {
           </CardTitle>
           <CardDescription>
             {isOAuth
-              ? `This account uses ${profile.authProvider === 'google' ? 'Google' : 'Microsoft'} Sign In. Password change is not available.`
+              ? 'This account uses Google Sign In. Password change is not available.'
               : isGuest
               ? 'Guest accounts do not have a password. Create a full account to set a password.'
               : 'Update your account password.'}
@@ -153,7 +153,7 @@ export default function AccountSecurityPage() {
         <CardContent>
           {isOAuth ? (
             <p className="text-muted-foreground text-sm">
-              Your account is secured via {profile.authProvider === 'google' ? 'Google' : 'Microsoft'}. No password management needed.
+              Your account is secured via Google. No password management needed.
             </p>
           ) : isGuest ? (
             <p className="text-muted-foreground text-sm">
@@ -346,7 +346,7 @@ export default function AccountSecurityPage() {
             <div className="mt-4 flex flex-col gap-3">
               {isOAuth ? (
                 <p className="text-muted-foreground text-sm">
-                  Since you signed up with {profile.authProvider === 'google' ? 'Google' : 'Microsoft'}, no password is required.
+                  Since you signed up with Google, no password is required.
                 </p>
               ) : (
                 <div className="flex flex-col gap-1.5">

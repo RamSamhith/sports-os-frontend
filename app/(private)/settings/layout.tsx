@@ -11,6 +11,7 @@ const settingsNav: ReadonlyArray<{ label: string; href: string; description: str
   { label: 'Theme', href: '/settings/theme', description: 'Appearance, contrast, motion' },
   { label: 'Profile', href: '/settings/profile', description: 'Name, photo, contact details' },
   { label: 'Location', href: '/settings/location', description: 'City, GPS, search radius' },
+  { label: 'Location Detection', href: '/settings/location-detection', description: 'Gmail scan, GPS detect' },
   { label: 'Notifications', href: '/settings/notifications', description: 'Email, WhatsApp, push' },
   { label: 'Privacy', href: '/settings/privacy', description: 'Data, sharing, visibility' },
   { label: 'Security', href: '/settings/security', description: 'Password, email, phone, 2FA' },

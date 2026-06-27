@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Palette, User, MapPin, Bell, Shield, LogOut, Play, Lock } from 'lucide-react';
+import { Palette, User, MapPin, Bell, Shield, LogOut, Play, Lock, Mail } from 'lucide-react';
 
 const sections = [
   {
@@ -22,6 +22,12 @@ const sections = [
     description: 'City, GPS, and search radius',
     href: '/settings/location',
     icon: MapPin,
+  },
+  {
+    title: 'Location Detection',
+    description: 'Gmail scan and GPS location detection',
+    href: '/settings/location-detection',
+    icon: Mail,
   },
   {
     title: 'Notifications',

@@ -1,42 +1,7 @@
 'use client';
 
 import { useEffect, useCallback, useState } from 'react';
-import { signInWithGoogle, signInWithMicrosoft } from '@/lib/api/auth';
-
-interface GoogleCredentialResponse {
-  credential: string;
-  select_by: string;
-}
-
-declare global {
-  interface Window {
-    google?: {
-      accounts: {
-        id: {
-          initialize: (config: {
-            client_id: string;
-            callback: (response: GoogleCredentialResponse) => void;
-            auto_select?: boolean;
-            cancel_on_tap_outside?: boolean;
-          }) => void;
-          renderButton: (element: HTMLElement, config: {
-            theme?: string;
-            size?: string;
-            text?: string;
-            shape?: string;
-            width?: number;
-          }) => void;
-          prompt: () => void;
-        };
-      };
-    };
-    msalConfig?: {
-      clientId: string;
-      authority: string;
-      redirectUri: string;
-    };
-  }
-}
+import { signInWithGoogle } from '@/lib/api/auth';
 
 export function useGoogleAuth() {
   const [loaded, setLoaded] = useState(false);
@@ -85,54 +50,7 @@ export function useGoogleAuth() {
   return { loaded, initialize, renderButton, prompt };
 }
 
-export function useMicrosoftAuth() {
-  const [loaded, setLoaded] = useState(false);
-
-  useEffect(() => {
-    const clientId = process.env.NEXT_PUBLIC_MICROSOFT_CLIENT_ID;
-    if (!clientId) return;
-
-    const script = document.createElement('script');
-    script.src = 'https://alcdn.msauth.net/browser/2.38.3/js/msal-browser.min.js';
-    script.async = true;
-    script.defer = true;
-    script.onload = () => setLoaded(true);
-    document.head.appendChild(script);
-    return () => { script.remove(); };
-  }, []);
-
-  const login = useCallback(async (): Promise<string | null> => {
-    const clientId = process.env.NEXT_PUBLIC_MICROSOFT_CLIENT_ID;
-    if (!clientId || !(window as any).msal) return null;
-
-    const msalInstance = new (window as any).msal.PublicClientApplication({
-      auth: {
-        clientId,
-        authority: 'https://login.microsoftonline.com/common',
-        redirectUri: window.location.origin,
-      },
-      cache: {
-        cacheLocation: 'localStorage',
-        storeAuthStateInCookie: false,
-      },
-    });
-
-    try {
-      const result = await msalInstance.loginPopup({
-        scopes: ['user.read'],
-        prompt: 'select_account',
-      });
-      return result.idToken;
-    } catch {
-      return null;
-    }
-  }, []);
-
-  return { loaded, login };
-}
-
 export async function handleSocialAuth(
-  provider: 'google' | 'microsoft',
   idToken: string,
   callbacks: {
     setAuth: (auth: boolean, onboarding: boolean) => void;
@@ -144,12 +62,10 @@ export async function handleSocialAuth(
   const { setAuth, setProfile, onSuccess, onError } = callbacks;
 
   try {
-    const result = provider === 'google'
-      ? await signInWithGoogle(idToken)
-      : await signInWithMicrosoft(idToken);
+    const result = await signInWithGoogle(idToken);
 
     if (!result.ok) {
-      onError(result.error.message ?? `${provider} sign-in failed`);
+      onError(result.error.message ?? 'Google sign-in failed');
       return;
     }
 

@@ -229,22 +229,18 @@ function ForgotPasswordContent() {
                 >
                   <Shield className="h-7 w-7 text-primary" />
                 </motion.div>
-                <h1 className="text-2xl font-bold tracking-tight">Account uses {oauthProvider === 'google' ? 'Google' : 'Microsoft'}</h1>
+                <h1 className="text-2xl font-bold tracking-tight">Account uses Google</h1>
                 <p className="text-muted-foreground mt-2 text-sm text-pretty">
-                  This account uses {oauthProvider === 'google' ? 'Google' : 'Microsoft'} Sign In. No password reset required.
+                  This account uses Google Sign In. No password reset required.
                 </p>
                 <div className="mt-6 flex w-full flex-col gap-3">
                   <Button
                     className="w-full gap-2"
                     onClick={() => {
-                      if (oauthProvider === 'google') {
-                        router.replace('/login');
-                      } else {
-                        router.replace('/login');
-                      }
+                      router.replace('/login');
                     }}
                   >
-                    Continue with {oauthProvider === 'google' ? 'Google' : 'Microsoft'}
+                    Continue with Google
                   </Button>
                   <Button variant="ghost" className="w-full" onClick={() => { setStep('email'); setOauthProvider(''); setEmail(''); }}>
                     Use a different email

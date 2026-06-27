@@ -1,5 +1,12 @@
-// lib/locationDetector.js
-// Detects Indian + major global locations mentioned inside email text.
+/**
+ * Location detector — extracts Indian + global locations from email text.
+ *
+ * Pure frontend logic. No external API calls.
+ * Uses regex-based NLP to find city names, state names, pincodes, and
+ * street-level address patterns in email content.
+ */
+
+// ─── Data ──────────────────────────────────────────────────────
 
 const INDIAN_CITIES = [
   'Hyderabad', 'Secunderabad', 'Mumbai', 'Delhi', 'New Delhi', 'Bangalore',
@@ -29,10 +36,11 @@ const GLOBAL_CITIES = [
   'Austin', 'Berlin', 'Paris', 'Amsterdam', 'Hong Kong',
 ];
 
+// ─── Compiled patterns ─────────────────────────────────────────
+
 const ALL_PLACE_NAMES = [...INDIAN_CITIES, ...INDIAN_STATES, ...GLOBAL_CITIES];
 
-// Build one regex with word boundaries, longest names first so "New Delhi"
-// matches before "Delhi" alone.
+/** Build regex with word boundaries; longest names first to avoid partial matches. */
 const PLACE_REGEX = new RegExp(
   '\\b(' +
     ALL_PLACE_NAMES
@@ -40,8 +48,8 @@ const PLACE_REGEX = new RegExp(
       .sort((a, b) => b.length - a.length)
       .map((p) => p.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))
       .join('|') +
-  ')\\b',
-  'gi'
+    ')\\b',
+  'gi',
 );
 
 const PINCODE_REGEX = /\b\d{6}\b/g;
@@ -49,12 +57,38 @@ const PINCODE_REGEX = /\b\d{6}\b/g;
 const ADDRESS_LINE_REGEX =
   /\b([A-Za-z0-9.,#\-\/ ]{0,40}(street|st\.|road|rd\.|nagar|colony|sector|lane|apartment|flat|plot|floor|block|society|enclave|layout)[A-Za-z0-9.,#\-\/ ]{0,40})\b/gi;
 
-// Simple landmark-style hints often used in emails (delivery, invites, etc.)
-const LANDMARK_HINTS = /\b(near|opposite|behind|next to|landmark)\b/i;
+// ─── Types ─────────────────────────────────────────────────────
 
-function uniqueCaseInsensitive(arr) {
-  const seen = new Set();
-  const out = [];
+export interface LocationDetection {
+  places: string[];
+  pincodes: string[];
+  addressLines: string[];
+  hasLocation: boolean;
+}
+
+export interface EmailLocationResult extends LocationDetection {
+  id: string;
+  subject: string;
+  from?: string;
+  snippet?: string;
+}
+
+export interface LocationGroup {
+  name: string;
+  count: number;
+  emails: Array<{ id: string; subject: string }>;
+}
+
+export interface LocationSummary {
+  perEmail: EmailLocationResult[];
+  grouped: LocationGroup[];
+}
+
+// ─── Helpers ───────────────────────────────────────────────────
+
+function uniqueCaseInsensitive(arr: string[]): string[] {
+  const seen = new Set<string>();
+  const out: string[] = [];
   for (const item of arr) {
     const key = item.trim().toLowerCase();
     if (!seen.has(key)) {
@@ -65,17 +99,18 @@ function uniqueCaseInsensitive(arr) {
   return out;
 }
 
+// ─── Public API ────────────────────────────────────────────────
+
 /**
  * Detect locations inside a block of text (subject + snippet + body).
- * Returns { places, pincodes, addressLines, hasLocation }
  */
-export function detectLocations(text) {
+export function detectLocations(text: string): LocationDetection {
   if (!text || typeof text !== 'string') {
     return { places: [], pincodes: [], addressLines: [], hasLocation: false };
   }
 
-  const places = [];
-  let match;
+  const places: string[] = [];
+  let match: RegExpExecArray | null;
   PLACE_REGEX.lastIndex = 0;
   while ((match = PLACE_REGEX.exec(text)) !== null) {
     places.push(match[1]);
@@ -83,8 +118,8 @@ export function detectLocations(text) {
 
   const pincodeMatches = text.match(PINCODE_REGEX) || [];
 
-  const addressLines = [];
-  let addrMatch;
+  const addressLines: string[] = [];
+  let addrMatch: RegExpExecArray | null;
   ADDRESS_LINE_REGEX.lastIndex = 0;
   while ((addrMatch = ADDRESS_LINE_REGEX.exec(text)) !== null) {
     addressLines.push(addrMatch[0].trim());
@@ -106,12 +141,13 @@ export function detectLocations(text) {
 }
 
 /**
- * Run detection across many emails and also build a grouped summary
- * (location name -> list of email ids/subjects mentioning it).
+ * Run detection across many emails and build a grouped summary
+ * (location name → list of email ids/subjects mentioning it).
  */
-export function summarizeLocations(emailsWithText) {
-  // emailsWithText: [{ id, subject, text }]
-  const grouped = {};
+export function summarizeLocations(
+  emailsWithText: Array<{ id: string; subject: string; text: string }>,
+): LocationSummary {
+  const grouped: Record<string, LocationGroup> = {};
 
   const perEmail = emailsWithText.map(({ id, subject, text }) => {
     const result = detectLocations(text);
