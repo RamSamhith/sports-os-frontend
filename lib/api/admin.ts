@@ -2,6 +2,7 @@ import type { Academy } from '@/types/domain/academy';
 import type { Coach } from '@/types/domain/coach';
 import type { ApiResponse, ListResponse } from './client';
 import { get } from './client';
+import type { UserRole } from '@/types/domain/user';
 
 // ─── Dashboard ──────────────────────────────────────────────
 
@@ -24,7 +25,7 @@ export interface AdminUser {
   name: string;
   email: string;
   phone?: string;
-  role: string;
+  role: UserRole;
   isVerified: boolean;
   isActive: boolean;
   createdAt: string;
@@ -34,9 +35,9 @@ export interface UserListResponse {
   items: AdminUser[];
   pagination: {
     page: number;
-    limit: number;
+    pageSize: number;
     total: number;
-    pages: number;
+    hasMore: boolean;
   };
 }
 

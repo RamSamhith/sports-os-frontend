@@ -4,7 +4,7 @@ import * as React from 'react';
 import Link from 'next/link';
 import { Container } from '@/components/layout/container';
 import { Section } from '@/components/layout/section';
-import { getAcademies } from '@/lib/api/academies';
+import { useHomepageData } from '@/lib/hooks/use-homepage-data';
 import { MapPin, ChevronRight, ChevronLeft, AlertTriangle } from 'lucide-react';
 import { CityCarouselSkeleton } from '@/components/feedback/skeletons';
 import { Button } from '@/components/ui/button';
@@ -18,9 +18,7 @@ interface CityData {
 }
 
 export function CitiesSection() {
-  const [cities, setCities] = React.useState<CityData[]>([]);
-  const [loading, setLoading] = React.useState(true);
-  const [error, setError] = React.useState<string | null>(null);
+  const { academies, loading, error } = useHomepageData();
   const scrollRef = React.useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = React.useState(false);
   const [canScrollRight, setCanScrollRight] = React.useState(true);
@@ -44,49 +42,30 @@ export function CitiesSection() {
     };
   }, [checkScroll, loading]);
 
-  const loadCities = React.useCallback(async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const res = await getAcademies({ pageSize: 200 });
+  const cities = React.useMemo(() => {
+    if (academies.length === 0) return [];
 
-      if (!res.ok) {
-        setError(res.error.message);
-        return;
-      }
+    const cityMap = new Map<string, { sports: Set<string>; totalRating: number; count: number }>();
 
-      const cityMap = new Map<string, { sports: Set<string>; totalRating: number; count: number }>();
+    academies.forEach((academy) => {
+      const city = academy.location.city;
+      const existing = cityMap.get(city) ?? { sports: new Set(), totalRating: 0, count: 0 };
+      academy.sportsOffered.forEach((s) => existing.sports.add(s));
+      existing.totalRating += academy.rating.average;
+      existing.count += 1;
+      cityMap.set(city, existing);
+    });
 
-      res.data.items.forEach((academy) => {
-        const city = academy.location.city;
-        const existing = cityMap.get(city) ?? { sports: new Set(), totalRating: 0, count: 0 };
-        academy.sportsOffered.forEach((s) => existing.sports.add(s));
-        existing.totalRating += academy.rating.average;
-        existing.count += 1;
-        cityMap.set(city, existing);
-      });
-
-      const cityData: CityData[] = Array.from(cityMap.entries())
-        .map(([name, data]) => ({
-          name,
-          academyCount: data.count,
-          topSports: Array.from(data.sports).slice(0, 2),
-          rating: data.totalRating / data.count,
-        }))
-        .sort((a, b) => b.academyCount - a.academyCount)
-        .slice(0, 10);
-
-      setCities(cityData);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load cities');
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  React.useEffect(() => {
-    loadCities();
-  }, [loadCities]);
+    return Array.from(cityMap.entries())
+      .map(([name, data]) => ({
+        name,
+        academyCount: data.count,
+        topSports: Array.from(data.sports).slice(0, 2),
+        rating: data.totalRating / data.count,
+      }))
+      .sort((a, b) => b.academyCount - a.academyCount)
+      .slice(0, 10);
+  }, [academies]);
 
   const scroll = (direction: 'left' | 'right') => {
     const el = scrollRef.current;
@@ -118,7 +97,7 @@ export function CitiesSection() {
               <p className="text-foreground font-medium">Failed to load cities</p>
               <p className="text-sm text-muted-foreground">{error}</p>
             </div>
-            <Button size="sm" variant="outline" onClick={loadCities}>
+            <Button size="sm" variant="outline" onClick={() => window.location.reload()}>
               Try again
             </Button>
           </div>

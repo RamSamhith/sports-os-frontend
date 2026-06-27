@@ -7,12 +7,14 @@ import { useAuth } from './use-auth';
 
 export interface Child {
   id: string;
+  parentId: string;
   name: string;
   age: number;
   gender?: string;
   sportInterests: string[];
   skillLevel?: string;
   createdAt: string;
+  updatedAt: string;
 }
 
 const CHILDREN_KEY = 'sportsos:children';
@@ -92,12 +94,14 @@ export function useChildren() {
         const child = c as unknown as Record<string, unknown>;
         return {
           id: String(child.id || ''),
+          parentId: String(child.parentId || ''),
           name: String(child.name || ''),
           age: Number(child.age) || 0,
           gender: child.gender ? String(child.gender) : undefined,
           skillLevel: child.skillLevel ? String(child.skillLevel) : undefined,
           sportInterests: Array.isArray(child.sportInterests) ? child.sportInterests.map(String) : [],
-          createdAt: new Date().toISOString(),
+          createdAt: String(child.createdAt || new Date().toISOString()),
+          updatedAt: String(child.updatedAt || new Date().toISOString()),
         };
       });
       if (backendChildren.length > 0) {
@@ -140,11 +144,13 @@ export function useChildren() {
       // Optimistic local update
       const localChild: Child = {
         id: generateId(),
+        parentId: '',
         name: data.name,
         age: data.age,
         sportInterests: data.sportInterests || (data.sport ? [data.sport] : []),
         skillLevel: data.skillLevel,
         createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
       };
       const next = [...children, localChild];
       setChildren(next);
@@ -169,11 +175,13 @@ export function useChildren() {
           const backendData = res.data as unknown as Record<string, unknown>;
           const backendChild: Child = {
             id: String(backendData.id || ''),
+            parentId: String(backendData.parentId || ''),
             name: data.name,
             age: data.age,
             sportInterests: data.sportInterests || (data.sport ? [data.sport] : []),
             skillLevel: data.skillLevel,
-            createdAt: new Date().toISOString(),
+            createdAt: String(backendData.createdAt || new Date().toISOString()),
+            updatedAt: String(backendData.updatedAt || new Date().toISOString()),
           };
           const updated = next.map((c) => (c.id === localChild.id ? backendChild : c));
           setChildren(updated);

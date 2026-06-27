@@ -12,9 +12,10 @@ import { useAcademySelection } from '@/lib/hooks/use-academy-selection';
 import { ConversionModal } from '@/components/auth/conversion-modal';
 import { getMatchingCriteria } from '@/lib/utils/matching';
 import { sportTaxonomy } from '@/lib/constants/sport-taxonomy';
-import { academies } from '@/data/academies';
+import { getAcademies } from '@/lib/api/academies';
 import { MyAcademyCard } from '@/components/profile/my-academy-card';
-import { Pencil, MapPin, Target, Trophy, User, Users, Sparkles, School, Star, ChevronRight, Search, BookOpen, Shield } from 'lucide-react';
+import { Pencil, MapPin, Target, Trophy, User, Users, Sparkles, School, Search, Shield } from 'lucide-react';
+import type { Academy } from '@/types/domain/academy';
 
 function getSportName(slug: string): string {
   return sportTaxonomy.find((s) => s.slug === slug)?.name ?? slug;
@@ -53,9 +54,26 @@ export default function ProfilePage() {
   const { selectedAcademyId } = useAcademySelection();
   const isParent = role === 'parent';
   const [showUpgrade, setShowUpgrade] = React.useState(false);
+  const [academies, setAcademies] = React.useState<Academy[]>([]);
+  const [academiesLoading, setAcademiesLoading] = React.useState(true);
+
+  React.useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await getAcademies({ pageSize: 200 });
+        if (!cancelled && res.ok) setAcademies(res.data.items ?? []);
+      } catch {
+        // silently fail — MyAcademyCard will show nothing
+      } finally {
+        if (!cancelled) setAcademiesLoading(false);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, []);
 
   const selectedAcademy = selectedAcademyId
-    ? academies.find((a) => a.id === selectedAcademyId)
+    ? academies.find((a) => a.id === selectedAcademyId || a.slug === selectedAcademyId)
     : null;
 
   return (

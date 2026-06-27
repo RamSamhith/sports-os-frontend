@@ -5,39 +5,21 @@ import Link from 'next/link';
 import { Container } from '@/components/layout/container';
 import { Section } from '@/components/layout/section';
 import { SportCard } from '@/components/sports/sport-card';
-import { listSports } from '@/lib/api/sports';
+import { useHomepageData } from '@/lib/hooks/use-homepage-data';
 import { Trophy, ChevronLeft, ChevronRight, Loader2, AlertTriangle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import type { Sport } from '@/types/domain/sport';
 
 export function FeaturedSports() {
-  const [sports, setSports] = React.useState<Sport[]>([]);
-  const [loading, setLoading] = React.useState(true);
-  const [error, setError] = React.useState<string | null>(null);
+  const { sports: allSports, loading, error } = useHomepageData();
+  const sports = React.useMemo(() => allSports.slice(0, 10), [allSports]);
   const scrollRef = React.useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = React.useState(false);
   const [canScrollRight, setCanScrollRight] = React.useState(true);
 
   const loadSports = React.useCallback(async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const res = await listSports({ status: 'published', limit: 10 });
-      if (res.ok) {
-        setSports(res.data.items);
-      } else {
-        setError(res.error.message);
-      }
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load sports');
-    } finally {
-      setLoading(false);
-    }
+    window.location.reload();
   }, []);
-
-  React.useEffect(() => {
-    loadSports();
-  }, [loadSports]);
 
   const checkScroll = React.useCallback(() => {
     const el = scrollRef.current;

@@ -1,8 +1,7 @@
 'use client';
 
 import { useEffect, useCallback, useState } from 'react';
-import { post } from '@/lib/api/client';
-import { login as apiLogin } from '@/lib/api/auth';
+import { signInWithGoogle, signInWithMicrosoft } from '@/lib/api/auth';
 
 interface GoogleCredentialResponse {
   credential: string;
@@ -145,7 +144,9 @@ export async function handleSocialAuth(
   const { setAuth, setProfile, onSuccess, onError } = callbacks;
 
   try {
-    const result = await post<{ token: string; user: any }>(`/auth/${provider}`, { idToken });
+    const result = provider === 'google'
+      ? await signInWithGoogle(idToken)
+      : await signInWithMicrosoft(idToken);
 
     if (!result.ok) {
       onError(result.error.message ?? `${provider} sign-in failed`);
@@ -163,7 +164,7 @@ export async function handleSocialAuth(
       email: user.email,
       phone: user.phone ?? '',
     });
-    setAuth(true, user.onboardingCompleted);
+    setAuth(true, user.onboardingCompleted ?? false);
     onSuccess();
   } catch {
     onError('Network error. Please try again.');

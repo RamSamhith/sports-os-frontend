@@ -4,11 +4,9 @@ import * as React from 'react';
 import Link from 'next/link';
 import { Container } from '@/components/layout/container';
 import { Section } from '@/components/layout/section';
-import { getAcademies } from '@/lib/api/academies';
-import { listSports } from '@/lib/api/sports';
+import { useHomepageData } from '@/lib/hooks/use-homepage-data';
 import { StatsSkeleton } from '@/components/feedback/skeletons';
 import { AlertTriangle } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 
 function formatCount(n: number) {
   return new Intl.NumberFormat('en-IN').format(n);
@@ -21,42 +19,17 @@ interface Stat {
 }
 
 export function StatsSection() {
-  const [stats, setStats] = React.useState<Stat[]>([]);
-  const [loading, setLoading] = React.useState(true);
-  const [error, setError] = React.useState<string | null>(null);
+  const { academies, sports, loading, error } = useHomepageData();
 
-  const loadStats = React.useCallback(async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const [academiesRes, sportsRes] = await Promise.all([
-        getAcademies({ pageSize: 200 }),
-        listSports({ status: 'published', limit: 100 }),
-      ]);
-
-      const academyCount = academiesRes.ok ? academiesRes.data.pagination?.total ?? academiesRes.data.items.length : 0;
-      const sportCount = sportsRes.ok ? sportsRes.data.pagination?.total ?? sportsRes.data.items.length : 0;
-
-      const cities = new Set<string>();
-      if (academiesRes.ok) {
-        academiesRes.data.items.forEach((a) => cities.add(a.location.city));
-      }
-
-      setStats([
-        { label: 'Academies', value: formatCount(academyCount), href: '/academies' },
-        { label: 'Sports', value: formatCount(sportCount), href: '/sports' },
-        { label: 'Cities', value: formatCount(cities.size), href: '/search' },
-      ]);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load stats');
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  React.useEffect(() => {
-    loadStats();
-  }, [loadStats]);
+  const stats = React.useMemo<Stat[]>(() => {
+    if (loading || error) return [];
+    const cities = new Set(academies.map(a => a.location.city));
+    return [
+      { label: 'Academies', value: formatCount(academies.length), href: '/academies' },
+      { label: 'Sports', value: formatCount(sports.length), href: '/sports' },
+      { label: 'Cities', value: formatCount(cities.size), href: '/search' },
+    ];
+  }, [academies, sports, loading, error]);
 
   if (loading) {
     return (
@@ -78,9 +51,6 @@ export function StatsSection() {
               <p className="text-foreground font-medium">Failed to load stats</p>
               <p className="text-sm text-muted-foreground">{error}</p>
             </div>
-            <Button size="sm" variant="outline" onClick={loadStats}>
-              Try again
-            </Button>
           </div>
         </Container>
       </Section>

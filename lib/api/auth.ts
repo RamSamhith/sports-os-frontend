@@ -1,4 +1,4 @@
-import type { User } from '@/types/domain/user';
+import type { User, UserRole } from '@/types/domain/user';
 import type { ApiResponse } from './client';
 
 export interface RegisterRequest {
@@ -42,7 +42,7 @@ export interface ResendOtpResponse {
 }
 
 export interface OnboardingPayload {
-  role?: string;
+  role?: UserRole;
   age?: number;
   gender?: string;
   sportInterests?: string[];
@@ -298,4 +298,21 @@ export async function syncConsent(data: SyncConsentRequest): Promise<ApiResponse
 export async function syncTheme(themePreference: string): Promise<ApiResponse<User>> {
   const { patch } = await import('./client');
   return patch<User>('/auth/profile', { themePreference });
+}
+
+// ─── OAuth (Google / Microsoft) ─────────────────────────────
+
+export interface OAuthResponse {
+  user: User;
+  token: string;
+}
+
+export async function signInWithGoogle(idToken: string): Promise<ApiResponse<OAuthResponse>> {
+  const { post } = await import('./client');
+  return post<OAuthResponse>('/auth/google', { idToken });
+}
+
+export async function signInWithMicrosoft(idToken: string): Promise<ApiResponse<OAuthResponse>> {
+  const { post } = await import('./client');
+  return post<OAuthResponse>('/auth/microsoft', { idToken });
 }

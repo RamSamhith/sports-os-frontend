@@ -1,7 +1,8 @@
 'use client';
 
 import { createContext, useCallback, useEffect, useMemo, useState, type ReactNode } from 'react';
-import { AuthContext, type AuthContextValue, type AuthChild, type OnboardingRole, type UserProfile } from '@/lib/hooks/use-auth';
+import { AuthContext, type AuthContextValue, type AuthChild, type UserProfile } from '@/lib/hooks/use-auth';
+import type { UserRole } from '@/types/domain/user';
 import { getMe, logout as apiLogout } from '@/lib/api/auth';
 
 const STORAGE_KEY = 'sportsos:auth-state';
@@ -22,7 +23,7 @@ const GUEST_STORAGE_KEYS = [
 
 interface PersistedAuthState {
   isAuthenticated: boolean;
-  role: OnboardingRole | null;
+  role: UserRole | null;
   onboardingCompleted: boolean;
   verified: boolean;
 }
@@ -56,6 +57,8 @@ const defaultOnboarding: PersistedOnboarding = {
   children: [],
 };
 
+const VALID_ROLES: readonly UserRole[] = ['athlete', 'parent', 'coach', 'academy_owner', 'admin'];
+
 function readState(): PersistedAuthState {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
@@ -63,7 +66,7 @@ function readState(): PersistedAuthState {
     const parsed = JSON.parse(raw);
     return {
       isAuthenticated: !!parsed.isAuthenticated,
-      role: parsed.role === 'athlete' || parsed.role === 'parent' ? parsed.role : null,
+      role: VALID_ROLES.includes(parsed.role) ? parsed.role : null,
       onboardingCompleted: !!parsed.onboardingCompleted,
       verified: !!parsed.verified,
     };
@@ -230,21 +233,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             location: user.location || '',
             children: (user.children || []).map((c) => ({
               id: c.id,
+              parentId: c.parentId,
               name: c.name,
               age: c.age,
               gender: c.gender,
               sportInterests: c.sportInterests || [],
               skillLevel: c.skillLevel,
+              createdAt: c.createdAt,
+              updatedAt: c.updatedAt,
             })),
           };
           setOnboardingState(backendOnboarding);
           writeOnboarding(backendOnboarding);
 
           // Update auth state from backend
-          const backendRole = user.role === 'athlete' || user.role === 'parent' ? user.role as OnboardingRole : null;
+          const validRole = VALID_ROLES.includes(user.role) ? user.role as UserRole : null;
           setState((prev) => ({
             ...prev,
-            role: backendRole || prev.role,
+            role: validRole || prev.role,
             onboardingCompleted: !!user.onboardingCompleted,
           }));
         } else if (res.ok === false && res.error?.code === 'UNAUTHORIZED') {
@@ -293,7 +299,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     });
   }, []);
 
-  const setRole = useCallback((role: OnboardingRole) => {
+  const setRole = useCallback((role: UserRole) => {
     setState((prev) => {
       if (prev.role === role) return prev;
       return { ...prev, role };

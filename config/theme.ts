@@ -13,6 +13,8 @@ export const themeNames = [
 
 export type ThemeName = (typeof themeNames)[number];
 
+export type ThemePreference = ThemeName | 'system';
+
 export interface ThemeMeta {
   id: ThemeName;
   label: string;

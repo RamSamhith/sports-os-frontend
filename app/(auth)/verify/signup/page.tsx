@@ -71,11 +71,14 @@ export default function VerifySignupPage() {
       location: res.data.user.location || '',
       children: (res.data.user.children || []).map((c) => ({
         id: c.id,
+        parentId: c.parentId,
         name: c.name,
         age: c.age,
         gender: c.gender,
         sportInterests: c.sportInterests || [],
         skillLevel: c.skillLevel,
+        createdAt: c.createdAt,
+        updatedAt: c.updatedAt,
       })),
     });
     setAuth(true, res.data.user.onboardingCompleted);

@@ -6,7 +6,7 @@ import { useOnboarding } from '@/lib/hooks/use-onboarding'
 import { useChildren } from '@/lib/hooks/use-children'
 import { useRecentlyViewed } from '@/lib/hooks/use-recently-viewed'
 import { getSuggestedAcademies, logMatchingAudit } from '@/lib/utils/matching'
-import { getAcademies } from '@/lib/api/academies'
+import { useHomepageData } from '@/lib/hooks/use-homepage-data'
 import type { OnboardingData, SkillLevel } from '@/lib/hooks/use-onboarding'
 import type { Academy } from '@/types/domain/academy'
 import { MatchingExplanation } from './matching-explanation'
@@ -25,8 +25,7 @@ export function PersonalizedHome() {
   const { data: onboarding, completed, hydrated } = useOnboarding()
   const { activeChild } = useChildren()
   const { recentAcademies, recentCoaches } = useRecentlyViewed()
-  const [apiAcademies, setApiAcademies] = useState<Academy[]>([])
-  const [apiError, setApiError] = useState<string | null>(null)
+  const { academies: apiAcademies, loading: apiLoading, error: apiError } = useHomepageData()
   const [coords, setCoords] = useState<{ lat: number; lng: number }>({ lat: DEFAULT_LAT, lng: DEFAULT_LNG })
 
   useEffect(() => {
@@ -37,21 +36,6 @@ export function PersonalizedHome() {
         { timeout: 5000 },
       )
     }
-  }, [])
-
-  useEffect(() => {
-    let cancelled = false
-    async function load() {
-      try {
-        const academiesRes = await getAcademies({ pageSize: 200 })
-        if (cancelled) return
-        if (academiesRes.ok) setApiAcademies(academiesRes.data.items)
-      } catch (err) {
-        if (!cancelled) setApiError(err instanceof Error ? err.message : 'Failed to load')
-      }
-    }
-    load()
-    return () => { cancelled = true }
   }, [])
 
   const effectiveOnboarding = useMemo<OnboardingData | null>(() => {

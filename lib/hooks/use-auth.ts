@@ -1,6 +1,7 @@
 'use client';
 
 import { createContext, useContext } from 'react';
+import type { UserRole } from '@/types/domain/user';
 
 export type OnboardingRole = 'athlete' | 'parent';
 
@@ -13,11 +14,14 @@ export interface UserProfile {
 
 export interface AuthChild {
   id: string;
+  parentId: string;
   name: string;
   age: number;
   gender?: string;
   sportInterests: string[];
   skillLevel?: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface AuthContextValue {
@@ -29,7 +33,7 @@ export interface AuthContextValue {
   isGuest: boolean;
 
   /** Selected role from onboarding, or null if not yet chosen. */
-  role: OnboardingRole | null;
+  role: UserRole | null;
   /** Whether the user has completed the onboarding role selection. */
   onboardingCompleted: boolean;
   /** Whether the user has completed OTP verification after signup. */
@@ -52,7 +56,7 @@ export interface AuthContextValue {
   /** Set authenticated flag (true after register / login). */
   setAuth: (authenticated: boolean, onboarded?: boolean) => void;
   /** Set the user's role (called from onboarding role selection). */
-  setRole: (role: OnboardingRole) => void;
+  setRole: (role: UserRole) => void;
   /** Mark onboarding as complete (called after role selection). */
   completeOnboarding: () => void;
   /** Mark OTP verification as complete. */
