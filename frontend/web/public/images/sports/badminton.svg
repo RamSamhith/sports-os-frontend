@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 750" role="img" aria-label="Badminton">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#0a141f"/>
+      <stop offset="60%" stop-color="#0a141f" stop-opacity="0.92"/>
+      <stop offset="100%" stop-color="#040a14"/>
+    </linearGradient>
+    <radialGradient id="spot" cx="50%" cy="38%" r="60%">
+      <stop offset="0%" stop-color="#67e8f9" stop-opacity="0.18"/>
+      <stop offset="100%" stop-color="#67e8f9" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="1200" height="750" fill="url(#sky)"/>
+  <rect width="1200" height="750" fill="url(#spot)"/>
+  
+    <rect x="0" y="380" width="1200" height="280" fill="#3b2716"/>
+    <line x1="0" y1="500" x2="1200" y2="500" stroke="#f1f5f9" stroke-width="3" opacity="0.5"/>
+    <g opacity="0.7">
+      <circle cx="300" cy="200" r="40" fill="#fef3c7"/>
+      <circle cx="600" cy="180" r="40" fill="#fef3c7"/>
+      <circle cx="900" cy="200" r="40" fill="#fef3c7"/>
+    </g>
+    <g>
+      <line x1="350" y1="500" x2="850" y2="500" stroke="#f1f5f9" stroke-width="4"/>
+    </g>
+    <g transform="translate(280 380)">
+      <circle r="16" fill="#fef3c7" stroke="#000" stroke-width="2"/>
+      <g stroke="#000" stroke-width="1.5">
+        <line x1="-14" y1="-7" x2="16" y2="7"/>
+        <line x1="-14" y1="0" x2="16" y2="0"/>
+        <line x1="-14" y1="7" x2="16" y2="-7"/>
+      </g>
+    </g>
+    <g transform="translate(820 360) rotate(20)">
+      <ellipse cx="0" cy="0" rx="50" ry="64" fill="none" stroke="#67e8f9" stroke-width="5"/>
+      <line x1="0" y1="64" x2="0" y2="160" stroke="#000" stroke-width="8"/>
+    </g>
+  <g transform="translate(40 700)">
+    <rect x="-8" y="-26" width="640" height="48" rx="8" fill="#000" opacity="0.55"/>
+    <text x="0" y="0" font-family="Inter, system-ui, sans-serif" font-size="22" font-weight="700" fill="#f1f5f9">Badminton</text>
+    <text x="0" y="22" font-family="Inter, system-ui, sans-serif" font-size="13" fill="#cbd5e1">SportsOS</text>
+  </g>
+</svg>

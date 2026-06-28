@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 750" role="img" aria-label="Athletics">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#0d2410"/>
+      <stop offset="60%" stop-color="#0d2410" stop-opacity="0.92"/>
+      <stop offset="100%" stop-color="#04140a"/>
+    </linearGradient>
+    <radialGradient id="spot" cx="50%" cy="38%" r="60%">
+      <stop offset="0%" stop-color="#bef264" stop-opacity="0.18"/>
+      <stop offset="100%" stop-color="#bef264" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="1200" height="750" fill="url(#sky)"/>
+  <rect width="1200" height="750" fill="url(#spot)"/>
+  
+    <rect x="0" y="380" width="1200" height="280" fill="#1c4a2a"/>
+    <g stroke="#f1f5f9" stroke-width="2" opacity="0.7" fill="none">
+      <line x1="0" y1="500" x2="1200" y2="500"/>
+      <line x1="0" y1="540" x2="1200" y2="540"/>
+      <line x1="0" y1="580" x2="1200" y2="580"/>
+      <line x1="0" y1="620" x2="1200" y2="620"/>
+    </g>
+    <g transform="translate(420 460)" fill="none" stroke="#bef264" stroke-width="6" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="0" cy="-90" r="18" fill="#f1f5f9"/>
+      <line x1="0" y1="-72" x2="0" y2="20"/>
+      <line x1="0" y1="20" x2="50" y2="60"/>
+      <line x1="0" y1="20" x2="-40" y2="60"/>
+      <line x1="0" y1="-40" x2="60" y2="-15"/>
+      <line x1="0" y1="-40" x2="-50" y2="-5"/>
+    </g>
+    <g transform="translate(720 480)" fill="none" stroke="#bef264" stroke-width="6" stroke-linecap="round" stroke-linejoin="round">
+      <line x1="0" y1="0" x2="80" y2="0"/>
+      <line x1="80" y1="0" x2="60" y2="-10"/>
+      <line x1="80" y1="0" x2="60" y2="10"/>
+    </g>
+  <g transform="translate(40 700)">
+    <rect x="-8" y="-26" width="640" height="48" rx="8" fill="#000" opacity="0.55"/>
+    <text x="0" y="0" font-family="Inter, system-ui, sans-serif" font-size="22" font-weight="700" fill="#f1f5f9">Athletics</text>
+    <text x="0" y="22" font-family="Inter, system-ui, sans-serif" font-size="13" fill="#cbd5e1">SportsOS</text>
+  </g>
+</svg>

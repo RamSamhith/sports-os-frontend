@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 750" role="img" aria-label="Swimming">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#0a2436"/>
+      <stop offset="60%" stop-color="#0a2436" stop-opacity="0.92"/>
+      <stop offset="100%" stop-color="#040e18"/>
+    </linearGradient>
+    <radialGradient id="spot" cx="50%" cy="38%" r="60%">
+      <stop offset="0%" stop-color="#67e8f9" stop-opacity="0.18"/>
+      <stop offset="100%" stop-color="#67e8f9" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="1200" height="750" fill="url(#sky)"/>
+  <rect width="1200" height="750" fill="url(#spot)"/>
+  
+    <rect x="0" y="380" width="1200" height="280" fill="#0a3a5a"/>
+    <g stroke="#67e8f9" stroke-width="2" fill="none" opacity="0.5">
+      <path d="M0 460 Q200 420 400 460 T800 460 T1200 460"/>
+      <path d="M0 510 Q200 470 400 510 T800 510 T1200 510"/>
+      <path d="M0 560 Q200 520 400 560 T800 560 T1200 560"/>
+    </g>
+    <g transform="translate(600 360) rotate(-8)">
+      <circle cx="0" cy="-50" r="18" fill="#f1f5f9"/>
+      <path d="M-14 -30 L0 40 L40 40" fill="none" stroke="#67e8f9" stroke-width="8" stroke-linecap="round"/>
+      <path d="M40 40 Q70 30 60 -10" fill="none" stroke="#67e8f9" stroke-width="8" stroke-linecap="round"/>
+    </g>
+    <g stroke="#f1f5f9" stroke-width="2" opacity="0.4" fill="none">
+      <line x1="100" y1="380" x2="100" y2="660"/>
+      <line x1="1100" y1="380" x2="1100" y2="660"/>
+    </g>
+  <g transform="translate(40 700)">
+    <rect x="-8" y="-26" width="640" height="48" rx="8" fill="#000" opacity="0.55"/>
+    <text x="0" y="0" font-family="Inter, system-ui, sans-serif" font-size="22" font-weight="700" fill="#f1f5f9">Swimming</text>
+    <text x="0" y="22" font-family="Inter, system-ui, sans-serif" font-size="13" fill="#cbd5e1">SportsOS</text>
+  </g>
+</svg>

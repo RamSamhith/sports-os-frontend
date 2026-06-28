@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 750" role="img" aria-label="Wrestling">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#241007"/>
+      <stop offset="60%" stop-color="#241007" stop-opacity="0.92"/>
+      <stop offset="100%" stop-color="#100604"/>
+    </linearGradient>
+    <radialGradient id="spot" cx="50%" cy="38%" r="60%">
+      <stop offset="0%" stop-color="#fb923c" stop-opacity="0.18"/>
+      <stop offset="100%" stop-color="#fb923c" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="1200" height="750" fill="url(#sky)"/>
+  <rect width="1200" height="750" fill="url(#spot)"/>
+  
+    <ellipse cx="600" cy="640" rx="900" ry="80" fill="#a16207"/>
+    <ellipse cx="600" cy="640" rx="240" ry="50" fill="none" stroke="#f1f5f9" stroke-width="3" opacity="0.6"/>
+    <g transform="translate(600 600)">
+      <circle r="60" fill="#fb923c" stroke="#000" stroke-width="3"/>
+      <path d="M-30 -20 Q0 -40 30 -20" fill="none" stroke="#000" stroke-width="3"/>
+      <circle cx="-12" cy="-8" r="3" fill="#000"/>
+      <circle cx="12" cy="-8" r="3" fill="#000"/>
+      <path d="M-40 30 L40 30" stroke="#000" stroke-width="6" stroke-linecap="round"/>
+    </g>
+  <g transform="translate(40 700)">
+    <rect x="-8" y="-26" width="640" height="48" rx="8" fill="#000" opacity="0.55"/>
+    <text x="0" y="0" font-family="Inter, system-ui, sans-serif" font-size="22" font-weight="700" fill="#f1f5f9">Wrestling</text>
+    <text x="0" y="22" font-family="Inter, system-ui, sans-serif" font-size="13" fill="#cbd5e1">SportsOS</text>
+  </g>
+</svg>
