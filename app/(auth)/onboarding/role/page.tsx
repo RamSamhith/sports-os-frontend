@@ -8,7 +8,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { SharedLayout } from '@/components/motion/shared-layout';
 import { cn } from '@/lib/utils/cn';
-import { Check, ArrowRight, User, Users } from 'lucide-react';
+import { Check, ArrowRight, User, Users, Dumbbell, Building2 } from 'lucide-react';
 import { useAuth, type OnboardingRole } from '@/lib/hooks/use-auth';
 import { saveOnboarding } from '@/lib/api/auth';
 
@@ -34,6 +34,20 @@ const roles: {
     icon: Users,
     description: 'I am managing sports opportunities for my child.',
     benefits: ['Manage children', 'Compare academies', 'Track progress', 'Plan pathways'],
+  },
+  {
+    id: 'coach',
+    label: 'Coach',
+    icon: Dumbbell,
+    description: 'I train athletes and manage coaching activities.',
+    benefits: ['Showcase expertise', 'Connect with athletes', 'Grow your network', 'Manage sessions'],
+  },
+  {
+    id: 'academy_owner',
+    label: 'Academy',
+    icon: Building2,
+    description: 'I run a sports academy or training facility.',
+    benefits: ['List your academy', 'Attract students', 'Manage enrollments', 'Build reputation'],
   },
 ];
 

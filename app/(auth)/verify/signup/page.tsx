@@ -81,7 +81,7 @@ export default function VerifySignupPage() {
         updatedAt: c.updatedAt,
       })),
     });
-    setAuth(true, res.data.user.onboardingCompleted);
+    setAuth(true, res.data.user.onboardingCompleted ?? false);
 
     try {
       sessionStorage.removeItem('sportsos:verify-email');

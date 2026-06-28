@@ -42,7 +42,11 @@ function VerifyLoginOtpContent() {
   useEffect(() => {
     if (isLoading) return;
     if (isAuthenticated) {
-      if (onboardingCompleted) router.replace('/');
+      if (onboardingCompleted) {
+        router.replace('/');
+      } else {
+        router.replace('/onboarding/role');
+      }
     }
   }, [isLoading, isAuthenticated, onboardingCompleted, router]);
 
@@ -72,7 +76,7 @@ function VerifyLoginOtpContent() {
 
       const userPhone = res.data.user.phone ?? '';
       setProfile({ name: res.data.user.name, email: res.data.user.email, phone: userPhone });
-      setAuth(true, res.data.user.onboardingCompleted);
+      setAuth(true, res.data.user.onboardingCompleted ?? false);
 
       try { sessionStorage.removeItem('sportsos:verify-email'); } catch { /* ignore */ }
 

@@ -63,11 +63,14 @@ export function ConversionModal({ open, onOpenChange, actionLabel }: ConversionM
       handleSocialAuth(credential, {
         setAuth,
         setProfile,
-        onSuccess: () => {
+        onSuccess: (onboardingCompleted) => {
           setSocialLoading(null);
           convertGuestToUser();
           trackGuestConversion('google');
           onOpenChange(false);
+          if (onboardingCompleted === false) {
+            router.replace('/onboarding/role');
+          }
         },
         onError: (msg) => { setSocialError(msg); setSocialLoading(null); },
       });

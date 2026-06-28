@@ -104,11 +104,14 @@ export function AuthModal({
         handleSocialAuth(credential, {
           setAuth,
           setProfile,
-          onSuccess: () => {
+          onSuccess: (onboardingCompleted) => {
             trackOAuthSuccess('google');
             trackLogin('google');
             onOpenChange(false);
             setSocialLoading(null);
+            if (onboardingCompleted === false) {
+              router.replace('/onboarding/role');
+            }
           },
           onError: (msg) => { trackOAuthError('google', msg); setSocialError(msg); setSocialLoading(null); },
         });
@@ -398,10 +401,13 @@ function LoginView({
       try { localStorage.setItem('sportsos:auth-token', res.data.token); } catch { /* ignore */ }
       const userPhone = res.data.user.phone ?? '';
       setProfile({ name: res.data.user.name, email: res.data.user.email, phone: userPhone });
-      setAuth(true, res.data.user.onboardingCompleted);
+      setAuth(true, res.data.user.onboardingCompleted ?? false);
       trackLogin('email');
       setIsSubmitting(false);
       onSuccess();
+      if (!res.data.user.onboardingCompleted) {
+        router.replace('/onboarding/role');
+      }
     } catch {
       setServerError('Network error. Please try again.');
       setIsSubmitting(false);

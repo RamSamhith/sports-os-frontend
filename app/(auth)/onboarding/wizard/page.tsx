@@ -17,6 +17,8 @@ import { cn } from '@/lib/utils/cn';
 
 const ATHLETE_STEPS = ['Age', 'Gender', 'Location', 'Sports', 'Skill', 'Goals'];
 const PARENT_STEPS = ["Child's Name", "Child's Age", 'Location', 'Sports', 'Skill'];
+const COACH_STEPS = ['Location', 'Sports', 'Skill', 'Goals'];
+const ACADEMY_STEPS = ['Location', 'Sports'];
 
 const SKILL_LEVELS: { value: SkillLevel; label: string; description: string }[] = [
   { value: 'beginner', label: 'Beginner', description: 'Just starting out' },
@@ -79,7 +81,7 @@ function OnboardingWizardContent() {
     }
   }, [isEdit, completed, isParent, parentData, athleteData]);
 
-  const steps = isParent ? PARENT_STEPS : ATHLETE_STEPS;
+  const steps = isParent ? PARENT_STEPS : role === 'coach' ? COACH_STEPS : role === 'academy_owner' ? ACADEMY_STEPS : ATHLETE_STEPS;
 
   useEffect(() => {
     return () => {};
@@ -111,6 +113,22 @@ function OnboardingWizardContent() {
         default: return false;
       }
     }
+    if (role === 'coach') {
+      switch (step) {
+        case 0: return location.trim().length >= 1;
+        case 1: return sports.length > 0;
+        case 2: return skillLevel !== '';
+        case 3: return true;
+        default: return false;
+      }
+    }
+    if (role === 'academy_owner') {
+      switch (step) {
+        case 0: return location.trim().length >= 1;
+        case 1: return sports.length > 0;
+        default: return false;
+      }
+    }
     switch (step) {
       case 0: return age !== '' && Number(age) >= 3 && Number(age) <= 80;
       case 1: return gender !== '';
@@ -120,7 +138,7 @@ function OnboardingWizardContent() {
       case 5: return true;
       default: return false;
     }
-  }, [step, isParent, age, gender, location, sports, skillLevel, childName]);
+  }, [step, isParent, role, age, gender, location, sports, skillLevel, childName]);
 
   function handleNext() {
     if (!canNext()) return;
@@ -136,26 +154,51 @@ function OnboardingWizardContent() {
   }
 
   function handleComplete() {
-    const data: OnboardingData = isParent
-      ? {
-          parent: {
-            childName: childName.trim(),
-            childAge: Number(age),
-            location: location.trim(),
-            sportInterests: sports,
-            skillLevel: skillLevel as SkillLevel,
-          },
-        }
-      : {
-          athlete: {
-            age: Number(age),
-            gender: gender as OnboardingData['athlete'] extends undefined ? never : NonNullable<OnboardingData['athlete']>['gender'],
-            location: location.trim(),
-            sportInterests: sports,
-            skillLevel: skillLevel as SkillLevel,
-            goals: goals.trim(),
-          },
-        };
+    let data: OnboardingData;
+    if (isParent) {
+      data = {
+        parent: {
+          childName: childName.trim(),
+          childAge: Number(age),
+          location: location.trim(),
+          sportInterests: sports,
+          skillLevel: skillLevel as SkillLevel,
+        },
+      };
+    } else if (role === 'coach') {
+      data = {
+        athlete: {
+          age: 0,
+          gender: 'prefer_not_to_say' as const,
+          location: location.trim(),
+          sportInterests: sports,
+          skillLevel: skillLevel as SkillLevel,
+          goals: goals.trim(),
+        },
+      };
+    } else if (role === 'academy_owner') {
+      data = {
+        athlete: {
+          age: 0,
+          gender: 'prefer_not_to_say' as const,
+          location: location.trim(),
+          sportInterests: sports,
+          skillLevel: 'intermediate' as SkillLevel,
+          goals: goals.trim(),
+        },
+      };
+    } else {
+      data = {
+        athlete: {
+          age: Number(age),
+          gender: gender as OnboardingData['athlete'] extends undefined ? never : NonNullable<OnboardingData['athlete']>['gender'],
+          location: location.trim(),
+          sportInterests: sports,
+          skillLevel: skillLevel as SkillLevel,
+          goals: goals.trim(),
+        },
+      };
+    }
 
     if (isEdit) {
       updateOnboardingData(data);
@@ -177,7 +220,7 @@ function OnboardingWizardContent() {
           sportInterests: sports,
           skillLevel: skillLevel as string,
         }];
-      } else {
+      } else if (role !== 'coach' && role !== 'academy_owner') {
         onboardingUpdate.age = Number(age);
         onboardingUpdate.gender = gender;
         onboardingUpdate.goals = goals.trim();
@@ -187,11 +230,11 @@ function OnboardingWizardContent() {
       // Persist to backend
       saveOnboarding({
         role: role || undefined,
-        age: isParent ? undefined : Number(age),
-        gender: isParent ? undefined : gender || undefined,
+        age: isParent || role === 'coach' || role === 'academy_owner' ? undefined : Number(age),
+        gender: isParent || role === 'coach' || role === 'academy_owner' ? undefined : gender || undefined,
         sportInterests: sports,
         skillLevel: skillLevel as string || undefined,
-        goals: isParent ? undefined : goals.trim() || undefined,
+        goals: role === 'coach' || role === 'academy_owner' ? goals.trim() || undefined : isParent ? undefined : goals.trim() || undefined,
         location: location.trim() || undefined,
         children: isParent ? [{
           name: childName.trim(),
@@ -220,8 +263,8 @@ function OnboardingWizardContent() {
   }
 
   const titles: Record<number, string> = {
-    0: isParent ? "What's your child's name?" : 'How old are you?',
-    1: isParent ? "How old is your child?" : 'What is your gender?',
+    0: isParent ? "What's your child's name?" : role === 'coach' ? 'Where are you based?' : role === 'academy_owner' ? 'Where is your academy?' : 'How old are you?',
+    1: isParent ? "How old is your child?" : role === 'coach' ? 'Which sports do you coach?' : role === 'academy_owner' ? 'Which sports do you offer?' : 'What is your gender?',
     2: 'Where are you located?',
     3: 'Which sports interest you?',
     4: "What's your skill level?",
@@ -252,7 +295,7 @@ function OnboardingWizardContent() {
       isLastStep={step === steps.length - 1}
     >
       <div className="flex flex-col gap-4">
-        {/* Step 0: Age / Child Name */}
+        {/* Step 0: Age / Child Name / Location (coach/academy) */}
         {step === 0 && isParent && (
           <div className="flex flex-col gap-1.5">
             <Label htmlFor="wizard-child-name">Child&apos;s name</Label>
@@ -267,7 +310,7 @@ function OnboardingWizardContent() {
           </div>
         )}
 
-        {step === 0 && !isParent && (
+        {step === 0 && !isParent && role !== 'coach' && role !== 'academy_owner' && (
           <div className="flex flex-col gap-1.5">
             <Label htmlFor="wizard-age">Your age</Label>
             <Input
@@ -291,8 +334,19 @@ function OnboardingWizardContent() {
           </div>
         )}
 
-        {/* Step 1: Gender (athlete) / Child Age (parent) */}
-        {step === 1 && !isParent && (
+        {step === 0 && (role === 'coach' || role === 'academy_owner') && (
+          <div className="flex flex-col gap-1.5">
+            <Label htmlFor="wizard-location">City</Label>
+            <LocationPicker
+              value={location}
+              onChange={setLocation}
+              placeholder="e.g. Bengaluru"
+            />
+          </div>
+        )}
+
+        {/* Step 1: Gender (athlete) / Child Age (parent) / Sports (coach/academy) */}
+        {step === 1 && !isParent && role !== 'coach' && role !== 'academy_owner' && (
           <div className="grid grid-cols-2 gap-2" role="radiogroup" aria-label="Select gender">
             {GENDER_OPTIONS.map((opt) => {
               const isSelected = gender === opt.value;
@@ -345,20 +399,7 @@ function OnboardingWizardContent() {
           </div>
         )}
 
-        {/* Step 2: Location */}
-        {step === 2 && (
-          <div className="flex flex-col gap-1.5">
-            <Label htmlFor="wizard-location">City</Label>
-            <LocationPicker
-              value={location}
-              onChange={setLocation}
-              placeholder="e.g. Bengaluru"
-            />
-          </div>
-        )}
-
-        {/* Step 3: Sports */}
-        {step === 3 && (
+        {step === 1 && (role === 'coach' || role === 'academy_owner') && (
           <div className="flex flex-wrap gap-2" role="group" aria-label="Select sports">
             {sportTaxonomy.map((s) => {
               const active = sports.includes(s.slug);
@@ -386,7 +427,93 @@ function OnboardingWizardContent() {
           </div>
         )}
 
-        {/* Step 4: Skill Level */}
+        {/* Step 2: Location (athlete/parent) / Skill (coach) */}
+        {step === 2 && role !== 'coach' && role !== 'academy_owner' && (
+          <div className="flex flex-col gap-1.5">
+            <Label htmlFor="wizard-location">City</Label>
+            <LocationPicker
+              value={location}
+              onChange={setLocation}
+              placeholder="e.g. Bengaluru"
+            />
+          </div>
+        )}
+
+        {step === 2 && role === 'coach' && (
+          <div className="grid grid-cols-2 gap-2" role="radiogroup" aria-label="Select skill level">
+            {SKILL_LEVELS.map((level) => {
+              const isSelected = skillLevel === level.value;
+              return (
+                <button
+                  key={level.value}
+                  type="button"
+                  role="radio"
+                  aria-checked={isSelected}
+                  onClick={() => setSkillLevel(level.value)}
+                  className={cn(
+                    'rounded-lg border-2 px-4 py-3 text-left transition-all',
+                    'focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none',
+                    isSelected
+                      ? 'border-primary bg-primary/5'
+                      : 'border-border/60 bg-background/60 hover:border-primary/30',
+                  )}
+                >
+                  <div className="flex items-center justify-between">
+                    <span className={cn('text-sm font-medium', isSelected ? 'text-primary' : 'text-foreground')}>
+                      {level.label}
+                    </span>
+                    {isSelected && <Check className="h-4 w-4 text-primary" />}
+                  </div>
+                  <span className="text-muted-foreground text-xs">{level.description}</span>
+                </button>
+              );
+            })}
+          </div>
+        )}
+
+        {/* Step 3: Sports (athlete/parent) / Goals (coach) */}
+        {step === 3 && role !== 'coach' && (
+          <div className="flex flex-wrap gap-2" role="group" aria-label="Select sports">
+            {sportTaxonomy.map((s) => {
+              const active = sports.includes(s.slug);
+              return (
+                <Badge
+                  key={s.slug}
+                  variant={active ? 'default' : 'outline'}
+                  role="checkbox"
+                  aria-checked={active}
+                  aria-label={s.name}
+                  tabIndex={0}
+                  onClick={() => toggleSport(s.slug)}
+                  onKeyDown={(e) => {
+                    if (e.key === ' ' || e.key === 'Enter') {
+                      e.preventDefault();
+                      toggleSport(s.slug);
+                    }
+                  }}
+                  className="cursor-pointer select-none"
+                >
+                  {s.name}
+                </Badge>
+              );
+            })}
+          </div>
+        )}
+
+        {step === 3 && role === 'coach' && (
+          <div className="flex flex-col gap-1.5">
+            <Label htmlFor="wizard-goals">Coaching goals</Label>
+            <Input
+              id="wizard-goals"
+              placeholder="e.g. Develop junior tennis players"
+              value={goals}
+              onChange={(e) => setGoals(e.target.value)}
+              autoFocus
+            />
+          </div>
+        )}
+
+        {/* Step 4: Skill Level (athlete/parent) */}
         {step === 4 && (
           <div className="grid grid-cols-2 gap-2" role="radiogroup" aria-label="Select skill level">
             {SKILL_LEVELS.map((level) => {

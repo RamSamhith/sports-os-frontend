@@ -54,8 +54,8 @@ export async function handleSocialAuth(
   idToken: string,
   callbacks: {
     setAuth: (auth: boolean, onboarding: boolean) => void;
-    setProfile: (profile: { name: string; email: string; phone: string }) => void;
-    onSuccess: () => void;
+    setProfile: (profile: { name: string; email: string; phone: string; authProvider?: 'credentials' | 'google' | 'microsoft' | 'guest' }) => void;
+    onSuccess: (onboardingCompleted?: boolean) => void;
     onError: (message: string) => void;
   }
 ) {
@@ -75,13 +75,16 @@ export async function handleSocialAuth(
       localStorage.setItem('sportsos:auth-token', token);
     } catch { /* ignore */ }
 
+    const onboarded = user.onboardingCompleted ?? false;
+
     setProfile({
       name: user.name,
       email: user.email,
       phone: user.phone ?? '',
+      authProvider: 'google',
     });
-    setAuth(true, user.onboardingCompleted ?? false);
-    onSuccess();
+    setAuth(true, onboarded);
+    onSuccess(onboarded);
   } catch {
     onError('Network error. Please try again.');
   }

@@ -54,6 +54,20 @@ export default function RegisterPage() {
 
   const googleAuth = useGoogleAuth();
 
+  useEffect(() => {
+    if (googleAuth.loaded) {
+      googleAuth.initialize((credential) => {
+        setSocialLoading('google');
+        handleSocialAuth(credential, {
+          setAuth,
+          setProfile,
+          onSuccess: () => { setSocialLoading(null); },
+          onError: (msg) => { setSocialError(msg); setSocialLoading(null); },
+        });
+      });
+    }
+  }, [googleAuth.loaded]); // eslint-disable-line react-hooks/exhaustive-deps
+
   // Restore signup draft when returning from OTP verification or edit flow
   useEffect(() => {
     if (typeof window === 'undefined') return;

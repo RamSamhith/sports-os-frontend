@@ -51,7 +51,11 @@ export default function LoginPage() {
   useEffect(() => {
     if (isLoading) return;
     if (isAuthenticated) {
-      if (onboardingCompleted) router.replace('/');
+      if (onboardingCompleted) {
+        router.replace('/');
+      } else {
+        router.replace('/onboarding/role');
+      }
     }
   }, [isLoading, isAuthenticated, onboardingCompleted, router]);
 
@@ -147,7 +151,7 @@ export default function LoginPage() {
       } catch { /* ignore */ }
       const userPhone = res.data.user.phone ?? '';
       setProfile({ name: res.data.user.name, email: res.data.user.email, phone: userPhone });
-      setAuth(true, res.data.user.onboardingCompleted);
+      setAuth(true, res.data.user.onboardingCompleted ?? false);
       setIsSubmitting(false);
       if (res.data.user.onboardingCompleted) {
         router.replace('/');

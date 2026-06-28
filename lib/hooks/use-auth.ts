@@ -3,7 +3,7 @@
 import { createContext, useContext } from 'react';
 import type { UserRole } from '@/types/domain/user';
 
-export type OnboardingRole = 'athlete' | 'parent';
+export type OnboardingRole = 'athlete' | 'parent' | 'coach' | 'academy_owner';
 
 export interface UserProfile {
   name: string;

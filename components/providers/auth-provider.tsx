@@ -219,6 +219,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             name: user.name || '',
             email: user.email || '',
             phone: user.phone || '',
+            authProvider: user.authProvider,
           };
           setProfileState(backendProfile);
           writeProfile(backendProfile);
