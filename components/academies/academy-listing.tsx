@@ -179,7 +179,7 @@ export function AcademyListing({ hideSearch = false }: { hideSearch?: boolean } 
   const dynamicSportOptions = React.useMemo(() =>
     sportOptions.map((o) => ({
       ...o,
-      count: allAcademies.filter((a) => a.sportsOffered.includes(o.value)).length,
+      count: allAcademies.filter((a) => (a.sportsOffered ?? []).includes(o.value)).length,
     })),
     [allAcademies]
   );
@@ -187,7 +187,7 @@ export function AcademyListing({ hideSearch = false }: { hideSearch?: boolean } 
   const dynamicFacilityOptions = React.useMemo(() =>
     facilityOptions.map((o) => ({
       ...o,
-      count: allAcademies.filter((a) => a.facilities.includes(o.value as never)).length,
+      count: allAcademies.filter((a) => (a.facilities ?? []).includes(o.value as never)).length,
     })),
     [allAcademies]
   );
@@ -195,7 +195,7 @@ export function AcademyListing({ hideSearch = false }: { hideSearch?: boolean } 
   const dynamicLevelOptions = React.useMemo(() =>
     levelOptions.map((o) => ({
       ...o,
-      count: allAcademies.filter((a) => a.trainingLevels.includes(o.value as never)).length,
+      count: allAcademies.filter((a) => (a.trainingLevels ?? []).includes(o.value as never)).length,
     })),
     [allAcademies]
   );

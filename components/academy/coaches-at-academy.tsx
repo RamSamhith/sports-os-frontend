@@ -39,7 +39,7 @@ function CompactCoachCard({ coach }: { coach: Coach }) {
             <p className="text-sm font-semibold leading-tight line-clamp-1">{coach.name}</p>
             <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
               <span className="line-clamp-1">
-                {coach.specialization.slice(0, 2).join(', ')}
+                {((coach.specialization ?? []).slice(0, 2)).join(', ')}
               </span>
               {coach.experienceYears > 0 && (
                 <span className="flex items-center gap-0.5">
@@ -53,7 +53,7 @@ function CompactCoachCard({ coach }: { coach: Coach }) {
               </span>
             </div>
             <div className="flex flex-wrap gap-1 pt-1">
-              {coach.sportsCoached.slice(0, 2).map((sport) => (
+              {(coach.sportsCoached ?? []).slice(0, 2).map((sport) => (
                 <Badge key={sport} variant="outline" className="text-[10px] px-1.5 py-0">
                   {sport}
                 </Badge>

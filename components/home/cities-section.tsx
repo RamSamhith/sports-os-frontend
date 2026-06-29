@@ -50,8 +50,8 @@ export function CitiesSection() {
     academies.forEach((academy) => {
       const city = academy.location.city;
       const existing = cityMap.get(city) ?? { sports: new Set(), totalRating: 0, count: 0 };
-      academy.sportsOffered.forEach((s) => existing.sports.add(s));
-      existing.totalRating += academy.rating.average;
+      (academy.sportsOffered ?? []).forEach((s) => existing.sports.add(s));
+      existing.totalRating += typeof academy.rating === 'number' ? academy.rating : (academy.rating?.average ?? 0);
       existing.count += 1;
       cityMap.set(city, existing);
     });

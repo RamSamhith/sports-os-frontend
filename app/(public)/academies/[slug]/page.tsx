@@ -20,9 +20,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   const academy = res.data;
   const title = `${academy.name} - Sports Academy in ${academy.location.city}`;
-  const description = academy.description
-    ? academy.description.slice(0, 160)
-    : `Find ${academy.name} in ${academy.location.city}, ${academy.location.state}. Sports: ${academy.sportsOffered.join(', ')}.`;
+  const description = (academy?.description ?? '').slice(0, 160)
+    || `Find ${academy.name} in ${academy.location.city}, ${academy.location.state}. Sports: ${(academy.sportsOffered ?? []).join(', ')}.`;
 
   return {
     title,

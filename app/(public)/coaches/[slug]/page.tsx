@@ -106,10 +106,10 @@ export default function CoachDetailPage() {
           </CardHeader>
           <CardContent className="flex flex-col gap-4">
             <p className="text-sm text-pretty">
-              Specialisation: {coach.specialization.join(', ')}.
+              Specialisation: {(coach.specialization ?? []).join(', ')}.
             </p>
             <div className="flex flex-wrap gap-1">
-              {coach.sportsCoached.map((sport) => (
+              {(coach.sportsCoached ?? []).map((sport) => (
                 <Badge key={sport} variant="secondary" className="text-xs">
                   {sport}
                 </Badge>
@@ -173,11 +173,11 @@ export default function CoachDetailPage() {
               <CardDescription>Certifications, awards, and career milestones</CardDescription>
             </CardHeader>
             <CardContent className="flex flex-col gap-4">
-              {coach.certifications.length > 0 && (
+              {(coach.certifications ?? []).length > 0 && (
                 <div>
                   <h3 className="text-sm font-semibold text-foreground mb-2">Certifications</h3>
                   <ul className="space-y-2">
-                    {coach.certifications.map((cert, i) => (
+                    {(coach.certifications ?? []).map((cert, i) => (
                       <li key={i} className="flex items-start gap-2 text-sm text-muted-foreground">
                         <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-primary/60" />
                         <div>

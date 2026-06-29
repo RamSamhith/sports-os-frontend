@@ -1,6 +1,8 @@
 import type { Academy } from '@/types/domain/academy';
 import type { ApiResponse, ListResponse } from './client';
 import { get } from './client';
+// TEMPORARY: Remove normalize imports and revert to direct `get<Academy>(...)` after backend fix
+import { normalizeAcademy, normalizeAcademies } from './normalize';
 
 export interface AcademyFilterParams {
   sport?: string;
@@ -21,13 +23,35 @@ export async function getAcademies(params?: AcademyFilterParams): Promise<ApiRes
   if (params?.search) query.search = params.search;
   if (params?.page) query.page = String(params.page);
   if (params?.pageSize) query.pageSize = String(params.pageSize);
-  return get<ListResponse<Academy>>('/academies', query);
+  const res = await get<Record<string, unknown>>('/academies', query);
+  if (!res.ok) return res;
+  const raw = res.data;
+  const rawItems = Array.isArray(raw?.items) ? raw.items : Array.isArray(raw) ? raw : [];
+  const rawPagination = raw?.pagination && typeof raw.pagination === 'object'
+    ? raw.pagination as Record<string, unknown>
+    : { page: params?.page ?? 1, pageSize: params?.pageSize ?? 12, total: 0, hasMore: false };
+  return {
+    ok: true,
+    data: {
+      items: normalizeAcademies(rawItems),
+      pagination: {
+        page: Number(rawPagination.page) || 1,
+        pageSize: Number(rawPagination.pageSize) || 12,
+        total: Number(rawPagination.total) || 0,
+        hasMore: Boolean(rawPagination.hasMore),
+      },
+    },
+  };
 }
 
 export async function getAcademy(slug: string): Promise<ApiResponse<Academy>> {
-  return get<Academy>(`/academies/by-slug/${slug}`);
+  const res = await get<Record<string, unknown>>(`/academies/by-slug/${slug}`);
+  if (!res.ok) return res;
+  return { ok: true, data: normalizeAcademy(res.data) };
 }
 
 export async function getAcademyById(id: string): Promise<ApiResponse<Academy>> {
-  return get<Academy>(`/academies/${id}`);
+  const res = await get<Record<string, unknown>>(`/academies/${id}`);
+  if (!res.ok) return res;
+  return { ok: true, data: normalizeAcademy(res.data) };
 }

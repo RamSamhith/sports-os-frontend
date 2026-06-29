@@ -41,7 +41,7 @@ export function FeaturedCoaches() {
   }, [retryKey]);
 
   const featured = [...coaches]
-    .sort((a, b) => b.rating.average - a.rating.average)
+    .sort((a, b) => (b.rating?.average ?? 0) - (a.rating?.average ?? 0))
     .slice(0, 3);
 
   return (

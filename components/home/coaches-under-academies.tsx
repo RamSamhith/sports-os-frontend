@@ -33,7 +33,7 @@ export function CoachesUnderAcademies() {
         }
 
         const topAcademies = [...academiesRes.data.items]
-          .sort((a, b) => b.rating.average - a.rating.average)
+          .sort((a, b) => (b.rating?.average ?? 0) - (a.rating?.average ?? 0))
           .slice(0, 3);
 
         const coachesRes = await getCoaches({ pageSize: 100 });
@@ -45,7 +45,7 @@ export function CoachesUnderAcademies() {
           ...academy,
           coaches: allCoaches
             .filter((c) => c.academyId === academy.id)
-            .sort((a, b) => b.rating.average - a.rating.average)
+            .sort((a, b) => (b.rating?.average ?? 0) - (a.rating?.average ?? 0))
             .slice(0, 2),
         }));
 
@@ -113,11 +113,11 @@ function AcademyCoachesCard({ academy }: { academy: AcademyWithCoaches }) {
           </div>
           <div className="flex items-center gap-1 text-xs">
             <Star className="h-3 w-3 fill-amber-400 text-amber-400" />
-            <span className="font-medium">{academy.rating.average.toFixed(1)}</span>
+            <span className="font-medium">{(typeof academy.rating === 'number' ? academy.rating : academy.rating?.average ?? 0).toFixed(1)}</span>
           </div>
         </div>
         <div className="mt-2 flex flex-wrap gap-1">
-          {academy.sportsOffered.slice(0, 3).map((sport) => (
+          {(academy.sportsOffered ?? []).slice(0, 3).map((sport) => (
             <Badge key={sport} variant="secondary" className="capitalize text-[10px]">
               {sport.replace(/-/g, ' ')}
             </Badge>
@@ -146,17 +146,17 @@ function AcademyCoachesCard({ academy }: { academy: AcademyWithCoaches }) {
                 </span>
                 <span className="flex items-center gap-0.5">
                   <Star className="h-3 w-3 fill-amber-400 text-amber-400" />
-                  {coach.rating.average}
+                  {(typeof coach.rating === 'number' ? coach.rating : coach.rating?.average ?? 0).toFixed(1)}
                 </span>
-                {coach.certifications.length > 0 && (
+                {(coach.certifications ?? []).length > 0 && (
                   <span className="flex items-center gap-0.5">
                     <Award className="h-3 w-3" />
-                    {coach.certifications.length} cert
+                    {(coach.certifications ?? []).length} cert
                   </span>
                 )}
               </div>
               <div className="mt-1 flex flex-wrap gap-1">
-                {coach.sportsCoached.slice(0, 2).map((sport) => (
+                {(coach.sportsCoached ?? []).slice(0, 2).map((sport) => (
                   <Badge key={sport} variant="outline" className="capitalize text-[10px] px-1.5 py-0">
                     {sport.replace(/-/g, ' ')}
                   </Badge>

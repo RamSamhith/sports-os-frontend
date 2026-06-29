@@ -19,7 +19,7 @@ export function TestimonialsSection() {
         if (cancelled || !academiesRes.ok) { setLoading(false); return; }
 
         const topAcademies = academiesRes.data.items
-          .sort((a, b) => b.rating.average - a.rating.average)
+          .sort((a, b) => (b.rating?.average ?? 0) - (a.rating?.average ?? 0))
           .slice(0, 5);
 
         const reviewPromises = topAcademies.map((a) =>
@@ -31,7 +31,7 @@ export function TestimonialsSection() {
 
         const allReviews = reviewResults
           .filter((r) => r.ok)
-          .flatMap((r) => r.data.reviews)
+          .flatMap((r) => r.data?.reviews ?? [])
           .filter((r) => r.rating >= 4 && r.text)
           .sort((a, b) => b.rating - a.rating || b.helpfulCount - a.helpfulCount)
           .slice(0, 3);

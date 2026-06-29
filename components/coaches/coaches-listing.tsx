@@ -161,7 +161,7 @@ export function CoachesListing({ hideSearch = false }: { hideSearch?: boolean } 
   const dynamicSportOptions = React.useMemo(() =>
     sportOptions.map((o) => ({
       ...o,
-      count: allCoaches.filter((c) => c.sportsCoached.includes(o.value)).length,
+      count: allCoaches.filter((c) => (c.sportsCoached ?? []).includes(o.value)).length,
     })),
     [allCoaches]
   );

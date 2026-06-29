@@ -94,9 +94,9 @@ export function MyAcademyCard({ academies, distance }: MyAcademyCardProps) {
             </Badge>
           )}
         </div>
-        {academy.sportsOffered && academy.sportsOffered.length > 0 && (
+        {academy.sportsOffered && (academy.sportsOffered ?? []).length > 0 && (
           <div className="flex flex-wrap gap-1">
-            {academy.sportsOffered.slice(0, 4).map((sport) => (
+            {(academy.sportsOffered ?? []).slice(0, 4).map((sport) => (
               <Badge key={sport} variant="outline" className="text-xs">
                 {sport}
               </Badge>

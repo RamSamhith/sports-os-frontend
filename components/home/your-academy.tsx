@@ -55,7 +55,7 @@ export function YourAcademy() {
               </div>
               <div className="flex items-center gap-2 text-xs text-muted-foreground">
                 <MapPin className="h-3 w-3" />
-                <span>{academy.location.city}</span>
+                <span>{academy.location?.city ?? 'Unknown'}</span>
                 <span>·</span>
                 <Star className="h-3 w-3 fill-amber-400 text-amber-400" />
                 <span>{ratingAvg.toFixed(1)}</span>

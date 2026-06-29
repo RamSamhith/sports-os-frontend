@@ -187,8 +187,8 @@ function CompareCard({ slot, onRemove }: { slot: Entity; onRemove: () => void })
         {(kind === 'academy' || kind === 'coach') && (
           <div className="flex items-center gap-1 text-xs">
             <Star aria-hidden className="fill-rating text-rating h-3.5 w-3.5" />
-            <span className="font-semibold">{(entity as Academy | Coach).rating.average.toFixed(1)}</span>
-            <span className="text-muted-foreground">({(entity as Academy | Coach).rating.count})</span>
+            <span className="font-semibold">{((entity as Academy | Coach).rating?.average ?? 0).toFixed(1)}</span>
+            <span className="text-muted-foreground">({((entity as Academy | Coach).rating?.count ?? 0)})</span>
           </div>
         )}
         <div className="flex flex-wrap gap-2 pt-1">
@@ -215,20 +215,20 @@ function ComparisonTable({ slots }: { slots: Entity[] }) {
   const anySport = slots.some((s) => s.kind === 'sport');
 
   if (anyAcademy || anyCoach) {
-    rows.push({ key: 'rating', label: 'Rating', values: slots.map((s) => s.kind === 'sport' ? '—' : (s.entity as Academy | Coach).rating.average.toFixed(1)) });
+    rows.push({ key: 'rating', label: 'Rating', values: slots.map((s) => s.kind === 'sport' ? '—' : ((s.entity as Academy | Coach).rating?.average ?? 0).toFixed(1)) });
     rows.push({ key: 'verification', label: 'Verification', values: slots.map((s) => s.kind === 'sport' ? '—' : (s.entity as Academy | Coach).verificationStatus) });
   }
   if (anySport) {
     rows.push({ key: 'category', label: 'Category', values: slots.map((s) => s.kind === 'sport' ? (s.entity as Sport).category : '—') });
     rows.push({ key: 'age', label: 'Age range', values: slots.map((s) => { if (s.kind !== 'sport') return '—'; const r = (s.entity as Sport).explorationGuidance?.ageSuitability; return r?.min !== undefined && r?.max !== undefined ? `${r.min}–${r.max}` : r?.min !== undefined ? `${r.min}+` : '—'; }) });
   }
-  rows.push({ key: 'sports', label: 'Sports', values: slots.map((s) => s.kind === 'academy' ? (s.entity as Academy).sportsOffered.join(', ') : s.kind === 'coach' ? (s.entity as Coach).sportsCoached.join(', ') : (s.entity as Sport).name) });
+  rows.push({ key: 'sports', label: 'Sports', values: slots.map((s) => s.kind === 'academy' ? (s.entity as Academy).sportsOffered?.join(', ') ?? '' : s.kind === 'coach' ? (s.entity as Coach).sportsCoached?.join(', ') ?? '' : (s.entity as Sport).name) });
   if (anyAcademy) {
-    rows.push({ key: 'facilities', label: 'Facilities', values: slots.map((s) => s.kind === 'academy' ? (s.entity as Academy).facilities.join(', ') : '—') });
-    rows.push({ key: 'levels', label: 'Training levels', values: slots.map((s) => s.kind === 'academy' ? (s.entity as Academy).trainingLevels.join(', ') : '—') });
+    rows.push({ key: 'facilities', label: 'Facilities', values: slots.map((s) => s.kind === 'academy' ? (s.entity as Academy).facilities?.join(', ') ?? '' : '—') });
+    rows.push({ key: 'levels', label: 'Training levels', values: slots.map((s) => s.kind === 'academy' ? (s.entity as Academy).trainingLevels?.join(', ') ?? '' : '—') });
   }
   if (anyCoach) {
-    rows.push({ key: 'specialization', label: 'Specialisation', values: slots.map((s) => s.kind === 'coach' ? (s.entity as Coach).specialization.join(', ') : '—') });
+    rows.push({ key: 'specialization', label: 'Specialisation', values: slots.map((s) => s.kind === 'coach' ? (s.entity as Coach).specialization?.join(', ') ?? '' : '—') });
   }
 
   return (

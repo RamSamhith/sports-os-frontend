@@ -81,7 +81,7 @@ export default function CityPage() {
     const sorted = [...academies];
     switch (sortBy) {
       case 'top-rated':
-        return sorted.sort((a, b) => b.rating.average - a.rating.average);
+        return sorted.sort((a, b) => (b.rating?.average ?? 0) - (a.rating?.average ?? 0));
       case 'most-reviewed':
         return sorted.sort((a, b) => b.rating.count - a.rating.count);
       case 'name':
@@ -94,7 +94,7 @@ export default function CityPage() {
   const topSports = React.useMemo(() => {
     const sportMap = new Map<string, number>();
     academies.forEach((a) => {
-      a.sportsOffered.forEach((s) => {
+      (a.sportsOffered ?? []).forEach((s) => {
         sportMap.set(s, (sportMap.get(s) ?? 0) + 1);
       });
     });
@@ -238,7 +238,7 @@ export default function CityPage() {
             </h2>
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
               {coaches
-                .sort((a, b) => b.rating.average - a.rating.average)
+                .sort((a, b) => (b.rating?.average ?? 0) - (a.rating?.average ?? 0))
                 .slice(0, 6)
                 .map((coach) => (
                   <Link
@@ -270,12 +270,12 @@ export default function CityPage() {
                         <div className="text-muted-foreground flex items-center gap-2 text-xs">
                           <span className="flex items-center gap-0.5">
                             <Star className="h-3 w-3 fill-amber-400 text-amber-400" />
-                            {coach.rating.average.toFixed(1)}
+                            {(coach.rating?.average ?? 0).toFixed(1)}
                           </span>
                           <span>{coach.experienceYears}+ yrs</span>
                         </div>
                         <div className="flex flex-wrap gap-1 mt-1">
-                          {coach.sportsCoached.slice(0, 2).map((s) => (
+                          {(coach.sportsCoached ?? []).slice(0, 2).map((s) => (
                             <Badge key={s} variant="secondary" className="text-[10px] px-1 py-0 capitalize">
                               {s.replace(/-/g, ' ')}
                             </Badge>

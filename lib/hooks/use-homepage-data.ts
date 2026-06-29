@@ -19,7 +19,7 @@ async function fetchAcademies(): Promise<Academy[]> {
     try {
       const res = await getAcademies({ pageSize: 200 });
       if (res.ok) {
-        academiesCache = res.data.items;
+        academiesCache = Array.isArray(res.data?.items) ? res.data.items : [];
         return academiesCache;
       }
       return [];
@@ -41,7 +41,7 @@ async function fetchSports(): Promise<Sport[]> {
     try {
       const res = await listSports({ status: 'published', limit: 100 });
       if (res.ok) {
-        sportsCache = res.data.items;
+        sportsCache = Array.isArray(res.data?.items) ? res.data.items : [];
         return sportsCache;
       }
       return [];

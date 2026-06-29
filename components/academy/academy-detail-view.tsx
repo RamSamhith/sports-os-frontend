@@ -79,10 +79,10 @@ export function AcademyDetailView({ slug }: { slug: string }) {
           const relatedAcademies = relatedRes.data.items
             .filter((a) => a.id !== res.data.id)
             .filter((a) =>
-              a.location.city === res.data.location.city ||
-              a.sportsOffered.some((s) => res.data.sportsOffered.includes(s))
+              a.location?.city === res.data.location?.city ||
+              (a.sportsOffered ?? []).some((s) => (res.data.sportsOffered ?? []).includes(s))
             )
-            .sort((a, b) => b.rating.average - a.rating.average)
+            .sort((a, b) => (b.rating?.average ?? 0) - (a.rating?.average ?? 0))
             .slice(0, 3);
           setRelated(relatedAcademies);
         }
@@ -178,7 +178,7 @@ export function AcademyDetailView({ slug }: { slug: string }) {
               {academy.location.city}, {academy.location.state}
               <span className="text-muted-foreground mx-1">·</span>
               <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-400" />
-              <span className="text-foreground font-semibold">{academy.rating.average.toFixed(1)}</span>
+              <span className="text-foreground font-semibold">{(academy.rating?.average ?? 0).toFixed(1)}</span>
               <span className="text-muted-foreground">({academy.rating.count} reviews)</span>
             </p>
           </div>
@@ -323,7 +323,7 @@ export function AcademyDetailView({ slug }: { slug: string }) {
                         </span>
                         <span className="flex items-center gap-0.5">
                           <Star className="h-3 w-3 fill-amber-400 text-amber-400" />
-                          {coach.rating.average}
+                          {(coach.rating?.average ?? 0).toFixed(1)}
                         </span>
                         {coach.certifications.length > 0 && (
                           <span className="flex items-center gap-0.5">
@@ -489,15 +489,15 @@ export function AcademyDetailView({ slug }: { slug: string }) {
                       <h3 className="text-sm font-semibold line-clamp-1 group-hover:underline">{a.name}</h3>
                       <p className="text-muted-foreground text-xs flex items-center gap-1">
                         <MapPin className="h-3 w-3" />
-                        {a.location.city}
+                        {a.location?.city}
                       </p>
                       <div className="flex items-center gap-2 mt-0.5">
                         <span className="flex items-center gap-0.5 text-xs">
                           <Star className="h-3 w-3 fill-amber-400 text-amber-400" />
-                          {a.rating.average.toFixed(1)}
+                          {(a.rating?.average ?? 0).toFixed(1)}
                         </span>
                         <div className="flex gap-1">
-                          {a.sportsOffered.slice(0, 2).map((s) => (
+                          {(a.sportsOffered ?? []).slice(0, 2).map((s) => (
                             <Badge key={s} variant="outline" className="text-[10px] px-1 py-0 capitalize">{s}</Badge>
                           ))}
                         </div>
