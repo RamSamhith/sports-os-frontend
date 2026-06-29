@@ -4,6 +4,7 @@ import * as React from 'react';
 import { Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { SearchInput } from '@/components/ui/search-input';
+import { SearchAutocomplete } from '@/components/search/search-autocomplete';
 import { AcademyListing } from '@/components/academies/academy-listing';
 import { CoachesListing } from '@/components/coaches/coaches-listing';
 import { SportsListing } from '@/components/sports/sports-listing';
@@ -123,14 +124,11 @@ function SearchPageContent() {
         </header>
 
         <div className="mb-4">
-          <SearchInput
-            value={query}
-            onValueChange={setQuery}
-            onSearch={handleSearch}
-            label="Search"
+          <SearchAutocomplete
             placeholder="Search academies, sports, cities…"
             size="lg"
-            onClear={handleClear}
+            initialValue={query}
+            onSelect={(href) => router.push(href)}
           />
         </div>
 

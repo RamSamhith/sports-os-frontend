@@ -1,5 +1,6 @@
 'use client';
 
+import * as React from 'react';
 import Link from 'next/link';
 import { motion, useReducedMotion } from 'framer-motion';
 import { ImageWithFallback } from '@/components/ui/image-with-fallback';
@@ -33,7 +34,7 @@ const sportBenefits: Record<string, string[]> = {
   basketball: ['Height coordination', 'Agility', 'Endurance'],
 };
 
-export function SportCard({ sport }: { sport: Sport }) {
+export const SportCard = React.memo(function SportCard({ sport }: { sport: Sport }) {
   const reduced = useReducedMotion();
   const { slug, name, sportType, coverImage, shortDescription, explorationGuidance, id } = sport;
   const imageSrc = coverImage ?? fixtureImages.sports[id];
@@ -111,4 +112,4 @@ export function SportCard({ sport }: { sport: Sport }) {
       </Card>
     </motion.div>
   );
-}
+});

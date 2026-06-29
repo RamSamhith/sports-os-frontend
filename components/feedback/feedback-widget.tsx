@@ -90,6 +90,7 @@ export function FeedbackWidget() {
                   onChange={(e) => setMessage(e.target.value)}
                   placeholder="Tell us what's on your mind..."
                   rows={3}
+                  aria-label="Your feedback"
                   className="bg-background border-border/60 w-full resize-none rounded-lg border p-2.5 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring"
                   maxLength={500}
                 />

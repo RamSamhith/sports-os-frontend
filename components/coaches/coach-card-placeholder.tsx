@@ -1,5 +1,6 @@
 'use client';
 
+import * as React from 'react';
 import Link from 'next/link';
 import { motion, useReducedMotion } from 'framer-motion';
 import { Bookmark, BookmarkCheck, MapPin, Star, Award, Clock } from 'lucide-react';
@@ -66,7 +67,7 @@ function CoachAvatar({ name, sport }: { name: string; sport: string }) {
   );
 }
 
-export function CoachCardPlaceholder({ coach }: { coach: Coach }) {
+export const CoachCardPlaceholder = React.memo(function CoachCardPlaceholder({ coach }: { coach: Coach }) {
   const reduced = useReducedMotion();
   const {
     slug,
@@ -208,4 +209,4 @@ export function CoachCardPlaceholder({ coach }: { coach: Coach }) {
       </Card>
     </motion.div>
   );
-}
+});

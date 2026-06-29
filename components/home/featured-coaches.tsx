@@ -6,7 +6,8 @@ import { Container } from '@/components/layout/container';
 import { Section } from '@/components/layout/section';
 import { CoachCardPlaceholder } from '@/components/coaches/coach-card-placeholder';
 import { getCoaches } from '@/lib/api/coaches';
-import { Users } from 'lucide-react';
+import { Users, AlertTriangle } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import { CoachCardSkeleton } from '@/components/feedback/skeletons';
 import type { Coach } from '@/types/domain/coach';
 
@@ -14,15 +15,20 @@ export function FeaturedCoaches() {
   const [coaches, setCoaches] = React.useState<Coach[]>([]);
   const [loading, setLoading] = React.useState(true);
   const [loadError, setLoadError] = React.useState(false);
+  const [retryKey, setRetryKey] = React.useState(0);
 
   React.useEffect(() => {
     let cancelled = false;
     async function load() {
       try {
+        setLoading(true);
+        setLoadError(false);
         const res = await getCoaches({ pageSize: 100 });
         if (cancelled) return;
         if (res.ok) {
           setCoaches(res.data.items);
+        } else {
+          setLoadError(true);
         }
       } catch {
         if (!cancelled) setLoadError(true);
@@ -32,7 +38,7 @@ export function FeaturedCoaches() {
     }
     load();
     return () => { cancelled = true; };
-  }, []);
+  }, [retryKey]);
 
   const featured = [...coaches]
     .sort((a, b) => b.rating.average - a.rating.average)
@@ -57,12 +63,15 @@ export function FeaturedCoaches() {
             ))}
           </div>
         ) : loadError ? (
-          <div className="text-muted-foreground flex flex-col items-center gap-3 rounded-xl border border-dashed py-12 text-center">
-            <Users className="h-10 w-10 opacity-40" />
+          <div className="flex flex-col items-center gap-3 rounded-xl border border-dashed py-12 text-center">
+            <AlertTriangle className="h-10 w-10 text-destructive/40" />
             <div>
               <p className="text-foreground font-medium">Failed to load coaches</p>
-              <p className="text-sm">Please try again later.</p>
+              <p className="text-sm text-muted-foreground">Please try again later.</p>
             </div>
+            <Button size="sm" variant="outline" onClick={() => setRetryKey((k) => k + 1)}>
+              Try again
+            </Button>
           </div>
         ) : featured.length === 0 ? (
           <div className="text-muted-foreground flex flex-col items-center gap-3 rounded-xl border border-dashed py-12 text-center">

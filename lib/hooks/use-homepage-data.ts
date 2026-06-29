@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { getAcademies } from '@/lib/api/academies';
 import { listSports } from '@/lib/api/sports';
 import type { Academy } from '@/types/domain/academy';
@@ -60,6 +60,7 @@ export function useHomepageData() {
   const [sports, setSports] = useState<Sport[]>(sportsCache ?? []);
   const [loading, setLoading] = useState(!academiesCache || !sportsCache);
   const [error, setError] = useState<string | null>(null);
+  const [retryKey, setRetryKey] = useState(0);
 
   useEffect(() => {
     let cancelled = false;
@@ -70,6 +71,7 @@ export function useHomepageData() {
         if (!cancelled) {
           setAcademies(a);
           setSports(s);
+          setError(null);
         }
       } catch (err) {
         if (!cancelled) setError(err instanceof Error ? err.message : 'Failed to load');
@@ -85,7 +87,15 @@ export function useHomepageData() {
 
     load();
     return () => { cancelled = true; };
+  }, [retryKey]);
+
+  const refetch = useCallback(() => {
+    academiesCache = null;
+    sportsCache = null;
+    setLoading(true);
+    setError(null);
+    setRetryKey((k) => k + 1);
   }, []);
 
-  return { academies, sports, loading, error };
+  return { academies, sports, loading, error, refetch };
 }

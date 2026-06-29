@@ -8,7 +8,7 @@ import { useAuth } from '@/lib/hooks/use-auth';
 import {
   getMyShortlistPopulated,
   addToShortlist,
-  removeFromShortlistBySlug,
+  removeFromShortlistById,
   clearShortlist,
 } from '@/lib/api/shortlist';
 import { trackShortlistAdd, trackShortlistRemove, trackGuestShortlist } from '@/lib/analytics/events';
@@ -78,6 +78,7 @@ export function ShortlistProvider({ children }: ShortlistProviderProps) {
   const [extras, setExtras] = React.useState<Record<string, { label: string; sublabel?: string; href: string }>>({});
   const [hydrated, setHydrated] = React.useState(false);
   const [populatedData, setPopulatedData] = React.useState<Record<string, Record<string, unknown>>>({});
+  const [backendIds, setBackendIds] = React.useState<Record<string, string>>({});
 
   React.useEffect(() => {
     const persisted = readPersisted();
@@ -117,6 +118,7 @@ export function ShortlistProvider({ children }: ShortlistProviderProps) {
 
           const popMap: Record<string, Record<string, unknown>> = {};
           const extrasMap: Record<string, { label: string; sublabel?: string; href: string }> = {};
+          const backendIdMap: Record<string, string> = {};
           for (const it of res.data) {
             const key = `${it.itemType}:${it.itemId}`;
             if (it.data) {
@@ -132,6 +134,7 @@ export function ShortlistProvider({ children }: ShortlistProviderProps) {
                   : `/coaches/${d.slug ?? it.itemId}`,
               };
             }
+            backendIdMap[key] = it.id;
           }
           for (const p of unsyncedGuest) {
             const key = `${p.itemType}:${p.itemId}`;
@@ -141,6 +144,7 @@ export function ShortlistProvider({ children }: ShortlistProviderProps) {
           }
           setPopulatedData(popMap);
           setExtras(extrasMap);
+          setBackendIds(backendIdMap);
         }
       });
     }
@@ -251,10 +255,14 @@ export function ShortlistProvider({ children }: ShortlistProviderProps) {
       remove(itemType, itemId);
       trackShortlistRemove(itemId, itemType);
       if (isAuthenticated && (itemType === 'academy' || itemType === 'coach')) {
-        removeFromShortlistBySlug(itemType, itemId).catch(() => {});
+        const key = `${itemType}:${itemId}`;
+        const backendId = backendIds[key];
+        if (backendId) {
+          removeFromShortlistById(backendId).catch(() => {});
+        }
       }
     },
-    [remove, isAuthenticated],
+    [remove, isAuthenticated, backendIds],
   );
 
   const clearAndSync = React.useCallback(() => {

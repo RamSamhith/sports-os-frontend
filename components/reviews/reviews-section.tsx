@@ -166,6 +166,7 @@ export function ReviewsSection({ targetType, targetId }: ReviewsSectionProps) {
           <select
             value={sortBy}
             onChange={(e) => setSortBy(e.target.value)}
+            aria-label="Sort reviews"
             className="border-border/60 bg-card/40 rounded-md border px-2 py-1.5 text-xs"
           >
             {sortOptions.map((opt) => (

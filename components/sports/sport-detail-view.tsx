@@ -83,7 +83,7 @@ export function SportDetailView({ sport }: SportDetailViewProps) {
     tournaments, competitionPathway, explorationGuidance,
   } = sport;
 
-  const imageSrc = coverImage || `/images/sports/${slug}-cover.jpg`;
+  const imageSrc = coverImage || `/images/sports/${slug}.svg`;
   const iconSrc = icon || `/images/sports/${slug}.svg`;
   const ageRange = explorationGuidance?.ageSuitability;
   const ageText =

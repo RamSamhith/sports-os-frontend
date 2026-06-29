@@ -54,6 +54,7 @@ export function CoachesListing({ hideSearch = false }: { hideSearch?: boolean } 
   const [total, setTotal] = React.useState(0);
   const [page, setPage] = React.useState(1);
   const [hasMore, setHasMore] = React.useState(true);
+  const [retryKey, setRetryKey] = React.useState(0);
   const sentinelRef = React.useRef<HTMLDivElement>(null);
 
   const [sports, setSports] = React.useState<string[]>(() => readListFromParams(searchParams, 'sport'));
@@ -105,7 +106,7 @@ export function CoachesListing({ hideSearch = false }: { hideSearch?: boolean } 
     }
     load();
     return () => { cancelled = true; };
-  }, [debouncedQuery, sports, cities, experience]);
+  }, [debouncedQuery, sports, cities, experience, retryKey]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Load more on intersection
   React.useEffect(() => {
@@ -154,7 +155,7 @@ export function CoachesListing({ hideSearch = false }: { hideSearch?: boolean } 
     }
     loadMore();
     return () => { cancelled = true; };
-  }, [page]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [page, loading, debouncedQuery, sports, cities, experience]);
 
   // Dynamic filter counts from all coaches
   const dynamicSportOptions = React.useMemo(() =>
@@ -266,7 +267,7 @@ export function CoachesListing({ hideSearch = false }: { hideSearch?: boolean } 
             <p className="text-foreground font-medium">Failed to load coaches</p>
             <p className="text-sm text-muted-foreground">{error}</p>
           </div>
-          <Button size="sm" variant="outline" onClick={() => window.location.reload()}>
+          <Button size="sm" variant="outline" onClick={() => setRetryKey((k) => k + 1)}>
             Try again
           </Button>
         </div>

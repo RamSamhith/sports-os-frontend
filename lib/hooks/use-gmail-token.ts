@@ -84,10 +84,10 @@ export function useGmailToken(): UseGmailTokenReturn {
 
     // Create or reuse the token client
     if (!clientRef.current) {
-      clientRef.current = window.google.accounts.oauth2.initTokenClient({
+      const client = window.google.accounts.oauth2.initTokenClient({
         client_id: clientId,
         scope: GMAIL_SCOPE,
-        callback: (tokenResponse) => {
+        callback: (tokenResponse: { error?: string; access_token?: string }) => {
           setLoading(false);
           if (tokenResponse.error) {
             setError(tokenResponse.error);
@@ -97,11 +97,12 @@ export function useGmailToken(): UseGmailTokenReturn {
             setError(null);
           }
         },
-      });
+      }) as unknown as TokenClient;
+      clientRef.current = client;
     }
 
     // prompt: 'consent' forces a fresh consent screen (required for first-time scope grant)
-    clientRef.current.requestAccessToken({ prompt: 'consent' });
+    clientRef.current?.requestAccessToken({ prompt: 'consent' });
   }, []);
 
   const disconnect = useCallback(() => {

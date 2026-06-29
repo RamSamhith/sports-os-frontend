@@ -17,7 +17,7 @@ export default function PrivateLayout({ children }: { children: ReactNode }) {
         <PrivateGuard>
           <Container className="grid grid-cols-1 gap-6 py-10 md:grid-cols-[240px_1fr]">
             <ProfileSidebar />
-            <main id="main" className="min-w-0">
+            <main id="main" tabIndex={-1} className="min-w-0">
               <PageTransition>{children}</PageTransition>
             </main>
           </Container>

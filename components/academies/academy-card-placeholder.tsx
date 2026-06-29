@@ -23,7 +23,7 @@ interface AcademyCardPlaceholderProps {
   distance?: number;
 }
 
-export function AcademyCardPlaceholder({ academy, priority = false, distance }: AcademyCardPlaceholderProps) {
+export const AcademyCardPlaceholder = React.memo(function AcademyCardPlaceholder({ academy, priority = false, distance }: AcademyCardPlaceholderProps) {
   const reduced = useReducedMotion();
   const {
     id,
@@ -225,4 +225,4 @@ export function AcademyCardPlaceholder({ academy, priority = false, distance }: 
     </Card>
     </motion.div>
   );
-}
+});
