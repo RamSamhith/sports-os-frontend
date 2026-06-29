@@ -142,16 +142,18 @@ export function SportDetailView({ sport }: SportDetailViewProps) {
       </div>
 
       {/* Quick Stats */}
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-        <StatCard icon={Users} label="Team Size" value={teamSize} />
-        <StatCard icon={Clock} label="Duration" value={matchDuration} />
-        <StatCard icon={IndianRupee} label="Monthly Cost" value={estimatedMonthlyCost} />
-        <StatCard icon={Timer} label="Learning Time" value={averageLearningTime} />
-      </div>
+      {(teamSize || matchDuration || estimatedMonthlyCost || averageLearningTime) && (
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+          {teamSize && <StatCard icon={Users} label="Team Size" value={teamSize} />}
+          {matchDuration && <StatCard icon={Clock} label="Duration" value={matchDuration} />}
+          {estimatedMonthlyCost && <StatCard icon={IndianRupee} label="Monthly Cost" value={estimatedMonthlyCost} />}
+          {averageLearningTime && <StatCard icon={Timer} label="Learning Time" value={averageLearningTime} />}
+        </div>
+      )}
 
       {/* About */}
       <section className="flex flex-col gap-3">
-        <SectionHeader icon={Star} title="About {name}" />
+        <SectionHeader icon={Star} title={`About ${name}`} />
         <p className="text-muted-foreground text-sm leading-relaxed">{shortDescription}</p>
         {fullDescription && (
           <p className="text-muted-foreground text-sm leading-relaxed">{fullDescription}</p>
@@ -166,37 +168,41 @@ export function SportDetailView({ sport }: SportDetailViewProps) {
       </section>
 
       {/* How to Play */}
-      <section className="flex flex-col gap-3">
-        <SectionHeader icon={Target} title="How to Play" />
-        <p className="text-muted-foreground text-sm leading-relaxed">{howToPlay}</p>
-        {objectiveOfGame && (
-          <div className="bg-muted/30 rounded-lg border p-3">
-            <span className="text-muted-foreground text-[10px] tracking-widest uppercase">Objective</span>
-            <p className="mt-1 text-sm">{objectiveOfGame}</p>
-          </div>
-        )}
-      </section>
+      {howToPlay && (
+        <section className="flex flex-col gap-3">
+          <SectionHeader icon={Target} title="How to Play" />
+          <p className="text-muted-foreground text-sm leading-relaxed">{howToPlay}</p>
+          {objectiveOfGame && (
+            <div className="bg-muted/30 rounded-lg border p-3">
+              <span className="text-muted-foreground text-[10px] tracking-widest uppercase">Objective</span>
+              <p className="mt-1 text-sm">{objectiveOfGame}</p>
+            </div>
+          )}
+        </section>
+      )}
 
       {/* Game Details */}
-      <section className="flex flex-col gap-3">
-        <SectionHeader icon={CircleDot} title="Game Details" />
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-          <InfoRow label="Playing Surface" value={playingSurface} />
-          <InfoRow label="Scoring System" value={scoringSystem} />
-          <InfoRow label="Age Groups" value={ageText} />
-          <InfoRow label="Playing Season" value={playingSeason} />
-          <InfoRow label="Training Frequency" value={trainingFrequency} />
-          <InfoRow label="Injury Risk" value={injuryRisk} />
-          <InfoRow label="Fitness Required" value={fitnessLevelRequired} />
-          <InfoRow label="Suitable For" value={suitableFor?.join(', ')} />
-        </div>
-        {requiredEquipment && requiredEquipment.length > 0 && (
-          <div className="flex flex-col gap-2">
-            <span className="text-muted-foreground text-[10px] tracking-widest uppercase">Required Equipment</span>
-            <TagList items={requiredEquipment} />
+      {(playingSurface || scoringSystem || ageText || playingSeason || trainingFrequency || injuryRisk || fitnessLevelRequired || suitableFor?.length) && (
+        <section className="flex flex-col gap-3">
+          <SectionHeader icon={CircleDot} title="Game Details" />
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            <InfoRow label="Playing Surface" value={playingSurface} />
+            <InfoRow label="Scoring System" value={scoringSystem} />
+            <InfoRow label="Age Groups" value={ageText} />
+            <InfoRow label="Playing Season" value={playingSeason} />
+            <InfoRow label="Training Frequency" value={trainingFrequency} />
+            <InfoRow label="Injury Risk" value={injuryRisk} />
+            <InfoRow label="Fitness Required" value={fitnessLevelRequired} />
+            <InfoRow label="Suitable For" value={suitableFor?.join(', ')} />
           </div>
-        )}
-      </section>
+          {requiredEquipment && requiredEquipment.length > 0 && (
+            <div className="flex flex-col gap-2">
+              <span className="text-muted-foreground text-[10px] tracking-widest uppercase">Required Equipment</span>
+              <TagList items={requiredEquipment} />
+            </div>
+          )}
+        </section>
+      )}
 
       {/* Benefits */}
       {(physicalBenefits?.length > 0 || mentalBenefits?.length > 0 || skillsDeveloped?.length > 0) && (

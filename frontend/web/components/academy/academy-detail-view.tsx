@@ -223,13 +223,12 @@ export function AcademyDetailView({ slug }: { slug: string }) {
         </div>
 
         {/* Trust bar */}
-        <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-6">
+        <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-5">
           {[
             { icon: Shield, label: 'Verified', value: academy.verificationStatus === 'verified' ? 'Yes' : 'Pending' },
             { icon: Clock, label: 'Experience', value: totalExperience > 0 ? `${totalExperience}+ yrs` : 'N/A' },
             { icon: Dumbbell, label: 'Sports', value: `${academy.sportsOffered.length}` },
             { icon: Users, label: 'Coaches', value: `${coachCount}` },
-            { icon: PhoneCall, label: 'Response', value: '< 24 hrs' },
             { icon: Building2, label: 'Facilities', value: `${facilityCount}` },
           ].map((item) => (
             <div key={item.label} className="border-border/60 bg-card/40 flex items-center gap-2.5 rounded-lg border p-2.5">
@@ -397,18 +396,16 @@ export function AcademyDetailView({ slug }: { slug: string }) {
         </div>
 
         {/* Achievements */}
-        {academy.achievementSignals && (
-          academy.achievementSignals.competitionParticipations.length > 0 ||
-          academy.achievementSignals.milestones.length > 0 ||
-          academy.achievementSignals.stateAthletesProduced > 0 ||
-          academy.achievementSignals.nationalAthletesProduced > 0
-        ) && (
+        {academy.achievementSignals?.competitionParticipations?.length > 0 ||
+          academy.achievementSignals?.milestones?.length > 0 ||
+          (academy.achievementSignals?.stateAthletesProduced ?? 0) > 0 ||
+          (academy.achievementSignals?.nationalAthletesProduced ?? 0) > 0 ? (
           <Card className="mt-4">
             <CardHeader className="pb-3">
               <CardTitle className="text-lg">Achievements</CardTitle>
             </CardHeader>
             <CardContent className="pt-0 flex flex-col gap-3">
-              {academy.achievementSignals.competitionParticipations.length > 0 && (
+              {academy.achievementSignals?.competitionParticipations?.length > 0 && (
                 <div>
                   <h3 className="text-xs font-semibold text-foreground mb-1.5">Competitions</h3>
                   <div className="flex flex-wrap gap-1.5">
@@ -418,7 +415,7 @@ export function AcademyDetailView({ slug }: { slug: string }) {
                   </div>
                 </div>
               )}
-              {academy.achievementSignals.milestones.length > 0 && (
+              {academy.achievementSignals?.milestones?.length > 0 && (
                 <div>
                   <h3 className="text-xs font-semibold text-foreground mb-1.5">Milestones</h3>
                   <ul className="space-y-1">
@@ -431,25 +428,25 @@ export function AcademyDetailView({ slug }: { slug: string }) {
                   </ul>
                 </div>
               )}
-              {(academy.achievementSignals.stateAthletesProduced > 0 || academy.achievementSignals.nationalAthletesProduced > 0) && (
+              {(academy.achievementSignals?.stateAthletesProduced ?? 0) > 0 || (academy.achievementSignals?.nationalAthletesProduced ?? 0) > 0 ? (
                 <div className="flex flex-wrap gap-3">
-                  {academy.achievementSignals.stateAthletesProduced > 0 && (
+                  {(academy.achievementSignals?.stateAthletesProduced ?? 0) > 0 && (
                     <div className="rounded-lg bg-muted px-3 py-2 text-xs">
-                      <span className="font-semibold">{academy.achievementSignals.stateAthletesProduced}</span>
+                      <span className="font-semibold">{academy.achievementSignals?.stateAthletesProduced}</span>
                       <span className="text-muted-foreground ml-1">State athletes</span>
                     </div>
                   )}
-                  {academy.achievementSignals.nationalAthletesProduced > 0 && (
+                  {(academy.achievementSignals?.nationalAthletesProduced ?? 0) > 0 && (
                     <div className="rounded-lg bg-muted px-3 py-2 text-xs">
-                      <span className="font-semibold">{academy.achievementSignals.nationalAthletesProduced}</span>
+                      <span className="font-semibold">{academy.achievementSignals?.nationalAthletesProduced}</span>
                       <span className="text-muted-foreground ml-1">National athletes</span>
                     </div>
                   )}
                 </div>
-              )}
+              ) : null}
             </CardContent>
           </Card>
-        )}
+        ) : null}
 
         {/* Reviews */}
         <ReviewsSection targetType="academy" targetId={academy.id} />
@@ -523,7 +520,7 @@ export function AcademyDetailView({ slug }: { slug: string }) {
 
       {/* Sticky CTA for mobile */}
       {showStickyCta && (
-        <div className="fixed bottom-0 left-0 right-0 z-50 border-t bg-background/95 backdrop-blur-sm p-3 pb-safe md:hidden">
+        <div className="fixed bottom-0 left-0 right-0 z-50 border-t bg-background/95 backdrop-blur-sm p-3 pb-safe md:hidden" role="complementary" aria-label="Academy actions">
           <div className="flex items-center gap-2">
             {academy.contact.phone && (
               <Button asChild variant="outline" className="h-12 min-w-[44px]">

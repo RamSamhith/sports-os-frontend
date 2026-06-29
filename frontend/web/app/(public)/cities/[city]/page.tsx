@@ -198,7 +198,9 @@ export default function CityPage() {
           </h2>
           <div className="flex items-center gap-2">
             <Filter className="h-4 w-4 text-muted-foreground" />
+            <label htmlFor="academy-sort" className="sr-only">Sort academies</label>
             <select
+              id="academy-sort"
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value as typeof sortBy)}
               className="border-border/60 bg-card/40 rounded-md border px-2 py-1.5 text-xs"

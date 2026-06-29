@@ -112,6 +112,8 @@ export function FeaturedAcademies() {
             ref={scrollRef}
             className="flex gap-4 overflow-x-auto pb-2 scrollbar-none"
             style={{ scrollSnapType: 'x mandatory' }}
+            role="region"
+            aria-label="Recommended academies"
           >
             {academies.map((academy, i) => (
               <div key={academy.id} className="w-[300px] shrink-0" style={{ scrollSnapAlign: 'start' }}>

@@ -105,16 +105,20 @@ export default function CoachDetailPage() {
             </CardDescription>
           </CardHeader>
           <CardContent className="flex flex-col gap-4">
-            <p className="text-sm text-pretty">
-              Specialisation: {coach.specialization.join(', ')}.
-            </p>
-            <div className="flex flex-wrap gap-1">
-              {coach.sportsCoached.map((sport) => (
-                <Badge key={sport} variant="secondary" className="text-xs">
-                  {sport}
-                </Badge>
-              ))}
-            </div>
+            {coach.specialization?.length > 0 && (
+              <p className="text-sm text-pretty">
+                Specialisation: {coach.specialization.join(', ')}.
+              </p>
+            )}
+            {coach.sportsCoached?.length > 0 && (
+              <div className="flex flex-wrap gap-1" role="list" aria-label="Sports coached">
+                {coach.sportsCoached.map((sport) => (
+                  <Badge key={sport} variant="secondary" className="text-xs" role="listitem">
+                    {sport}
+                  </Badge>
+                ))}
+              </div>
+            )}
             <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:flex-wrap">
               <Button asChild size="lg">
                 <ProtectedLink href={`/enquiry/coach/${coach.slug}`}>Request callback</ProtectedLink>
@@ -138,14 +142,14 @@ export default function CoachDetailPage() {
           </CardContent>
         </Card>
 
-        {(coach.contact.phone || coach.contact.email) && (
+        {(coach.contact?.phone || coach.contact?.email) && (
           <div className="mt-6">
             <Card>
               <CardHeader>
                 <CardTitle>Contact</CardTitle>
               </CardHeader>
               <CardContent className="flex flex-col gap-3">
-                {coach.contact.phone && (
+                {coach.contact?.phone && (
                   <div className="flex items-center gap-3 text-sm">
                     <Phone className="h-4 w-4 text-muted-foreground" />
                     <a href={`tel:${coach.contact.phone}`} className="text-foreground hover:underline">
@@ -153,7 +157,7 @@ export default function CoachDetailPage() {
                     </a>
                   </div>
                 )}
-                {coach.contact.email && (
+                {coach.contact?.email && (
                   <div className="flex items-center gap-3 text-sm">
                     <Mail className="h-4 w-4 text-muted-foreground" />
                     <a href={`mailto:${coach.contact.email}`} className="text-foreground hover:underline">
@@ -166,6 +170,7 @@ export default function CoachDetailPage() {
           </div>
         )}
 
+        {(coach.certifications?.length > 0 || coach.experienceYears > 0) && (
         <div className="mt-6">
           <Card>
             <CardHeader>
@@ -173,7 +178,7 @@ export default function CoachDetailPage() {
               <CardDescription>Certifications, awards, and career milestones</CardDescription>
             </CardHeader>
             <CardContent className="flex flex-col gap-4">
-              {coach.certifications.length > 0 && (
+              {coach.certifications?.length > 0 && (
                 <div>
                   <h3 className="text-sm font-semibold text-foreground mb-2">Certifications</h3>
                   <ul className="space-y-2">
@@ -201,6 +206,7 @@ export default function CoachDetailPage() {
             </CardContent>
           </Card>
         </div>
+        )}
       </Container>
     </Section>
   );

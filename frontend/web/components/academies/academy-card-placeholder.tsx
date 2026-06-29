@@ -37,10 +37,10 @@ export function AcademyCardPlaceholder({ academy, priority = false, distance }: 
     description,
     coverImage,
   } = academy;
-  const sportSlugs = sportsOffered.slice(0, 3);
-  const moreCount = sportsOffered.length - sportSlugs.length;
+  const sportSlugs = sportsOffered?.slice(0, 3) ?? [];
+  const moreCount = (sportsOffered?.length ?? 0) - sportSlugs.length;
   const imageSrc = coverImage ?? fixtureImages.academies[academy.id];
-  const rankingScore = Math.round((rating.average / 5) * 100 + Math.min(rating.count, 100));
+  const rankingScore = Math.round(((rating?.average ?? 0) / 5) * 100 + Math.min(rating?.count ?? 0, 100));
 
   const { has: hasShortlist, addWithMeta, remove: removeFromShortlist } = useShortlist();
   const isSaved = hasShortlist('academy', id);
@@ -173,10 +173,10 @@ export function AcademyCardPlaceholder({ academy, priority = false, distance }: 
           <div className="shrink-0 text-right">
             <div className="flex items-center justify-end gap-1 text-sm font-semibold">
               <Star aria-hidden className="fill-rating text-rating h-3.5 w-3.5" />
-              {rating.average.toFixed(1)}
+              {(rating?.average ?? 0).toFixed(1)}
             </div>
             <div className="text-muted-foreground text-[10px] tracking-widest uppercase">
-              {rating.count} review{rating.count === 1 ? '' : 's'}
+              {rating?.count ?? 0} review{(rating?.count ?? 0) === 1 ? '' : 's'}
             </div>
           </div>
         </div>
@@ -193,13 +193,13 @@ export function AcademyCardPlaceholder({ academy, priority = false, distance }: 
         )}
 
         <div className="flex items-center gap-3 text-[11px] text-muted-foreground">
-          {facilities.length > 0 && (
+          {(facilities?.length ?? 0) > 0 && (
             <span className="flex items-center gap-1">
               <Shield className="h-3 w-3" />
               {facilities.length} facilities
             </span>
           )}
-          {sportsOffered.length > 0 && (
+          {(sportsOffered?.length ?? 0) > 0 && (
             <span className="flex items-center gap-1">
               <Users className="h-3 w-3" />
               {sportsOffered.length} sport{sportsOffered.length === 1 ? '' : 's'}
