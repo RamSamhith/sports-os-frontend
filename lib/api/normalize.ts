@@ -17,6 +17,76 @@
  * ║     the normalize imports.                                 ║
  * ║  3. Run pnpm typecheck to verify.                          ║
  * ╚══════════════════════════════════════════════════════════════╝
+ *
+ * ═══════════════════════════════════════════════════════════════
+ *  BACKEND TEAM: Required Response Format
+ * ═══════════════════════════════════════════════════════════════
+ *
+ *  When the backend response matches these shapes, delete this file.
+ *
+ *  ACADEMY response fields (from /academies, /academy/{id}):
+ *    id             : string              ← currently _id (ObjectId)
+ *    slug           : string
+ *    name           : string
+ *    description    : string
+ *    location       : { city, state, country, lat, lng }  ← currently flat city/state/latitude/longitude
+ *    contact        : { phone, email, website }           ← currently contactNumber (top-level)
+ *    sportsOffered  : string[]            ← currently "sport": "Football" (single string)
+ *    facilities     : Facility[]          ← currently "facilities": "Fitness Center, Parking" (comma-string)
+ *    trainingLevels : TrainingLevel[]     ← should be array of strings
+ *    ageRange       : { min?, max? } | null
+ *    batchInformation : string
+ *    certifications : string[]
+ *    verificationStatus : VerificationStatus  ← currently "verified": boolean
+ *    achievementSignals : { stateAthletesProduced, nationalAthletesProduced, competitionParticipations, milestones }
+ *    rating         : { average: number, count: number }  ← currently a plain number (4.6)
+ *    coverImage     : string              ← currently "academyImage"
+ *    gallery        : string[]
+ *    sourceCount    : number
+ *    status         : "published" | "draft" | "archived"
+ *    lastUpdatedAt  : ISO string          ← currently "updatedAt"
+ *    createdAt      : ISO string
+ *
+ *  COACH response fields (from /coaches, /coach/{id}):
+ *    id             : string              ← currently _id
+ *    slug           : string
+ *    name           : string
+ *    avatar         : string              ← currently coachImage/photo
+ *    certifications : string[]
+ *    experienceYears : number             ← currently "experience"
+ *    sportsCoached  : string[]            ← currently "sport" (single string)
+ *    specialization : string[]            ← may be comma-string
+ *    academyId      : string | null
+ *    location       : { city, state, country, lat, lng }  ← currently flat
+ *    contact        : { phone, email }   ← currently contactNumber (top-level)
+ *    bio            : string | null
+ *    achievements   : string[] | null
+ *    verificationStatus : VerificationStatus  ← currently "verified": boolean
+ *    rating         : { average: number, count: number }  ← currently a plain number
+ *    sourceCount    : number
+ *    status         : "published" | "draft" | "archived"
+ *    lastUpdatedAt  : ISO string
+ *    createdAt      : ISO string
+ *
+ *  SPORT response fields (from /sports, /sport/{id}):
+ *    id             : string              ← currently _id
+ *    slug           : string
+ *    name           : string
+ *    category       : "Indoor" | "Outdoor" | "Both"
+ *    sportType      : "team" | "individual" | "both"
+ *    ... (40+ string/array fields — see types/domain/sport.ts)
+ *    status         : "published" | "draft" | "archived"
+ *
+ *  IMPORTANT:
+ *    - rating MUST be { average, count }, not a plain number
+ *    - location MUST be nested, not flat city/state/latitude/longitude
+ *    - sportsOffered/sportsCoached MUST be string[], not a single string
+ *    - facilities MUST be Facility[], not a comma-separated string
+ *    - verified (boolean) MUST become verificationStatus (string enum)
+ *    - contactNumber (top-level) MUST become contact.phone (nested)
+ *    - academyImage MUST become coverImage
+ *    - updatedAt MUST become lastUpdatedAt
+ * ═══════════════════════════════════════════════════════════════
  */
 
 import type { Academy, Facility, TrainingLevel, VerificationStatus, AcademyStatus } from '@/types/domain/academy';
