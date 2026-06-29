@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+
 import { motion, useReducedMotion } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
 import { SearchAutocomplete } from '@/components/search/search-autocomplete';
@@ -30,7 +30,7 @@ const badgeVariant = {
 };
 
 export function Hero() {
-  const router = useRouter();
+
   const reduced = useReducedMotion();
 
   return (

@@ -1,5 +1,6 @@
 import type { Sport } from '@/types/domain/sport';
 import type { ApiResponse, ListResponse } from './client';
+import { get } from './client';
 // TEMPORARY: Remove normalize imports and revert to direct `get<Sport>(...)` after backend fix
 import { normalizeSport, normalizeSports } from './normalize';
 
@@ -9,7 +10,6 @@ export async function listSports(params?: {
   page?: number;
   limit?: number;
 }): Promise<ApiResponse<ListResponse<Sport>>> {
-  const { get } = await import('./client');
   const query = new URLSearchParams();
   if (params?.category) query.set('category', params.category);
   if (params?.status) query.set('status', params.status);
@@ -38,7 +38,6 @@ export async function listSports(params?: {
 }
 
 export async function getSport(slug: string): Promise<ApiResponse<Sport>> {
-  const { get } = await import('./client');
   const res = await get<Record<string, unknown>>(`/sports/${slug}`);
   if (!res.ok) return res;
   const raw = res.data;

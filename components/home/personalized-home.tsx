@@ -74,7 +74,7 @@ export function PersonalizedHome() {
     if (completed && effectiveOnboarding && apiAcademies.length > 0) {
       logMatchingAudit(effectiveOnboarding, apiAcademies, [])
     }
-  }, [completed, effectiveOnboarding, role, activeChild, apiAcademies])
+  }, [completed, effectiveOnboarding, apiAcademies])
 
   if (!hydrated || !completed || !effectiveOnboarding) return null
 

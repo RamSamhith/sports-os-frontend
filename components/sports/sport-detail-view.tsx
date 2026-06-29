@@ -143,15 +143,15 @@ export function SportDetailView({ sport }: SportDetailViewProps) {
 
       {/* Quick Stats */}
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-        <StatCard icon={Users} label="Team Size" value={teamSize} />
-        <StatCard icon={Clock} label="Duration" value={matchDuration} />
-        <StatCard icon={IndianRupee} label="Monthly Cost" value={estimatedMonthlyCost} />
-        <StatCard icon={Timer} label="Learning Time" value={averageLearningTime} />
+        <StatCard icon={Users} label="Team Size" value={teamSize ?? 'N/A'} />
+        <StatCard icon={Clock} label="Duration" value={matchDuration ?? 'N/A'} />
+        <StatCard icon={IndianRupee} label="Monthly Cost" value={estimatedMonthlyCost ?? 'N/A'} />
+        <StatCard icon={Timer} label="Learning Time" value={averageLearningTime ?? 'N/A'} />
       </div>
 
       {/* About */}
       <section className="flex flex-col gap-3">
-        <SectionHeader icon={Star} title="About {name}" />
+        <SectionHeader icon={Star} title={`About ${name}`} />
         <p className="text-muted-foreground text-sm leading-relaxed">{shortDescription}</p>
         {fullDescription && (
           <p className="text-muted-foreground text-sm leading-relaxed">{fullDescription}</p>

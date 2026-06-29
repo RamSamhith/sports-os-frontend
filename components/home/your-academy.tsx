@@ -40,7 +40,7 @@ export function YourAcademy() {
         <Card className="transition-all hover:shadow-md group-hover:border-primary/50">
           <CardContent className="flex items-center gap-3 p-4">
             <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-sm font-bold text-primary">
-              {academy.name.split(' ').map((n) => n[0]).join('').slice(0, 2)}
+              {(academy.name || '?').split(' ').map((n) => n[0]).join('').slice(0, 2)}
             </div>
             <div className="min-w-0 flex-1">
               <div className="flex items-center gap-2">

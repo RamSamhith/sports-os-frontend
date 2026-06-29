@@ -64,32 +64,35 @@ export function AcademyDetailView({ slug }: { slug: string }) {
   React.useEffect(() => {
     let cancelled = false;
     async function load() {
-      setLoading(true);
-      setError(null);
-      const res = await getAcademy(slug);
-      if (cancelled) return;
-      if (res.ok) {
-        setAcademy(res.data);
-        const coachesRes = await getCoaches({ pageSize: 100 });
-        if (!cancelled && coachesRes.ok) {
-          setCoaches(coachesRes.data.items.filter((c) => c.academyId === res.data.id));
+      try {
+        setLoading(true);
+        setError(null);
+        const res = await getAcademy(slug);
+        if (cancelled) return;
+        if (res.ok) {
+          setAcademy(res.data);
+          const coachesRes = await getCoaches({ pageSize: 100 });
+          if (!cancelled && coachesRes.ok) {
+            setCoaches(coachesRes.data.items.filter((c) => c.academyId === res.data.id));
+          }
+          const relatedRes = await getAcademies({ pageSize: 100 });
+          if (!cancelled && relatedRes.ok) {
+            const relatedAcademies = relatedRes.data.items
+              .filter((a) => a.id !== res.data.id)
+              .filter((a) =>
+                a.location?.city === res.data.location?.city ||
+                (a.sportsOffered ?? []).some((s) => (res.data.sportsOffered ?? []).includes(s))
+              )
+              .sort((a, b) => (b.rating?.average ?? 0) - (a.rating?.average ?? 0))
+              .slice(0, 3);
+            setRelated(relatedAcademies);
+          }
+        } else {
+          setError(res.error.message);
         }
-        const relatedRes = await getAcademies({ pageSize: 100 });
-        if (!cancelled && relatedRes.ok) {
-          const relatedAcademies = relatedRes.data.items
-            .filter((a) => a.id !== res.data.id)
-            .filter((a) =>
-              a.location?.city === res.data.location?.city ||
-              (a.sportsOffered ?? []).some((s) => (res.data.sportsOffered ?? []).includes(s))
-            )
-            .sort((a, b) => (b.rating?.average ?? 0) - (a.rating?.average ?? 0))
-            .slice(0, 3);
-          setRelated(relatedAcademies);
-        }
-      } else {
-        setError(res.error.message);
+      } finally {
+        if (!cancelled) setLoading(false);
       }
-      setLoading(false);
     }
     load();
     return () => { cancelled = true; };
@@ -129,7 +132,7 @@ export function AcademyDetailView({ slug }: { slug: string }) {
     );
   }
 
-  const facilityCount = academy.facilities.length;
+  const facilityCount = (academy.facilities ?? []).length;
   const coachCount = coaches.length;
   const totalExperience = coaches.reduce((sum, c) => sum + c.experienceYears, 0);
 
@@ -227,7 +230,7 @@ export function AcademyDetailView({ slug }: { slug: string }) {
           {[
             { icon: Shield, label: 'Verified', value: academy.verificationStatus === 'verified' ? 'Yes' : 'Pending' },
             { icon: Clock, label: 'Experience', value: totalExperience > 0 ? `${totalExperience}+ yrs` : 'N/A' },
-            { icon: Dumbbell, label: 'Sports', value: `${academy.sportsOffered.length}` },
+            { icon: Dumbbell, label: 'Sports', value: `${(academy.sportsOffered ?? []).length}` },
             { icon: Users, label: 'Coaches', value: `${coachCount}` },
             { icon: PhoneCall, label: 'Response', value: '< 24 hrs' },
             { icon: Building2, label: 'Facilities', value: `${facilityCount}` },
@@ -250,19 +253,19 @@ export function AcademyDetailView({ slug }: { slug: string }) {
               <p className="text-sm text-pretty leading-relaxed">{academy.description}</p>
               <div className="text-muted-foreground flex items-center gap-3 text-xs mt-3">
                 <LastUpdated at={academy.lastUpdatedAt || academy.createdAt} />
-                <CertificationIndicator count={academy.certifications.length} />
+                <CertificationIndicator count={(academy.certifications ?? []).length} />
               </div>
             </CardContent>
           </Card>
         )}
 
         {/* Sports */}
-        {academy.sportsOffered.length > 0 && (
+        {(academy.sportsOffered ?? []).length > 0 && (
           <Card className="mt-4">
             <CardContent className="p-4">
               <h2 className="text-sm font-semibold mb-2">Sports offered</h2>
               <div className="flex flex-wrap gap-1.5">
-                {academy.sportsOffered.map((sport) => (
+                {(academy.sportsOffered ?? []).map((sport) => (
                   <Link key={sport} href={`/sports/${sport}`}>
                     <Badge variant="secondary" className="capitalize hover:bg-accent/20 transition-colors cursor-pointer">
                       {sport.replace(/-/g, ' ')}
@@ -275,12 +278,12 @@ export function AcademyDetailView({ slug }: { slug: string }) {
         )}
 
         {/* Facilities */}
-        {academy.facilities.length > 0 && (
+        {(academy.facilities ?? []).length > 0 && (
           <Card className="mt-4">
             <CardContent className="p-4">
               <h2 className="text-sm font-semibold mb-2">Facilities</h2>
               <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
-                {academy.facilities.map((f) => (
+                {(academy.facilities ?? []).map((f) => (
                   <div key={f} className="flex items-center gap-2 text-sm">
                     <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-500" />
                     <span>{facilityLabels[f] ?? f.replace(/_/g, ' ')}</span>
@@ -309,7 +312,7 @@ export function AcademyDetailView({ slug }: { slug: string }) {
                     className="group flex items-center gap-3 rounded-lg border border-border/50 p-3 transition-colors hover:border-foreground/20 hover:bg-accent/5"
                   >
                     <div className="bg-muted flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-xs font-semibold uppercase">
-                      {coach.name.split(' ').map((n) => n[0]).join('').slice(0, 2)}
+                      {(coach.name || '?').split(' ').map((n) => n[0]).join('').slice(0, 2)}
                     </div>
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-1.5">
@@ -325,10 +328,10 @@ export function AcademyDetailView({ slug }: { slug: string }) {
                           <Star className="h-3 w-3 fill-amber-400 text-amber-400" />
                           {(coach.rating?.average ?? 0).toFixed(1)}
                         </span>
-                        {coach.certifications.length > 0 && (
+                        {(coach.certifications ?? []).length > 0 && (
                           <span className="flex items-center gap-0.5">
                             <Award className="h-3 w-3" />
-                            {coach.certifications.length} cert
+                            {(coach.certifications ?? []).length} cert
                           </span>
                         )}
                       </div>
@@ -398,8 +401,8 @@ export function AcademyDetailView({ slug }: { slug: string }) {
 
         {/* Achievements */}
         {academy.achievementSignals && (
-          academy.achievementSignals.competitionParticipations.length > 0 ||
-          academy.achievementSignals.milestones.length > 0 ||
+          (academy.achievementSignals.competitionParticipations ?? []).length > 0 ||
+          (academy.achievementSignals.milestones ?? []).length > 0 ||
           academy.achievementSignals.stateAthletesProduced > 0 ||
           academy.achievementSignals.nationalAthletesProduced > 0
         ) && (
@@ -408,21 +411,21 @@ export function AcademyDetailView({ slug }: { slug: string }) {
               <CardTitle className="text-lg">Achievements</CardTitle>
             </CardHeader>
             <CardContent className="pt-0 flex flex-col gap-3">
-              {academy.achievementSignals.competitionParticipations.length > 0 && (
+              {(academy.achievementSignals.competitionParticipations ?? []).length > 0 && (
                 <div>
                   <h3 className="text-xs font-semibold text-foreground mb-1.5">Competitions</h3>
                   <div className="flex flex-wrap gap-1.5">
-                    {academy.achievementSignals.competitionParticipations.map((comp) => (
+                    {(academy.achievementSignals.competitionParticipations ?? []).map((comp) => (
                       <Badge key={comp} variant="secondary" className="text-xs">{comp}</Badge>
                     ))}
                   </div>
                 </div>
               )}
-              {academy.achievementSignals.milestones.length > 0 && (
+              {(academy.achievementSignals.milestones ?? []).length > 0 && (
                 <div>
                   <h3 className="text-xs font-semibold text-foreground mb-1.5">Milestones</h3>
                   <ul className="space-y-1">
-                    {academy.achievementSignals.milestones.map((m) => (
+                    {(academy.achievementSignals.milestones ?? []).map((m) => (
                       <li key={m} className="flex items-center gap-2 text-xs text-muted-foreground">
                         <span className="h-1 w-1 shrink-0 rounded-full bg-primary/60" />
                         {m}

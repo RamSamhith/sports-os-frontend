@@ -103,7 +103,7 @@ export default function RegisterPage() {
     } else {
       router.replace('/');
     }
-  }, [isLoading, isAuthenticated, verified, onboardingCompleted, router]);
+  }, [isLoading, isAuthenticated, onboardingCompleted, router]);
 
   function validate(): FieldErrors {
     const e: FieldErrors = {};

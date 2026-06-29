@@ -296,7 +296,7 @@ export function ReviewsSection({ targetType, targetId }: ReviewsSectionProps) {
                   <Badge variant="outline" className="text-[10px] mt-2 capitalize">{review.sport}</Badge>
                 )}
                 <div className="flex items-center gap-3 mt-2 text-[10px] text-muted-foreground">
-                  <button className="flex items-center gap-1 hover:text-foreground transition-colors">
+                  <button disabled className="flex items-center gap-1 cursor-default text-muted-foreground">
                     <ThumbsUp className="h-3 w-3" />
                     Helpful ({review.helpfulCount})
                   </button>

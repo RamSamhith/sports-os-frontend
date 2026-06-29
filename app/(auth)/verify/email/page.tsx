@@ -17,7 +17,7 @@ const FAST = { duration: 0.2, ease: [0.2, 0, 0, 1] as const };
 export default function VerifyEmailPage() {
   const reduced = useReducedMotion();
   const router = useRouter();
-  const { isAuthenticated, isLoading, profile, onboardingCompleted, setAuth, setProfile, setOnboarding } = useAuth();
+  const { isAuthenticated, isLoading, profile, setAuth, setProfile, setOnboarding } = useAuth();
   const [otp, setOtp] = useState('');
   const [error, setError] = useState('');
   const [isVerifying, setIsVerifying] = useState(false);

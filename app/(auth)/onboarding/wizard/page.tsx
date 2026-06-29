@@ -84,10 +84,6 @@ function OnboardingWizardContent() {
   const steps = isParent ? PARENT_STEPS : role === 'coach' ? COACH_STEPS : role === 'academy_owner' ? ACADEMY_STEPS : ATHLETE_STEPS;
 
   useEffect(() => {
-    return () => {};
-  }, []);
-
-  useEffect(() => {
     if (isLoading) return;
     if (!isAuthenticated) {
       router.replace('/login');

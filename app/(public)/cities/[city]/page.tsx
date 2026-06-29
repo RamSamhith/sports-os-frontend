@@ -56,14 +56,14 @@ export default function CityPage() {
         if (academiesRes.ok) {
           setAllAcademies(academiesRes.data.items);
           const cityAcademies = academiesRes.data.items.filter(
-            (a) => a.location.city.toLowerCase() === cityName.toLowerCase()
+            (a) => (a.location?.city ?? '').toLowerCase() === cityName.toLowerCase()
           );
           setAcademies(cityAcademies);
         }
 
         if (coachesRes.ok) {
           const cityCoaches = coachesRes.data.items.filter(
-            (c) => c.location.city.toLowerCase() === cityName.toLowerCase()
+            (c) => (c.location?.city ?? '').toLowerCase() === cityName.toLowerCase()
           );
           setCoaches(cityCoaches);
         }
@@ -83,7 +83,7 @@ export default function CityPage() {
       case 'top-rated':
         return sorted.sort((a, b) => (b.rating?.average ?? 0) - (a.rating?.average ?? 0));
       case 'most-reviewed':
-        return sorted.sort((a, b) => b.rating.count - a.rating.count);
+        return sorted.sort((a, b) => (typeof b.rating === 'number' ? 0 : (b.rating?.count ?? 0)) - (typeof a.rating === 'number' ? 0 : (a.rating?.count ?? 0)));
       case 'name':
         return sorted.sort((a, b) => a.name.localeCompare(b.name));
       default:
@@ -107,10 +107,11 @@ export default function CityPage() {
     const slug = cityName.toLowerCase().replace(/\s+/g, '-');
     const nearbySlugs = nearbyCities[slug] ?? [];
     const nearbyData = allAcademies
-      .filter((a) => nearbySlugs.includes(a.location.city.toLowerCase().replace(/\s+/g, '-')))
+      .filter((a) => nearbySlugs.includes((a.location?.city ?? '').toLowerCase().replace(/\s+/g, '-')))
       .reduce((map, a) => {
-        if (!map.has(a.location.city)) map.set(a.location.city, { name: a.location.city, count: 0 });
-        map.get(a.location.city)!.count++;
+        const cityName = a.location?.city ?? '';
+        if (!map.has(cityName)) map.set(cityName, { name: cityName, count: 0 });
+        map.get(cityName)!.count++;
         return map;
       }, new Map<string, { name: string; count: number }>());
     return Array.from(nearbyData.values()).slice(0, 4);

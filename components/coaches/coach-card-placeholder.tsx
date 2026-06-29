@@ -84,9 +84,11 @@ export const CoachCardPlaceholder = React.memo(function CoachCardPlaceholder({ c
   const { has: hasShortlist, addWithMeta, remove: removeFromShortlist } = useShortlist();
   const isSaved = hasShortlist('coach', id);
 
-  const highlight = certifications.length > 0 ? certifications[0].name : null;
+  const certs = certifications ?? [];
+  const highlight = certs.length > 0 ? certs[0].name : null;
 
-  const sublabel = `${location.city} · ${experienceYears}+ yrs`;
+  const city = location?.city ?? 'Unknown';
+  const sublabel = `${city} · ${experienceYears}+ yrs`;
 
   return (
     <motion.div
@@ -187,11 +189,11 @@ export const CoachCardPlaceholder = React.memo(function CoachCardPlaceholder({ c
           </span>
 
           {/* Certifications count */}
-          {certifications.length > 0 ? (
+          {certs.length > 0 ? (
             <span className="text-muted-foreground flex items-center gap-1">
               <Award aria-hidden className="h-3.5 w-3.5" />
-              <span className="text-foreground font-medium">{certifications.length}</span>
-              <span>cert{certifications.length !== 1 ? 's' : ''}</span>
+              <span className="text-foreground font-medium">{certs.length}</span>
+              <span>cert{certs.length !== 1 ? 's' : ''}</span>
             </span>
           ) : null}
 

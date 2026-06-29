@@ -22,7 +22,7 @@ interface ShortlistViewProps {
 }
 
 export function ShortlistView({ entityType }: ShortlistViewProps) {
-  const { items, remove } = useShortlist();
+  const { items, remove, clear } = useShortlist();
   const [resolvedItems, setResolvedItems] = React.useState<Array<{ id: string; data: Academy | Coach }>>([]);
   const [loading, setLoading] = React.useState(true);
 
@@ -112,7 +112,7 @@ export function ShortlistView({ entityType }: ShortlistViewProps) {
         <p className="text-muted-foreground text-sm">
           {resolvedItems.length} saved {resolvedItems.length === 1 ? entityType : pluralLabel}
         </p>
-        <Button variant="ghost" size="icon-touch" onClick={() => { for (const item of resolvedItems) remove(entityType, item.id); toast(`Cleared all saved ${pluralLabel.toLowerCase()}`); }} aria-label={`Clear all saved ${pluralLabel.toLowerCase()}`}>
+        <Button variant="ghost" size="icon-touch" onClick={() => { clear(); toast(`Cleared all saved ${pluralLabel.toLowerCase()}`); }} aria-label={`Clear all saved ${pluralLabel.toLowerCase()}`}>
           <Trash2 className="h-4 w-4" />
         </Button>
       </div>

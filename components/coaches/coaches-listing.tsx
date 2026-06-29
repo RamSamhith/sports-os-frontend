@@ -341,7 +341,7 @@ export function CoachesListing({ hideSearch = false }: { hideSearch?: boolean } 
               ))}
               {appliedCount > 0 ? (
                 <Button size="sm" variant="outline" onClick={clearAll}>
-                  <X className="h-3.5 h-3.5" /> Clear all
+                  <X className="h-3.5 w-3.5" /> Clear all
                 </Button>
               ) : null}
             </div>

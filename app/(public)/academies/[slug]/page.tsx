@@ -71,11 +71,11 @@ export default async function AcademyDetailPage({ params }: Props) {
         geo: academy.location.lat && academy.location.lng
           ? { '@type': 'GeoCoordinates', latitude: academy.location.lat, longitude: academy.location.lng }
           : undefined,
-        aggregateRating: academy.rating.count > 0
+        aggregateRating: (academy.rating?.count ?? 0) > 0
           ? {
               '@type': 'AggregateRating',
-              ratingValue: academy.rating.average,
-              reviewCount: academy.rating.count,
+              ratingValue: academy.rating?.average ?? 0,
+              reviewCount: academy.rating?.count ?? 0,
             }
           : undefined,
         sport: academy.sportsOffered,

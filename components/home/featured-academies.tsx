@@ -18,7 +18,7 @@ export function FeaturedAcademies() {
   const [canScrollRight, setCanScrollRight] = React.useState(true);
 
   const academies = React.useMemo(
-    () => [...allAcademies].sort((a, b) => b.rating.average - a.rating.average).slice(0, 8),
+    () => [...allAcademies].sort((a, b) => (b.rating?.average ?? 0) - (a.rating?.average ?? 0)).slice(0, 8),
     [allAcademies]
   );
 

@@ -91,6 +91,10 @@ export function SearchAutocomplete({
   const dataLoadedRef = React.useRef(false);
   const containerRef = React.useRef<HTMLDivElement>(null);
 
+  React.useEffect(() => {
+    setQuery(initialValue);
+  }, [initialValue]);
+
   const debouncedQuery = useDebounce(query, 250);
 
   React.useEffect(() => {

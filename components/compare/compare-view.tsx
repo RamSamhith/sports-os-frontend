@@ -134,7 +134,7 @@ export function CompareView() {
 
       <div className="flex items-center justify-between">
         <p className="text-muted-foreground text-sm">
-          {resolved.length} of {maxItems} selected
+          {resolved.length} of {maxItems === Infinity ? 'unlimited' : maxItems} selected
         </p>
         <Button variant="ghost" className="min-h-[44px] min-w-[44px]" onClick={() => { clear(); toast('Cleared compare'); }} aria-label="Clear all compare items">
           <X className="h-4 w-4" /> Clear all

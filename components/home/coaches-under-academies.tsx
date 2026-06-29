@@ -108,7 +108,7 @@ function AcademyCoachesCard({ academy }: { academy: AcademyWithCoaches }) {
             </Link>
             <p className="text-muted-foreground mt-0.5 flex items-center gap-1 text-xs">
               <MapPin className="h-3 w-3 shrink-0" />
-              <span className="truncate">{academy.location.city}</span>
+              <span className="truncate">{academy.location?.city ?? 'Unknown'}</span>
             </p>
           </div>
           <div className="flex items-center gap-1 text-xs">
@@ -132,7 +132,7 @@ function AcademyCoachesCard({ academy }: { academy: AcademyWithCoaches }) {
             className="hover:bg-accent/5 flex items-center gap-3 p-4 transition-colors"
           >
             <div className="bg-muted flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-xs font-semibold uppercase">
-              {coach.name.split(' ').map((n) => n[0]).join('').slice(0, 2)}
+              {(coach.name || '?').split(' ').map((n) => n[0]).join('').slice(0, 2)}
             </div>
             <div className="min-w-0 flex-1">
               <div className="flex items-center gap-1.5">
