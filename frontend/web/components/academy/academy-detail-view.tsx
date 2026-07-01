@@ -1,7 +1,6 @@
 'use client';
 
 import * as React from 'react';
-import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import { Container } from '@/components/layout/container';
 import { Section } from '@/components/layout/section';
@@ -20,15 +19,18 @@ import { ProtectedLink } from '@/components/auth/protected-link';
 import { ReviewsSection } from '@/components/reviews/reviews-section';
 import { ImageWithFallback } from '@/components/ui/image-with-fallback';
 import { AcademyDetailSkeleton } from '@/components/feedback/skeletons';
+import { SectionNav, useSectionObserver } from '@/components/ui/section-nav';
 import { fixtureImages } from '@/lib/images';
 import { getAcademy, getAcademies } from '@/lib/api/academies';
 import { getCoaches } from '@/lib/api/coaches';
+import { useRecentlyViewed } from '@/lib/hooks/use-recently-viewed';
 import type { Academy } from '@/types/domain/academy';
 import type { Coach } from '@/types/domain/coach';
 import {
   Globe, Mail, Phone, AlertTriangle, Star, MapPin,
   Clock, Award, ChevronRight, Users, ArrowLeft,
-  Shield, CheckCircle2, Building2, GraduationCap, PhoneCall, Dumbbell, MessageSquare, MessageCircle
+  Shield, CheckCircle2, Building2, PhoneCall, Dumbbell, MessageCircle,
+  Info, Trophy, MapPinned, MessageSquareText,
 } from 'lucide-react';
 
 const facilityLabels: Record<string, string> = {
@@ -50,6 +52,7 @@ export function AcademyDetailView({ slug }: { slug: string }) {
   const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState<string | null>(null);
   const [showStickyCta, setShowStickyCta] = React.useState(false);
+  const { addView } = useRecentlyViewed();
 
   React.useEffect(() => {
     const observer = new IntersectionObserver(
@@ -64,36 +67,66 @@ export function AcademyDetailView({ slug }: { slug: string }) {
   React.useEffect(() => {
     let cancelled = false;
     async function load() {
-      setLoading(true);
-      setError(null);
-      const res = await getAcademy(slug);
-      if (cancelled) return;
-      if (res.ok) {
-        setAcademy(res.data);
-        const coachesRes = await getCoaches({ pageSize: 100 });
-        if (!cancelled && coachesRes.ok) {
-          setCoaches(coachesRes.data.items.filter((c) => c.academyId === res.data.id));
+      try {
+        setLoading(true);
+        setError(null);
+        const res = await getAcademy(slug);
+        if (cancelled) return;
+        if (res.ok) {
+          setAcademy(res.data);
+          addView({ id: res.data.id, slug: res.data.slug, type: 'academy', name: res.data.name });
+          const coachesRes = await getCoaches({ pageSize: 100 });
+          if (!cancelled && coachesRes.ok) {
+            setCoaches((coachesRes.data.items ?? []).filter((c) => c.academyId === res.data.id));
+          }
+          const relatedRes = await getAcademies({ pageSize: 100 });
+          if (!cancelled && relatedRes.ok) {
+            const relatedAcademies = (relatedRes.data.items ?? [])
+              .filter((a) => a.id !== res.data.id)
+              .filter((a) =>
+                a.location?.city === res.data.location?.city ||
+                (a.sportsOffered ?? []).some((s) => (res.data.sportsOffered ?? []).includes(s))
+              )
+              .sort((a, b) => (b.rating?.average ?? 0) - (a.rating?.average ?? 0))
+              .slice(0, 3);
+            setRelated(relatedAcademies);
+          }
+        } else {
+          setError(res.error.message);
         }
-        const relatedRes = await getAcademies({ pageSize: 100 });
-        if (!cancelled && relatedRes.ok) {
-          const relatedAcademies = relatedRes.data.items
-            .filter((a) => a.id !== res.data.id)
-            .filter((a) =>
-              a.location.city === res.data.location.city ||
-              a.sportsOffered.some((s) => res.data.sportsOffered.includes(s))
-            )
-            .sort((a, b) => b.rating.average - a.rating.average)
-            .slice(0, 3);
-          setRelated(relatedAcademies);
+      } catch (e) {
+        console.error('[AcademyDetail] load error:', e);
+        if (!cancelled) {
+          setError(e instanceof Error ? e.message : 'Failed to load academy details');
         }
-      } else {
-        setError(res.error.message);
+      } finally {
+        if (!cancelled) setLoading(false);
       }
-      setLoading(false);
     }
     load();
     return () => { cancelled = true; };
-  }, [slug]);
+  }, [slug, addView]);
+
+  const facilityCount = (academy?.facilities ?? []).length;
+  const coachCount = coaches.length;
+  const totalExperience = coaches.reduce((sum, c) => sum + c.experienceYears, 0);
+
+  const sectionConfig = React.useMemo(() => {
+    if (!academy) return [];
+    const sections = [
+      { id: 'overview', label: 'Overview', icon: Info },
+      { id: 'sports', label: 'Sports', icon: Trophy, show: (academy.sportsOffered ?? []).length > 0 },
+      { id: 'facilities', label: 'Facilities', icon: CheckCircle2, show: (academy.facilities ?? []).length > 0 },
+      { id: 'coaches', label: 'Coaches', icon: Users, show: coaches.length > 0 },
+      { id: 'contact', label: 'Contact', icon: Phone },
+      { id: 'reviews', label: 'Reviews', icon: MessageSquareText },
+      { id: 'location', label: 'Location', icon: MapPinned },
+    ];
+    return sections.filter((s) => s.show !== false);
+  }, [academy, coaches]);
+
+  const sectionIds = React.useMemo(() => sectionConfig.map((s) => s.id), [sectionConfig]);
+  const activeSectionId = useSectionObserver({ sectionIds });
 
   if (loading) {
     return (
@@ -129,10 +162,6 @@ export function AcademyDetailView({ slug }: { slug: string }) {
     );
   }
 
-  const facilityCount = academy.facilities.length;
-  const coachCount = coaches.length;
-  const totalExperience = coaches.reduce((sum, c) => sum + c.experienceYears, 0);
-
   return (
     <Section spacing="sm">
       <Container>
@@ -148,6 +177,13 @@ export function AcademyDetailView({ slug }: { slug: string }) {
         <Button asChild variant="ghost" className="mb-3 -ml-2 min-h-[44px]">
           <Link href="/academies"><ArrowLeft className="h-4 w-4 mr-1" /> Back to academies</Link>
         </Button>
+
+        <SectionNav sections={sectionConfig} activeId={activeSectionId} className="-mx-4 mb-4 hidden md:block" />
+
+        {/* Mobile section nav */}
+        <div className="mb-4 md:hidden">
+          <SectionNav sections={sectionConfig} activeId={activeSectionId} className="-mx-4 border-0" sticky={false} />
+        </div>
 
         {/* Gallery */}
         <div className="bg-muted/40 relative h-56 w-full overflow-hidden rounded-xl md:h-72 lg:h-80">
@@ -178,8 +214,8 @@ export function AcademyDetailView({ slug }: { slug: string }) {
               {academy.location.city}, {academy.location.state}
               <span className="text-muted-foreground mx-1">·</span>
               <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-400" />
-              <span className="text-foreground font-semibold">{academy.rating.average.toFixed(1)}</span>
-              <span className="text-muted-foreground">({academy.rating.count} reviews)</span>
+              <span className="text-foreground font-semibold">{(academy.rating?.average ?? 0).toFixed(1)}</span>
+              <span className="text-muted-foreground">({academy.rating?.count ?? 0} reviews)</span>
             </p>
           </div>
           <div id="academy-cta" className="flex flex-wrap items-center gap-2">
@@ -223,12 +259,13 @@ export function AcademyDetailView({ slug }: { slug: string }) {
         </div>
 
         {/* Trust bar */}
-        <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-5">
+        <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-6">
           {[
             { icon: Shield, label: 'Verified', value: academy.verificationStatus === 'verified' ? 'Yes' : 'Pending' },
             { icon: Clock, label: 'Experience', value: totalExperience > 0 ? `${totalExperience}+ yrs` : 'N/A' },
-            { icon: Dumbbell, label: 'Sports', value: `${academy.sportsOffered.length}` },
+            { icon: Dumbbell, label: 'Sports', value: `${(academy.sportsOffered ?? []).length}` },
             { icon: Users, label: 'Coaches', value: `${coachCount}` },
+            { icon: PhoneCall, label: 'Response', value: '< 24 hrs' },
             { icon: Building2, label: 'Facilities', value: `${facilityCount}` },
           ].map((item) => (
             <div key={item.label} className="border-border/60 bg-card/40 flex items-center gap-2.5 rounded-lg border p-2.5">
@@ -243,25 +280,25 @@ export function AcademyDetailView({ slug }: { slug: string }) {
 
         {/* Description */}
         {academy.description && (
-          <Card className="mt-4">
+          <Card id="overview" className="mt-4 scroll-mt-24">
             <CardContent className="p-4">
               <h2 className="text-sm font-semibold mb-2">About this academy</h2>
               <p className="text-sm text-pretty leading-relaxed">{academy.description}</p>
               <div className="text-muted-foreground flex items-center gap-3 text-xs mt-3">
                 <LastUpdated at={academy.lastUpdatedAt || academy.createdAt} />
-                <CertificationIndicator count={academy.certifications.length} />
+                <CertificationIndicator count={(academy.certifications ?? []).length} />
               </div>
             </CardContent>
           </Card>
         )}
 
         {/* Sports */}
-        {academy.sportsOffered.length > 0 && (
-          <Card className="mt-4">
+        {(academy.sportsOffered ?? []).length > 0 && (
+          <Card id="sports" className="mt-4 scroll-mt-24">
             <CardContent className="p-4">
               <h2 className="text-sm font-semibold mb-2">Sports offered</h2>
               <div className="flex flex-wrap gap-1.5">
-                {academy.sportsOffered.map((sport) => (
+                {(academy.sportsOffered ?? []).map((sport) => (
                   <Link key={sport} href={`/sports/${sport}`}>
                     <Badge variant="secondary" className="capitalize hover:bg-accent/20 transition-colors cursor-pointer">
                       {sport.replace(/-/g, ' ')}
@@ -274,12 +311,12 @@ export function AcademyDetailView({ slug }: { slug: string }) {
         )}
 
         {/* Facilities */}
-        {academy.facilities.length > 0 && (
-          <Card className="mt-4">
+        {(academy.facilities ?? []).length > 0 && (
+          <Card id="facilities" className="mt-4 scroll-mt-24">
             <CardContent className="p-4">
               <h2 className="text-sm font-semibold mb-2">Facilities</h2>
               <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
-                {academy.facilities.map((f) => (
+                {(academy.facilities ?? []).map((f) => (
                   <div key={f} className="flex items-center gap-2 text-sm">
                     <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-500" />
                     <span>{facilityLabels[f] ?? f.replace(/_/g, ' ')}</span>
@@ -292,7 +329,7 @@ export function AcademyDetailView({ slug }: { slug: string }) {
 
         {/* Coaches */}
         {coaches.length > 0 && (
-          <Card className="mt-4">
+          <Card id="coaches" className="mt-4 scroll-mt-24">
             <CardHeader className="pb-3">
               <CardTitle className="text-lg flex items-center gap-2">
                 <Users className="h-5 w-5 text-muted-foreground" />
@@ -308,7 +345,7 @@ export function AcademyDetailView({ slug }: { slug: string }) {
                     className="group flex items-center gap-3 rounded-lg border border-border/50 p-3 transition-colors hover:border-foreground/20 hover:bg-accent/5"
                   >
                     <div className="bg-muted flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-xs font-semibold uppercase">
-                      {coach.name.split(' ').map((n) => n[0]).join('').slice(0, 2)}
+                      {(coach.name || '?').split(' ').map((n) => n[0]).join('').slice(0, 2)}
                     </div>
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-1.5">
@@ -322,12 +359,12 @@ export function AcademyDetailView({ slug }: { slug: string }) {
                         </span>
                         <span className="flex items-center gap-0.5">
                           <Star className="h-3 w-3 fill-amber-400 text-amber-400" />
-                          {coach.rating.average}
+                          {(coach.rating?.average ?? 0).toFixed(1)}
                         </span>
-                        {coach.certifications.length > 0 && (
+                        {(coach.certifications ?? []).length > 0 && (
                           <span className="flex items-center gap-0.5">
                             <Award className="h-3 w-3" />
-                            {coach.certifications.length} cert
+                            {(coach.certifications ?? []).length} cert
                           </span>
                         )}
                       </div>
@@ -341,7 +378,7 @@ export function AcademyDetailView({ slug }: { slug: string }) {
         )}
 
         {/* Contact + Map grid */}
-        <div className="mt-4 grid gap-4 md:grid-cols-2">
+        <div id="contact" className="mt-4 grid gap-4 scroll-mt-24 md:grid-cols-2">
           <Card>
             <CardContent className="p-4">
               <AcademyInfo
@@ -396,30 +433,32 @@ export function AcademyDetailView({ slug }: { slug: string }) {
         </div>
 
         {/* Achievements */}
-        {academy.achievementSignals?.competitionParticipations?.length > 0 ||
-          academy.achievementSignals?.milestones?.length > 0 ||
-          (academy.achievementSignals?.stateAthletesProduced ?? 0) > 0 ||
-          (academy.achievementSignals?.nationalAthletesProduced ?? 0) > 0 ? (
+        {academy.achievementSignals && (
+          (academy.achievementSignals.competitionParticipations ?? []).length > 0 ||
+          (academy.achievementSignals.milestones ?? []).length > 0 ||
+          academy.achievementSignals.stateAthletesProduced > 0 ||
+          academy.achievementSignals.nationalAthletesProduced > 0
+        ) && (
           <Card className="mt-4">
             <CardHeader className="pb-3">
               <CardTitle className="text-lg">Achievements</CardTitle>
             </CardHeader>
             <CardContent className="pt-0 flex flex-col gap-3">
-              {academy.achievementSignals?.competitionParticipations?.length > 0 && (
+              {(academy.achievementSignals.competitionParticipations ?? []).length > 0 && (
                 <div>
                   <h3 className="text-xs font-semibold text-foreground mb-1.5">Competitions</h3>
                   <div className="flex flex-wrap gap-1.5">
-                    {academy.achievementSignals.competitionParticipations.map((comp) => (
+                    {(academy.achievementSignals.competitionParticipations ?? []).map((comp) => (
                       <Badge key={comp} variant="secondary" className="text-xs">{comp}</Badge>
                     ))}
                   </div>
                 </div>
               )}
-              {academy.achievementSignals?.milestones?.length > 0 && (
+              {(academy.achievementSignals.milestones ?? []).length > 0 && (
                 <div>
                   <h3 className="text-xs font-semibold text-foreground mb-1.5">Milestones</h3>
                   <ul className="space-y-1">
-                    {academy.achievementSignals.milestones.map((m) => (
+                    {(academy.achievementSignals.milestones ?? []).map((m) => (
                       <li key={m} className="flex items-center gap-2 text-xs text-muted-foreground">
                         <span className="h-1 w-1 shrink-0 rounded-full bg-primary/60" />
                         {m}
@@ -428,31 +467,33 @@ export function AcademyDetailView({ slug }: { slug: string }) {
                   </ul>
                 </div>
               )}
-              {(academy.achievementSignals?.stateAthletesProduced ?? 0) > 0 || (academy.achievementSignals?.nationalAthletesProduced ?? 0) > 0 ? (
+              {(academy.achievementSignals.stateAthletesProduced > 0 || academy.achievementSignals.nationalAthletesProduced > 0) && (
                 <div className="flex flex-wrap gap-3">
-                  {(academy.achievementSignals?.stateAthletesProduced ?? 0) > 0 && (
+                  {academy.achievementSignals.stateAthletesProduced > 0 && (
                     <div className="rounded-lg bg-muted px-3 py-2 text-xs">
-                      <span className="font-semibold">{academy.achievementSignals?.stateAthletesProduced}</span>
+                      <span className="font-semibold">{academy.achievementSignals.stateAthletesProduced}</span>
                       <span className="text-muted-foreground ml-1">State athletes</span>
                     </div>
                   )}
-                  {(academy.achievementSignals?.nationalAthletesProduced ?? 0) > 0 && (
+                  {academy.achievementSignals.nationalAthletesProduced > 0 && (
                     <div className="rounded-lg bg-muted px-3 py-2 text-xs">
-                      <span className="font-semibold">{academy.achievementSignals?.nationalAthletesProduced}</span>
+                      <span className="font-semibold">{academy.achievementSignals.nationalAthletesProduced}</span>
                       <span className="text-muted-foreground ml-1">National athletes</span>
                     </div>
                   )}
                 </div>
-              ) : null}
+              )}
             </CardContent>
           </Card>
-        ) : null}
+        )}
 
         {/* Reviews */}
-        <ReviewsSection targetType="academy" targetId={academy.id} />
+        <div id="reviews" className="scroll-mt-24">
+          <ReviewsSection targetType="academy" targetId={academy.id} />
+        </div>
 
         {/* Map */}
-        <div className="mt-4">
+        <div id="location" className="mt-4 scroll-mt-24">
           <LocationMap
             lat={academy.location.lat}
             lng={academy.location.lng}
@@ -486,15 +527,15 @@ export function AcademyDetailView({ slug }: { slug: string }) {
                       <h3 className="text-sm font-semibold line-clamp-1 group-hover:underline">{a.name}</h3>
                       <p className="text-muted-foreground text-xs flex items-center gap-1">
                         <MapPin className="h-3 w-3" />
-                        {a.location.city}
+                        {a.location?.city}
                       </p>
                       <div className="flex items-center gap-2 mt-0.5">
                         <span className="flex items-center gap-0.5 text-xs">
                           <Star className="h-3 w-3 fill-amber-400 text-amber-400" />
-                          {a.rating.average.toFixed(1)}
+                          {(a.rating?.average ?? 0).toFixed(1)}
                         </span>
                         <div className="flex gap-1">
-                          {a.sportsOffered.slice(0, 2).map((s) => (
+                          {(a.sportsOffered ?? []).slice(0, 2).map((s) => (
                             <Badge key={s} variant="outline" className="text-[10px] px-1 py-0 capitalize">{s}</Badge>
                           ))}
                         </div>
@@ -520,7 +561,7 @@ export function AcademyDetailView({ slug }: { slug: string }) {
 
       {/* Sticky CTA for mobile */}
       {showStickyCta && (
-        <div className="fixed bottom-0 left-0 right-0 z-50 border-t bg-background/95 backdrop-blur-sm p-3 pb-safe md:hidden" role="complementary" aria-label="Academy actions">
+        <div className="fixed bottom-0 left-0 right-0 z-50 border-t bg-background/95 backdrop-blur-sm p-3 pb-safe md:hidden">
           <div className="flex items-center gap-2">
             {academy.contact.phone && (
               <Button asChild variant="outline" className="h-12 min-w-[44px]">

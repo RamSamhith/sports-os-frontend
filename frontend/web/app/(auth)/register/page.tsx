@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
+import { PhoneInput } from '@/components/ui/phone-input';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { SharedLayout } from '@/components/motion/shared-layout';
@@ -103,7 +104,7 @@ export default function RegisterPage() {
     } else {
       router.replace('/');
     }
-  }, [isLoading, isAuthenticated, verified, onboardingCompleted, router]);
+  }, [isLoading, isAuthenticated, onboardingCompleted, router]);
 
   function validate(): FieldErrors {
     const e: FieldErrors = {};
@@ -399,24 +400,16 @@ export default function RegisterPage() {
               className="flex flex-col gap-1.5"
             >
               <Label htmlFor="register-phone">Phone number</Label>
-              <Input
+              <PhoneInput
                 id="register-phone"
-                type="tel"
-                placeholder="+91 98765 43210"
                 value={phone}
-                onChange={(e) => handleChange('phone', e.target.value)}
+                onChange={(val) => handleChange('phone', val)}
                 onBlur={(e) => handleBlur('phone', e.target.value)}
+                error={errors.phone}
                 autoComplete="tel"
                 required
-                aria-invalid={!!errors.phone}
-                aria-describedby={errors.phone ? errorId('phone') : undefined}
                 disabled={isSubmitting}
               />
-              {errors.phone && (
-                <p id={errorId('phone')} role="alert" className="text-destructive text-xs">
-                  {errors.phone}
-                </p>
-              )}
             </motion.div>
 
             <motion.div

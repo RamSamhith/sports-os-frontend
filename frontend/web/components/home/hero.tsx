@@ -1,10 +1,10 @@
 'use client';
 
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+
 import { motion, useReducedMotion } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
-import { SearchBar } from '@/components/search/search-bar';
+import { SearchAutocomplete } from '@/components/search/search-autocomplete';
 import { AuroraBackground } from '@/components/layout/aurora-background';
 import { TrackedCTA } from '@/components/analytics/tracked-cta';
 import { ease } from '@/components/motion/constants';
@@ -30,14 +30,8 @@ const badgeVariant = {
 };
 
 export function Hero() {
-  const router = useRouter();
-  const reduced = useReducedMotion();
 
-  const handleSearch = (value: string) => {
-    if (value.trim()) {
-      router.push(`/search?q=${encodeURIComponent(value.trim())}`);
-    }
-  };
+  const reduced = useReducedMotion();
 
   return (
     <section className="relative isolate overflow-hidden py-12 md:py-20 ambient-shimmer">
@@ -86,7 +80,7 @@ export function Hero() {
           variants={reduced ? undefined : { hidden: { opacity: 0, y: 12 }, show: { opacity: 1, y: 0, transition: { duration: 0.5, ease: ease.standard, delay: 0.12 } } }}
           className="mt-6 w-full max-w-xl"
         >
-          <SearchBar onSearch={handleSearch} placeholder="Search academies, sports, cities…" />
+          <SearchAutocomplete placeholder="Search academies, sports, cities…" size="lg" />
         </motion.div>
 
         <motion.div
@@ -94,11 +88,16 @@ export function Hero() {
           animate="show"
           variants={reduced ? undefined : staggerContainer}
           transition={{ delay: 0.2 }}
-          className="mt-4"
+          className="mt-4 flex flex-wrap items-center justify-center gap-3"
         >
           <TrackedCTA event="home.cta_click" properties={{ cta: 'explore-academies' }} asChild>
             <Link href="/academies" className="inline-flex items-center gap-2 rounded-lg bg-primary px-5 py-3 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 min-h-[44px]">
               Explore Academies <ArrowRight className="h-4 w-4" />
+            </Link>
+          </TrackedCTA>
+          <TrackedCTA event="home.cta_click" properties={{ cta: 'explore-sports' }} asChild>
+            <Link href="/sports" className="inline-flex items-center gap-2 rounded-lg border border-border/60 bg-card/40 px-5 py-3 text-sm font-medium transition-colors hover:bg-accent/15 min-h-[44px]">
+              Explore Sports <ArrowRight className="h-4 w-4" />
             </Link>
           </TrackedCTA>
         </motion.div>

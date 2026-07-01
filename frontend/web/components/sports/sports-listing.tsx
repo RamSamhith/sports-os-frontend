@@ -1,12 +1,12 @@
 'use client';
 
 import * as React from 'react';
-import { X, Loader2, AlertTriangle } from 'lucide-react';
+import { Loader2, AlertTriangle, Trophy, Search } from 'lucide-react';
 import { SearchInput } from '@/components/ui/search-input';
 import { Button } from '@/components/ui/button';
 import { SportGrid } from '@/components/sports/sport-grid';
 import { EmptyState } from '@/components/feedback/empty-state';
-import { Inbox } from 'lucide-react';
+import Link from 'next/link';
 import { useSearchQuery } from '@/lib/hooks/use-search-query';
 import { listSports } from '@/lib/api/sports';
 import type { Sport } from '@/types/domain/sport';
@@ -81,15 +81,54 @@ export function SportsListing({ hideSearch = false }: { hideSearch?: boolean } =
             />
           </div>
         )}
-        <div className="flex flex-col items-center gap-3 rounded-xl border border-dashed py-12 text-center">
-          <AlertTriangle className="h-10 w-10 text-destructive/40" />
-          <div>
-            <p className="text-foreground font-medium">Failed to load sports</p>
-            <p className="text-sm text-muted-foreground">{error}</p>
+        <div className="border-border/40 bg-card/40 mx-auto flex w-full max-w-md flex-col items-center gap-4 rounded-xl border border-dashed p-12 text-center">
+          <div className="bg-destructive/10 grid h-16 w-16 place-items-center rounded-full">
+            <AlertTriangle className="h-7 w-7 text-destructive/60" />
           </div>
-          <Button size="sm" variant="outline" onClick={loadSports}>
+          <div>
+            <h3 className="text-lg font-semibold tracking-tight">Unable to load sports</h3>
+            <p className="text-muted-foreground mt-1 text-sm text-pretty">{error}</p>
+          </div>
+          <Button size="sm" variant="outline" onClick={loadSports} className="mt-1">
             Try again
           </Button>
+        </div>
+      </div>
+    );
+  }
+
+  if (allSports.length === 0 && !loading) {
+    return (
+      <div className="flex flex-col gap-4">
+        {!hideSearch && (
+          <div>
+            <SearchInput
+              value=""
+              onValueChange={() => {}}
+              label="Search sports"
+              placeholder="Search sports by name or category…"
+              size="lg"
+            />
+          </div>
+        )}
+        <div className="border-border/40 bg-card/40 mx-auto flex w-full max-w-md flex-col items-center gap-4 rounded-xl border border-dashed p-12 text-center">
+          <div className="bg-primary/10 grid h-16 w-16 place-items-center rounded-full">
+            <Trophy className="h-7 w-7 text-primary/60" />
+          </div>
+          <div>
+            <h3 className="text-lg font-semibold tracking-tight">Sports catalog coming soon</h3>
+            <p className="text-muted-foreground mt-1 text-sm text-pretty">
+              We&apos;re building a comprehensive sports directory. In the meantime, explore our academies to find the right sport for you.
+            </p>
+          </div>
+          <div className="mt-2 flex flex-wrap gap-2">
+            <Button asChild size="sm">
+              <Link href="/academies">Browse academies</Link>
+            </Button>
+            <Button asChild size="sm" variant="outline">
+              <Link href="/search">Search everything</Link>
+            </Button>
+          </div>
         </div>
       </div>
     );
@@ -115,13 +154,29 @@ export function SportsListing({ hideSearch = false }: { hideSearch?: boolean } =
 
       {filtered.length === 0 ? (
         <EmptyState
-          icon={<Inbox className="h-5 w-5" />}
-          title="No sports found"
-          description="Try a different name or category."
+          icon={<Search className="h-5 w-5" />}
+          title={query ? "No sports match your search" : "Sports catalog coming soon"}
+          description={query ? "Try a different name or category, or browse our full list of sports." : "We're building a comprehensive sports directory. Explore our academies to find the right sport for you."}
           action={
-            <Button size="sm" variant="outline" onClick={() => setQuery('')}>
-              <X className="h-3.5 w-3.5" /> Clear search
-            </Button>
+            query ? (
+              <div className="flex flex-wrap gap-2">
+                <Button size="sm" variant="outline" onClick={() => setQuery('')}>
+                  Clear search
+                </Button>
+                <Button asChild size="sm">
+                  <Link href="/sports">View all sports</Link>
+                </Button>
+              </div>
+            ) : (
+              <div className="flex flex-wrap gap-2">
+                <Button asChild size="sm">
+                  <Link href="/academies">Browse academies</Link>
+                </Button>
+                <Button asChild size="sm" variant="outline">
+                  <Link href="/search">Search everything</Link>
+                </Button>
+              </div>
+            )
           }
         />
       ) : (

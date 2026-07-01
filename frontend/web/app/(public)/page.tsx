@@ -3,6 +3,7 @@ import { Hero } from '@/components/home/hero';
 import { StatsSection } from '@/components/home/stats-section';
 import { FeaturedAcademies } from '@/components/home/featured-academies';
 import { TestimonialsSection } from '@/components/home/testimonials-section';
+import { CtaSection } from '@/components/home/cta-section';
 import { HomepageAuthModal } from '@/components/auth/homepage-auth-modal';
 import { siteConfig } from '@/config/site';
 
@@ -42,11 +43,12 @@ export default function HomePage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
       <Hero />
-      <FeaturedAcademies />
-      <StatsSection />
       <FeaturedSports />
+      <FeaturedAcademies />
       <CitiesSection />
+      <StatsSection />
       <TestimonialsSection />
+      <CtaSection />
       <PersonalizedHome />
       <HomepageAuthModal />
     </>

@@ -2,7 +2,8 @@
 
 import * as React from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { X, AlertTriangle } from 'lucide-react';
+import { X, AlertTriangle, Search } from 'lucide-react';
+import Link from 'next/link';
 import { FullPageSkeleton, CoachCardSkeleton } from '@/components/feedback/skeletons';
 import { SearchInput } from '@/components/ui/search-input';
 import { Button } from '@/components/ui/button';
@@ -12,7 +13,6 @@ import { FilterGroup } from '@/components/filters/filter-group';
 import { Separator } from '@/components/ui/separator';
 import { CoachCardPlaceholder } from '@/components/coaches/coach-card-placeholder';
 import { EmptyState } from '@/components/feedback/empty-state';
-import { Inbox } from 'lucide-react';
 import { useSearchQuery } from '@/lib/hooks/use-search-query';
 import { getCoaches } from '@/lib/api/coaches';
 import { sportTaxonomy } from '@/lib/constants/sport-taxonomy';
@@ -54,6 +54,7 @@ export function CoachesListing({ hideSearch = false }: { hideSearch?: boolean } 
   const [total, setTotal] = React.useState(0);
   const [page, setPage] = React.useState(1);
   const [hasMore, setHasMore] = React.useState(true);
+  const [retryKey, setRetryKey] = React.useState(0);
   const sentinelRef = React.useRef<HTMLDivElement>(null);
 
   const [sports, setSports] = React.useState<string[]>(() => readListFromParams(searchParams, 'sport'));
@@ -92,9 +93,9 @@ export function CoachesListing({ hideSearch = false }: { hideSearch?: boolean } 
       });
       if (cancelled) return;
       if (res.ok) {
-        setResults(res.data.items);
-        setTotal(res.data.pagination.total);
-        setHasMore(res.data.items.length < (res.data.pagination.total ?? 0));
+        setResults(res.data?.items ?? []);
+        setTotal(res.data?.pagination?.total ?? 0);
+        setHasMore((res.data?.items ?? []).length < (res.data?.pagination?.total ?? 0));
         if (debouncedQuery) {
           trackSearch(debouncedQuery, res.data.pagination.total, 'coaches');
         }
@@ -105,7 +106,7 @@ export function CoachesListing({ hideSearch = false }: { hideSearch?: boolean } 
     }
     load();
     return () => { cancelled = true; };
-  }, [debouncedQuery, sports, cities, experience]);
+  }, [debouncedQuery, sports, cities, experience, retryKey]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Load more on intersection
   React.useEffect(() => {
@@ -142,8 +143,8 @@ export function CoachesListing({ hideSearch = false }: { hideSearch?: boolean } 
         });
         if (cancelled) return;
         if (res.ok) {
-          setResults((prev) => [...prev, ...res.data.items]);
-          setHasMore(res.data.items.length === PAGE_SIZE);
+          setResults((prev) => [...prev, ...(res.data?.items ?? [])]);
+          setHasMore((res.data?.items ?? []).length === PAGE_SIZE);
         }
       } catch {
         // network error — stop infinite scroll
@@ -154,13 +155,13 @@ export function CoachesListing({ hideSearch = false }: { hideSearch?: boolean } 
     }
     loadMore();
     return () => { cancelled = true; };
-  }, [page]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [page, loading, debouncedQuery, sports, cities, experience]);
 
   // Dynamic filter counts from all coaches
   const dynamicSportOptions = React.useMemo(() =>
     sportOptions.map((o) => ({
       ...o,
-      count: allCoaches.filter((c) => c.sportsCoached.includes(o.value)).length,
+      count: allCoaches.filter((c) => (c.sportsCoached ?? []).includes(o.value)).length,
     })),
     [allCoaches]
   );
@@ -266,7 +267,7 @@ export function CoachesListing({ hideSearch = false }: { hideSearch?: boolean } 
             <p className="text-foreground font-medium">Failed to load coaches</p>
             <p className="text-sm text-muted-foreground">{error}</p>
           </div>
-          <Button size="sm" variant="outline" onClick={() => window.location.reload()}>
+          <Button size="sm" variant="outline" className="min-h-[44px]" onClick={() => setRetryKey((k) => k + 1)}>
             Try again
           </Button>
         </div>
@@ -331,7 +332,7 @@ export function CoachesListing({ hideSearch = false }: { hideSearch?: boolean } 
                   {c.label}
                   <button
                     onClick={c.onRemove}
-                    className="text-muted-foreground hover:text-foreground p-1 -m-1 rounded"
+                    className="text-muted-foreground hover:text-foreground flex h-11 w-11 items-center justify-center -m-1.5 rounded"
                     aria-label={`Remove filter ${c.label}`}
                   >
                     <X className="h-3.5 w-3.5" />
@@ -339,8 +340,8 @@ export function CoachesListing({ hideSearch = false }: { hideSearch?: boolean } 
                 </Badge>
               ))}
               {appliedCount > 0 ? (
-                <Button size="sm" variant="outline" onClick={clearAll}>
-                  <X className="h-3.5 h-3.5" /> Clear all
+                <Button size="sm" variant="outline" className="min-h-[44px]" onClick={clearAll}>
+                  <X className="h-3.5 w-3.5" /> Clear all
                 </Button>
               ) : null}
             </div>
@@ -354,13 +355,24 @@ export function CoachesListing({ hideSearch = false }: { hideSearch?: boolean } 
 
       {results.length === 0 ? (
         <EmptyState
-          icon={<Inbox className="h-5 w-5" />}
-          title="No coaches found"
-          description="Try a different name, city, or sport."
+          icon={<Search className="h-5 w-5" />}
+          title={query || appliedCount > 0 ? "No coaches match your search" : "No coaches listed yet"}
+          description={query || appliedCount > 0 ? "Try adjusting your filters or searching by a different name, city, or sport." : "Coaches are joining regularly. Browse academies to discover coaching options in the meantime."}
           action={
-            <Button size="sm" variant="outline" onClick={clearAll}>
-              <X className="h-3.5 h-3.5" /> Clear all
-            </Button>
+            query || appliedCount > 0 ? (
+              <div className="flex flex-wrap gap-2">
+                <Button size="sm" variant="outline" className="min-h-[44px]" onClick={clearAll}>
+                  Clear all filters
+                </Button>
+                <Button asChild size="sm" className="min-h-[44px]">
+                  <Link href="/coaches">View all coaches</Link>
+                </Button>
+              </div>
+            ) : (
+              <Button asChild size="sm" className="min-h-[44px]">
+                <Link href="/academies">Browse academies</Link>
+              </Button>
+            )
           }
         />
       ) : (

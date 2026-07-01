@@ -3,14 +3,15 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { type RecentlyViewedItem } from '@/lib/hooks/use-recently-viewed'
-import { Clock, Dumbbell, Users, ChevronRight, History } from 'lucide-react'
+import { Clock, Dumbbell, Users, ChevronRight, History, Trash2 } from 'lucide-react'
 
 interface RecentlyViewedProps {
   academies: RecentlyViewedItem[]
   coaches: RecentlyViewedItem[]
+  onClear?: () => void
 }
 
-export function RecentlyViewed({ academies, coaches }: RecentlyViewedProps) {
+export function RecentlyViewed({ academies, coaches, onClear }: RecentlyViewedProps) {
   const items = [...academies, ...coaches].sort(
     (a, b) => new Date(b.viewedAt).getTime() - new Date(a.viewedAt).getTime(),
   )
@@ -24,6 +25,17 @@ export function RecentlyViewed({ academies, coaches }: RecentlyViewedProps) {
           <History className="h-4 w-4 text-muted-foreground" />
           <h2 className="text-xl font-semibold text-foreground">Recently Viewed</h2>
         </div>
+        {onClear && (
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={onClear}
+            className="text-muted-foreground hover:text-foreground min-h-[44px]"
+          >
+            <Trash2 className="h-3.5 w-3.5 mr-1" />
+            Clear
+          </Button>
+        )}
       </div>
       <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3">
         {items.slice(0, 4).map((item) => (

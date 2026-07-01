@@ -8,6 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
+import { PhoneInput } from '@/components/ui/phone-input';
 import { useAuth } from '@/lib/hooks/use-auth';
 import { login as apiLogin, register as apiRegister } from '@/lib/api/auth';
 import { useGoogleAuth, handleSocialAuth } from '@/lib/hooks/use-social-auth';
@@ -691,20 +692,16 @@ function RegisterView({
           </motion.div>
           <motion.div variants={reduced ? undefined : formFieldVariants} initial="hidden" animate="visible" transition={{ delay: 0.10 }} className="flex flex-col gap-1.5">
             <Label htmlFor="modal-reg-phone">Phone number</Label>
-            <Input
+            <PhoneInput
               id="modal-reg-phone"
-              type="tel"
-              placeholder="98765 43210"
               value={phone}
-              onChange={(e) => handleChange('phone', e.target.value)}
+              onChange={(val) => handleChange('phone', val)}
               onBlur={(e) => handleBlur('phone', e.target.value)}
+              error={errors.phone}
               autoComplete="tel"
               required
-              aria-invalid={!!errors.phone}
-              aria-describedby={errors.phone ? errorId('phone') : undefined}
               disabled={isSubmitting}
             />
-            {errors.phone && <p id={errorId('phone')} role="alert" className="text-destructive text-xs">{errors.phone}</p>}
           </motion.div>
           <motion.div variants={reduced ? undefined : formFieldVariants} initial="hidden" animate="visible" transition={{ delay: 0.11 }} className="flex flex-col gap-1.5">
             <Label htmlFor="modal-reg-password">Password</Label>

@@ -2,7 +2,8 @@
 
 import * as React from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { X, AlertTriangle } from 'lucide-react';
+import { X, AlertTriangle, Search } from 'lucide-react';
+import Link from 'next/link';
 import { FullPageSkeleton, AcademyCardSkeleton } from '@/components/feedback/skeletons';
 import { Button } from '@/components/ui/button';
 import { SearchInput } from '@/components/ui/search-input';
@@ -19,7 +20,7 @@ import { getAcademies } from '@/lib/api/academies';
 import { trackSearch } from '@/lib/analytics/events';
 import type { Academy } from '@/types/domain/academy';
 
-const PAGE_SIZE = 12;
+const PAGE_SIZE = 24;
 
 const sportOptions = sportTaxonomy.map((s) => ({
   value: s.slug,
@@ -65,6 +66,7 @@ export function AcademyListing({ hideSearch = false }: { hideSearch?: boolean } 
   const [total, setTotal] = React.useState(0);
   const [page, setPage] = React.useState(1);
   const [hasMore, setHasMore] = React.useState(true);
+  const [retryKey, setRetryKey] = React.useState(0);
   const sentinelRef = React.useRef<HTMLDivElement>(null);
 
   const [sports, setSports] = React.useState<string[]>(() => readListFromParams(searchParams, 'sport'));
@@ -75,14 +77,22 @@ export function AcademyListing({ hideSearch = false }: { hideSearch?: boolean } 
   // Fetch all academies on mount for filter counts
   React.useEffect(() => {
     let cancelled = false;
-    async function load() {
-      const res = await getAcademies({ pageSize: 200 });
-      if (cancelled) return;
-      if (res.ok) {
-        setAllAcademies(res.data.items);
+    async function loadAll() {
+      const allItems: Academy[] = [];
+      let pg = 1;
+      let keepGoing = true;
+      while (keepGoing && !cancelled) {
+        const res = await getAcademies({ pageSize: 100, page: pg });
+        if (!res.ok || cancelled) break;
+        const items = res.data?.items ?? [];
+        allItems.push(...items);
+        const total = res.data?.pagination?.total ?? 0;
+        if (allItems.length >= total || items.length < 100) keepGoing = false;
+        pg++;
       }
+      if (!cancelled) setAllAcademies(allItems);
     }
-    load();
+    loadAll();
     return () => { cancelled = true; };
   }, []);
 
@@ -106,9 +116,9 @@ export function AcademyListing({ hideSearch = false }: { hideSearch?: boolean } 
         });
         if (cancelled) return;
         if (res.ok) {
-          setResults(res.data.items);
-          setTotal(res.data.pagination.total);
-          setHasMore(res.data.items.length < (res.data.pagination.total ?? 0));
+          setResults(res.data?.items ?? []);
+          setTotal(res.data?.pagination?.total ?? 0);
+          setHasMore((res.data?.items ?? []).length < (res.data?.pagination?.total ?? 0));
           if (debouncedQuery) {
             trackSearch(debouncedQuery, res.data.pagination.total, 'academies');
           }
@@ -123,7 +133,7 @@ export function AcademyListing({ hideSearch = false }: { hideSearch?: boolean } 
     }
     load();
     return () => { cancelled = true; };
-  }, [debouncedQuery, sports, facilities, levels, statuses]);
+  }, [debouncedQuery, sports, facilities, levels, statuses, retryKey]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Load more on intersection
   React.useEffect(() => {
@@ -161,8 +171,8 @@ export function AcademyListing({ hideSearch = false }: { hideSearch?: boolean } 
         });
         if (cancelled) return;
         if (res.ok) {
-          setResults((prev) => [...prev, ...res.data.items]);
-          setHasMore(res.data.items.length === PAGE_SIZE);
+          setResults((prev) => [...prev, ...(res.data?.items ?? [])]);
+          setHasMore((res.data?.items ?? []).length === PAGE_SIZE);
         }
       } catch {
         // network error — stop infinite scroll
@@ -173,12 +183,12 @@ export function AcademyListing({ hideSearch = false }: { hideSearch?: boolean } 
     }
     loadMore();
     return () => { cancelled = true; };
-  }, [page]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [page, loading, debouncedQuery, sports, facilities, levels, statuses]);
 
   const dynamicSportOptions = React.useMemo(() =>
     sportOptions.map((o) => ({
       ...o,
-      count: allAcademies.filter((a) => a.sportsOffered.includes(o.value)).length,
+      count: allAcademies.filter((a) => (a.sportsOffered ?? []).includes(o.value)).length,
     })),
     [allAcademies]
   );
@@ -186,7 +196,7 @@ export function AcademyListing({ hideSearch = false }: { hideSearch?: boolean } 
   const dynamicFacilityOptions = React.useMemo(() =>
     facilityOptions.map((o) => ({
       ...o,
-      count: allAcademies.filter((a) => a.facilities.includes(o.value as never)).length,
+      count: allAcademies.filter((a) => (a.facilities ?? []).includes(o.value as never)).length,
     })),
     [allAcademies]
   );
@@ -194,7 +204,7 @@ export function AcademyListing({ hideSearch = false }: { hideSearch?: boolean } 
   const dynamicLevelOptions = React.useMemo(() =>
     levelOptions.map((o) => ({
       ...o,
-      count: allAcademies.filter((a) => a.trainingLevels.includes(o.value as never)).length,
+      count: allAcademies.filter((a) => (a.trainingLevels ?? []).includes(o.value as never)).length,
     })),
     [allAcademies]
   );
@@ -319,7 +329,7 @@ export function AcademyListing({ hideSearch = false }: { hideSearch?: boolean } 
             <p className="text-foreground font-medium">Failed to load academies</p>
             <p className="text-sm text-muted-foreground">{error}</p>
           </div>
-          <Button size="sm" variant="outline" onClick={() => window.location.reload()}>
+          <Button size="sm" variant="outline" className="min-h-[44px]" onClick={() => setRetryKey((k) => k + 1)}>
             Try again
           </Button>
         </div>
@@ -397,7 +407,7 @@ export function AcademyListing({ hideSearch = false }: { hideSearch?: boolean } 
               {c.label}
               <button
                 onClick={c.onRemove}
-                className="text-muted-foreground hover:text-foreground p-1 -m-1 rounded"
+                className="text-muted-foreground hover:text-foreground flex h-11 w-11 items-center justify-center -m-1.5 rounded"
                 aria-label={`Remove filter ${c.label}`}
               >
                 <X className="h-3.5 w-3.5" />
@@ -405,7 +415,7 @@ export function AcademyListing({ hideSearch = false }: { hideSearch?: boolean } 
             </Badge>
           ))}
           {appliedCount > 0 ? (
-            <Button size="sm" variant="outline" onClick={clearAll}>
+            <Button size="sm" variant="outline" className="min-h-[44px]" onClick={clearAll}>
               <X className="h-3.5 h-3.5" /> Clear all
             </Button>
           ) : null}
@@ -418,13 +428,24 @@ export function AcademyListing({ hideSearch = false }: { hideSearch?: boolean } 
 
       {results.length === 0 ? (
         <EmptyState
-          icon={<AlertTriangle className="h-5 w-5" />}
-          title="No academies found"
-          description="Try expanding your search or removing some filters."
+          icon={<Search className="h-5 w-5" />}
+          title={query || appliedCount > 0 ? "No academies match your filters" : "No academies available yet"}
+          description={query || appliedCount > 0 ? "Try broadening your search or removing some filters to see more results." : "We're onboarding new sports academies. Check back soon or explore what else we offer."}
           action={
-            <Button size="sm" variant="outline" onClick={clearAll}>
-              Clear filters
-            </Button>
+            query || appliedCount > 0 ? (
+              <div className="flex flex-wrap gap-2">
+                <Button size="sm" variant="outline" className="min-h-[44px]" onClick={clearAll}>
+                  Clear all filters
+                </Button>
+                <Button asChild size="sm" className="min-h-[44px]">
+                  <Link href="/academies">View all academies</Link>
+                </Button>
+              </div>
+            ) : (
+              <Button asChild size="sm" className="min-h-[44px]">
+                <Link href="/search">Search everything</Link>
+              </Button>
+            )
           }
         />
       ) : (

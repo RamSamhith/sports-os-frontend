@@ -8,7 +8,6 @@ import { useRecentlyViewed } from '@/lib/hooks/use-recently-viewed'
 import { getSuggestedAcademies, logMatchingAudit } from '@/lib/utils/matching'
 import { useHomepageData } from '@/lib/hooks/use-homepage-data'
 import type { OnboardingData, SkillLevel } from '@/lib/hooks/use-onboarding'
-import type { Academy } from '@/types/domain/academy'
 import { MatchingExplanation } from './matching-explanation'
 import { SuggestedAcademies } from './suggested-academies'
 import { RecentlyViewed } from './recently-viewed'
@@ -24,7 +23,7 @@ export function PersonalizedHome() {
   const { role } = useAuth()
   const { data: onboarding, completed, hydrated } = useOnboarding()
   const { activeChild } = useChildren()
-  const { recentAcademies, recentCoaches } = useRecentlyViewed()
+  const { recentAcademies, recentCoaches, clearHistory } = useRecentlyViewed()
   const { academies: apiAcademies, loading: apiLoading, error: apiError } = useHomepageData()
   const [coords, setCoords] = useState<{ lat: number; lng: number }>({ lat: DEFAULT_LAT, lng: DEFAULT_LNG })
 
@@ -74,7 +73,7 @@ export function PersonalizedHome() {
     if (completed && effectiveOnboarding && apiAcademies.length > 0) {
       logMatchingAudit(effectiveOnboarding, apiAcademies, [])
     }
-  }, [completed, effectiveOnboarding, role, activeChild, apiAcademies])
+  }, [completed, effectiveOnboarding, apiAcademies])
 
   if (!hydrated || !completed || !effectiveOnboarding) return null
 
@@ -137,7 +136,7 @@ export function PersonalizedHome() {
       {showRecentlyViewed && (
         <Section>
           <Container size="lg">
-            <RecentlyViewed academies={recentAcademies} coaches={recentCoaches} />
+            <RecentlyViewed academies={recentAcademies} coaches={recentCoaches} onClear={clearHistory} />
           </Container>
         </Section>
       )}
