@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
+import { PhoneInput } from '@/components/ui/phone-input';
 import { useAuth } from '@/lib/hooks/use-auth';
 import { useRouter } from 'next/navigation';
 import { changePassword, changeEmail, changePhone, deleteAccount } from '@/lib/api/auth';
@@ -291,12 +292,10 @@ export default function AccountSecurityPage() {
             </div>
             <div className="flex flex-col gap-1.5">
               <Label htmlFor="new-phone">New Phone</Label>
-              <Input
+              <PhoneInput
                 id="new-phone"
-                type="tel"
                 value={newPhone}
-                onChange={(e) => setNewPhone(e.target.value)}
-                placeholder="+91 98765 43210"
+                onChange={setNewPhone}
                 disabled={changingPhone}
               />
             </div>

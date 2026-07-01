@@ -12,6 +12,8 @@ import { LogOut } from 'lucide-react';
 const allItems = [
   { href: '/profile/personal', label: 'Personal' },
   { href: '/profile/children', label: 'Children', parentOnly: true },
+  { href: '/profile/academy', label: 'My Academy', roleOnly: 'academy_owner' },
+  { href: '/profile/coach', label: 'My Coach Profile', roleOnly: 'coach' },
   { href: '/profile/preferences', label: 'Preferences' },
   { href: '/profile/saved', label: 'Saved' },
   { href: '/profile/enquiries', label: 'Enquiries' },
@@ -24,7 +26,11 @@ export function ProfileSidebar() {
   const { role, signOut } = useAuth();
   const isParent = role === 'parent';
 
-  const items = allItems.filter((it) => !it.parentOnly || isParent);
+  const items = allItems.filter((it) => {
+    if (it.parentOnly && !isParent) return false;
+    if ('roleOnly' in it && it.roleOnly !== role) return false;
+    return true;
+  });
 
   function handleSignOut() {
     signOut();

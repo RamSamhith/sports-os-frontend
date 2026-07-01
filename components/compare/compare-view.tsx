@@ -2,12 +2,11 @@
 
 import * as React from 'react';
 import Link from 'next/link';
-import { GitCompare, X, Star, MapPin } from 'lucide-react';
+import { GitCompare, X, Star } from 'lucide-react';
 import { CompareTableSkeleton } from '@/components/feedback/skeletons';
 import { toast } from 'sonner';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { ImageWithFallback } from '@/components/ui/image-with-fallback';
 import { EmptyState } from '@/components/feedback/empty-state';
 import { VerifiedBadge } from '@/components/trust/verified-badge';
@@ -94,16 +93,29 @@ export function CompareView() {
 
   if (items.length === 0) {
     return (
-      <EmptyState
-        icon={<GitCompare className="h-5 w-5" />}
-        title="Nothing to compare yet"
-        description="Tap the compare button on any academy, coach, or sport to add them here."
-        action={
-          <Button asChild>
-            <Link href="/academies">Explore Academies</Link>
-          </Button>
-        }
-      />
+      <div className="flex flex-col gap-6">
+        <header className="flex flex-col gap-1">
+          <h1 className="text-3xl font-semibold tracking-tight md:text-4xl">Compare</h1>
+          <p className="text-muted-foreground text-sm">
+            Side-by-side comparison of up to {maxItems} items.
+          </p>
+        </header>
+        <EmptyState
+          icon={<GitCompare className="h-5 w-5" />}
+          title="Start building your comparison"
+          description="Browse academies, coaches, or sports and tap the compare icon to add them here. You'll see them side by side."
+          action={
+            <div className="flex flex-wrap gap-2">
+              <Button asChild>
+                <Link href="/academies">Explore Academies</Link>
+              </Button>
+              <Button asChild variant="outline">
+                <Link href="/coaches">Find Coaches</Link>
+              </Button>
+            </div>
+          }
+        />
+      </div>
     );
   }
 
@@ -192,9 +204,9 @@ function CompareCard({ slot, onRemove }: { slot: Entity; onRemove: () => void })
           </div>
         )}
         <div className="flex flex-wrap gap-2 pt-1">
-          <Button size="sm" variant="default" asChild><Link href={href}>View Details</Link></Button>
+          <Button size="sm" variant="default" className="min-h-[44px]" asChild><Link href={href}>View Details</Link></Button>
           {kind !== 'sport' && (
-            <Button size="sm" variant="outline" asChild><ProtectedLink href={`/enquiry/${kind}/${(entity as Academy | Coach).slug}`}>Enquire</ProtectedLink></Button>
+            <Button size="sm" variant="outline" className="min-h-[44px]" asChild><ProtectedLink href={`/enquiry/${kind}/${(entity as Academy | Coach).slug}`}>Enquire</ProtectedLink></Button>
           )}
         </div>
       </CardContent>
@@ -206,6 +218,37 @@ interface ComparisonRow {
   key: string;
   label: string;
   values: Array<string | React.ReactNode>;
+  type?: 'numeric' | 'text' | 'status';
+}
+
+function getHighlightClass(row: ComparisonRow, index: number): string {
+  if (row.type === 'numeric') {
+    const nums = row.values
+      .map((v) => (typeof v === 'string' ? parseFloat(v) : NaN))
+      .filter((n) => !isNaN(n));
+    if (nums.length < 2) return '';
+    const val = parseFloat(typeof row.values[index] === 'string' ? row.values[index] as string : '');
+    if (isNaN(val)) return '';
+    const max = Math.max(...nums);
+    const min = Math.min(...nums);
+    if (max === min) return 'bg-muted/30';
+    if (val === max) return 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-400';
+    if (val === min) return 'bg-red-500/10 text-red-700 dark:text-red-400';
+    return 'bg-amber-500/10 text-amber-700 dark:text-amber-400';
+  }
+  if (row.type === 'status') {
+    const val = typeof row.values[index] === 'string' ? row.values[index] as string : '';
+    if (val === 'verified') return 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-400';
+    if (val === 'rejected') return 'bg-red-500/10 text-red-700 dark:text-red-400';
+    if (val === 'pending' || val === 'submitted' || val === 'under_review') return 'bg-amber-500/10 text-amber-700 dark:text-amber-400';
+    return '';
+  }
+  if (row.type === 'text') {
+    const val = typeof row.values[index] === 'string' ? row.values[index] as string : '';
+    if (!val || val === '—') return 'text-muted-foreground';
+    return 'font-medium';
+  }
+  return '';
 }
 
 function ComparisonTable({ slots }: { slots: Entity[] }) {
@@ -215,20 +258,21 @@ function ComparisonTable({ slots }: { slots: Entity[] }) {
   const anySport = slots.some((s) => s.kind === 'sport');
 
   if (anyAcademy || anyCoach) {
-    rows.push({ key: 'rating', label: 'Rating', values: slots.map((s) => s.kind === 'sport' ? '—' : ((s.entity as Academy | Coach).rating?.average ?? 0).toFixed(1)) });
-    rows.push({ key: 'verification', label: 'Verification', values: slots.map((s) => s.kind === 'sport' ? '—' : (s.entity as Academy | Coach).verificationStatus) });
+    rows.push({ key: 'rating', label: 'Rating', type: 'numeric', values: slots.map((s) => s.kind === 'sport' ? '—' : ((s.entity as Academy | Coach).rating?.average ?? 0).toFixed(1)) });
+    rows.push({ key: 'verification', label: 'Verification', type: 'status', values: slots.map((s) => s.kind === 'sport' ? '—' : (s.entity as Academy | Coach).verificationStatus) });
+    rows.push({ key: 'reviews', label: 'Reviews', type: 'numeric', values: slots.map((s) => s.kind === 'sport' ? '—' : `${(s.entity as Academy | Coach).rating?.count ?? 0}`) });
   }
   if (anySport) {
-    rows.push({ key: 'category', label: 'Category', values: slots.map((s) => s.kind === 'sport' ? (s.entity as Sport).category : '—') });
-    rows.push({ key: 'age', label: 'Age range', values: slots.map((s) => { if (s.kind !== 'sport') return '—'; const r = (s.entity as Sport).explorationGuidance?.ageSuitability; return r?.min !== undefined && r?.max !== undefined ? `${r.min}–${r.max}` : r?.min !== undefined ? `${r.min}+` : '—'; }) });
+    rows.push({ key: 'category', label: 'Category', type: 'text', values: slots.map((s) => s.kind === 'sport' ? (s.entity as Sport).category : '—') });
+    rows.push({ key: 'age', label: 'Age range', type: 'text', values: slots.map((s) => { if (s.kind !== 'sport') return '—'; const r = (s.entity as Sport).explorationGuidance?.ageSuitability; return r?.min !== undefined && r?.max !== undefined ? `${r.min}–${r.max}` : r?.min !== undefined ? `${r.min}+` : '—'; }) });
   }
-  rows.push({ key: 'sports', label: 'Sports', values: slots.map((s) => s.kind === 'academy' ? (s.entity as Academy).sportsOffered?.join(', ') ?? '' : s.kind === 'coach' ? (s.entity as Coach).sportsCoached?.join(', ') ?? '' : (s.entity as Sport).name) });
+  rows.push({ key: 'sports', label: 'Sports', type: 'text', values: slots.map((s) => s.kind === 'academy' ? (s.entity as Academy).sportsOffered?.join(', ') ?? '' : s.kind === 'coach' ? (s.entity as Coach).sportsCoached?.join(', ') ?? '' : (s.entity as Sport).name) });
   if (anyAcademy) {
-    rows.push({ key: 'facilities', label: 'Facilities', values: slots.map((s) => s.kind === 'academy' ? (s.entity as Academy).facilities?.join(', ') ?? '' : '—') });
-    rows.push({ key: 'levels', label: 'Training levels', values: slots.map((s) => s.kind === 'academy' ? (s.entity as Academy).trainingLevels?.join(', ') ?? '' : '—') });
+    rows.push({ key: 'facilities', label: 'Facilities', type: 'text', values: slots.map((s) => s.kind === 'academy' ? (s.entity as Academy).facilities?.join(', ') ?? '' : '—') });
+    rows.push({ key: 'levels', label: 'Training levels', type: 'text', values: slots.map((s) => s.kind === 'academy' ? (s.entity as Academy).trainingLevels?.join(', ') ?? '' : '—') });
   }
   if (anyCoach) {
-    rows.push({ key: 'specialization', label: 'Specialisation', values: slots.map((s) => s.kind === 'coach' ? (s.entity as Coach).specialization?.join(', ') ?? '' : '—') });
+    rows.push({ key: 'specialization', label: 'Specialisation', type: 'text', values: slots.map((s) => s.kind === 'coach' ? (s.entity as Coach).specialization?.join(', ') ?? '' : '—') });
   }
 
   return (
@@ -247,7 +291,7 @@ function ComparisonTable({ slots }: { slots: Entity[] }) {
             <tr key={row.key} className="border-border/40 border-b last:border-0">
               <th scope="row" className="text-muted-foreground p-3 text-left text-xs tracking-wide uppercase">{row.label}</th>
               {row.values.map((v, i) => (
-                <td key={`${row.key}-${i}`} className="p-3 align-top text-sm">{v}</td>
+                <td key={`${row.key}-${i}`} className={`p-3 align-top text-sm ${getHighlightClass(row, i)}`}>{v}</td>
               ))}
             </tr>
           ))}

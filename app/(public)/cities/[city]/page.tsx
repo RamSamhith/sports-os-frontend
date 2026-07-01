@@ -6,7 +6,6 @@ import Link from 'next/link';
 import { Container } from '@/components/layout/container';
 import { Section } from '@/components/layout/section';
 import { Breadcrumbs } from '@/components/seo/breadcrumbs';
-import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { AcademyCardPlaceholder } from '@/components/academies/academy-card-placeholder';
@@ -15,8 +14,7 @@ import { LocationMap } from '@/components/academy/location-map';
 import { getAcademies } from '@/lib/api/academies';
 import { getCoaches } from '@/lib/api/coaches';
 import { VerifiedBadge } from '@/components/trust/verified-badge';
-import { fixtureImages } from '@/lib/images';
-import { MapPin, Star, Users, Trophy, ArrowLeft, Filter, Navigation } from 'lucide-react';
+import { MapPin, Star, Trophy, ArrowLeft, Filter, Navigation } from 'lucide-react';
 import type { Academy } from '@/types/domain/academy';
 import type { Coach } from '@/types/domain/coach';
 
@@ -138,14 +136,13 @@ export default function CityPage() {
         <Breadcrumbs
           items={[
             { label: 'Home', href: '/' },
-            { label: 'Cities', href: '/search' },
             { label: cityName },
           ]}
           className="mb-3"
         />
 
         <Button asChild variant="ghost" className="mb-3 -ml-2 min-h-[44px]">
-          <Link href="/search"><ArrowLeft className="h-4 w-4 mr-1" /> Back to search</Link>
+          <Link href="/"><ArrowLeft className="h-4 w-4 mr-1" /> Back to home</Link>
         </Button>
 
         {/* Header */}
@@ -202,7 +199,7 @@ export default function CityPage() {
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value as typeof sortBy)}
-              className="border-border/60 bg-card/40 rounded-md border px-2 py-1.5 text-xs"
+              className="border-border/60 bg-card/40 min-h-[44px] rounded-md border px-3 py-2.5 text-xs"
             >
               <option value="top-rated">Top Rated</option>
               <option value="most-reviewed">Most Reviewed</option>

@@ -248,3 +248,56 @@ export function put<T>(path: string, body?: unknown): Promise<ApiResponse<T>> {
 export function del<T>(path: string, body?: unknown): Promise<ApiResponse<T>> {
   return request<T>(path, { method: 'DELETE', body: body ? JSON.stringify(body) : undefined });
 }
+
+export async function uploadFile<T>(path: string, file: File, fieldName = 'file'): Promise<ApiResponse<T>> {
+  const url = `${API_BASE}${path}`;
+  const token = getToken();
+  const headers: Record<string, string> = {};
+  if (token) headers['Authorization'] = `Bearer ${token}`;
+
+  const formData = new FormData();
+  formData.append(fieldName, file);
+
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 30_000);
+
+  try {
+    const res = await fetch(url, {
+      method: 'POST',
+      headers,
+      body: formData,
+      credentials: 'include',
+      signal: controller.signal,
+    });
+    clearTimeout(timeoutId);
+
+    if (res.status === 204) {
+      return { ok: true, data: undefined as T };
+    }
+
+    const json = await res.json();
+    if (!res.ok) {
+      const err = json.error ?? json;
+      return {
+        ok: false,
+        error: {
+          code: err.code ?? 'UPLOAD_ERROR',
+          message: err.message ?? 'Upload failed',
+          details: err.details,
+        },
+      };
+    }
+    return { ok: true, data: json.data ?? json };
+  } catch (err) {
+    clearTimeout(timeoutId);
+    const message = err instanceof Error ? err.message : 'Upload failed';
+    const isAbort = err instanceof DOMException && err.name === 'AbortError';
+    return {
+      ok: false,
+      error: {
+        code: isAbort ? 'TIMEOUT' : 'UPLOAD_ERROR',
+        message: isAbort ? 'Upload timed out. Please try again.' : message,
+      },
+    };
+  }
+}

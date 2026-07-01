@@ -308,7 +308,7 @@ export function SearchAutocomplete({
           <button
             type="button"
             onClick={() => { setQuery(''); inputRef.current?.focus(); }}
-            className="text-muted-foreground hover:text-foreground absolute top-1/2 right-3 -translate-y-1/2 p-1"
+            className="text-muted-foreground hover:text-foreground absolute top-1/2 right-1 -translate-y-1/2 flex h-11 w-11 items-center justify-center"
             aria-label="Clear search"
           >
             <X className="h-4 w-4" />

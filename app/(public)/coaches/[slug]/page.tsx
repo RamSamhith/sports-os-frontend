@@ -15,9 +15,10 @@ import { ProtectedLink } from '@/components/auth/protected-link';
 import { ImageWithFallback } from '@/components/ui/image-with-fallback';
 import { fixtureImages } from '@/lib/images';
 import { getCoach } from '@/lib/api/coaches';
+import { useRecentlyViewed } from '@/lib/hooks/use-recently-viewed';
 import type { Coach } from '@/types/domain/coach';
 import Link from 'next/link';
-import { AlertTriangle, Phone, Mail } from 'lucide-react';
+import { AlertTriangle, Phone, Mail, ArrowLeft } from 'lucide-react';
 import { CoachDetailSkeleton } from '@/components/feedback/skeletons';
 
 export default function CoachDetailPage() {
@@ -26,6 +27,7 @@ export default function CoachDetailPage() {
   const [coach, setCoach] = React.useState<Coach | null>(null);
   const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState<string | null>(null);
+  const { addView } = useRecentlyViewed();
 
   React.useEffect(() => {
     let cancelled = false;
@@ -36,6 +38,7 @@ export default function CoachDetailPage() {
       if (cancelled) return;
       if (res.ok) {
         setCoach(res.data);
+        addView({ id: res.data.id, slug: res.data.slug, type: 'coach', name: res.data.name });
       } else {
         setError(res.error.message);
       }
@@ -43,7 +46,7 @@ export default function CoachDetailPage() {
     }
     load();
     return () => { cancelled = true; };
-  }, [slug]);
+  }, [slug, addView]);
 
   if (loading) {
     return (
@@ -83,8 +86,11 @@ export default function CoachDetailPage() {
             { label: 'Coaches', href: '/coaches' },
             { label: coach.name },
           ]}
-          className="mb-4"
+          className="mb-3"
         />
+        <Button asChild variant="ghost" className="mb-3 -ml-2 min-h-[44px]">
+          <Link href="/coaches"><ArrowLeft className="h-4 w-4 mr-1" /> Back to coaches</Link>
+        </Button>
         <Card className="overflow-hidden">
           <div className="bg-muted/40 relative h-48 w-full overflow-hidden md:h-56 lg:h-64 xl:h-72">
             <ImageWithFallback

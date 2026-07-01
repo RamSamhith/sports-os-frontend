@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 import Link from 'next/link';
-import { Bookmark, Trash2 } from 'lucide-react';
+import { Bookmark, Trash2, Search } from 'lucide-react';
 import { ShortlistSkeleton } from '@/components/feedback/skeletons';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
@@ -10,8 +10,8 @@ import { useShortlist } from '@/lib/hooks/use-shortlist';
 import { EmptyState } from '@/components/feedback/empty-state';
 import { AcademyCardPlaceholder } from '@/components/academies/academy-card-placeholder';
 import { CoachCardPlaceholder } from '@/components/coaches/coach-card-placeholder';
-import { getAcademy } from '@/lib/api/academies';
-import { getCoach } from '@/lib/api/coaches';
+import { getAcademyById } from '@/lib/api/academies';
+import { getCoachById } from '@/lib/api/coaches';
 import type { Academy } from '@/types/domain/academy';
 import type { Coach } from '@/types/domain/coach';
 
@@ -22,15 +22,15 @@ interface ShortlistViewProps {
 }
 
 export function ShortlistView({ entityType }: ShortlistViewProps) {
-  const { items, remove, clear } = useShortlist();
+  const { items, remove, clear, populatedData } = useShortlist();
   const [resolvedItems, setResolvedItems] = React.useState<Array<{ id: string; data: Academy | Coach }>>([]);
   const [loading, setLoading] = React.useState(true);
 
-  const ids = items.filter((it) => it.itemType === entityType).map((it) => it.itemId);
-  const idsKey = ids.join(',');
+  const entityItems = items.filter((it) => it.itemType === entityType);
+  const idsKey = entityItems.map((it) => it.itemId).join(',');
 
   React.useEffect(() => {
-    if (ids.length === 0) {
+    if (entityItems.length === 0) {
       setResolvedItems([]);
       setLoading(false);
       return;
@@ -39,19 +39,28 @@ export function ShortlistView({ entityType }: ShortlistViewProps) {
     let cancelled = false;
     async function resolveAll() {
       const results: Array<{ id: string; data: Academy | Coach }> = [];
-      // Fetch all items in parallel
-      const fetches = ids.map(async (id) => {
+
+      for (const item of entityItems) {
+        const key = `${item.itemType}:${item.itemId}`;
+
+        // Prefer populated data from provider (already fetched on login)
+        if (populatedData?.[key]) {
+          results.push({ id: item.itemId, data: populatedData[key] as unknown as Academy | Coach });
+          continue;
+        }
+
+        // Fall back to individual fetch using ID (not slug)
         try {
           if (entityType === 'academy') {
-            const res = await getAcademy(id);
-            if (!cancelled && res.ok) results.push({ id, data: res.data });
+            const res = await getAcademyById(item.itemId);
+            if (!cancelled && res.ok) results.push({ id: item.itemId, data: res.data });
           } else {
-            const res = await getCoach(id);
-            if (!cancelled && res.ok) results.push({ id, data: res.data });
+            const res = await getCoachById(item.itemId);
+            if (!cancelled && res.ok) results.push({ id: item.itemId, data: res.data });
           }
         } catch { /* skip */ }
-      });
-      await Promise.all(fetches);
+      }
+
       if (!cancelled) {
         setResolvedItems(results);
         setLoading(false);
@@ -72,15 +81,16 @@ export function ShortlistView({ entityType }: ShortlistViewProps) {
     );
   }
 
-  if (ids.length === 0) {
+  if (entityItems.length === 0) {
     return (
       <EmptyState
         icon={<Bookmark className="h-5 w-5" />}
         title={`No ${pluralLabel.toLowerCase()} saved`}
-        description="Saved items appear here. Tap the bookmark on a card to add."
+        description="Save academies and coaches you're interested in. They'll appear here for easy comparison."
         action={
           <Button asChild>
             <Link href={entityType === 'academy' ? '/academies' : '/coaches'}>
+              <Search className="mr-2 h-4 w-4" />
               Browse {pluralLabel}
             </Link>
           </Button>
@@ -89,15 +99,16 @@ export function ShortlistView({ entityType }: ShortlistViewProps) {
     );
   }
 
-  if (resolvedItems.length === 0 && ids.length > 0) {
+  if (resolvedItems.length === 0 && entityItems.length > 0) {
     return (
       <EmptyState
         icon={<Bookmark className="h-5 w-5" />}
-        title={`No saved ${pluralLabel.toLowerCase()} found`}
-        description="Saved items may have been removed. Try browsing again."
+        title={`Some ${pluralLabel.toLowerCase()} couldn't be loaded`}
+        description="They may have been removed. Try browsing again."
         action={
           <Button asChild>
             <Link href={entityType === 'academy' ? '/academies' : '/coaches'}>
+              <Search className="mr-2 h-4 w-4" />
               Browse {pluralLabel}
             </Link>
           </Button>
@@ -112,8 +123,18 @@ export function ShortlistView({ entityType }: ShortlistViewProps) {
         <p className="text-muted-foreground text-sm">
           {resolvedItems.length} saved {resolvedItems.length === 1 ? entityType : pluralLabel}
         </p>
-        <Button variant="ghost" size="icon-touch" onClick={() => { clear(); toast(`Cleared all saved ${pluralLabel.toLowerCase()}`); }} aria-label={`Clear all saved ${pluralLabel.toLowerCase()}`}>
-          <Trash2 className="h-4 w-4" />
+        <Button
+          variant="ghost"
+          size="sm"
+          className="text-muted-foreground hover:text-destructive gap-1.5 min-h-[44px]"
+          onClick={() => {
+            clear();
+            toast(`Cleared all saved ${pluralLabel.toLowerCase()}`);
+          }}
+          aria-label={`Clear all saved ${pluralLabel.toLowerCase()}`}
+        >
+          <Trash2 className="h-3.5 w-3.5" />
+          Clear all
         </Button>
       </div>
       <div className="grid grid-cols-1 items-start gap-4 sm:grid-cols-2 lg:grid-cols-3">

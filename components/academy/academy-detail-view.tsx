@@ -19,15 +19,18 @@ import { ProtectedLink } from '@/components/auth/protected-link';
 import { ReviewsSection } from '@/components/reviews/reviews-section';
 import { ImageWithFallback } from '@/components/ui/image-with-fallback';
 import { AcademyDetailSkeleton } from '@/components/feedback/skeletons';
+import { SectionNav, useSectionObserver } from '@/components/ui/section-nav';
 import { fixtureImages } from '@/lib/images';
 import { getAcademy, getAcademies } from '@/lib/api/academies';
 import { getCoaches } from '@/lib/api/coaches';
+import { useRecentlyViewed } from '@/lib/hooks/use-recently-viewed';
 import type { Academy } from '@/types/domain/academy';
 import type { Coach } from '@/types/domain/coach';
 import {
   Globe, Mail, Phone, AlertTriangle, Star, MapPin,
   Clock, Award, ChevronRight, Users, ArrowLeft,
-  Shield, CheckCircle2, Building2, GraduationCap, PhoneCall, Dumbbell, MessageSquare, MessageCircle
+  Shield, CheckCircle2, Building2, PhoneCall, Dumbbell, MessageCircle,
+  Info, Trophy, MapPinned, MessageSquareText,
 } from 'lucide-react';
 
 const facilityLabels: Record<string, string> = {
@@ -49,6 +52,7 @@ export function AcademyDetailView({ slug }: { slug: string }) {
   const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState<string | null>(null);
   const [showStickyCta, setShowStickyCta] = React.useState(false);
+  const { addView } = useRecentlyViewed();
 
   React.useEffect(() => {
     const observer = new IntersectionObserver(
@@ -70,6 +74,7 @@ export function AcademyDetailView({ slug }: { slug: string }) {
         if (cancelled) return;
         if (res.ok) {
           setAcademy(res.data);
+          addView({ id: res.data.id, slug: res.data.slug, type: 'academy', name: res.data.name });
           const coachesRes = await getCoaches({ pageSize: 100 });
           if (!cancelled && coachesRes.ok) {
             setCoaches((coachesRes.data.items ?? []).filter((c) => c.academyId === res.data.id));
@@ -100,7 +105,28 @@ export function AcademyDetailView({ slug }: { slug: string }) {
     }
     load();
     return () => { cancelled = true; };
-  }, [slug]);
+  }, [slug, addView]);
+
+  const facilityCount = (academy?.facilities ?? []).length;
+  const coachCount = coaches.length;
+  const totalExperience = coaches.reduce((sum, c) => sum + c.experienceYears, 0);
+
+  const sectionConfig = React.useMemo(() => {
+    if (!academy) return [];
+    const sections = [
+      { id: 'overview', label: 'Overview', icon: Info },
+      { id: 'sports', label: 'Sports', icon: Trophy, show: (academy.sportsOffered ?? []).length > 0 },
+      { id: 'facilities', label: 'Facilities', icon: CheckCircle2, show: (academy.facilities ?? []).length > 0 },
+      { id: 'coaches', label: 'Coaches', icon: Users, show: coaches.length > 0 },
+      { id: 'contact', label: 'Contact', icon: Phone },
+      { id: 'reviews', label: 'Reviews', icon: MessageSquareText },
+      { id: 'location', label: 'Location', icon: MapPinned },
+    ];
+    return sections.filter((s) => s.show !== false);
+  }, [academy, coaches]);
+
+  const sectionIds = React.useMemo(() => sectionConfig.map((s) => s.id), [sectionConfig]);
+  const activeSectionId = useSectionObserver({ sectionIds });
 
   if (loading) {
     return (
@@ -136,10 +162,6 @@ export function AcademyDetailView({ slug }: { slug: string }) {
     );
   }
 
-  const facilityCount = (academy.facilities ?? []).length;
-  const coachCount = coaches.length;
-  const totalExperience = coaches.reduce((sum, c) => sum + c.experienceYears, 0);
-
   return (
     <Section spacing="sm">
       <Container>
@@ -155,6 +177,13 @@ export function AcademyDetailView({ slug }: { slug: string }) {
         <Button asChild variant="ghost" className="mb-3 -ml-2 min-h-[44px]">
           <Link href="/academies"><ArrowLeft className="h-4 w-4 mr-1" /> Back to academies</Link>
         </Button>
+
+        <SectionNav sections={sectionConfig} activeId={activeSectionId} className="-mx-4 mb-4 hidden md:block" />
+
+        {/* Mobile section nav */}
+        <div className="mb-4 md:hidden">
+          <SectionNav sections={sectionConfig} activeId={activeSectionId} className="-mx-4 border-0" sticky={false} />
+        </div>
 
         {/* Gallery */}
         <div className="bg-muted/40 relative h-56 w-full overflow-hidden rounded-xl md:h-72 lg:h-80">
@@ -251,7 +280,7 @@ export function AcademyDetailView({ slug }: { slug: string }) {
 
         {/* Description */}
         {academy.description && (
-          <Card className="mt-4">
+          <Card id="overview" className="mt-4 scroll-mt-24">
             <CardContent className="p-4">
               <h2 className="text-sm font-semibold mb-2">About this academy</h2>
               <p className="text-sm text-pretty leading-relaxed">{academy.description}</p>
@@ -265,7 +294,7 @@ export function AcademyDetailView({ slug }: { slug: string }) {
 
         {/* Sports */}
         {(academy.sportsOffered ?? []).length > 0 && (
-          <Card className="mt-4">
+          <Card id="sports" className="mt-4 scroll-mt-24">
             <CardContent className="p-4">
               <h2 className="text-sm font-semibold mb-2">Sports offered</h2>
               <div className="flex flex-wrap gap-1.5">
@@ -283,7 +312,7 @@ export function AcademyDetailView({ slug }: { slug: string }) {
 
         {/* Facilities */}
         {(academy.facilities ?? []).length > 0 && (
-          <Card className="mt-4">
+          <Card id="facilities" className="mt-4 scroll-mt-24">
             <CardContent className="p-4">
               <h2 className="text-sm font-semibold mb-2">Facilities</h2>
               <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
@@ -300,7 +329,7 @@ export function AcademyDetailView({ slug }: { slug: string }) {
 
         {/* Coaches */}
         {coaches.length > 0 && (
-          <Card className="mt-4">
+          <Card id="coaches" className="mt-4 scroll-mt-24">
             <CardHeader className="pb-3">
               <CardTitle className="text-lg flex items-center gap-2">
                 <Users className="h-5 w-5 text-muted-foreground" />
@@ -349,7 +378,7 @@ export function AcademyDetailView({ slug }: { slug: string }) {
         )}
 
         {/* Contact + Map grid */}
-        <div className="mt-4 grid gap-4 md:grid-cols-2">
+        <div id="contact" className="mt-4 grid gap-4 scroll-mt-24 md:grid-cols-2">
           <Card>
             <CardContent className="p-4">
               <AcademyInfo
@@ -459,10 +488,12 @@ export function AcademyDetailView({ slug }: { slug: string }) {
         )}
 
         {/* Reviews */}
-        <ReviewsSection targetType="academy" targetId={academy.id} />
+        <div id="reviews" className="scroll-mt-24">
+          <ReviewsSection targetType="academy" targetId={academy.id} />
+        </div>
 
         {/* Map */}
-        <div className="mt-4">
+        <div id="location" className="mt-4 scroll-mt-24">
           <LocationMap
             lat={academy.location.lat}
             lng={academy.location.lng}

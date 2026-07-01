@@ -1,12 +1,11 @@
 'use client';
 
 import * as React from 'react';
-import { X, Loader2, AlertTriangle, Trophy } from 'lucide-react';
+import { Loader2, AlertTriangle, Trophy, Search } from 'lucide-react';
 import { SearchInput } from '@/components/ui/search-input';
 import { Button } from '@/components/ui/button';
 import { SportGrid } from '@/components/sports/sport-grid';
 import { EmptyState } from '@/components/feedback/empty-state';
-import { Inbox } from 'lucide-react';
 import Link from 'next/link';
 import { useSearchQuery } from '@/lib/hooks/use-search-query';
 import { listSports } from '@/lib/api/sports';
@@ -155,13 +154,29 @@ export function SportsListing({ hideSearch = false }: { hideSearch?: boolean } =
 
       {filtered.length === 0 ? (
         <EmptyState
-          icon={<Inbox className="h-5 w-5" />}
-          title="No sports found"
-          description="Try a different name or category."
+          icon={<Search className="h-5 w-5" />}
+          title={query ? "No sports match your search" : "Sports catalog coming soon"}
+          description={query ? "Try a different name or category, or browse our full list of sports." : "We're building a comprehensive sports directory. Explore our academies to find the right sport for you."}
           action={
-            <Button size="sm" variant="outline" onClick={() => setQuery('')}>
-              <X className="h-3.5 w-3.5" /> Clear search
-            </Button>
+            query ? (
+              <div className="flex flex-wrap gap-2">
+                <Button size="sm" variant="outline" onClick={() => setQuery('')}>
+                  Clear search
+                </Button>
+                <Button asChild size="sm">
+                  <Link href="/sports">View all sports</Link>
+                </Button>
+              </div>
+            ) : (
+              <div className="flex flex-wrap gap-2">
+                <Button asChild size="sm">
+                  <Link href="/academies">Browse academies</Link>
+                </Button>
+                <Button asChild size="sm" variant="outline">
+                  <Link href="/search">Search everything</Link>
+                </Button>
+              </div>
+            )
           }
         />
       ) : (

@@ -1,0 +1,1550 @@
+export interface SportContent {
+  tagline: string;
+  about: string;
+  rules: string;
+  individualOrTeam: 'individual' | 'team' | 'both';
+  olympic: boolean;
+  beginnerDifficulty: 'Easy' | 'Moderate' | 'Challenging';
+  equipment: string[];
+  benefits: { physical: string[]; mental: string[] };
+  trainingPath: string;
+  careerOpportunities: string[];
+  competitions: { state: string[]; national: string[]; international: string[] };
+  majorTournaments: string[];
+  funFacts: string[];
+  faqs: { q: string; a: string }[];
+}
+
+export const sportsContent: Record<string, SportContent> = {
+  cricket: {
+    tagline: "India's religion — a bat-and-ball game of strategy, skill, and passion.",
+    about:
+      "Cricket is the most popular sport in India, followed by billions across the subcontinent. It is played in three formats: Test, ODI, and T20, each demanding different skill sets. India's IPL is the world's richest cricket league and has redefined T20 cricket globally.",
+    rules:
+      "Two teams of eleven players take turns batting and bowling on an oval field with a 22-yard pitch. The batting side scores runs by hitting the ball and running between wickets, while the bowling side tries to dismiss batsmen. A match ends when all innings are completed or a target is chased.",
+    individualOrTeam: "team",
+    olympic: false,
+    beginnerDifficulty: "Moderate",
+    equipment: [
+      "Cricket bat",
+      "Leather ball",
+      "Pads and gloves",
+      "Helmet",
+      "Stumps",
+    ],
+    benefits: {
+      physical: [
+        "Improves hand-eye coordination",
+        "Builds cardiovascular endurance",
+        "Enhances running speed and agility",
+      ],
+      mental: [
+        "Develops strategic thinking under pressure",
+        "Teaches teamwork and communication",
+        "Builds patience and concentration over long sessions",
+      ],
+    },
+    trainingPath:
+      "Start with soft-ball cricket at school or local clubs to learn basic batting, bowling, and fielding. Progress to age-group tournaments (Under-14, Under-16, Under-19) through district and state associations. Elite players enter Ranji Trophy, IPL, and eventually national selection via BCCI pathways.",
+    careerOpportunities: [
+      "Professional player (domestic and international)",
+      "Cricket coaching and academies",
+      "Sports journalism and commentary",
+      "Umpiring and match refereeing",
+    ],
+    competitions: {
+      state: [
+        "Ranji Trophy (state teams)",
+        "Vijay Hazare Trophy",
+        "Syed Mushtaq Ali Trophy",
+      ],
+      national: [
+        "Duleep Trophy",
+        "Irani Cup",
+        "India A tours",
+      ],
+      international: [
+        "IPL (Indian Premier League)",
+        "ICC Cricket World Cup",
+        "ICC T20 World Cup",
+      ],
+    },
+    majorTournaments: [
+      "ICC Cricket World Cup",
+      "Indian Premier League (IPL)",
+      "ICC T20 World Cup",
+    ],
+    funFacts: [
+      "India won the Cricket World Cup in 1983 and 2011, sparking nationwide celebrations.",
+      "The IPL is the most-watched cricket league with a brand value exceeding $10 billion.",
+      "Sachin Tendulkar holds the record for most international runs and centuries.",
+    ],
+    faqs: [
+      {
+        q: "At what age can children start playing cricket?",
+        a: "Children can begin with soft-ball cricket as early as age 5-6 at local clubs and school programs.",
+      },
+      {
+        q: "Is cricket an Olympic sport?",
+        a: "Cricket was not in the Olympics for over a century but has been included in the 2028 Los Angeles Olympics in T20 format.",
+      },
+      {
+        q: "How do I get selected for state or national cricket teams?",
+        a: "Perform consistently in district-level tournaments and age-group competitions. State associations conduct trials and selection matches for higher levels.",
+      },
+    ],
+  },
+
+  football: {
+    tagline: "The beautiful game — the world's most popular team sport.",
+    about:
+      "Football is played in virtually every country on Earth. In India, the Indian Super League (ISL) and I-League drive the professional scene, while grassroots programs are expanding rapidly. The sport demands speed, endurance, and tactical intelligence.",
+    rules:
+      "Two teams of eleven players try to score by getting the ball into the opponent's goal. Only the goalkeeper may handle the ball with hands during play. The team with more goals at the end of 90 minutes wins.",
+    individualOrTeam: "team",
+    olympic: true,
+    beginnerDifficulty: "Easy",
+    equipment: [
+      "Football (size 4 or 5)",
+      "Football boots (cleats)",
+      "Shin guards",
+      "Goalkeeper gloves (if playing GK)",
+    ],
+    benefits: {
+      physical: [
+        "Boosts cardiovascular fitness through constant running",
+        "Improves lower-body strength and agility",
+        "Enhances coordination and balance",
+      ],
+      mental: [
+        "Teaches quick decision-making in fast play",
+        "Builds team spirit and leadership",
+        "Develops spatial awareness and tactical thinking",
+      ],
+    },
+    trainingPath:
+      "Begin with local football clubs or school teams to learn dribbling, passing, and positioning. Progress through district and state leagues, aiming for junior national competitions. Top players are scouted for ISL, I-League, or national camp selections.",
+    careerOpportunities: [
+      "Professional footballer (domestic leagues and abroad)",
+      "Football coaching and youth development",
+      "Sports management and scouting",
+      "Football journalism and analysis",
+    ],
+    competitions: {
+      state: [
+        "Santosh Trophy",
+        "State Football League",
+      ],
+      national: [
+        "I-League",
+        "Durand Cup",
+        "Super Cup",
+      ],
+      international: [
+        "Indian Super League (ISL)",
+        "AFC Champions League",
+        "FIFA World Cup",
+      ],
+    },
+    majorTournaments: [
+      "FIFA World Cup",
+      "Indian Super League (ISL)",
+      "AFC Asian Cup",
+    ],
+    funFacts: [
+      "The FIFA World Cup final is the most-watched single sporting event globally.",
+      "Kolkata's Salt Lake Stadium is one of the largest football venues in India with over 85,000 capacity.",
+      "India qualified for the 1950 FIFA World Cup but withdrew, reportedly due to lack of footwear.",
+    ],
+    faqs: [
+      {
+        q: "Can I start playing football as a teenager?",
+        a: "Yes. Many players begin serious training between ages 10-14. School and district-level programs are open to beginners.",
+      },
+      {
+        q: "How is football different from futsal?",
+        a: "Football is played on a full-size grass or turf pitch with 11 players, while futsal is played indoors on a hard court with 5 players per side.",
+      },
+      {
+        q: "What is the ISL?",
+        a: "The Indian Super League is India's top professional football league, featuring franchise teams from across the country.",
+      },
+    ],
+  },
+
+  basketball: {
+    tagline: "Fast-paced, high-flying, and endlessly exciting.",
+    about:
+      "Basketball is a dynamic team sport played on a hard court with a hoop at each end. India's UBA and BCL leagues are growing the professional scene, and basketball is hugely popular in schools across the country. The sport combines athleticism with sharp shooting skills.",
+    rules:
+      "Two teams of five players each try to score by shooting the ball through the opponent's hoop. The team with the most points at the end of four quarters wins. Dribbling is required to move with the ball, and fouls result in free throws.",
+    individualOrTeam: "team",
+    olympic: true,
+    beginnerDifficulty: "Moderate",
+    equipment: [
+      "Basketball (size 5, 6, or 7)",
+      "Basketball shoes (high-top recommended)",
+      "Jersey and shorts",
+    ],
+    benefits: {
+      physical: [
+        "Improves vertical jump and explosive power",
+        "Builds full-body endurance",
+        "Enhances hand-eye coordination and reflexes",
+      ],
+      mental: [
+        "Sharpens quick decision-making under pressure",
+        "Teaches leadership and on-court communication",
+        "Develops spatial awareness and court vision",
+      ],
+    },
+    trainingPath:
+      "Start at school or local clubs learning dribbling, shooting, and defensive fundamentals. Compete in district and state championships to build competitive experience. Top performers can join national camps, UBA, or Basketball India League teams.",
+    careerOpportunities: [
+      "Professional basketball player",
+      "Basketball coaching and personal training",
+      "Sports analytics and scouting",
+      "Event management for basketball tournaments",
+    ],
+    competitions: {
+      state: [
+        "State Basketball Championship",
+        "Inter-school tournaments",
+      ],
+      national: [
+        "Basketball India Senior Nationals",
+        "Basketball Champions League (BCL)",
+        "FIBA Asia Qualifiers (India leg)",
+      ],
+      international: [
+        "FIBA Basketball World Cup",
+        "Olympic Games",
+        "FIBA Asia Cup",
+      ],
+    },
+    majorTournaments: [
+      "NBA (global premier league)",
+      "FIBA Basketball World Cup",
+      "Olympic Games basketball",
+    ],
+    funFacts: [
+      "Basketball was invented in 1891 by Dr. James Naismith in Massachusetts using a peach basket.",
+      "The NBA's shortest player ever was Muggsy Bogues at 5'3\", while the tallest was Gheorghe Muresan at 7'7\".",
+      "India hosted the FIBA Asia Cup qualifiers and is working toward a professional national league.",
+    ],
+    faqs: [
+      {
+        q: "How tall do I need to play basketball?",
+        a: "Height helps but is not required. Guard positions value speed, shooting, and ball-handling skills over height.",
+      },
+      {
+        q: "What is the best age to start basketball?",
+        a: "Children can start learning basic skills from age 6-7. Serious competitive training usually begins around age 10-12.",
+      },
+      {
+        q: "Is basketball popular in India?",
+        a: "Basketball has a strong school-level presence in India and is growing professionally through leagues like UBA and BCL.",
+      },
+    ],
+  },
+
+  badminton: {
+    tagline: "Lightning-fast racquet sport where India consistently shines on the world stage.",
+    about:
+      "Badminton is one of India's most successful Olympic sports, with players like PV Sindhu and Saina Nehwal winning medals at the highest level. It is a high-intensity indoor sport requiring explosive movement, precise reflexes, and tactical shot-making.",
+    rules:
+      "Players or pairs hit a shuttlecock over a net, aiming to land it in the opponent's court. Matches are best of three games to 21 points each. A shuttlecock must clear the net and land within the court boundaries to score.",
+    individualOrTeam: "both",
+    olympic: true,
+    beginnerDifficulty: "Easy",
+    equipment: [
+      "Badminton racquet",
+      "Shuttlecocks (feather or synthetic)",
+      "Badminton shoes (non-marking sole)",
+      "Grip tape",
+    ],
+    benefits: {
+      physical: [
+        "Builds explosive leg strength and agility",
+        "Improves reflexes and hand-eye coordination",
+        "Burns calories and improves cardiovascular health",
+      ],
+      mental: [
+        "Develops split-second tactical decision-making",
+        "Builds focus and concentration during rallies",
+        "Teaches resilience and sportsmanship",
+      ],
+    },
+    trainingPath:
+      "Start at a local badminton academy or school program to learn grip, footwork, and basic strokes. Progress through district and state ranking tournaments to gain competitive exposure. Top performers enter national camps and can aim for BWF World Tour and Olympic selection via BAI.",
+    careerOpportunities: [
+      "Professional badminton player",
+      "Badminton coaching and academy ownership",
+      "Sports physiotherapy for racquet sports",
+      "Tournament organization and management",
+    ],
+    competitions: {
+      state: [
+        "State Badminton Championships",
+        "District ranking tournaments",
+      ],
+      national: [
+        "Senior National Badminton Championship",
+        "India Open",
+        "Premier Badminton League (PBL)",
+      ],
+      international: [
+        "BWF World Tour events",
+        "Thomas & Uber Cup",
+        "Olympic Games",
+      ],
+    },
+    majorTournaments: [
+      "BWF World Championships",
+      "Olympic Games",
+      "Thomas & Uber Cup",
+    ],
+    funFacts: [
+      "The fastest recorded smash in badminton is over 493 km/h, making it the fastest racquet sport.",
+      "PV Sindhu became the first Indian woman to win two individual Olympic medals (2016 silver, 2020 bronze).",
+      "A shuttlecock can travel at speeds exceeding 300 km/h during professional rallies.",
+    ],
+    faqs: [
+      {
+        q: "Is badminton easy to learn?",
+        a: "Basic badminton is beginner-friendly and can be learned quickly. Advanced competitive play requires dedicated training in footwork and shot technique.",
+      },
+      {
+        q: "Can I play badminton outdoors?",
+        a: "Outdoor play is possible in calm conditions, but competitive badminton is played indoors to avoid wind affecting the shuttlecock.",
+      },
+      {
+        q: "How do I improve my smash?",
+        a: "Focus on wrist strength, proper grip, body rotation, and timing drills. Regular practice with a coach helps refine technique.",
+      },
+    ],
+  },
+
+  tennis: {
+    tagline: "A game of power, precision, and mental endurance on the court.",
+    about:
+      "Tennis is a globally renowned racquet sport played in singles and doubles formats. India has a proud tennis tradition with players like Leander Paes, Mahesh Bhupathi, and Sania Mirza achieving world-number-one rankings. The sport demands athleticism, tactical thinking, and mental toughness.",
+    rules:
+      "Players hit a ball over a net into the opponent's court, aiming to make it unreturnable. Points progress through love, 15, 30, and 40, with games forming sets and sets forming matches. A player must win by two clear games in a set.",
+    individualOrTeam: "both",
+    olympic: true,
+    beginnerDifficulty: "Moderate",
+    equipment: [
+      "Tennis racquet",
+      "Tennis balls",
+      "Tennis shoes",
+      "Grip and dampeners",
+    ],
+    benefits: {
+      physical: [
+        "Improves cardiovascular fitness through constant movement",
+        "Builds core strength and rotational power",
+        "Enhances agility, speed, and reaction time",
+      ],
+      mental: [
+        "Develops mental resilience during long rallies and matches",
+        "Teaches strategic point construction",
+        "Builds discipline through rigorous training routines",
+      ],
+    },
+    trainingPath:
+      "Begin with coaching at a tennis club or academy to learn strokes, serve, and court movement. Compete in AITA junior ranking tournaments to build competitive experience. Advanced players progress through ITF junior circuits and can aim for ATP/WTA Tour or national team selection.",
+    careerOpportunities: [
+      "Professional tennis player",
+      "Tennis coaching and academy management",
+      "Sports commentary and journalism",
+      "Tournament event management",
+    ],
+    competitions: {
+      state: [
+        "State Tennis Championships",
+        "AITA district ranking tournaments",
+      ],
+      national: [
+        "AITA National Championships",
+        "Doubles Masters Series",
+        "University tennis nationals",
+      ],
+      international: [
+        "Grand Slam tournaments (Australian Open, French Open, Wimbledon, US Open)",
+        "Davis Cup",
+        "Olympic Games",
+      ],
+    },
+    majorTournaments: [
+      "Grand Slam tournaments (Australian Open, French Open, Wimbledon, US Open)",
+      "Davis Cup",
+      "ATP/WTA Finals",
+    ],
+    funFacts: [
+      "Tennis originated in 19th-century England and was originally called 'lawn tennis'.",
+      "Leander Paes and Mahesh Bhupathi were called the 'Indian Express' and held the world No. 1 doubles ranking.",
+      "Wimbledon's Centre Court has a retractable roof that can close in under 10 minutes.",
+    ],
+    faqs: [
+      {
+        q: "What is the best age to start tennis?",
+        a: "Children can start tennis from age 5-6 with modified equipment and courts. Competitive training usually begins around age 8-10.",
+      },
+      {
+        q: "Is tennis an individual or team sport?",
+        a: "Tennis can be both. Singles is individual, while doubles involves pairs. Davis Cup and team events add a team dimension.",
+      },
+      {
+        q: "How do I get tennis ranking points in India?",
+        a: "Participate in AITA-organized ranking tournaments at district, state, and national levels. Points are awarded based on tournament category and finish.",
+      },
+    ],
+  },
+
+  "table-tennis": {
+    tagline: "Lightning reflexes on a 2.74m table — the fastest racquet sport.",
+    about:
+      "Table tennis is a high-speed indoor sport played on a small table, demanding incredible reflexes and wrist control. India has produced Olympic medalists like Achanta Sharath Kamal and Manika Batra. The sport is accessible to all ages and is widely played in Indian clubs and schools.",
+    rules:
+      "Two or four players hit a lightweight ball back and forth across a net on a table. Points are scored when the opponent fails to return the ball correctly. Games are played to 11 points, and matches are best of five or seven games.",
+    individualOrTeam: "both",
+    olympic: true,
+    beginnerDifficulty: "Easy",
+    equipment: [
+      "Table tennis racket (paddle)",
+      "Table tennis balls",
+      "Table tennis table",
+      "Net and posts",
+    ],
+    benefits: {
+      physical: [
+        "Sharpens reflexes and reaction time",
+        "Improves hand-eye coordination and wrist flexibility",
+        "Enhances lower-body agility with quick footwork",
+      ],
+      mental: [
+        "Develops rapid tactical thinking",
+        "Builds concentration and focus during fast rallies",
+        "Teaches composure under pressure",
+      ],
+    },
+    trainingPath:
+      "Start at a local club or school with basic ball control, serve, and footwork drills. Compete in TTFI district and state ranking events to build competitive experience. Top players enter national championships and can aim for WTT events and Olympic selection.",
+    careerOpportunities: [
+      "Professional table tennis player",
+      "Table tennis coaching",
+      "Sports equipment sales and sponsorship",
+      "Event organizing for local and national tournaments",
+    ],
+    competitions: {
+      state: [
+        "State Table Tennis Championships",
+        "TTFI district ranking tournaments",
+      ],
+      national: [
+        "Senior National Table Tennis Championship",
+        "Ultimate Table Tennis (UTT)",
+        "Inter-university championships",
+      ],
+      international: [
+        "World Table Tennis Championships",
+        "WTT World Tour events",
+        "Olympic Games",
+      ],
+    },
+    majorTournaments: [
+      "World Table Tennis Championships",
+      "Olympic Games",
+      "WTT Grand Smash events",
+    ],
+    funFacts: [
+      "Table tennis became an Olympic sport in 1988 at the Seoul Games.",
+      "The ball can travel at speeds exceeding 110 km/h in professional play.",
+      "Manika Batra became the first Indian woman to win an Olympic medal in table tennis (2020, mixed doubles).",
+    ],
+    faqs: [
+      {
+        q: "Is table tennis good for beginners?",
+        a: "Yes. Table tennis is one of the easiest sports to pick up and can be played recreationally or competitively at any age.",
+      },
+      {
+        q: "What rubber should I use on my paddle?",
+        a: "Beginners should start with smooth rubber for control. As skills develop, inverted or pimpled rubber can add spin and speed.",
+      },
+      {
+        q: "How do I generate more spin?",
+        a: "Focus on brushing the ball at an angle rather than hitting it flat. Wrist snap and a fast forearm motion create more spin.",
+      },
+    ],
+  },
+
+  swimming: {
+    tagline: "Master the water — full-body fitness and Olympic glory.",
+    about:
+      "Swimming is both a life skill and a competitive sport with four main strokes: freestyle, backstroke, breaststroke, and butterfly. India has produced Olympic-level swimmers like Virdhawal Khade and Sajan Prakash. The sport builds total-body fitness and is suitable from a very young age.",
+    rules:
+      "Swimmers race across a pool (25m or 50m) using one of the four Olympic strokes. Each stroke has specific rules about technique and turns. The fastest swimmer to touch the wall at the end wins.",
+    individualOrTeam: "both",
+    olympic: true,
+    beginnerDifficulty: "Moderate",
+    equipment: [
+      "Swimsuit",
+      "Goggles",
+      "Swim cap",
+      "Kickboard and pull buoy (training aids)",
+    ],
+    benefits: {
+      physical: [
+        "Builds full-body muscle strength and endurance",
+        "Improves cardiovascular health and lung capacity",
+        "Low-impact exercise, gentle on joints",
+      ],
+      mental: [
+        "Reduces stress and anxiety through rhythmic breathing",
+        "Builds discipline and goal-oriented mindset",
+        "Boosts confidence through progressive skill mastery",
+      ],
+    },
+    trainingPath:
+      "Begin with water familiarization and learning basic strokes at a local pool or swim school. Progress through district and state aquatics championships to build competitive times. Elite swimmers train at national camps and can qualify for World Aquatics events and the Olympics via SWFI.",
+    careerOpportunities: [
+      "Competitive swimmer",
+      "Swimming coach and instructor",
+      "Lifeguard and water safety professional",
+      "Sports physiotherapy for aquatic athletes",
+    ],
+    competitions: {
+      state: [
+        "State Aquatics Championships",
+        "District swim meets",
+      ],
+      national: [
+        "Senior National Aquatic Championship",
+        "Khelo India swimming events",
+        "Open Water Swimming Championship",
+      ],
+      international: [
+        "World Aquatics Championships",
+        "Asian Games",
+        "Olympic Games",
+      ],
+    },
+    majorTournaments: [
+      "World Aquatics Championships",
+      "Olympic Games",
+      "Asian Games swimming",
+    ],
+    funFacts: [
+      "Swimming is the only sport included in every modern Olympic Games since 1896.",
+      "The butterfly stroke was only invented in the 1930s and became an Olympic event in 1956.",
+      "India's Sajan Prakash became the first Indian swimmer to breach the Olympic qualification time in the 200m butterfly.",
+    ],
+    faqs: [
+      {
+        q: "At what age can children learn swimming?",
+        a: "Children can start water familiarization from age 4-5. Formal stroke training typically begins around age 6-8.",
+      },
+      {
+        q: "Which swimming stroke burns the most calories?",
+        a: "Butterfly generally burns the most calories per hour due to the intense full-body effort, followed by freestyle.",
+      },
+      {
+        q: "How do I improve my swimming speed?",
+        a: "Focus on technique (streamline body position, efficient strokes), build endurance through regular training, and incorporate interval sets.",
+      },
+    ],
+  },
+
+  athletics: {
+    tagline: "The foundation of all sports — run, jump, throw, and break limits.",
+    about:
+      "Athletics (track and field) is the cornerstone of the Olympic Games, encompassing sprints, middle and long-distance running, jumps, throws, and combined events. India has a strong tradition in middle-distance running and race walking. Athletics builds the physical foundation for virtually every other sport.",
+    rules:
+      "Events are divided into track (running), field (jumps and throws), and combined events (decathlon/heptathlon). Each event has specific rules about technique, lanes, and measurement. In timed events, the fastest athlete wins; in field events, the longest or highest distance/height counts.",
+    individualOrTeam: "both",
+    olympic: true,
+    beginnerDifficulty: "Easy",
+    equipment: [
+      "Running shoes (event-specific spikes)",
+      "Track suit and competition kit",
+      "Throwing implements (discus, javelin, shot — event-specific)",
+    ],
+    benefits: {
+      physical: [
+        "Builds cardiovascular fitness and endurance",
+        "Improves speed, power, and explosive strength",
+        "Develops flexibility and functional movement",
+      ],
+      mental: [
+        "Teaches goal-setting and self-discipline",
+        "Builds mental toughness through personal bests",
+        "Develops focus and determination",
+      ],
+    },
+    trainingPath:
+      "Start at school or local athletics clubs to identify your event and learn proper technique. Compete in district and state meets to build race experience and qualifying marks. Elite athletes enter national camps and can aim for Federation Cup, Diamond League, and Olympic qualification via AFI.",
+    careerOpportunities: [
+      "Professional athlete (sprints, distance, jumps, throws)",
+      "Athletics coaching and personal training",
+      "Sports science and biomechanics",
+      "Sports journalism and event management",
+    ],
+    competitions: {
+      state: [
+        "State Athletics Championships",
+        "Inter-state meets",
+      ],
+      national: [
+        "Federation Cup",
+        "National Inter-State Championships",
+        "Khelo India Athletics",
+      ],
+      international: [
+        "Diamond League",
+        "World Athletics Championships",
+        "Olympic Games",
+      ],
+    },
+    majorTournaments: [
+      "Olympic Games",
+      "World Athletics Championships",
+      "Diamond League",
+    ],
+    funFacts: [
+      "The modern Olympic motto 'Citius, Altius, Fortius' means 'Faster, Higher, Stronger'.",
+      "Milkha Singh, the 'Flying Sikh', missed an Olympic bronze in the 400m by just 0.1 seconds in 1960.",
+      "Neeraj Chopra won India's first-ever Olympic gold in athletics (javelin throw) at Tokyo 2020.",
+    ],
+    faqs: [
+      {
+        q: "What is the best event for a beginner?",
+        a: "Start with sprints (100m, 200m) or middle-distance (400m, 800m) to build general fitness. Field events like long jump can also be beginner-friendly.",
+      },
+      {
+        q: "Do I need special shoes for athletics?",
+        a: "Yes. Running spikes are designed for specific events. Sprint spikes are stiff and lightweight, while distance spikes offer more cushioning.",
+      },
+      {
+        q: "How do I improve my running speed?",
+        a: "Incorporate interval training, strength exercises (squats, lunges), proper form drills, and adequate rest into your routine.",
+      },
+    ],
+  },
+
+  wrestling: {
+    tagline: "The oldest combat sport — strength, technique, and warrior spirit.",
+    about:
+      "Wrestling is one of the oldest and most prestigious combat sports, with strongholds in Haryana, Punjab, and Maharashtra. India has won multiple Olympic medals in wrestling through athletes like Sushil Kumar, Yogeshwar Dutt, and Bajrang Punia. Freestyle and Greco-Roman are the two main styles.",
+    rules:
+      "Two wrestlers compete on a circular mat, trying to pin the opponent's shoulders to the ground or score points through takedowns, reversals, and exposure. Each bout consists of two three-minute periods. The wrestler with more points or a pin wins.",
+    individualOrTeam: "individual",
+    olympic: true,
+    beginnerDifficulty: "Challenging",
+    equipment: [
+      "Wrestling singlet",
+      "Wrestling shoes",
+      "Headgear",
+      "Mouthguard",
+    ],
+    benefits: {
+      physical: [
+        "Builds full-body strength and muscle endurance",
+        "Develops explosive power and grip strength",
+        "Improves cardiovascular fitness through intense training",
+      ],
+      mental: [
+        "Teaches discipline and mental toughness",
+        "Builds resilience through intense physical challenges",
+        "Develops tactical awareness and quick adaptation",
+      ],
+    },
+    trainingPath:
+      "Begin at a local akhada (traditional wrestling gym) or sports academy to learn basics of stance, takedowns, and escapes. Compete in district and state championships to build competitive experience. Top wrestlers enter national camps and aim for Asian Games and Olympic selection via WFI.",
+    careerOpportunities: [
+      "Professional wrestler (domestic and international)",
+      "Wrestling coach and akhada instructor",
+      "Sports physiotherapy for combat athletes",
+      "MMA transition (mixed martial arts)",
+    ],
+    competitions: {
+      state: [
+        "State Wrestling Championships",
+        "Inter-school and university wrestling",
+      ],
+      national: [
+        "Senior National Wrestling Championship",
+        "Pro Wrestling League",
+        " Commonwealth Wrestling Championship (India host)",
+      ],
+      international: [
+        "World Wrestling Championships",
+        "Asian Games",
+        "Olympic Games",
+      ],
+    },
+    majorTournaments: [
+      "World Wrestling Championships",
+      "Olympic Games",
+      "Asian Games",
+    ],
+    funFacts: [
+      "Wrestling has been part of the modern Olympics since the very first Games in 1896.",
+      "India's Sushil Kumar is the only Indian individual to win two Olympic medals in wrestling (2008 bronze, 2012 silver).",
+      "Traditional Indian wrestling (kushti) is practiced in akhadis and involves rigorous daily routines including 5 AM training.",
+    ],
+    faqs: [
+      {
+        q: "At what age can I start wrestling?",
+        a: "Children can start wrestling from age 6-8 at local akhadas or sports academies. Early training focuses on fitness and basic techniques.",
+      },
+      {
+        q: "Is wrestling dangerous?",
+        a: "Wrestling has injury risks like any contact sport, but proper coaching, protective gear, and weight-class divisions significantly reduce danger.",
+      },
+      {
+        q: "What is the difference between freestyle and Greco-Roman?",
+        a: "Freestyle allows attacks on the entire body, while Greco-Roman restricts holds to above the waist, emphasizing upper-body throws.",
+      },
+    ],
+  },
+
+  boxing: {
+    tagline: "The sweet science — where speed meets power in the ring.",
+    about:
+      "Boxing is an Olympic combat sport with a proud Indian tradition, especially from Haryana and the North-East. India has won Olympic medals through Vijender Singh and Lovlina Borgohain. The sport demands lightning reflexes, tactical intelligence, and incredible stamina.",
+    rules:
+      "Two boxers fight in a ring, wearing gloves and trying to land punches on the opponent's scoring zone (front and sides of the head and torso). Bouts consist of three to twelve rounds of three minutes each. The boxer with more clean, effective punches wins by decision or knockout.",
+    individualOrTeam: "individual",
+    olympic: true,
+    beginnerDifficulty: "Challenging",
+    equipment: [
+      "Boxing gloves",
+      "Boxing shoes",
+      "Headgear (amateur)",
+      "Mouthguard",
+      "Hand wraps",
+    ],
+    benefits: {
+      physical: [
+        "Builds upper-body and core strength",
+        "Improves cardiovascular endurance and speed",
+        "Enhances hand-eye coordination and reflexes",
+      ],
+      mental: [
+        "Develops mental toughness and discipline",
+        "Builds confidence and self-control",
+        "Teaches strategic thinking and composure under pressure",
+      ],
+    },
+    trainingPath:
+      "Start at a local boxing gym to learn basic stance, jab, cross, and defensive moves. Compete in state and national amateur boxing championships to build ring experience. Top boxers can aim for India Open, World Championships, and Olympic selection via BFI.",
+    careerOpportunities: [
+      "Professional boxer (amateur or pro)",
+      "Boxing coach and trainer",
+      "Sports commentary and journalism",
+      "Gym ownership and fitness training",
+    ],
+    competitions: {
+      state: [
+        "State Boxing Championships",
+        "District boxing meets",
+      ],
+      national: [
+        "Senior National Boxing Championship",
+        "India Open Boxing",
+        "Youth National Championships",
+      ],
+      international: [
+        "IBA World Boxing Championships",
+        "Asian Games",
+        "Olympic Games",
+      ],
+    },
+    majorTournaments: [
+      "IBA World Boxing Championships",
+      "Olympic Games",
+      "Asian Games",
+    ],
+    funFacts: [
+      "Boxing has been an Olympic sport since 1904 (with a break in 1912).",
+      "Vijender Singh became the first Indian boxer to win an Olympic medal (2008 bronze).",
+      "Lovlina Borgohain won India's second Olympic boxing medal (2020 bronze) in the welterweight category.",
+    ],
+    faqs: [
+      {
+        q: "Is boxing safe for beginners?",
+        a: "Yes, with proper coaching, protective gear, and controlled sparring, boxing is safe for beginners of all ages.",
+      },
+      {
+        q: "How do I improve my punching power?",
+        a: "Focus on proper technique, core strength training, shadow boxing, and heavy bag drills. Power comes from hip rotation, not just arm strength.",
+      },
+      {
+        q: "Can boxing help with self-defense?",
+        a: "Boxing builds excellent reflexes, distance awareness, and striking skills that are highly effective for self-defense.",
+      },
+    ],
+  },
+
+  karate: {
+    tagline: "A striking art of discipline, precision, and respect.",
+    about:
+      "Karate is a Japanese martial art emphasizing punching, kicking, and defensive blocking. It includes kata (forms) and kumite (sparring) in competition. India has produced multiple Asian-level karate medalists. The sport builds physical power and mental discipline in equal measure.",
+    rules:
+      "Competitors score points by landing controlled strikes (punches, kicks, knee strikes) on the opponent's body or head. Bouts last up to three minutes. WKF rules award Ippon (full point) and Waza-ari (half point) for effective, well-timed techniques.",
+    individualOrTeam: "both",
+    olympic: false,
+    beginnerDifficulty: "Moderate",
+    equipment: [
+      "Karate gi (uniform)",
+      "Karate belt (indicating rank)",
+      "Hand and shin guards",
+      "Mouthguard",
+    ],
+    benefits: {
+      physical: [
+        "Improves flexibility and dynamic kicking range",
+        "Builds explosive power and core strength",
+        "Enhances balance and coordination",
+      ],
+      mental: [
+        "Develops discipline and respect through traditional values",
+        "Builds focus and mental calmness",
+        "Teaches self-control and emotional regulation",
+      ],
+    },
+    trainingPath:
+      "Begin at a local karate dojo to learn basic stances, strikes, and kata. Progress through belt grades (kyu levels) and compete in district and state championships. Elite karatekas can enter national championships and represent India at Asian and World Karate Championships.",
+    careerOpportunities: [
+      "Professional karate competitor",
+      "Karate instructor and dojo owner",
+      "Self-defense trainer",
+      "Martial arts choreography for films",
+    ],
+    competitions: {
+      state: [
+        "State Karate Championships",
+        "District karate meets",
+      ],
+      national: [
+        "National Karate Championship",
+        "All India Karate Federation events",
+      ],
+      international: [
+        "Asian Karate Championship",
+        "World Karate Championship",
+        "Asian Games",
+      ],
+    },
+    majorTournaments: [
+      "World Karate Championship",
+      "Asian Karate Championship",
+      "Karate Premier League",
+    ],
+    funFacts: [
+      "Karate originated in Okinawa, Japan, and was influenced by Chinese martial arts.",
+      "The word 'karate' means 'empty hand' in Japanese.",
+      "Karate was included in the 2020 Tokyo Olympics as a one-time event and is not currently in the 2028 program.",
+    ],
+    faqs: [
+      {
+        q: "At what age can children start karate?",
+        a: "Children as young as 4-5 can begin introductory karate classes. Formal training with kata and kumite typically starts around age 6-8.",
+      },
+      {
+        q: "What belt color means I'm a black belt?",
+        a: "A black belt represents an advanced level of skill and knowledge, typically achieved after 3-5 years of consistent training.",
+      },
+      {
+        q: "Is karate effective for self-defense?",
+        a: "Yes. Karate teaches practical striking, blocking, and awareness skills that are effective for self-defense situations.",
+      },
+    ],
+  },
+
+  judo: {
+    tagline: "The gentle way — using your opponent's force against them.",
+    about:
+      "Judo is an Olympic martial art developed in Japan, emphasizing throws, pins, and submissions. India has produced Asian-level judo medalists, and the sport is growing through grassroots programs. Judo teaches maximum efficiency with minimum effort.",
+    rules:
+      "Two judokas compete on a mat, attempting to throw, pin, or submit the opponent. An immediate throw landing the opponent on their back scores ippon (full point) and wins the bout. Otherwise, scores are given for lesser throws and pins, with the highest total winning.",
+    individualOrTeam: "both",
+    olympic: true,
+    beginnerDifficulty: "Moderate",
+    equipment: [
+      "Judo gi (uniform)",
+      "Judo belt",
+      "Mouthguard (optional)",
+    ],
+    benefits: {
+      physical: [
+        "Builds full-body functional strength",
+        "Improves balance, coordination, and flexibility",
+        "Develops explosive throwing power",
+      ],
+      mental: [
+        "Teaches respect, humility, and self-discipline",
+        "Builds composure and tactical awareness",
+        "Develops confidence through controlled physical contact",
+      ],
+    },
+    trainingPath:
+      "Begin at a judo club or sports academy to learn breakfalls (ukemi), basic throws, and groundwork. Progress through belt grades (kyu/dan levels) and compete in district and state championships. Elite judokas can enter national camps and aim for Asian Games and Olympic selection via JFI.",
+    careerOpportunities: [
+      "Professional judo athlete",
+      "Judo coach and instructor",
+      "Self-defense and security training",
+      "Sports physiotherapy for grappling athletes",
+    ],
+    competitions: {
+      state: [
+        "State Judo Championships",
+        "District judo meets",
+      ],
+      national: [
+        "Senior National Judo Championship",
+        "Junior National Judo Championship",
+      ],
+      international: [
+        "World Judo Tour events",
+        "Asian Judo Championship",
+        "Olympic Games",
+      ],
+    },
+    majorTournaments: [
+      "World Judo Championships",
+      "Olympic Games",
+      "Asian Games judo",
+    ],
+    funFacts: [
+      "Judo was the first Asian martial art to be included in the Olympic Games (1964 Tokyo).",
+      "The highest judo rank is 10th dan (red belt), held by very few practitioners worldwide.",
+      "Judo means 'the gentle way' and was founded by Jigoro Kano in 1882.",
+    ],
+    faqs: [
+      {
+        q: "Is judo suitable for children?",
+        a: "Yes. Judo is one of the most popular martial arts for children, teaching discipline, respect, and physical skills from age 5-6.",
+      },
+      {
+        q: "Do I need to be strong to do judo?",
+        a: "Judo emphasizes technique over brute strength. Proper leverage and timing allow smaller judokas to throw larger opponents.",
+      },
+      {
+        q: "What is the difference between judo and Brazilian Jiu-Jitsu?",
+        a: "Judo emphasizes throws and pins, while BJJ focuses more on ground submissions. Both share common grappling roots.",
+      },
+    ],
+  },
+
+  kabaddi: {
+    tagline: "India's indigenous contact sport — raid, tackle, and breathe.",
+    about:
+      "Kabaddi is an ancient Indian contact team sport that has seen a professional revival through the Pro Kabaddi League since 2014. It requires immense lung capacity, agility, and tactical awareness. India dominates international kabaddi and has won multiple World Cup titles.",
+    rules:
+      "Two teams of seven players take turns sending a 'raider' into the opponent's half. The raider must tag defenders and return to their half in a single breath while continuously chanting 'kabaddi.' Defenders try to tackle the raider and prevent their return.",
+    individualOrTeam: "team",
+    olympic: false,
+    beginnerDifficulty: "Moderate",
+    equipment: [
+      "Kabaddi mat or court",
+      "Jersey and shorts",
+      "Knee and ankle supports",
+    ],
+    benefits: {
+      physical: [
+        "Builds explosive speed and agility",
+        "Improves lung capacity and breath control",
+        "Develops full-body strength and endurance",
+      ],
+      mental: [
+        "Teaches quick decision-making under pressure",
+        "Builds courage and tactical awareness",
+        "Develops team coordination and trust",
+      ],
+    },
+    trainingPath:
+      "Start at local kabaddi clubs or school teams to learn raiding techniques and defensive formations. Compete in district and state championships to gain match experience. Top players are scouted for Pro Kabaddi League and national team selection via AKFI.",
+    careerOpportunities: [
+      "Professional kabaddi player (PKL and international)",
+      "Kabaddi coaching",
+      "Sports commentary and analysis",
+      "Sports management for kabaddi leagues",
+    ],
+    competitions: {
+      state: [
+        "State Kabaddi Championship",
+        "Inter-school kabaddi tournaments",
+      ],
+      national: [
+        "Pro Kabaddi League (PKL)",
+        "Senior National Kabaddi Championship",
+        "Yuva Kabaddi Series",
+      ],
+      international: [
+        "Kabaddi World Cup",
+        "Asian Games",
+        "Asian Kabaddi Championship",
+      ],
+    },
+    majorTournaments: [
+      "Pro Kabaddi League (PKL)",
+      "Kabaddi World Cup",
+      "Asian Games kabaddi",
+    ],
+    funFacts: [
+      "Kabaddi is believed to have originated over 4,000 years ago in ancient India.",
+      "India has won every Kabaddi World Cup held so far (men's format).",
+      "The Pro Kabaddi League is the second most-watched sports league in India after IPL.",
+    ],
+    faqs: [
+      {
+        q: "Is kabaddi suitable for beginners?",
+        a: "Yes. Kabaddi is easy to learn at a basic level. Start with local clubs or school teams to learn the fundamentals.",
+      },
+      {
+        q: "How important is lung capacity in kabaddi?",
+        a: "Lung capacity is crucial. Raiders need to hold their breath while chanting 'kabaddi' during a raid, which can last 30-40 seconds.",
+      },
+      {
+        q: "Can women play kabaddi?",
+        a: "Absolutely. Women's kabaddi is growing rapidly, with PKL women's teams and international competitions offering equal opportunities.",
+      },
+    ],
+  },
+
+  hockey: {
+    tagline: "India's most decorated Olympic sport — speed, skill, and legacy.",
+    about:
+      "Field hockey is India's most successful Olympic sport, with eight gold medals. Strong talent bases exist in Punjab, Odisha, and Karnataka. The modern game is fast, technical, and played on artificial turf. India's resurgence in recent years includes Olympic bronze medals in 2020 and 2024.",
+    rules:
+      "Two teams of eleven players use curved sticks to hit a ball into the opponent's goal. Only the goalkeeper can use their body to stop the ball. A match consists of four quarters of 15 minutes each.",
+    individualOrTeam: "team",
+    olympic: true,
+    beginnerDifficulty: "Moderate",
+    equipment: [
+      "Hockey stick",
+      "Hockey ball",
+      "Shin guards",
+      "Goalkeeper pads (if playing GK)",
+      "Mouthguard",
+    ],
+    benefits: {
+      physical: [
+        "Builds cardiovascular endurance through constant running",
+        "Improves agility and stick-handling coordination",
+        "Develops lower-body strength and sprint speed",
+      ],
+      mental: [
+        "Teaches teamwork and on-field communication",
+        "Develops tactical awareness and game reading",
+        "Builds discipline through rigorous training routines",
+      ],
+    },
+    trainingPath:
+      "Start at local hockey clubs or school programs to learn basic stick skills and game rules. Compete in district and state championships to gain competitive experience. Top players enter national camps and can aim for Hockey India League and Olympic selection via HI.",
+    careerOpportunities: [
+      "Professional hockey player",
+      "Hockey coaching and development",
+      "Sports administration in hockey federations",
+      "Turf management and sports facility operations",
+    ],
+    competitions: {
+      state: [
+        "State Hockey Championship",
+        "Inter-school hockey tournaments",
+      ],
+      national: [
+        "Hockey India League",
+        "Senior National Hockey Championship",
+        "Dhyan Chand Trophy",
+      ],
+      international: [
+        "FIH Pro League",
+        "Hockey World Cup",
+        "Olympic Games",
+      ],
+    },
+    majorTournaments: [
+      "Olympic Games",
+      "FIH Hockey World Cup",
+      "FIH Pro League",
+    ],
+    funFacts: [
+      "India has won 8 Olympic gold medals in hockey, more than any other country in the sport.",
+      "Dhyan Chand, India's hockey legend, has his birthday (August 29) celebrated as National Sports Day.",
+      "The Odisha government has been a major sponsor of Indian hockey, funding the national team's training infrastructure.",
+    ],
+    faqs: [
+      {
+        q: "Is field hockey different from ice hockey?",
+        a: "Yes. Field hockey is played on turf/grass with a ball and curved stick, while ice hockey is played on ice with a puck and straight stick.",
+      },
+      {
+        q: "At what age can children start hockey?",
+        a: "Children can start with mini hockey programs from age 5-6. Competitive training usually begins around age 8-10.",
+      },
+      {
+        q: "Why did India dominate hockey historically?",
+        a: "India's dominance was built on exceptional stick skills, speed, and tactical intelligence, with legends like Dhyan Chand leading the way.",
+      },
+    ],
+  },
+
+  chess: {
+    tagline: "The game of kings — where the mind is the ultimate weapon.",
+    about:
+      "Chess is a 64-square strategy board game with a thriving Indian professional scene, anchored by Viswanathan Anand. India has produced numerous grandmasters and is a global chess powerhouse. The game develops critical thinking, pattern recognition, and strategic planning.",
+    rules:
+      "Two players each control 16 pieces on an 8x8 board, trying to checkmate the opponent's king. Each piece type moves differently. The game can end in checkmate, stalemate, draw by repetition, or by agreement.",
+    individualOrTeam: "individual",
+    olympic: false,
+    beginnerDifficulty: "Easy",
+    equipment: [
+      "Chess board and pieces",
+      "Chess clock",
+      "Scorebook (for tournament play)",
+    ],
+    benefits: {
+      physical: [
+        "Improves concentration and stamina during long games",
+        "Develops fine motor skills through piece handling",
+        "Promotes healthy brain function through mental exercise",
+      ],
+      mental: [
+        "Enhances critical thinking and problem-solving",
+        "Builds pattern recognition and memory",
+        "Teaches patience, planning, and decision-making",
+      ],
+    },
+    trainingPath:
+      "Learn the basic rules and pieces through local chess clubs or online platforms. Compete in district and state chess championships to gain rating points. Top players aim for FIDE titles (FM, IM, GM) and can represent India in Chess Olympiad and World Championship events via AICF.",
+    careerOpportunities: [
+      "Professional chess player",
+      "Chess coaching and academy",
+      "Chess journalist and content creator",
+      "Arbitration and tournament organization",
+    ],
+    competitions: {
+      state: [
+        "State Chess Championship",
+        "District open tournaments",
+      ],
+      national: [
+        "National Chess Championship",
+        "AICF Rating tournaments",
+        "Chess Olympiad (India team)",
+      ],
+      international: [
+        "FIDE World Championship",
+        "FIDE Grand Prix",
+        "Chess Olympiad",
+      ],
+    },
+    majorTournaments: [
+      "FIDE World Chess Championship",
+      "Chess Olympiad",
+      "Tata Steel Chess Tournament",
+    ],
+    funFacts: [
+      "India has over 80 grandmasters and is one of the top chess nations in the world.",
+      "Viswanathan Anand was the first Asian to win the World Chess Championship (2000).",
+      "The number of possible chess games exceeds the number of atoms in the observable universe.",
+    ],
+    faqs: [
+      {
+        q: "At what age should children learn chess?",
+        a: "Children as young as 4-5 can learn basic chess rules. Formal training with tactics and strategy can begin from age 6-7.",
+      },
+      {
+        q: "Is chess considered a sport?",
+        a: "Yes. Chess is recognized as a sport by the International Olympic Committee (IOC) and requires intense mental and physical stamina.",
+      },
+      {
+        q: "How do I improve my chess rating?",
+        a: "Study tactics, analyze your games, play regularly in rated tournaments, and consider working with a chess coach.",
+      },
+    ],
+  },
+
+  skating: {
+    tagline: "Roll with speed, grace, and adrenaline on wheels or blades.",
+    about:
+      "Skating encompasses inline, quad, and ice skating across speed, artistic, and roller hockey disciplines. India has a strong speed skating tradition with multiple Asian-level medalists. The sport is accessible from a young age and offers both recreational and competitive pathways.",
+    rules:
+      "Rules vary by discipline. In speed skating, competitors race to cover a set distance in the shortest time. Artistic skating is judged on technical skill and presentation. Roller hockey follows similar rules to field hockey but on a rink.",
+    individualOrTeam: "both",
+    olympic: false,
+    beginnerDifficulty: "Moderate",
+    equipment: [
+      "Inline or quad skates",
+      "Helmet",
+      "Knee and elbow pads",
+      "Wrist guards",
+    ],
+    benefits: {
+      physical: [
+        "Builds leg strength and cardiovascular endurance",
+        "Improves balance, coordination, and agility",
+        "Enhances core stability and posture",
+      ],
+      mental: [
+        "Builds confidence through progressive skill mastery",
+        "Teaches perseverance and goal-setting",
+        "Develops spatial awareness and focus",
+      ],
+    },
+    trainingPath:
+      "Start with basic balance and skating drills at a local rink or skating club. Progress through district and state championships to gain competitive experience. Top skaters enter national championships (RSFI) and can aim for Asian Championships and World Skate Games.",
+    careerOpportunities: [
+      "Professional speed or artistic skater",
+      "Skating coach and instructor",
+      "Skate park and rink management",
+      "Freestyle skating performance",
+    ],
+    competitions: {
+      state: [
+        "State Skating Championship",
+        "District skating meets",
+      ],
+      national: [
+        "RSFI National Skating Championship",
+        "Khelo India skating events",
+      ],
+      international: [
+        "World Skate Games",
+        "Asian Inline Skating Championship",
+        "World Speed Skating Championship",
+      ],
+    },
+    majorTournaments: [
+      "World Skate Games",
+      "Asian Roller Skating Championship",
+      "National Roller Skating Championship",
+    ],
+    funFacts: [
+      "Roller skating was invented in the 18th century and was initially used as a way to 'walk on wheels'.",
+      "India has won over 100 medals at Asian Roller Skating Championships.",
+      "Speed skating on inline skates can reach speeds of over 50 km/h.",
+    ],
+    faqs: [
+      {
+        q: "At what age can children start skating?",
+        a: "Children can start skating from age 4-5 with proper safety gear. Balance and basic movement skills develop quickly at this age.",
+      },
+      {
+        q: "Is inline or quad skating better for beginners?",
+        a: "Both are suitable for beginners. Inline skates are more commonly used for speed and outdoor skating, while quad skates are popular for artistic and recreational skating.",
+      },
+      {
+        q: "Do I need to learn ice skating too?",
+        a: "Not necessarily. Roller skating and ice skating are different disciplines. Choose the one that interests you or is more accessible in your area.",
+      },
+    ],
+  },
+
+  archery: {
+    tagline: "Precision, focus, and stillness — hit the bullseye from any distance.",
+    about:
+      "Archery is a precision sport requiring focus, strength, and consistency. India has strongholds in Jharkhand, Manipur, and the North-East, and has produced Olympic medalists like Deepika Kumari. The sport demands physical steadiness and mental calmness.",
+    rules:
+      "Archers shoot arrows at a target from set distances (70m in Olympic recurve). Points are scored based on how close the arrow lands to the center. A match consists of sets of three arrows, with the highest total score winning.",
+    individualOrTeam: "both",
+    olympic: true,
+    beginnerDifficulty: "Moderate",
+    equipment: [
+      "Recurve or compound bow",
+      "Arrows",
+      "Arm guard and finger tab",
+      "Quiver",
+    ],
+    benefits: {
+      physical: [
+        "Builds upper-body and core strength",
+        "Improves posture and shoulder stability",
+        "Enhances focus and fine motor control",
+      ],
+      mental: [
+        "Develops intense concentration and mental stillness",
+        "Teaches patience and consistency",
+        "Builds confidence through precision improvement",
+      ],
+    },
+    trainingPath:
+      "Begin at a local archery club or range to learn proper stance, draw, and release technique. Compete in district and state archery championships to build competitive experience. Elite archers can aim for national camps and Olympic selection via AAI.",
+    careerOpportunities: [
+      "Professional archer",
+      "Archery coaching and range management",
+      "Sports equipment manufacturing",
+      "Event management for archery tournaments",
+    ],
+    competitions: {
+      state: [
+        "State Archery Championship",
+        "District archery meets",
+      ],
+      national: [
+        "Senior National Archery Championship",
+        "AAI Grand Prix events",
+      ],
+      international: [
+        "World Archery Championships",
+        "Asian Archery Championship",
+        "Olympic Games",
+      ],
+    },
+    majorTournaments: [
+      "World Archery Championships",
+      "Olympic Games",
+      "Asian Games archery",
+    ],
+    funFacts: [
+      "Archery is one of the oldest arts and was used for hunting and warfare for thousands of years.",
+      "Deepika Kumari became the world No. 1 ranked archer in 2012 at age 18.",
+      "Modern Olympic archery targets have a diameter of 122 cm, with the innermost 'X' ring just 6.1 cm wide.",
+    ],
+    faqs: [
+      {
+        q: "What age is best to start archery?",
+        a: "Children can begin archery from age 8-10 with lightweight bows. Proper coaching ensures safe and effective skill development.",
+      },
+      {
+        q: "Is archery physically demanding?",
+        a: "Yes. Drawing a bow repeatedly requires significant upper-body and core strength, though it builds over time with training.",
+      },
+      {
+        q: "What is the difference between recurve and compound bows?",
+        a: "Recurve bows are used in Olympic competition and rely on arm strength, while compound bows use a pulley system for increased power and accuracy.",
+      },
+    ],
+  },
+
+  shooting: {
+    tagline: "Steady hands, sharp eyes, and ice-cold nerves.",
+    about:
+      "Shooting sports encompass rifle, pistol, and shotgun disciplines, requiring extreme precision and composure. India has produced multiple Olympic medalists including Abhinav Bindra, Rajyavardhan Singh Rathore, and Manu Bhaker. The sport demands physical stillness and mental focus.",
+    rules:
+      "Shooters aim at targets from various distances using different firearms. In Olympic events, rifle and pistol shooters fire a set number of shots at stationary targets. The highest total score wins. Shotgun events involve hitting moving clay targets.",
+    individualOrTeam: "both",
+    olympic: true,
+    beginnerDifficulty: "Challenging",
+    equipment: [
+      "Air rifle or pistol",
+      "Competition ammunition",
+      "Shooting glasses and ear protection",
+      "Shooting jacket and gloves (for rifle)",
+    ],
+    benefits: {
+      physical: [
+        "Develops exceptional hand steadiness and muscle control",
+        "Improves breathing control and body stability",
+        "Enhances visual focus and concentration",
+      ],
+      mental: [
+        "Builds intense concentration and mental discipline",
+        "Teaches emotional control under pressure",
+        "Develops patience and precision-oriented thinking",
+      ],
+    },
+    trainingPath:
+      "Begin with air rifle or air pistol at a local shooting range to learn safety, stance, and aiming. Compete in district and state shooting championships to build competitive experience. Elite shooters can aim for national championships and Olympic selection via NRAI.",
+    careerOpportunities: [
+      "Professional shooter (Olympic and international)",
+      "Shooting coach and range instructor",
+      "Sports psychology for precision sports",
+      "Armed forces and police recruitment (shooting skills valued)",
+    ],
+    competitions: {
+      state: [
+        "State Shooting Championship",
+        "District shooting trials",
+      ],
+      national: [
+        "National Shooting Championship",
+        "ISSF selection trials",
+        "Khelo India shooting events",
+      ],
+      international: [
+        "ISSF World Cup",
+        "World Shooting Championship",
+        "Olympic Games",
+      ],
+    },
+    majorTournaments: [
+      "Olympic Games shooting",
+      "ISSF World Cup",
+      "World Shooting Championship",
+    ],
+    funFacts: [
+      "Abhinav Bindra won India's first individual Olympic gold medal in shooting (2008 Beijing).",
+      "Shooting requires a heart rate as low as 40-60 BPM during competition for maximum stability.",
+      "The difference between first and last place in Olympic shooting can be as little as 0.1 points.",
+    ],
+    faqs: [
+      {
+        q: "At what age can children start shooting?",
+        a: "Children can begin air rifle training from age 10-12. Safety and proper coaching are essential from the start.",
+      },
+      {
+        q: "Is shooting expensive to get into?",
+        a: "Initial costs include equipment and range fees. Air rifle/pistol is more affordable than firearm shooting. Many ranges offer rental equipment for beginners.",
+      },
+      {
+        q: "Do I need good eyesight for shooting?",
+        a: "Good vision helps, but shooting glasses can correct vision issues. The skill is more about focus, stability, and technique than perfect eyesight.",
+      },
+    ],
+  },
+
+  yoga: {
+    tagline: "India's gift to the world — unite body, mind, and breath.",
+    about:
+      "Yoga is an ancient Indian practice that has evolved into a competitive sport with international championships. It encompasses physical postures (asanas), breathing techniques (pranayama), and meditation. India is the global epicenter of yoga, and the practice is recognized by the UN.",
+    rules:
+      "In competitive yoga, participants perform a series of postures judged on technique, flexibility, balance, and duration. Competitions follow specific routines and scoring criteria. Yoga also has traditional practice with no formal competition rules.",
+    individualOrTeam: "both",
+    olympic: false,
+    beginnerDifficulty: "Easy",
+    equipment: [
+      "Yoga mat",
+      "Comfortable clothing",
+      "Yoga blocks and straps (optional)",
+    ],
+    benefits: {
+      physical: [
+        "Improves flexibility and joint mobility",
+        "Builds core strength and balance",
+        "Enhances respiratory function through pranayama",
+      ],
+      mental: [
+        "Reduces stress and anxiety",
+        "Improves focus and mental clarity",
+        "Promotes emotional balance and self-awareness",
+      ],
+    },
+    trainingPath:
+      "Begin with basic yoga classes at a local studio or online to learn foundational postures and breathing. Progress through regular practice to intermediate and advanced asanas. Competitive yogis can participate in state and national championships and aim for Asian and World Yogasana Championships.",
+    careerOpportunities: [
+      "Yoga instructor and studio owner",
+      "Corporate wellness trainer",
+      "Yoga therapy and rehabilitation",
+      "Content creation and online yoga platforms",
+    ],
+    competitions: {
+      state: [
+        "State Yogasana Championship",
+        "District yoga competitions",
+      ],
+      national: [
+        "National Yogasana Championship",
+        "All India Yoga Championship",
+      ],
+      international: [
+        "Asian Yogasana Championship",
+        "World Yogasana Championship",
+        "International Day of Yoga events",
+      ],
+    },
+    majorTournaments: [
+      "World Yogasana Championship",
+      "Asian Yogasana Championship",
+      "National Yogasana Championship",
+    ],
+    funFacts: [
+      "The International Day of Yoga (June 21) was proposed by India and adopted by the UN in 2014.",
+      "Yoga originated in India over 5,000 years ago and was originally a spiritual practice.",
+      "Over 300 million people worldwide practice yoga regularly.",
+    ],
+    faqs: [
+      {
+        q: "Can anyone start yoga at any age?",
+        a: "Yes. Yoga is suitable for all ages and fitness levels. Modified postures make it accessible even for those with physical limitations.",
+      },
+      {
+        q: "Is yoga a sport?",
+        a: "Traditional yoga is a practice, but competitive yogasana is recognized as a sport with formal rules, judging, and international championships.",
+      },
+      {
+        q: "How often should I practice yoga?",
+        a: "For general health benefits, 3-5 sessions per week of 30-60 minutes is recommended. Consistency is more important than intensity.",
+      },
+    ],
+  },
+
+  gymnastics: {
+    tagline: "Defy gravity — flip, twist, and land with precision.",
+    about:
+      "Gymnastics encompasses artistic, rhythmic, and trampoline disciplines, requiring extraordinary flexibility, strength, and body awareness. India has produced continental medal winners and the sport is gaining popularity through Khelo India programs. It builds an incredible athletic foundation.",
+    rules:
+      "In artistic gymnastics, athletes perform routines on various apparatus (floor, vault, beam, bars for women; floor, vault, rings, pommel horse, parallel bars, high bar for men). Routines are scored on difficulty and execution. Rhythmic gymnastics involves apparatus manipulation with dance elements.",
+    individualOrTeam: "both",
+    olympic: true,
+    beginnerDifficulty: "Challenging",
+    equipment: [
+      "Gymnastics leotard",
+      "Gymnastics mat",
+      "Apparatus (varies by discipline)",
+      "Grips and wristbands",
+    ],
+    benefits: {
+      physical: [
+        "Builds exceptional flexibility and range of motion",
+        "Develops strength-to-body-weight ratio",
+        "Improves spatial awareness and body control",
+      ],
+      mental: [
+        "Builds confidence through mastering complex skills",
+        "Teaches discipline and attention to detail",
+        "Develops courage to attempt challenging moves",
+      ],
+    },
+    trainingPath:
+      "Begin at a gymnastics academy with foundational flexibility, strength, and basic skill training. Progress through age-group competitions at district and state levels. Elite gymnasts can enter national camps and aim for Asian Games and Olympic selection via GFI.",
+    careerOpportunities: [
+      "Professional gymnast",
+      "Gymnastics coaching and academy management",
+      "Choreography for rhythmic gymnastics",
+      "Circus and performance arts",
+    ],
+    competitions: {
+      state: [
+        "State Gymnastics Championship",
+        "District gymnastics meets",
+      ],
+      national: [
+        "Senior National Gymnastics Championship",
+        "Khelo India gymnastics events",
+      ],
+      international: [
+        "World Gymnastics Championships",
+        "Asian Games gymnastics",
+        "Olympic Games",
+      ],
+    },
+    majorTournaments: [
+      "World Gymnastics Championships",
+      "Olympic Games",
+      "Asian Games gymnastics",
+    ],
+    funFacts: [
+      "Gymnastics was part of the first modern Olympic Games in 1896.",
+      "The Perfect 10 in gymnastics was first achieved by Nadia Comaneci at the 1976 Olympics.",
+      "Dipa Karmakar became the first Indian female gymnast to qualify for an Olympic Games (2016 Rio).",
+    ],
+    faqs: [
+      {
+        q: "At what age should children start gymnastics?",
+        a: "Children can start recreational gymnastics from age 4-5. Competitive training typically begins around age 6-8.",
+      },
+      {
+        q: "Is gymnastics dangerous?",
+        a: "Gymnastics carries injury risks, but proper coaching, progressive skill development, and safety equipment significantly reduce danger.",
+      },
+      {
+        q: "Can adults start gymnastics?",
+        a: "Yes, adults can start gymnastics, though learning advanced skills takes longer. Many gyms offer adult beginner classes focused on fitness and basic skills.",
+      },
+    ],
+  },
+};

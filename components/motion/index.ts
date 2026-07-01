@@ -5,7 +5,6 @@ export * from './hover-lift';
 export * from './motion-config';
 export * from './page-transition';
 export * from './press';
-export * from './reveal';
 export * from './scroll-progress';
 export * from './shared-layout';
 export * from './stagger';

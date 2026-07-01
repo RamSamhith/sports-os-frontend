@@ -64,6 +64,24 @@ export function useRecentlyViewed() {
     [],
   )
 
+  const clearHistory = useCallback(() => {
+    setItems([])
+    saveItems([])
+    window.dispatchEvent(new StorageEvent('storage', { key: STORAGE_KEY }))
+  }, [])
+
+  const removeView = useCallback(
+    (id: string, type: RecentlyViewedType) => {
+      setItems((prev) => {
+        const next = prev.filter((i) => !(i.id === id && i.type === type))
+        saveItems(next)
+        window.dispatchEvent(new StorageEvent('storage', { key: STORAGE_KEY }))
+        return next
+      })
+    },
+    [],
+  )
+
   const recentAcademies = items.filter((i) => i.type === 'academy')
   const recentCoaches = items.filter((i) => i.type === 'coach')
 
@@ -72,6 +90,8 @@ export function useRecentlyViewed() {
     recentAcademies,
     recentCoaches,
     addView,
+    clearHistory,
+    removeView,
     recentCount: items.length,
   }
 }
