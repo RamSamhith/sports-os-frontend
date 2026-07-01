@@ -93,9 +93,9 @@ export function CoachesListing({ hideSearch = false }: { hideSearch?: boolean } 
       });
       if (cancelled) return;
       if (res.ok) {
-        setResults(res.data.items);
-        setTotal(res.data.pagination.total);
-        setHasMore(res.data.items.length < (res.data.pagination.total ?? 0));
+        setResults(res.data?.items ?? []);
+        setTotal(res.data?.pagination?.total ?? 0);
+        setHasMore((res.data?.items ?? []).length < (res.data?.pagination?.total ?? 0));
         if (debouncedQuery) {
           trackSearch(debouncedQuery, res.data.pagination.total, 'coaches');
         }
@@ -143,8 +143,8 @@ export function CoachesListing({ hideSearch = false }: { hideSearch?: boolean } 
         });
         if (cancelled) return;
         if (res.ok) {
-          setResults((prev) => [...prev, ...res.data.items]);
-          setHasMore(res.data.items.length === PAGE_SIZE);
+          setResults((prev) => [...prev, ...(res.data?.items ?? [])]);
+          setHasMore((res.data?.items ?? []).length === PAGE_SIZE);
         }
       } catch {
         // network error — stop infinite scroll

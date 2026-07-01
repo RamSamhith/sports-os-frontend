@@ -46,8 +46,8 @@ export function ReviewsSection({ targetType, targetId }: ReviewsSectionProps) {
     try {
       const res = await getReviews(targetType, targetId, { sort: sortBy, limit: 50 });
       if (res.ok) {
-        setReviews(res.data.reviews);
-        setStats(res.data.stats);
+        setReviews(res.data?.reviews ?? []);
+        setStats(res.data?.stats ?? null);
       }
     } catch {
       setLoadError(true);

@@ -1,7 +1,6 @@
 'use client';
 
 import * as React from 'react';
-import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import { Container } from '@/components/layout/container';
 import { Section } from '@/components/layout/section';
@@ -73,11 +72,11 @@ export function AcademyDetailView({ slug }: { slug: string }) {
           setAcademy(res.data);
           const coachesRes = await getCoaches({ pageSize: 100 });
           if (!cancelled && coachesRes.ok) {
-            setCoaches(coachesRes.data.items.filter((c) => c.academyId === res.data.id));
+            setCoaches((coachesRes.data.items ?? []).filter((c) => c.academyId === res.data.id));
           }
           const relatedRes = await getAcademies({ pageSize: 100 });
           if (!cancelled && relatedRes.ok) {
-            const relatedAcademies = relatedRes.data.items
+            const relatedAcademies = (relatedRes.data.items ?? [])
               .filter((a) => a.id !== res.data.id)
               .filter((a) =>
                 a.location?.city === res.data.location?.city ||
@@ -89,6 +88,11 @@ export function AcademyDetailView({ slug }: { slug: string }) {
           }
         } else {
           setError(res.error.message);
+        }
+      } catch (e) {
+        console.error('[AcademyDetail] load error:', e);
+        if (!cancelled) {
+          setError(e instanceof Error ? e.message : 'Failed to load academy details');
         }
       } finally {
         if (!cancelled) setLoading(false);
@@ -182,7 +186,7 @@ export function AcademyDetailView({ slug }: { slug: string }) {
               <span className="text-muted-foreground mx-1">·</span>
               <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-400" />
               <span className="text-foreground font-semibold">{(academy.rating?.average ?? 0).toFixed(1)}</span>
-              <span className="text-muted-foreground">({academy.rating.count} reviews)</span>
+              <span className="text-muted-foreground">({academy.rating?.count ?? 0} reviews)</span>
             </p>
           </div>
           <div id="academy-cta" className="flex flex-wrap items-center gap-2">

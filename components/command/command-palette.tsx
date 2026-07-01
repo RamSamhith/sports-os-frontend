@@ -48,7 +48,7 @@ function buildResults(
       matches(a.name, lower),
       matches(a.location?.city ?? '', lower),
       matches(a.location?.state ?? '', lower),
-      ...a.sportsOffered.map((s) => matches(s, lower)),
+      ...(a.sportsOffered ?? []).map((s) => matches(s, lower)),
     );
     if (score > 0) {
       results.push({

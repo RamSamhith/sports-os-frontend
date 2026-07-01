@@ -80,7 +80,7 @@ export function AcademyListing({ hideSearch = false }: { hideSearch?: boolean } 
       const res = await getAcademies({ pageSize: 200 });
       if (cancelled) return;
       if (res.ok) {
-        setAllAcademies(res.data.items);
+        setAllAcademies(res.data?.items ?? []);
       }
     }
     load();
@@ -107,9 +107,9 @@ export function AcademyListing({ hideSearch = false }: { hideSearch?: boolean } 
         });
         if (cancelled) return;
         if (res.ok) {
-          setResults(res.data.items);
-          setTotal(res.data.pagination.total);
-          setHasMore(res.data.items.length < (res.data.pagination.total ?? 0));
+          setResults(res.data?.items ?? []);
+          setTotal(res.data?.pagination?.total ?? 0);
+          setHasMore((res.data?.items ?? []).length < (res.data?.pagination?.total ?? 0));
           if (debouncedQuery) {
             trackSearch(debouncedQuery, res.data.pagination.total, 'academies');
           }
@@ -162,8 +162,8 @@ export function AcademyListing({ hideSearch = false }: { hideSearch?: boolean } 
         });
         if (cancelled) return;
         if (res.ok) {
-          setResults((prev) => [...prev, ...res.data.items]);
-          setHasMore(res.data.items.length === PAGE_SIZE);
+          setResults((prev) => [...prev, ...(res.data?.items ?? [])]);
+          setHasMore((res.data?.items ?? []).length === PAGE_SIZE);
         }
       } catch {
         // network error — stop infinite scroll

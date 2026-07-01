@@ -51,9 +51,9 @@ export function AcademyInfo({
           </div>
         )}
       </div>
-      {sportsOffered.length > 0 && (
+      {(sportsOffered ?? []).length > 0 && (
         <div className="flex flex-wrap gap-1">
-          {sportsOffered.map((sport) => (
+          {(sportsOffered ?? []).map((sport) => (
             <Badge key={sport} variant="secondary" className="text-xs">
               {sport}
             </Badge>
