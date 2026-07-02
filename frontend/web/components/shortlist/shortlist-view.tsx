@@ -30,7 +30,9 @@ export function ShortlistView({ entityType }: ShortlistViewProps) {
   const idsKey = entityItems.map((it) => it.itemId).join(',');
 
   React.useEffect(() => {
-    if (entityItems.length === 0) {
+    const currentIds = idsKey ? idsKey.split(',') : [];
+
+    if (currentIds.length === 0) {
       setResolvedItems([]);
       setLoading(false);
       return;
@@ -40,23 +42,21 @@ export function ShortlistView({ entityType }: ShortlistViewProps) {
     async function resolveAll() {
       const results: Array<{ id: string; data: Academy | Coach }> = [];
 
-      for (const item of entityItems) {
-        const key = `${item.itemType}:${item.itemId}`;
+      for (const id of currentIds) {
+        const key = `${entityType}:${id}`;
 
-        // Prefer populated data from provider (already fetched on login)
         if (populatedData?.[key]) {
-          results.push({ id: item.itemId, data: populatedData[key] as unknown as Academy | Coach });
+          results.push({ id, data: populatedData[key] as unknown as Academy | Coach });
           continue;
         }
 
-        // Fall back to individual fetch using ID (not slug)
         try {
           if (entityType === 'academy') {
-            const res = await getAcademyById(item.itemId);
-            if (!cancelled && res.ok) results.push({ id: item.itemId, data: res.data });
+            const res = await getAcademyById(id);
+            if (!cancelled && res.ok) results.push({ id, data: res.data });
           } else {
-            const res = await getCoachById(item.itemId);
-            if (!cancelled && res.ok) results.push({ id: item.itemId, data: res.data });
+            const res = await getCoachById(id);
+            if (!cancelled && res.ok) results.push({ id, data: res.data });
           }
         } catch { /* skip */ }
       }
@@ -68,8 +68,7 @@ export function ShortlistView({ entityType }: ShortlistViewProps) {
     }
     resolveAll();
     return () => { cancelled = true; };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [idsKey, entityType]);
+  }, [idsKey, entityType, populatedData]);
 
   const pluralLabel = entityType === 'academy' ? 'Academies' : 'Coaches';
 

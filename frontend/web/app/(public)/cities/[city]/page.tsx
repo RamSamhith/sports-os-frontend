@@ -9,7 +9,7 @@ import { Breadcrumbs } from '@/components/seo/breadcrumbs';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { AcademyCardPlaceholder } from '@/components/academies/academy-card-placeholder';
-import { ImageWithFallback } from '@/components/ui/image-with-fallback';
+import { CoachImage } from '@/components/ui/coach-image';
 import { LocationMap } from '@/components/academy/location-map';
 import { getAcademies } from '@/lib/api/academies';
 import { getCoaches } from '@/lib/api/coaches';
@@ -47,23 +47,26 @@ export default function CityPage() {
       try {
         const [academiesRes, coachesRes] = await Promise.all([
           getAcademies({ pageSize: 200 }),
-          getCoaches({ pageSize: 200 }),
+          getCoaches({ city: cityName, pageSize: 100 }),
         ]);
         if (cancelled) return;
 
         if (academiesRes.ok) {
-          setAllAcademies(academiesRes.data.items);
-          const cityAcademies = academiesRes.data.items.filter(
-            (a) => (a.location?.city ?? '').toLowerCase() === cityName.toLowerCase()
-          );
+          const items = academiesRes.data.items;
+          setAllAcademies(items);
+          const normalizedCity = cityName.toLowerCase().trim();
+          const cityAcademies = items.filter((a) => {
+            const academyCity = (a.location?.city ?? '').toLowerCase().trim();
+            const academyCitySlug = a.location?.city
+              ? a.location.city.toLowerCase().replace(/\s+/g, '-')
+              : '';
+            return academyCity === normalizedCity || academyCitySlug === normalizedCity;
+          });
           setAcademies(cityAcademies);
         }
 
         if (coachesRes.ok) {
-          const cityCoaches = coachesRes.data.items.filter(
-            (c) => (c.location?.city ?? '').toLowerCase() === cityName.toLowerCase()
-          );
-          setCoaches(cityCoaches);
+          setCoaches(coachesRes.data.items);
         }
       } catch {
         // network error — leave arrays empty
@@ -122,8 +125,25 @@ export default function CityPage() {
     return (
       <Section>
         <Container>
-          <div className="flex items-center justify-center py-24">
-            <div className="text-muted-foreground text-sm">Loading academies in {cityName}...</div>
+          <div className="mb-3 h-4 w-48 animate-pulse rounded bg-muted" />
+          <div className="mb-6 h-8 w-72 animate-pulse rounded bg-muted" />
+          <div className="mb-6 flex gap-2">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <div key={i} className="h-8 w-24 animate-pulse rounded-full bg-muted" />
+            ))}
+          </div>
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <div key={i} className="rounded-xl border bg-card">
+                <div className="aspect-[16/9] animate-pulse bg-muted rounded-t-xl" />
+                <div className="p-4 space-y-3">
+                  <div className="h-5 w-3/4 animate-pulse rounded bg-muted" />
+                  <div className="h-4 w-1/2 animate-pulse rounded bg-muted" />
+                  <div className="h-3 w-full animate-pulse rounded bg-muted" />
+                  <div className="h-10 w-full animate-pulse rounded-lg bg-muted" />
+                </div>
+              </div>
+            ))}
           </div>
         </Container>
       </Section>
@@ -216,15 +236,28 @@ export default function CityPage() {
             ))}
           </div>
         ) : (
-          <div className="border-border/60 bg-card/40 flex flex-col items-center gap-3 rounded-xl border border-dashed py-12 text-center">
-            <MapPin className="h-10 w-10 opacity-40" />
-            <div>
-              <p className="text-foreground font-medium">No academies found in {cityName}</p>
-              <p className="text-sm text-muted-foreground">Try searching for a nearby city or sport.</p>
+          <div className="border-border/60 bg-card/40 flex flex-col items-center gap-4 rounded-xl border border-dashed py-16 text-center">
+            <div className="bg-muted/50 grid h-16 w-16 place-items-center rounded-full">
+              <MapPin className="h-8 w-8 text-muted-foreground/60" />
             </div>
-            <Button asChild variant="outline">
-              <Link href="/search">Search all academies</Link>
-            </Button>
+            <div className="max-w-sm">
+              <p className="text-foreground text-lg font-semibold">No academies in {cityName} yet</p>
+              <p className="text-muted-foreground mt-1 text-sm">
+                We&apos;re expanding fast! Try a nearby city or browse all academies.
+              </p>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {nearby.length > 0 && (
+                <Button asChild variant="outline">
+                  <Link href={`/cities/${encodeURIComponent(nearby[0].name.toLowerCase().replace(/\s+/g, '-'))}`}>
+                    Browse {nearby[0].name}
+                  </Link>
+                </Button>
+              )}
+              <Button asChild>
+                <Link href="/search">Search all academies</Link>
+              </Button>
+            </div>
           </div>
         )}
 
@@ -245,20 +278,16 @@ export default function CityPage() {
                     className="group border-border/60 bg-card/40 hover:border-foreground/20 rounded-xl border p-3 transition-colors"
                   >
                     <div className="flex items-start gap-3">
-                      <div className="bg-muted relative h-12 w-12 shrink-0 overflow-hidden rounded-full">
-                        {coach.avatar ? (
-                          <ImageWithFallback
-                            src={coach.avatar}
-                            alt={coach.name}
-                            fill
-                            sizes="48px"
-                            className="object-cover"
-                          />
-                        ) : (
-                          <span className="bg-primary/15 text-foreground/80 grid h-full w-full place-items-center text-sm font-semibold uppercase">
-                            {coach.name.split(' ').map((n) => n[0]).join('').slice(0, 2)}
-                          </span>
-                        )}
+                      <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-full">
+                        <CoachImage
+                          avatar={coach.avatar}
+                          sportsCoached={coach.sportsCoached}
+                          name={coach.name}
+                          alt={coach.name}
+                          fill
+                          sizes="48px"
+                          className="object-cover"
+                        />
                       </div>
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center gap-1.5">

@@ -9,7 +9,6 @@ import { MapPin, ChevronRight, ChevronLeft, AlertTriangle, Search } from 'lucide
 import { CityCarouselSkeleton } from '@/components/feedback/skeletons';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import type { Academy } from '@/types/domain/academy';
 
 interface CityData {
   name: string;
@@ -92,7 +91,7 @@ export function CitiesSection() {
 
   if (loading) {
     return (
-      <Section spacing="sm">
+      <Section spacing="md">
         <Container size="lg">
           <CityCarouselSkeleton />
         </Container>
@@ -102,10 +101,10 @@ export function CitiesSection() {
 
   if (error) {
     return (
-      <Section spacing="sm">
+      <Section spacing="md">
         <Container size="lg">
           <div className="mb-4">
-            <h2 className="text-xl font-semibold tracking-tight md:text-2xl">Explore by city</h2>
+            <h2 className="text-xl font-semibold tracking-tight md:text-2xl">Popular Cities</h2>
             <p className="text-muted-foreground text-xs">Find academies in your city.</p>
           </div>
           <div className="flex flex-col items-center gap-3 rounded-xl border border-dashed py-12 text-center">
@@ -126,11 +125,11 @@ export function CitiesSection() {
   if (allCities.length === 0) return null;
 
   return (
-    <Section spacing="sm">
+    <Section spacing="md">
       <Container size="lg">
         <div className="mb-4 flex items-end justify-between gap-4">
           <div>
-            <h2 className="text-xl font-semibold tracking-tight md:text-2xl">Explore by city</h2>
+            <h2 className="text-xl font-semibold tracking-tight md:text-2xl">Popular Cities</h2>
             <p className="text-muted-foreground text-xs">
               {allCities.length} cities with {academiesTotal || academies.length} academies
             </p>

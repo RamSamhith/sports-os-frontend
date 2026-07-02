@@ -31,10 +31,10 @@ const trustItems: Array<{ icon: LucideIcon; title: string; description: string }
 
 export function TrustSection() {
   return (
-    <Section spacing="sm">
+    <Section spacing="md">
       <Container size="lg">
         <div className="mb-4">
-          <h2 className="text-xl font-semibold tracking-tight md:text-2xl">Trust & Verification</h2>
+          <h2 className="text-xl font-semibold tracking-tight md:text-2xl">Trusted by Athletes</h2>
           <p className="text-muted-foreground text-xs">Every academy and coach on our platform is verified for quality and authenticity.</p>
         </div>
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">

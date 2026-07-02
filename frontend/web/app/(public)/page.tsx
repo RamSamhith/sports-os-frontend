@@ -6,6 +6,7 @@ import { TrustSection } from '@/components/home/trust-section';
 import { StatsSection } from '@/components/home/stats-section';
 import { TestimonialsSection } from '@/components/home/testimonials-section';
 import { CtaSection } from '@/components/home/cta-section';
+import { RecentlyViewed } from '@/components/home/recently-viewed';
 import { HomepageAuthModal } from '@/components/auth/homepage-auth-modal';
 import { siteConfig } from '@/config/site';
 
@@ -47,6 +48,7 @@ export default function HomePage() {
       <Hero />
       <PersonalizedHome />
       <FeaturedAcademies />
+      <RecentlyViewed />
       <CitiesSection />
       <FeaturedSports />
       <FeaturedCoaches />

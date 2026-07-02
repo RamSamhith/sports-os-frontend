@@ -6,7 +6,7 @@ import { AuroraBackground } from '@/components/layout/aurora-background';
 
 export function CtaSection() {
   return (
-    <Section>
+    <Section spacing="md">
       <Container size="md">
         <div className="border-border/60 bg-card/40 relative overflow-hidden rounded-2xl border p-10 text-center md:p-14">
           <AuroraBackground />

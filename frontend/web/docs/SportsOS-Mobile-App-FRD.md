@@ -169,7 +169,7 @@ App
 │   ├── Register
 │   ├── Forgot Password
 │   ├── OTP Verification
-│   └── Social Login (Google)
+│   └── Social Login (Google, Microsoft)
 │
 └── Onboarding (stack)
     ├── Welcome
@@ -587,7 +587,7 @@ interface ShortlistItem {
 | **Email Input** | With validation |
 | **Password Input** | Show/hide toggle |
 | **Login Button** | Primary CTA |
-| **Social Login** | Google button |
+| **Social Login** | Google, Microsoft buttons |
 | **Forgot Password** | Link → Forgot Password screen |
 | **Sign Up** | Link → Register screen |
 
@@ -601,7 +601,7 @@ interface ShortlistItem {
 | **Phone Input** | Optional, with country code |
 | **Role Selection** | Parent / Athlete radio |
 | **Register Button** | Primary CTA |
-| **Social Login** | Google button |
+| **Social Login** | Google, Microsoft buttons |
 | **Login Link** | "Already have an account? Login" |
 
 #### Forgot Password

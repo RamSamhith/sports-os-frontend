@@ -6,9 +6,8 @@ import { Container } from '@/components/layout/container';
 import { Section } from '@/components/layout/section';
 import { SportCard } from '@/components/sports/sport-card';
 import { useHomepageData } from '@/lib/hooks/use-homepage-data';
-import { Trophy, ChevronLeft, ChevronRight, Loader2, AlertTriangle } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Loader2, AlertTriangle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import type { Sport } from '@/types/domain/sport';
 
 export function FeaturedSports() {
   const { sports: allSports, loading, error, refetch } = useHomepageData();
@@ -49,11 +48,11 @@ export function FeaturedSports() {
 
   if (loading) {
     return (
-      <Section spacing="sm">
+      <Section spacing="md">
         <Container size="lg">
           <div className="mb-4 flex items-end justify-between gap-4">
             <div>
-              <h2 className="text-xl font-semibold tracking-tight md:text-2xl">Popular sports</h2>
+              <h2 className="text-xl font-semibold tracking-tight md:text-2xl">Popular Sports</h2>
               <p className="text-muted-foreground text-xs">Explore sports, benefits, and pathways.</p>
             </div>
           </div>
@@ -67,11 +66,11 @@ export function FeaturedSports() {
 
   if (error) {
     return (
-      <Section spacing="sm">
+      <Section spacing="md">
         <Container size="lg">
           <div className="mb-4 flex items-end justify-between gap-4">
             <div>
-              <h2 className="text-xl font-semibold tracking-tight md:text-2xl">Popular sports</h2>
+              <h2 className="text-xl font-semibold tracking-tight md:text-2xl">Popular Sports</h2>
               <p className="text-muted-foreground text-xs">Explore sports, benefits, and pathways.</p>
             </div>
           </div>
@@ -93,12 +92,12 @@ export function FeaturedSports() {
   if (sports.length === 0) return null;
 
   return (
-    <Section spacing="sm">
+    <Section spacing="md">
       <Container size="lg">
         <div className="mb-4 flex items-end justify-between gap-4">
           <div>
-            <h2 className="text-xl font-semibold tracking-tight md:text-2xl">Popular sports</h2>
-            <p className="text-muted-foreground text-xs">Explore sports, benefits, and pathways.</p>
+<h2 className="text-xl font-semibold tracking-tight md:text-2xl">Popular Sports</h2>
+              <p className="text-muted-foreground text-xs">Explore sports, benefits, and pathways.</p>
           </div>
           <div className="flex items-center gap-1">
             <Link href="/sports" className="text-muted-foreground hover:text-foreground mr-2 text-xs min-h-[44px] flex items-center">

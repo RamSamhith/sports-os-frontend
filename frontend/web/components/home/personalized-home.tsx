@@ -10,7 +10,6 @@ import { useHomepageData } from '@/lib/hooks/use-homepage-data'
 import type { OnboardingData, SkillLevel } from '@/lib/hooks/use-onboarding'
 import { MatchingExplanation } from './matching-explanation'
 import { SuggestedAcademies } from './suggested-academies'
-import { RecentlyViewed } from './recently-viewed'
 import { ContinueExploring } from './continue-exploring'
 import { YourAcademy } from './your-academy'
 import { Section } from '@/components/layout/section'
@@ -23,8 +22,8 @@ export function PersonalizedHome() {
   const { role } = useAuth()
   const { data: onboarding, completed, hydrated } = useOnboarding()
   const { activeChild } = useChildren()
-  const { recentAcademies, recentCoaches, clearHistory } = useRecentlyViewed()
-  const { academies: apiAcademies, loading: apiLoading, error: apiError } = useHomepageData()
+  const { recentAcademies, recentCoaches } = useRecentlyViewed()
+  const { academies: apiAcademies } = useHomepageData()
   const [coords, setCoords] = useState<{ lat: number; lng: number }>({ lat: DEFAULT_LAT, lng: DEFAULT_LNG })
 
   useEffect(() => {
@@ -67,7 +66,6 @@ export function PersonalizedHome() {
 
   const lastAcademy = recentAcademies[0]
   const showContinueExploring = !!lastAcademy
-  const showRecentlyViewed = recentAcademies.length > 0
 
   useEffect(() => {
     if (completed && effectiveOnboarding && apiAcademies.length > 0) {
@@ -80,8 +78,7 @@ export function PersonalizedHome() {
   const hasContent =
     suggestedAcademies.primary.length > 0 ||
     suggestedAcademies.fallback.length > 0 ||
-    showContinueExploring ||
-    showRecentlyViewed
+    showContinueExploring
 
   if (!hasContent) return null
 
@@ -133,13 +130,6 @@ export function PersonalizedHome() {
         </Section>
       )}
 
-      {showRecentlyViewed && (
-        <Section>
-          <Container size="lg">
-            <RecentlyViewed academies={recentAcademies} coaches={recentCoaches} onClear={clearHistory} />
-          </Container>
-        </Section>
-      )}
     </div>
   )
 }

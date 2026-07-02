@@ -229,11 +229,62 @@ function CompareCard({ slot, onRemove }: { slot: Entity; onRemove: () => void })
   );
 }
 
+const difficultyColors: Record<string, string> = {
+  Easy: 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border-emerald-500/20',
+  Moderate: 'bg-amber-500/10 text-amber-700 dark:text-amber-400 border-amber-500/20',
+  Challenging: 'bg-red-500/10 text-red-700 dark:text-red-400 border-red-500/20',
+};
+
+const fitnessColors: Record<string, string> = {
+  Low: 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-400',
+  Medium: 'bg-amber-500/10 text-amber-700 dark:text-amber-400',
+  High: 'bg-red-500/10 text-red-700 dark:text-red-400',
+};
+
+function Chip({ value, mapping }: { value: string; mapping?: Record<string, string> }) {
+  const cls = mapping?.[value] || 'bg-muted/50 text-muted-foreground';
+  return (
+    <span className={`inline-block rounded-full border px-2.5 py-0.5 text-[11px] font-medium ${cls}`}>
+      {value}
+    </span>
+  );
+}
+
+function ProgressBar({ value, max = 5 }: { value: number; max?: number }) {
+  const pct = Math.min(100, (value / max) * 100);
+  return (
+    <div className="flex items-center gap-2">
+      <div className="bg-muted h-1.5 w-full max-w-[80px] overflow-hidden rounded-full">
+        <div
+          className="bg-primary h-full rounded-full transition-all"
+          style={{ width: `${pct}%` }}
+        />
+      </div>
+      <span className="text-xs font-medium tabular-nums">{value}/{max}</span>
+    </div>
+  );
+}
+
+function YesNoChip({ value }: { value: boolean | string }) {
+  const ok = value === true || value === 'Yes' || value === 'yes';
+  return (
+    <span className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[11px] font-medium ${
+      ok
+        ? 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border-emerald-500/20'
+        : 'bg-muted/50 text-muted-foreground border-border/40'
+    } border`}>
+      <span className={`h-1.5 w-1.5 rounded-full ${ok ? 'bg-emerald-500' : 'bg-muted-foreground/50'}`} />
+      {ok ? 'Yes' : 'No'}
+    </span>
+  );
+}
+
 interface ComparisonRow {
   key: string;
   label: string;
   values: Array<string | React.ReactNode>;
-  type?: 'numeric' | 'text' | 'status';
+  type?: 'numeric' | 'text' | 'status' | 'chip';
+  chipMapping?: Record<string, string>;
 }
 
 function getHighlightClass(row: ComparisonRow, index: number): string {
@@ -258,7 +309,7 @@ function getHighlightClass(row: ComparisonRow, index: number): string {
     if (val === 'pending' || val === 'submitted' || val === 'under_review') return 'bg-amber-500/10 text-amber-700 dark:text-amber-400';
     return '';
   }
-  if (row.type === 'text') {
+  if (row.type === 'chip' || row.type === 'text') {
     const val = typeof row.values[index] === 'string' ? row.values[index] as string : '';
     if (!val || val === '—') return 'text-muted-foreground';
     return 'font-medium';
@@ -292,23 +343,15 @@ function ComparisonTable({ slots }: { slots: Entity[] }) {
     rows.push({ key: 'category', label: 'Category', type: 'text', values: slots.map((s) => s.kind === 'sport' ? (s.entity as Sport).category : '—') });
     rows.push({ key: 'sportType', label: 'Sport Type', type: 'text', values: slots.map((s) => s.kind === 'sport' ? (s.entity as Sport).sportType || '—' : '—') });
     rows.push({ key: 'age', label: 'Age range', type: 'text', values: slots.map((s) => { if (s.kind !== 'sport') return '—'; const r = (s.entity as Sport).explorationGuidance?.ageSuitability; return r?.min !== undefined && r?.max !== undefined ? `${r.min}–${r.max}` : r?.min !== undefined ? `${r.min}+` : '—'; }) });
-    rows.push({ key: 'difficulty', label: 'Difficulty', type: 'text', values: allSportSlugs.map((slug, i) => sportsContentData[i]?.beginnerDifficulty || '—') });
-    rows.push({ key: 'fitness', label: 'Fitness Level', type: 'text', values: slots.map((s) => s.kind === 'sport' ? (s.entity as Sport).fitnessLevelRequired || '—' : '—') });
-    rows.push({ key: 'olympic', label: 'Olympic Sport', type: 'text', values: allSportSlugs.map((slug, i) => sportsContentData[i]?.olympic ? 'Yes' : 'No') });
-    rows.push({ key: 'indoorOutdoor', label: 'Indoor / Outdoor', type: 'text', values: slots.map((s) => s.kind === 'sport' ? ((s.entity as Sport).sportType ?? '—') : '—') });
-    rows.push({ key: 'individualTeam', label: 'Individual / Team', type: 'text', values: allSportSlugs.map((slug, i) => sportsContentData[i]?.individualOrTeam || '—') });
-    rows.push({ key: 'beginner', label: 'Beginner Friendly', type: 'text', values: slots.map((s) => s.kind === 'sport' ? ((s.entity as Sport).beginnerFriendly ? 'Yes' : 'No') : '—') });
-    rows.push({ key: 'endurance', label: 'Endurance', type: 'text', values: slots.map((s) => s.kind === 'sport' ? 'Varies' : '—') });
-    rows.push({ key: 'strength', label: 'Strength', type: 'text', values: slots.map((s) => s.kind === 'sport' ? 'Varies' : '—') });
-    rows.push({ key: 'agility', label: 'Agility', type: 'text', values: slots.map((s) => s.kind === 'sport' ? 'Varies' : '—') });
-    rows.push({ key: 'flexibility', label: 'Flexibility', type: 'text', values: slots.map((s) => s.kind === 'sport' ? 'Varies' : '—') });
-    rows.push({ key: 'coordination', label: 'Coordination', type: 'text', values: slots.map((s) => s.kind === 'sport' ? 'Varies' : '—') });
-    rows.push({ key: 'mentalFocus', label: 'Mental Focus', type: 'text', values: slots.map((s) => s.kind === 'sport' ? 'Varies' : '—') });
-    rows.push({ key: 'reactionSpeed', label: 'Reaction Speed', type: 'text', values: slots.map((s) => s.kind === 'sport' ? 'Varies' : '—') });
-    rows.push({ key: 'calories', label: 'Calories Burned', type: 'text', values: slots.map((s) => s.kind === 'sport' ? 'Varies' : '—') });
+    rows.push({ key: 'difficulty', label: 'Difficulty', type: 'chip', chipMapping: difficultyColors, values: allSportSlugs.map((slug, i) => sportsContentData[i]?.beginnerDifficulty || '—') });
+    rows.push({ key: 'fitness', label: 'Fitness Level', type: 'chip', chipMapping: fitnessColors, values: slots.map((s) => s.kind === 'sport' ? (s.entity as Sport).fitnessLevelRequired || '—' : '—') });
+    rows.push({ key: 'olympic', label: 'Olympic Sport', type: 'chip', values: allSportSlugs.map((slug, i) => sportsContentData[i]?.olympic ? 'Yes' : 'No') });
+    rows.push({ key: 'indoorOutdoor', label: 'Indoor / Outdoor', type: 'chip', values: slots.map((s) => s.kind === 'sport' ? ((s.entity as Sport).indoorOutdoor ?? (s.entity as Sport).category ?? '—') : '—') });
+    rows.push({ key: 'individualTeam', label: 'Individual / Team', type: 'chip', values: allSportSlugs.map((slug, i) => sportsContentData[i]?.individualOrTeam || '—') });
+    rows.push({ key: 'beginner', label: 'Beginner Friendly', type: 'chip', values: slots.map((s) => s.kind === 'sport' ? ((s.entity as Sport).beginnerFriendly ? 'Yes' : 'No') : '—') });
     rows.push({ key: 'equipment', label: 'Equipment Required', type: 'text', values: allSportSlugs.map((slug, i) => (sportsContentData[i]?.equipment ?? []).join(', ') || '—') });
     rows.push({ key: 'trainingFreq', label: 'Training Frequency', type: 'text', values: slots.map((s) => s.kind === 'sport' ? (s.entity as Sport).trainingFrequency || '—' : '—') });
-    rows.push({ key: 'injuryRisk', label: 'Injury Risk', type: 'text', values: slots.map((s) => s.kind === 'sport' ? (s.entity as Sport).injuryRisk || '—' : '—') });
+    rows.push({ key: 'injuryRisk', label: 'Injury Risk', type: 'chip', chipMapping: fitnessColors, values: slots.map((s) => s.kind === 'sport' ? (s.entity as Sport).injuryRisk || '—' : '—') });
     rows.push({ key: 'competitionPath', label: 'Competition Path', type: 'text', values: allSportSlugs.map((slug, i) => {
       const comps = sportsContentData[i]?.competitions;
       if (!comps) return '—';
@@ -357,9 +400,18 @@ function ComparisonTable({ slots }: { slots: Entity[] }) {
           {rows.map((row) => (
             <tr key={row.key} className="border-border/40 border-b last:border-0">
               <th scope="row" className="text-muted-foreground p-3 text-left text-xs tracking-wide uppercase">{row.label}</th>
-              {row.values.map((v, i) => (
-                <td key={`${row.key}-${i}`} className={`p-3 align-top text-sm ${getHighlightClass(row, i)}`}>{v}</td>
-              ))}
+              {row.values.map((v, i) => {
+                const val = typeof v === 'string' ? v : '';
+                return (
+                  <td key={`${row.key}-${i}`} className={`p-3 align-top text-sm ${getHighlightClass(row, i)}`}>
+                    {row.type === 'chip' && val ? (
+                      <Chip value={val} mapping={row.chipMapping} />
+                    ) : (
+                      v
+                    )}
+                  </td>
+                );
+              })}
             </tr>
           ))}
         </tbody>

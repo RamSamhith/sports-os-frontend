@@ -37,7 +37,7 @@ export function StatsSection() {
 
   if (loading) {
     return (
-      <Section spacing="sm">
+      <Section spacing="md">
         <Container size="lg">
           <StatsSkeleton />
         </Container>
@@ -47,7 +47,7 @@ export function StatsSection() {
 
   if (error) {
     return (
-      <Section spacing="sm">
+      <Section spacing="md">
         <Container size="lg">
           <div className="flex flex-col items-center gap-3 rounded-xl border border-dashed py-12 text-center">
             <AlertTriangle className="h-10 w-10 text-destructive/40" />
@@ -62,7 +62,7 @@ export function StatsSection() {
   }
 
   return (
-    <Section spacing="sm">
+    <Section spacing="md">
       <Container size="lg">
         <div className="grid grid-cols-3 gap-2 md:grid-cols-3">
           {stats.map((s) => (
