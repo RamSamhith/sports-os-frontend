@@ -10,7 +10,6 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { ImageWithFallback } from '@/components/ui/image-with-fallback';
 import { VerifiedBadge } from '@/components/trust/verified-badge';
-import { fixtureImages } from '@/lib/images';
 import { useShortlist } from '@/lib/hooks/use-shortlist';
 import { useCompare } from '@/lib/hooks/use-compare';
 import { trackAcademyCardClick } from '@/lib/analytics/events';
@@ -39,7 +38,7 @@ export const AcademyCardPlaceholder = React.memo(function AcademyCardPlaceholder
   } = academy;
   const sportSlugs = (sportsOffered ?? []).slice(0, 3);
   const moreCount = (sportsOffered ?? []).length - sportSlugs.length;
-  const imageSrc = coverImage ?? fixtureImages.academies[academy.id];
+  const imageSrc = coverImage ?? `/images/academies/${slug}.svg`;
   const avg = typeof rating === 'number' ? rating : (rating?.average ?? 0);
   const cnt = typeof rating === 'number' ? 0 : (rating?.count ?? 0);
   const rankingScore = Math.round((avg / 5) * 100 + Math.min(cnt, 100));

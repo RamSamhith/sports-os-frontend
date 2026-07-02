@@ -20,7 +20,6 @@ import { ReviewsSection } from '@/components/reviews/reviews-section';
 import { ImageWithFallback } from '@/components/ui/image-with-fallback';
 import { AcademyDetailSkeleton } from '@/components/feedback/skeletons';
 import { SectionNav, useSectionObserver } from '@/components/ui/section-nav';
-import { fixtureImages } from '@/lib/images';
 import { getAcademy, getAcademies } from '@/lib/api/academies';
 import { getCoaches } from '@/lib/api/coaches';
 import { useRecentlyViewed } from '@/lib/hooks/use-recently-viewed';
@@ -188,7 +187,7 @@ export function AcademyDetailView({ slug }: { slug: string }) {
         {/* Gallery */}
         <div className="bg-muted/40 relative h-56 w-full overflow-hidden rounded-xl md:h-72 lg:h-80">
           <ImageWithFallback
-            src={academy.coverImage ?? fixtureImages.academies[academy.id]}
+            src={academy.coverImage ?? `/images/academies/${academy.slug}.svg`}
             alt={`${academy.name} cover image`}
             fill
             sizes="(max-width: 1024px) 100vw, 1024px"
@@ -516,7 +515,7 @@ export function AcademyDetailView({ slug }: { slug: string }) {
                   <div className="flex items-start gap-3">
                     <div className="bg-muted relative h-14 w-14 shrink-0 overflow-hidden rounded-lg">
                       <ImageWithFallback
-                        src={a.coverImage ?? fixtureImages.academies[a.id]}
+                        src={a.coverImage ?? `/images/academies/${a.slug}.svg`}
                         alt={a.name}
                         fill
                         sizes="56px"

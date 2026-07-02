@@ -175,7 +175,7 @@ export function CompareView() {
 function CompareCard({ slot, onRemove }: { slot: Entity; onRemove: () => void }) {
   const { kind, entity } = slot;
   const href = kind === 'academy' ? `/academies/${(entity as Academy).slug}` : kind === 'coach' ? `/coaches/${(entity as Coach).slug}` : `/sports/${(entity as Sport).slug}`;
-  const imageSrc = kind === 'academy' ? ((entity as Academy).coverImage ?? '') : kind === 'coach' ? ((entity as Coach).avatar ?? '') : ((entity as Sport).coverImage ?? '');
+  const imageSrc = kind === 'academy' ? ((entity as Academy).coverImage ?? `/images/academies/${(entity as Academy).slug}.svg`) : kind === 'coach' ? ((entity as Coach).avatar ?? '') : ((entity as Sport).coverImage ?? '');
   const sublabel = kind === 'academy' ? `${(entity as Academy).location.city}, ${(entity as Academy).location.state}` : kind === 'coach' ? `${(entity as Coach).location.city} · ${(entity as Coach).experienceYears}+ yrs` : (entity as Sport).category;
 
   return (

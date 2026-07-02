@@ -6,7 +6,6 @@ import { motion, useReducedMotion } from 'framer-motion';
 import { ImageWithFallback } from '@/components/ui/image-with-fallback';
 import { Card } from '@/components/ui/card';
 import { CompareButton } from '@/components/academies/compare-button';
-import { fixtureImages } from '@/lib/images';
 import { ease, duration } from '@/components/motion/constants';
 import { Check } from 'lucide-react';
 import type { Sport } from '@/types/domain/sport';
@@ -37,7 +36,7 @@ const sportBenefits: Record<string, string[]> = {
 export const SportCard = React.memo(function SportCard({ sport }: { sport: Sport }) {
   const reduced = useReducedMotion();
   const { slug, name, sportType, coverImage, shortDescription, explorationGuidance, id } = sport;
-  const imageSrc = coverImage ?? fixtureImages.sports[id];
+  const imageSrc = coverImage ?? `/images/sports/${slug}.svg`;
   const initial = name.charAt(0);
   const ageRange = explorationGuidance?.ageSuitability;
   const ageText =
