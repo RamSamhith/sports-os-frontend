@@ -48,7 +48,7 @@ export function TestimonialsSection() {
 
   if (loading) {
     return (
-      <Section spacing="sm">
+      <Section spacing="md">
         <Container size="lg">
           <div className="mb-4 text-center">
             <h2 className="text-xl font-semibold tracking-tight md:text-2xl">What parents say</h2>
@@ -65,7 +65,7 @@ export function TestimonialsSection() {
   if (testimonials.length === 0) return null;
 
   return (
-    <Section spacing="sm">
+    <Section spacing="md">
       <Container size="lg">
         <div className="mb-4 text-center">
           <h2 className="text-xl font-semibold tracking-tight md:text-2xl">What parents say</h2>

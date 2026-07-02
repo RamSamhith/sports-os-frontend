@@ -5,9 +5,9 @@ import Link from 'next/link';
 import { motion, useReducedMotion } from 'framer-motion';
 import { ImageWithFallback } from '@/components/ui/image-with-fallback';
 import { Card } from '@/components/ui/card';
-import { CompareButton } from '@/components/academies/compare-button';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { ease, duration } from '@/components/motion/constants';
-import { Check } from 'lucide-react';
 import type { Sport } from '@/types/domain/sport';
 
 const sportBenefits: Record<string, string[]> = {
@@ -33,81 +33,91 @@ const sportBenefits: Record<string, string[]> = {
   basketball: ['Height coordination', 'Agility', 'Endurance'],
 };
 
+const sportGradients: Record<string, string> = {
+  cricket: 'from-blue-600 to-blue-800/60',
+  football: 'from-emerald-600 to-emerald-800/60',
+  basketball: 'from-orange-600 to-orange-800/60',
+  badminton: 'from-violet-600 to-violet-800/60',
+  tennis: 'from-yellow-600 to-yellow-800/60',
+  swimming: 'from-sky-600 to-sky-800/60',
+  athletics: 'from-red-600 to-red-800/60',
+  yoga: 'from-rose-600 to-rose-800/60',
+  default: 'from-primary/60 to-primary/20',
+};
+
 export const SportCard = React.memo(function SportCard({ sport }: { sport: Sport }) {
   const reduced = useReducedMotion();
   const { slug, name, sportType, coverImage, shortDescription, explorationGuidance, id } = sport;
   const imageSrc = coverImage ?? `/images/sports/${slug}.svg`;
-  const initial = name.charAt(0);
   const ageRange = explorationGuidance?.ageSuitability;
   const ageText =
     ageRange?.min !== undefined && ageRange?.max !== undefined
-      ? `Ages ${ageRange.min}–${ageRange.max}`
+      ? `${ageRange.min}–${ageRange.max} yrs`
       : ageRange?.min !== undefined
-        ? `Ages ${ageRange.min}+`
+        ? `${ageRange.min}+ yrs`
         : null;
 
   const benefits = sport.physicalBenefits?.slice(0, 3) ?? sportBenefits[slug] ?? [];
+  const gradient = sportGradients[slug] ?? sportGradients.default;
 
   return (
     <motion.div
-      whileHover={reduced ? undefined : { y: -3, scale: 1.005 }}
+      whileHover={reduced ? undefined : { y: -4, scale: 1.008 }}
       whileTap={reduced ? undefined : { scale: 0.995 }}
       transition={{ duration: duration.fast, ease: ease.athletic }}
       className="w-full"
     >
-      <Card className="group flex flex-col gap-3 p-4 hover:border-foreground/25">
-        <div className="flex items-center gap-3">
-          <span className="bg-muted/40 relative h-9 w-9 shrink-0 overflow-hidden rounded-md">
-            <ImageWithFallback
-              src={imageSrc}
-              alt={`${name} cover`}
-              fill
-              sizes="36px"
-              className="object-cover"
-              fallback={
-                <span className="bg-primary/15 text-foreground/80 grid h-full w-full place-items-center text-sm font-semibold uppercase">
-                  {initial}
+      <Card className="group overflow-hidden border-border/40 hover:border-foreground/20 hover:shadow-xl transition-all duration-300">
+        <Link
+          href={`/sports/${slug}`}
+          className="bg-muted/40 relative block aspect-[16/9] w-full overflow-hidden"
+        >
+          <ImageWithFallback
+            src={imageSrc}
+            alt={`${name} cover`}
+            fill
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+            className="object-cover transition-transform duration-500 ease-out group-hover:scale-[1.06]"
+            fallback={
+              <div className={`flex h-full w-full items-center justify-center bg-gradient-to-br ${gradient}`}>
+                <span className="text-3xl font-bold text-white/80 drop-shadow-sm">
+                  {name.charAt(0)}
                 </span>
-              }
-            />
-          </span>
-          <div className="min-w-0 flex-1">
-            <Link href={`/sports/${slug}`} className="hover:underline">
-              <h3 className="line-clamp-1 text-base font-semibold tracking-tight">{name}</h3>
-            </Link>
-            <div className="text-muted-foreground text-xs capitalize">{sportType}</div>
-          </div>
-          <CompareButton
-            entityType="sport"
-            slug={slug}
-            label={name}
-            sublabel={sportType}
-            href={`/sports/${slug}`}
+              </div>
+            }
           />
-        </div>
-        {shortDescription ? (
-          <Link
-            href={`/sports/${slug}`}
-            className="text-muted-foreground line-clamp-2 text-xs text-pretty hover:text-foreground/80"
-          >
-            {shortDescription}
-          </Link>
-        ) : null}
-        {benefits.length > 0 && (
-          <div className="flex flex-wrap gap-x-3 gap-y-1">
-            {benefits.map((benefit) => (
-              <span key={benefit} className="flex items-center gap-1 text-[11px] text-muted-foreground">
-                <Check className="h-3 w-3 text-primary/70" />
-                {benefit}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
+          <div className="absolute bottom-3 left-3 right-3">
+            <h3 className="text-base font-bold text-white drop-shadow-sm line-clamp-1">{name}</h3>
+            <div className="flex items-center gap-2 mt-0.5">
+              <span className="bg-white/20 text-white/80 rounded-full px-2 py-0.5 text-[10px] capitalize backdrop-blur-sm">
+                {sportType}
               </span>
-            ))}
+              {ageText && (
+                <span className="text-white/70 text-xs">{ageText}</span>
+              )}
+            </div>
           </div>
-        )}
-        {ageText ? (
-          <span className="text-muted-foreground text-[10px] tracking-widest uppercase">
-            {ageText}
-          </span>
-        ) : null}
+        </Link>
+        <div className="flex flex-col gap-3 p-4">
+          {shortDescription && (
+            <p className="text-muted-foreground text-xs line-clamp-2 leading-relaxed">{shortDescription}</p>
+          )}
+          {benefits.length > 0 && (
+            <div className="flex flex-wrap gap-1">
+              {benefits.map((benefit) => (
+                <Badge key={benefit} variant="secondary" className="text-[10px]">
+                  {benefit}
+                </Badge>
+              ))}
+            </div>
+          )}
+          <Button size="lg" className="w-full h-11 mt-1" asChild>
+            <Link href={`/sports/${slug}`}>
+              Explore {name}
+            </Link>
+          </Button>
+        </div>
       </Card>
     </motion.div>
   );

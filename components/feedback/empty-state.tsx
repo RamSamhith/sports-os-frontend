@@ -6,9 +6,10 @@ export interface EmptyStateProps extends React.HTMLAttributes<HTMLDivElement> {
   description?: string;
   icon?: React.ReactNode;
   action?: React.ReactNode;
+  secondaryAction?: React.ReactNode;
 }
 
-export function EmptyState({ title, description, icon, action, className, ...props }: EmptyStateProps) {
+export function EmptyState({ title, description, icon, action, secondaryAction, className, ...props }: EmptyStateProps) {
   return (
     <div
       role="status"
@@ -18,10 +19,11 @@ export function EmptyState({ title, description, icon, action, className, ...pro
       )}
       {...props}
     >
-      {icon ? <div className="bg-muted/50 grid h-12 w-12 place-items-center rounded-full">{icon}</div> : null}
+      {icon ? <div className="bg-muted/50 grid h-14 w-14 place-items-center rounded-full">{icon}</div> : null}
       <h3 className="text-base font-semibold tracking-tight">{title}</h3>
       {description ? <p className="text-muted-foreground text-sm text-pretty">{description}</p> : null}
-      {action ? <div className="mt-2">{action}</div> : null}
+      {action ? <div className="mt-2 flex flex-wrap justify-center gap-2">{action}</div> : null}
+      {secondaryAction ? <div className="mt-1">{secondaryAction}</div> : null}
     </div>
   );
 }

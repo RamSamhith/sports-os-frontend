@@ -12,7 +12,7 @@ import { ShortlistToggle } from '@/components/shortlist/shortlist-toggle';
 import { CompareButton } from '@/components/academies/compare-button';
 import { VerifiedBadge } from '@/components/trust/verified-badge';
 import { ProtectedLink } from '@/components/auth/protected-link';
-import { ImageWithFallback } from '@/components/ui/image-with-fallback';
+import { CoachImage } from '@/components/ui/coach-image';
 import { getCoach } from '@/lib/api/coaches';
 import { useRecentlyViewed } from '@/lib/hooks/use-recently-viewed';
 import type { Coach } from '@/types/domain/coach';
@@ -91,9 +91,11 @@ export default function CoachDetailPage() {
           <Link href="/coaches"><ArrowLeft className="h-4 w-4 mr-1" /> Back to coaches</Link>
         </Button>
         <Card className="overflow-hidden">
-          <div className="bg-muted/40 relative h-48 w-full overflow-hidden md:h-56 lg:h-64 xl:h-72">
-            <ImageWithFallback
-              src={coach.avatar ?? `/images/coaches/${coach.slug}.svg`}
+          <div className="relative h-48 w-full overflow-hidden md:h-56 lg:h-64 xl:h-72">
+            <CoachImage
+              avatar={coach.avatar}
+              sportsCoached={coach.sportsCoached}
+              name={coach.name}
               alt={`${coach.name} cover image`}
               fill
               sizes="(max-width: 1024px) 100vw, 1024px"
