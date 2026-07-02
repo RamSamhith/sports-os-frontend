@@ -46,8 +46,8 @@ export function ReviewsSection({ targetType, targetId }: ReviewsSectionProps) {
     try {
       const res = await getReviews(targetType, targetId, { sort: sortBy, limit: 50 });
       if (res.ok) {
-        setReviews(res.data.reviews);
-        setStats(res.data.stats);
+        setReviews(res.data?.reviews ?? []);
+        setStats(res.data?.stats ?? null);
       }
     } catch {
       setLoadError(true);
@@ -163,11 +163,10 @@ export function ReviewsSection({ targetType, targetId }: ReviewsSectionProps) {
 
         {/* Sort */}
         <div className="mb-3 flex items-center gap-2">
-          <label htmlFor="review-sort" className="sr-only">Sort reviews</label>
           <select
-            id="review-sort"
             value={sortBy}
             onChange={(e) => setSortBy(e.target.value)}
+            aria-label="Sort reviews"
             className="border-border/60 bg-card/40 rounded-md border px-2 py-1.5 text-xs"
           >
             {sortOptions.map((opt) => (
@@ -194,7 +193,6 @@ export function ReviewsSection({ targetType, targetId }: ReviewsSectionProps) {
                       key={star}
                       type="button"
                       onClick={() => setFormRating(star)}
-                      aria-label={`Rate ${star} out of 5 stars`}
                       className="focus-visible:ring-ring rounded-sm focus-visible:ring-2 focus-visible:outline-none"
                     >
                       <Star
@@ -224,7 +222,7 @@ export function ReviewsSection({ targetType, targetId }: ReviewsSectionProps) {
                   id="review-text"
                   value={formText}
                   onChange={(e) => setFormText(e.target.value)}
-                  placeholder={`Share your experience with this ${targetType}...`}
+                  placeholder="Share your experience with this academy..."
                   rows={4}
                   maxLength={2000}
                 />
@@ -266,7 +264,7 @@ export function ReviewsSection({ targetType, targetId }: ReviewsSectionProps) {
                       <User className="h-4 w-4 text-muted-foreground" />
                     </div>
                     <div>
-                      <p className="text-sm font-medium">{review.parentName || 'Anonymous'}</p>
+                      <p className="text-sm font-medium">{review.parentName || review.userId?.name || 'Parent'}</p>
                       <div className="flex items-center gap-1">
                         {Array.from({ length: 5 }).map((_, i) => (
                           <Star
@@ -298,10 +296,10 @@ export function ReviewsSection({ targetType, targetId }: ReviewsSectionProps) {
                   <Badge variant="outline" className="text-[10px] mt-2 capitalize">{review.sport}</Badge>
                 )}
                 <div className="flex items-center gap-3 mt-2 text-[10px] text-muted-foreground">
-                  <span className="flex items-center gap-1" aria-label={`Helpful: ${review.helpfulCount}`}>
+                  <button disabled className="flex items-center gap-1 cursor-default text-muted-foreground">
                     <ThumbsUp className="h-3 w-3" />
                     Helpful ({review.helpfulCount})
-                  </span>
+                  </button>
                 </div>
               </div>
             ))}

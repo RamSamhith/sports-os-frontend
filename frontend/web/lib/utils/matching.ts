@@ -405,6 +405,7 @@ export function getSuggestedAcademies(
   limit = 6,
 ): AcademySuggestions {
   const empty: AcademySuggestions = { primary: [], fallback: [], hasExactMatch: false }
+  if (!Array.isArray(academies)) return empty;
   if (!onboarding) return { ...empty, primary: academies.slice(0, limit), fallback: [] }
 
   const interests = getInterests(onboarding)
@@ -472,6 +473,7 @@ export function getSuggestedCoaches(
   limit = 6,
 ): CoachSuggestions {
   const empty: CoachSuggestions = { primary: [], fallback: [], hasExactMatch: false }
+  if (!Array.isArray(coaches)) return empty;
   if (!onboarding) return { ...empty, primary: coaches.slice(0, limit), fallback: [] }
 
   const interests = getInterests(onboarding)
@@ -525,6 +527,7 @@ export function getNearbyAcademies(
   userLng?: number,
   limit = 6,
 ): SuggestedAcademy[] {
+  if (!Array.isArray(academies)) return [];
   if (userLat == null || userLng == null) return academies.slice(0, limit)
 
   return academies
@@ -553,6 +556,7 @@ export function getNearbyCoaches(
   userLng?: number,
   limit = 6,
 ): SuggestedCoach[] {
+  if (!Array.isArray(coaches)) return [];
   if (userLat == null || userLng == null) return coaches.slice(0, limit)
 
   return coaches

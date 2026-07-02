@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { getAcademies } from '@/lib/api/academies';
 import { listSports } from '@/lib/api/sports';
 import type { Academy } from '@/types/domain/academy';
@@ -19,7 +19,7 @@ async function fetchAcademies(): Promise<Academy[]> {
     try {
       const res = await getAcademies({ pageSize: 200 });
       if (res.ok) {
-        academiesCache = res.data.items;
+        academiesCache = Array.isArray(res.data?.items) ? res.data.items : [];
         return academiesCache;
       }
       return [];
@@ -41,7 +41,7 @@ async function fetchSports(): Promise<Sport[]> {
     try {
       const res = await listSports({ status: 'published', limit: 100 });
       if (res.ok) {
-        sportsCache = res.data.items;
+        sportsCache = Array.isArray(res.data?.items) ? res.data.items : [];
         return sportsCache;
       }
       return [];
@@ -60,6 +60,7 @@ export function useHomepageData() {
   const [sports, setSports] = useState<Sport[]>(sportsCache ?? []);
   const [loading, setLoading] = useState(!academiesCache || !sportsCache);
   const [error, setError] = useState<string | null>(null);
+  const [retryKey, setRetryKey] = useState(0);
 
   useEffect(() => {
     let cancelled = false;
@@ -70,6 +71,7 @@ export function useHomepageData() {
         if (!cancelled) {
           setAcademies(a);
           setSports(s);
+          setError(null);
         }
       } catch (err) {
         if (!cancelled) setError(err instanceof Error ? err.message : 'Failed to load');
@@ -85,7 +87,15 @@ export function useHomepageData() {
 
     load();
     return () => { cancelled = true; };
+  }, [retryKey]);
+
+  const refetch = useCallback(() => {
+    academiesCache = null;
+    sportsCache = null;
+    setLoading(true);
+    setError(null);
+    setRetryKey((k) => k + 1);
   }, []);
 
-  return { academies, sports, loading, error };
+  return { academies, sports, loading, error, refetch };
 }

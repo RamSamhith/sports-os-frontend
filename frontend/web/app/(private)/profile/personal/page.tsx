@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -26,9 +26,12 @@ export default function PersonalPage() {
   const [hydrated, setHydrated] = useState(false);
   const [saved, setSaved] = useState(false);
   const [saving, setSaving] = useState(false);
+  const hydratedRef = useRef(false);
 
   // Hydrate from auth profile
   useEffect(() => {
+    if (hydratedRef.current) return;
+    hydratedRef.current = true;
     setName(profile.name);
     setEmail(profile.email);
     setPhone(profile.phone);

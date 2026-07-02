@@ -57,8 +57,10 @@ export default function OtpMethodPage() {
     if (!selected) return;
     const method = methods.find((m) => m.id === selected);
     const destination = method?.getDestination(profile?.email ?? '', profile?.phone ?? '') ?? '';
-    sessionStorage.setItem('sportsos:otp-method', selected);
-    sessionStorage.setItem('sportsos:otp-destination', destination);
+    try {
+      sessionStorage.setItem('sportsos:otp-method', selected);
+      sessionStorage.setItem('sportsos:otp-destination', destination);
+    } catch { /* ignore */ }
     router.push('/verify/signup');
   }
 

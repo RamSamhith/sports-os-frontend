@@ -21,15 +21,15 @@ export default function ChildrenPage() {
   const [editingChild, setEditingChild] = useState<Child | null>(null);
   const [removingChild, setRemovingChild] = useState<Child | null>(null);
 
-  // Guard: redirect athletes to personal page (no flash)
-  const isAthlete = role === 'athlete';
+  // Guard: redirect non-parent roles to personal page (no flash)
+  const isUnauthorized = role && role !== 'parent';
   useEffect(() => {
-    if (!isLoading && isAthlete) {
+    if (!isLoading && isUnauthorized) {
       router.replace('/profile/personal');
     }
-  }, [isLoading, isAthlete, router]);
+  }, [isLoading, isUnauthorized, router]);
 
-  if (isLoading || isAthlete) {
+  if (isLoading || isUnauthorized) {
     return null;
   }
 

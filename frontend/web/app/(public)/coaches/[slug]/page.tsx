@@ -13,11 +13,11 @@ import { CompareButton } from '@/components/academies/compare-button';
 import { VerifiedBadge } from '@/components/trust/verified-badge';
 import { ProtectedLink } from '@/components/auth/protected-link';
 import { ImageWithFallback } from '@/components/ui/image-with-fallback';
-import { fixtureImages } from '@/lib/images';
 import { getCoach } from '@/lib/api/coaches';
+import { useRecentlyViewed } from '@/lib/hooks/use-recently-viewed';
 import type { Coach } from '@/types/domain/coach';
 import Link from 'next/link';
-import { AlertTriangle, Phone, Mail } from 'lucide-react';
+import { AlertTriangle, Phone, Mail, ArrowLeft } from 'lucide-react';
 import { CoachDetailSkeleton } from '@/components/feedback/skeletons';
 
 export default function CoachDetailPage() {
@@ -26,6 +26,7 @@ export default function CoachDetailPage() {
   const [coach, setCoach] = React.useState<Coach | null>(null);
   const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState<string | null>(null);
+  const { addView } = useRecentlyViewed();
 
   React.useEffect(() => {
     let cancelled = false;
@@ -36,6 +37,7 @@ export default function CoachDetailPage() {
       if (cancelled) return;
       if (res.ok) {
         setCoach(res.data);
+        addView({ id: res.data.id, slug: res.data.slug, type: 'coach', name: res.data.name });
       } else {
         setError(res.error.message);
       }
@@ -43,7 +45,7 @@ export default function CoachDetailPage() {
     }
     load();
     return () => { cancelled = true; };
-  }, [slug]);
+  }, [slug, addView]);
 
   if (loading) {
     return (
@@ -83,12 +85,15 @@ export default function CoachDetailPage() {
             { label: 'Coaches', href: '/coaches' },
             { label: coach.name },
           ]}
-          className="mb-4"
+          className="mb-3"
         />
+        <Button asChild variant="ghost" className="mb-3 -ml-2 min-h-[44px]">
+          <Link href="/coaches"><ArrowLeft className="h-4 w-4 mr-1" /> Back to coaches</Link>
+        </Button>
         <Card className="overflow-hidden">
           <div className="bg-muted/40 relative h-48 w-full overflow-hidden md:h-56 lg:h-64 xl:h-72">
             <ImageWithFallback
-              src={coach.avatar ?? fixtureImages.coaches[coach.id]}
+              src={coach.avatar ?? `/images/coaches/${coach.slug}.svg`}
               alt={`${coach.name} cover image`}
               fill
               sizes="(max-width: 1024px) 100vw, 1024px"
@@ -105,20 +110,16 @@ export default function CoachDetailPage() {
             </CardDescription>
           </CardHeader>
           <CardContent className="flex flex-col gap-4">
-            {coach.specialization?.length > 0 && (
-              <p className="text-sm text-pretty">
-                Specialisation: {coach.specialization.join(', ')}.
-              </p>
-            )}
-            {coach.sportsCoached?.length > 0 && (
-              <div className="flex flex-wrap gap-1" role="list" aria-label="Sports coached">
-                {coach.sportsCoached.map((sport) => (
-                  <Badge key={sport} variant="secondary" className="text-xs" role="listitem">
-                    {sport}
-                  </Badge>
-                ))}
-              </div>
-            )}
+            <p className="text-sm text-pretty">
+              Specialisation: {(coach.specialization ?? []).join(', ')}.
+            </p>
+            <div className="flex flex-wrap gap-1">
+              {(coach.sportsCoached ?? []).map((sport) => (
+                <Badge key={sport} variant="secondary" className="text-xs">
+                  {sport}
+                </Badge>
+              ))}
+            </div>
             <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:flex-wrap">
               <Button asChild size="lg">
                 <ProtectedLink href={`/enquiry/coach/${coach.slug}`}>Request callback</ProtectedLink>
@@ -142,14 +143,14 @@ export default function CoachDetailPage() {
           </CardContent>
         </Card>
 
-        {(coach.contact?.phone || coach.contact?.email) && (
+        {(coach.contact.phone || coach.contact.email) && (
           <div className="mt-6">
             <Card>
               <CardHeader>
                 <CardTitle>Contact</CardTitle>
               </CardHeader>
               <CardContent className="flex flex-col gap-3">
-                {coach.contact?.phone && (
+                {coach.contact.phone && (
                   <div className="flex items-center gap-3 text-sm">
                     <Phone className="h-4 w-4 text-muted-foreground" />
                     <a href={`tel:${coach.contact.phone}`} className="text-foreground hover:underline">
@@ -157,7 +158,7 @@ export default function CoachDetailPage() {
                     </a>
                   </div>
                 )}
-                {coach.contact?.email && (
+                {coach.contact.email && (
                   <div className="flex items-center gap-3 text-sm">
                     <Mail className="h-4 w-4 text-muted-foreground" />
                     <a href={`mailto:${coach.contact.email}`} className="text-foreground hover:underline">
@@ -170,7 +171,6 @@ export default function CoachDetailPage() {
           </div>
         )}
 
-        {(coach.certifications?.length > 0 || coach.experienceYears > 0) && (
         <div className="mt-6">
           <Card>
             <CardHeader>
@@ -178,11 +178,11 @@ export default function CoachDetailPage() {
               <CardDescription>Certifications, awards, and career milestones</CardDescription>
             </CardHeader>
             <CardContent className="flex flex-col gap-4">
-              {coach.certifications?.length > 0 && (
+              {(coach.certifications ?? []).length > 0 && (
                 <div>
                   <h3 className="text-sm font-semibold text-foreground mb-2">Certifications</h3>
                   <ul className="space-y-2">
-                    {coach.certifications.map((cert, i) => (
+                    {(coach.certifications ?? []).map((cert, i) => (
                       <li key={i} className="flex items-start gap-2 text-sm text-muted-foreground">
                         <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-primary/60" />
                         <div>
@@ -206,7 +206,6 @@ export default function CoachDetailPage() {
             </CardContent>
           </Card>
         </div>
-        )}
       </Container>
     </Section>
   );

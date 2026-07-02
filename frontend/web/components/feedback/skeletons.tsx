@@ -2,7 +2,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 
 export function AcademyCardSkeleton() {
   return (
-    <div className="border-border/60 bg-card/50 flex flex-col gap-3 rounded-xl border p-4" aria-busy="true" aria-label="Loading academy">
+    <div className="border-border/60 bg-card/50 flex flex-col gap-3 rounded-xl border p-4">
       <Skeleton className="aspect-[16/10] w-full" />
       <Skeleton className="h-4 w-2/3" />
       <Skeleton className="h-3 w-1/2" />
@@ -16,7 +16,7 @@ export function AcademyCardSkeleton() {
 
 export function CoachCardSkeleton() {
   return (
-    <div className="border-border/60 bg-card/50 flex items-center gap-3 rounded-xl border p-4" aria-busy="true" aria-label="Loading coach">
+    <div className="border-border/60 bg-card/50 flex items-center gap-3 rounded-xl border p-4">
       <Skeleton className="h-12 w-12 rounded-full" />
       <div className="flex flex-1 flex-col gap-2">
         <Skeleton className="h-4 w-1/2" />
@@ -28,7 +28,7 @@ export function CoachCardSkeleton() {
 
 export function SportCardSkeleton() {
   return (
-    <div className="border-border/60 bg-card/50 flex flex-col gap-2 rounded-xl border p-4" aria-busy="true" aria-label="Loading sport">
+    <div className="border-border/60 bg-card/50 flex flex-col gap-2 rounded-xl border p-4">
       <Skeleton className="h-8 w-8 rounded-md" />
       <Skeleton className="h-4 w-1/2" />
       <Skeleton className="h-3 w-2/3" />
@@ -128,7 +128,7 @@ export function ShortlistSkeleton() {
 
 export function AcademyDetailSkeleton() {
   return (
-    <div className="flex flex-col gap-6" aria-busy="true" aria-label="Loading academy details">
+    <div className="flex flex-col gap-6">
       <Skeleton className="aspect-video w-full rounded-xl" />
       <div className="flex flex-col gap-2">
         <Skeleton className="h-8 w-2/3" />
@@ -155,7 +155,7 @@ export function AcademyDetailSkeleton() {
 
 export function CoachDetailSkeleton() {
   return (
-    <div className="flex flex-col gap-6" aria-busy="true" aria-label="Loading coach details">
+    <div className="flex flex-col gap-6">
       <div className="flex items-center gap-4">
         <Skeleton className="h-20 w-20 rounded-full" />
         <div className="flex flex-col gap-2">
@@ -177,7 +177,7 @@ export function CoachDetailSkeleton() {
 
 export function FullPageSkeleton() {
   return (
-    <div className="flex flex-col gap-6 py-10" aria-busy="true" aria-label="Loading content">
+    <div className="flex flex-col gap-6 py-10">
       <Skeleton className="h-10 w-2/3" />
       <Skeleton className="h-4 w-1/2" />
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">

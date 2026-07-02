@@ -1,5 +1,6 @@
 'use client';
 
+import * as React from 'react';
 import Link from 'next/link';
 import { motion, useReducedMotion } from 'framer-motion';
 import { Bookmark, BookmarkCheck, MapPin, Star, Award, Clock } from 'lucide-react';
@@ -66,7 +67,7 @@ function CoachAvatar({ name, sport }: { name: string; sport: string }) {
   );
 }
 
-export function CoachCardPlaceholder({ coach }: { coach: Coach }) {
+export const CoachCardPlaceholder = React.memo(function CoachCardPlaceholder({ coach }: { coach: Coach }) {
   const reduced = useReducedMotion();
   const {
     slug,
@@ -83,9 +84,11 @@ export function CoachCardPlaceholder({ coach }: { coach: Coach }) {
   const { has: hasShortlist, addWithMeta, remove: removeFromShortlist } = useShortlist();
   const isSaved = hasShortlist('coach', id);
 
-  const highlight = certifications?.length > 0 ? certifications[0].name : null;
+  const certs = certifications ?? [];
+  const highlight = certs.length > 0 ? certs[0].name : null;
 
-  const sublabel = `${location?.city ?? 'Location'} · ${experienceYears ?? 0}+ yrs`;
+  const city = location?.city ?? 'Unknown';
+  const sublabel = `${city} · ${experienceYears}+ yrs`;
 
   return (
     <motion.div
@@ -97,7 +100,7 @@ export function CoachCardPlaceholder({ coach }: { coach: Coach }) {
       <Card className="group relative flex flex-col p-4 transition-[box-shadow] duration-200 ease-out hover:shadow-[var(--shadow-md)]">
         {/* Top row: Avatar + Identity + Actions */}
         <div className="flex items-start gap-3">
-          <CoachAvatar name={name} sport={sportsCoached?.[0] ?? 'athletics'} />
+          <CoachAvatar name={name} sport={sportsCoached[0] ?? 'athletics'} />
 
           <div className="min-w-0 flex-1">
             {/* Name + Verified */}
@@ -174,28 +177,28 @@ export function CoachCardPlaceholder({ coach }: { coach: Coach }) {
         <div className="mt-3 flex flex-wrap items-center gap-3 border-t border-border/50 pt-3 text-xs">
           {/* Rating */}
           <span className="text-muted-foreground flex items-center gap-1">
-            <Star aria-hidden className="h-3.5 w-3.5 fill-amber-400 text-amber-400" aria-label={`Rating: ${rating?.average ?? 0} out of 5`} />
-            <span className="text-foreground font-medium">{rating?.average ?? 0}</span>
-            <span>({rating?.count ?? 0})</span>
+            <Star aria-hidden className="h-3.5 w-3.5 fill-amber-400 text-amber-400" />
+            <span className="text-foreground font-medium">{rating.average}</span>
+            <span>({rating.count})</span>
           </span>
 
           {/* Experience */}
           <span className="text-muted-foreground flex items-center gap-1">
             <Clock aria-hidden className="h-3.5 w-3.5" />
-            <span className="text-foreground font-medium">{experienceYears ?? 0}+ yrs</span>
+            <span className="text-foreground font-medium">{experienceYears}+ yrs</span>
           </span>
 
           {/* Certifications count */}
-          {(certifications?.length ?? 0) > 0 ? (
+          {certs.length > 0 ? (
             <span className="text-muted-foreground flex items-center gap-1">
               <Award aria-hidden className="h-3.5 w-3.5" />
-              <span className="text-foreground font-medium">{certifications.length}</span>
-              <span>cert{certifications.length !== 1 ? 's' : ''}</span>
+              <span className="text-foreground font-medium">{certs.length}</span>
+              <span>cert{certs.length !== 1 ? 's' : ''}</span>
             </span>
           ) : null}
 
           {/* Sport tags — pushed right */}
-          {(sportsCoached?.length ?? 0) > 0 ? (
+          {sportsCoached.length > 0 ? (
             <div className="ml-auto flex flex-wrap gap-1">
               {sportsCoached.map((s) => (
                 <Badge key={s} variant="secondary" className="capitalize text-[10px]">
@@ -208,4 +211,4 @@ export function CoachCardPlaceholder({ coach }: { coach: Coach }) {
       </Card>
     </motion.div>
   );
-}
+});

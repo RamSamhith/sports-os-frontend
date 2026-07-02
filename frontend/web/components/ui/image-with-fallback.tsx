@@ -45,8 +45,8 @@ export function ImageWithFallback({
     );
   }
 
-  // Build Cloudinary srcset if configured and src is a public ID (not full URL)
-  const isCloudinary = isCloudinaryConfigured() && src && !src.startsWith('http');
+  // Build Cloudinary srcset if configured and src is a public ID (not full URL or local path)
+  const isCloudinary = isCloudinaryConfigured() && src && !src.startsWith('http') && !src.startsWith('/');
   const cloudinary = isCloudinary
     ? cloudinarySrcSet(src, [400, 800, 1200, 1600], { quality: 'auto', format: 'auto' })
     : null;

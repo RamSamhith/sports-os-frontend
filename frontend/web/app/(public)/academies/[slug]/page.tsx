@@ -20,9 +20,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   const academy = res.data;
   const title = `${academy.name} - Sports Academy in ${academy.location.city}`;
-  const description = academy.description
-    ? academy.description.slice(0, 160)
-    : `Find ${academy.name} in ${academy.location.city}, ${academy.location.state}. Sports: ${academy.sportsOffered.join(', ')}.`;
+  const description = (academy?.description ?? '').slice(0, 160)
+    || `Find ${academy.name} in ${academy.location.city}, ${academy.location.state}. Sports: ${(academy.sportsOffered ?? []).join(', ')}.`;
 
   return {
     title,
@@ -72,11 +71,11 @@ export default async function AcademyDetailPage({ params }: Props) {
         geo: academy.location.lat && academy.location.lng
           ? { '@type': 'GeoCoordinates', latitude: academy.location.lat, longitude: academy.location.lng }
           : undefined,
-        aggregateRating: academy.rating.count > 0
+        aggregateRating: (academy.rating?.count ?? 0) > 0
           ? {
               '@type': 'AggregateRating',
-              ratingValue: academy.rating.average,
-              reviewCount: academy.rating.count,
+              ratingValue: academy.rating?.average ?? 0,
+              reviewCount: academy.rating?.count ?? 0,
             }
           : undefined,
         sport: academy.sportsOffered,

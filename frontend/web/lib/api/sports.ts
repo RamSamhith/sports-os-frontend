@@ -1,5 +1,6 @@
 import type { Sport } from '@/types/domain/sport';
 import type { ApiResponse, ListResponse } from './client';
+import { get } from './client';
 
 export async function listSports(params?: {
   category?: string;
@@ -7,7 +8,6 @@ export async function listSports(params?: {
   page?: number;
   limit?: number;
 }): Promise<ApiResponse<ListResponse<Sport>>> {
-  const { get } = await import('./client');
   const query = new URLSearchParams();
   if (params?.category) query.set('category', params.category);
   if (params?.status) query.set('status', params.status);
@@ -18,10 +18,11 @@ export async function listSports(params?: {
 }
 
 export async function getSport(slug: string): Promise<ApiResponse<Sport>> {
-  const { get } = await import('./client');
   const res = await get<Sport | { sport: Sport }>(`/sports/${slug}`);
-  if (res.ok && 'sport' in res.data) {
-    return { ok: true, data: res.data.sport };
+  if (!res.ok) return res;
+  const data = res.data;
+  if (data && typeof data === 'object' && 'sport' in data && typeof (data as { sport: unknown }).sport === 'object') {
+    return { ok: true, data: (data as { sport: Sport }).sport };
   }
-  return res as ApiResponse<Sport>;
+  return { ok: true, data: data as Sport };
 }

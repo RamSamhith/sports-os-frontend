@@ -9,7 +9,7 @@ export interface UserProfile {
   name: string;
   email: string;
   phone: string;
-  authProvider?: 'credentials' | 'google' | 'guest';
+  authProvider?: 'credentials' | 'google' | 'microsoft' | 'guest';
 }
 
 export interface AuthChild {

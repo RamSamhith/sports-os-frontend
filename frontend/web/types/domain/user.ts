@@ -26,7 +26,7 @@ export interface User {
   email: string;
   phone?: string;
   avatar?: string;
-  authProvider?: 'credentials' | 'google' | 'guest';
+  authProvider?: 'credentials' | 'google' | 'microsoft' | 'guest';
   lastLoginAt?: string;
   isVerified?: boolean;
   phoneVerified?: boolean;

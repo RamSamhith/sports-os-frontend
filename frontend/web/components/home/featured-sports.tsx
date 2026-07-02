@@ -11,15 +11,15 @@ import { Button } from '@/components/ui/button';
 import type { Sport } from '@/types/domain/sport';
 
 export function FeaturedSports() {
-  const { sports: allSports, loading, error } = useHomepageData();
+  const { sports: allSports, loading, error, refetch } = useHomepageData();
   const sports = React.useMemo(() => allSports.slice(0, 10), [allSports]);
   const scrollRef = React.useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = React.useState(false);
   const [canScrollRight, setCanScrollRight] = React.useState(true);
 
   const loadSports = React.useCallback(async () => {
-    window.location.reload();
-  }, []);
+    refetch();
+  }, [refetch]);
 
   const checkScroll = React.useCallback(() => {
     const el = scrollRef.current;
@@ -128,8 +128,6 @@ export function FeaturedSports() {
           ref={scrollRef}
           className="flex gap-3 overflow-x-auto pb-2 scrollbar-none"
           style={{ scrollSnapType: 'x mandatory' }}
-          role="region"
-          aria-label="Popular sports"
         >
           {sports.map((s) => (
             <div key={s.id} className="w-[260px] shrink-0" style={{ scrollSnapAlign: 'start' }}>

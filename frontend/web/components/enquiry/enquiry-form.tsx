@@ -206,7 +206,7 @@ export function EnquiryForm({
         {isGuest || !isAuthenticated ? (
           <GuestGuard>
             <Button type="button">
-              Submit enquiry
+              Sign in to submit
             </Button>
           </GuestGuard>
         ) : (

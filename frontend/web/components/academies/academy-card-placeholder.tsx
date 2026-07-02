@@ -10,7 +10,6 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { ImageWithFallback } from '@/components/ui/image-with-fallback';
 import { VerifiedBadge } from '@/components/trust/verified-badge';
-import { fixtureImages } from '@/lib/images';
 import { useShortlist } from '@/lib/hooks/use-shortlist';
 import { useCompare } from '@/lib/hooks/use-compare';
 import { trackAcademyCardClick } from '@/lib/analytics/events';
@@ -23,7 +22,7 @@ interface AcademyCardPlaceholderProps {
   distance?: number;
 }
 
-export function AcademyCardPlaceholder({ academy, priority = false, distance }: AcademyCardPlaceholderProps) {
+export const AcademyCardPlaceholder = React.memo(function AcademyCardPlaceholder({ academy, priority = false, distance }: AcademyCardPlaceholderProps) {
   const reduced = useReducedMotion();
   const {
     id,
@@ -37,10 +36,12 @@ export function AcademyCardPlaceholder({ academy, priority = false, distance }: 
     description,
     coverImage,
   } = academy;
-  const sportSlugs = sportsOffered?.slice(0, 3) ?? [];
-  const moreCount = (sportsOffered?.length ?? 0) - sportSlugs.length;
-  const imageSrc = coverImage ?? fixtureImages.academies[academy.id];
-  const rankingScore = Math.round(((rating?.average ?? 0) / 5) * 100 + Math.min(rating?.count ?? 0, 100));
+  const sportSlugs = (sportsOffered ?? []).slice(0, 3);
+  const moreCount = (sportsOffered ?? []).length - sportSlugs.length;
+  const imageSrc = coverImage ?? `/images/academies/${slug}.svg`;
+  const avg = typeof rating === 'number' ? rating : (rating?.average ?? 0);
+  const cnt = typeof rating === 'number' ? 0 : (rating?.count ?? 0);
+  const rankingScore = Math.round((avg / 5) * 100 + Math.min(cnt, 100));
 
   const { has: hasShortlist, addWithMeta, remove: removeFromShortlist } = useShortlist();
   const isSaved = hasShortlist('academy', id);
@@ -65,7 +66,7 @@ export function AcademyCardPlaceholder({ academy, priority = false, distance }: 
       <Link
         href={`/academies/${slug}`}
         className="bg-muted/40 relative block aspect-[16/10] w-full overflow-hidden focus-visible:ring-ring focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
-        aria-label={`${name}, ${location.city}`}
+        aria-label={`${name}, ${location?.city ?? 'Unknown'}`}
       >
         <ImageWithFallback
           src={imageSrc}
@@ -116,7 +117,7 @@ export function AcademyCardPlaceholder({ academy, priority = false, distance }: 
               } else {
                 addWithMeta('academy', id, {
                   label: name,
-                  sublabel: `${location.city}, ${location.state}`,
+                  sublabel: `${location?.city ?? 'Unknown'}, ${location?.state ?? ''}`,
                   href: `/academies/${slug}`,
                 });
                 toast.success(`Saved ${name}`);
@@ -140,7 +141,7 @@ export function AcademyCardPlaceholder({ academy, priority = false, distance }: 
               } else if (canAddToCompare('academy', slug)) {
                 addToCompare('academy', slug, {
                   label: name,
-                  sublabel: `${location.city}, ${location.state}`,
+                  sublabel: `${location?.city ?? 'Unknown'}, ${location?.state ?? ''}`,
                   href: `/academies/${slug}`,
                 });
                 toast.success(`Added ${name} to compare`);
@@ -166,17 +167,17 @@ export function AcademyCardPlaceholder({ academy, priority = false, distance }: 
             <p className="text-muted-foreground mt-0.5 flex items-center gap-1 text-xs">
               <MapPin aria-hidden className="h-3 w-3 shrink-0" />
               <span className="truncate">
-                {location.city}, {location.state}
+                {location?.city ?? 'Unknown'}, {location?.state ?? ''}
               </span>
             </p>
           </div>
           <div className="shrink-0 text-right">
             <div className="flex items-center justify-end gap-1 text-sm font-semibold">
               <Star aria-hidden className="fill-rating text-rating h-3.5 w-3.5" />
-              {(rating?.average ?? 0).toFixed(1)}
+              {avg.toFixed(1)}
             </div>
             <div className="text-muted-foreground text-[10px] tracking-widest uppercase">
-              {rating?.count ?? 0} review{(rating?.count ?? 0) === 1 ? '' : 's'}
+              {cnt} review{cnt === 1 ? '' : 's'}
             </div>
           </div>
         </div>
@@ -193,16 +194,16 @@ export function AcademyCardPlaceholder({ academy, priority = false, distance }: 
         )}
 
         <div className="flex items-center gap-3 text-[11px] text-muted-foreground">
-          {(facilities?.length ?? 0) > 0 && (
+          {(facilities ?? []).length > 0 && (
             <span className="flex items-center gap-1">
               <Shield className="h-3 w-3" />
-              {facilities.length} facilities
+              {(facilities ?? []).length} facilities
             </span>
           )}
-          {(sportsOffered?.length ?? 0) > 0 && (
+          {(sportsOffered ?? []).length > 0 && (
             <span className="flex items-center gap-1">
               <Users className="h-3 w-3" />
-              {sportsOffered.length} sport{sportsOffered.length === 1 ? '' : 's'}
+              {(sportsOffered ?? []).length} sport{(sportsOffered ?? []).length === 1 ? '' : 's'}
             </span>
           )}
         </div>
@@ -225,4 +226,4 @@ export function AcademyCardPlaceholder({ academy, priority = false, distance }: 
     </Card>
     </motion.div>
   );
-}
+});
