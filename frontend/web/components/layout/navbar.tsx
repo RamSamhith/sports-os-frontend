@@ -130,7 +130,7 @@ export function Navbar() {
 
             <Sheet open={open} onOpenChange={setOpen}>
               <SheetTrigger asChild>
-                <div className="grid h-11 w-11 place-items-center sm:hidden">
+                <div className="grid h-11 w-11 place-items-center md:hidden">
                   <Button variant="ghost" size="icon-touch" aria-label="Open menu">
                     <Menu className="h-4 w-4" />
                   </Button>

@@ -8,19 +8,23 @@ import type { Sport } from '@/types/domain/sport';
 
 let academiesCache: Academy[] | null = null;
 let academiesPromise: Promise<Academy[]> | null = null;
+let academiesTotalCache: number = 0;
 let sportsCache: Sport[] | null = null;
 let sportsPromise: Promise<Sport[]> | null = null;
+let sportsTotalCache: number = 0;
 
-async function fetchAcademies(): Promise<Academy[]> {
-  if (academiesCache) return academiesCache;
-  if (academiesPromise) return academiesPromise;
+async function fetchAcademies(): Promise<{ items: Academy[]; total: number }> {
+  if (academiesCache) return { items: academiesCache, total: academiesTotalCache };
+  if (academiesPromise) return academiesPromise.then((items) => ({ items, total: academiesTotalCache }));
 
   academiesPromise = (async () => {
     try {
       const res = await getAcademies({ pageSize: 200 });
       if (res.ok) {
-        academiesCache = Array.isArray(res.data?.items) ? res.data.items : [];
-        return academiesCache;
+        const items = Array.isArray(res.data?.items) ? res.data.items : [];
+        academiesTotalCache = res.data?.pagination?.total ?? items.length;
+        academiesCache = items;
+        return items;
       }
       return [];
     } catch {
@@ -30,19 +34,21 @@ async function fetchAcademies(): Promise<Academy[]> {
     }
   })();
 
-  return academiesPromise;
+  return academiesPromise.then((items) => ({ items, total: academiesTotalCache }));
 }
 
-async function fetchSports(): Promise<Sport[]> {
-  if (sportsCache) return sportsCache;
-  if (sportsPromise) return sportsPromise;
+async function fetchSports(): Promise<{ items: Sport[]; total: number }> {
+  if (sportsCache) return { items: sportsCache, total: sportsTotalCache };
+  if (sportsPromise) return sportsPromise.then((items) => ({ items, total: sportsTotalCache }));
 
   sportsPromise = (async () => {
     try {
       const res = await listSports({ status: 'published', limit: 100 });
       if (res.ok) {
-        sportsCache = Array.isArray(res.data?.items) ? res.data.items : [];
-        return sportsCache;
+        const items = Array.isArray(res.data?.items) ? res.data.items : [];
+        sportsTotalCache = res.data?.pagination?.total ?? items.length;
+        sportsCache = items;
+        return items;
       }
       return [];
     } catch {
@@ -52,12 +58,14 @@ async function fetchSports(): Promise<Sport[]> {
     }
   })();
 
-  return sportsPromise;
+  return sportsPromise.then((items) => ({ items, total: sportsTotalCache }));
 }
 
 export function useHomepageData() {
   const [academies, setAcademies] = useState<Academy[]>(academiesCache ?? []);
   const [sports, setSports] = useState<Sport[]>(sportsCache ?? []);
+  const [academiesTotal, setAcademiesTotal] = useState(academiesTotalCache);
+  const [sportsTotal, setSportsTotal] = useState(sportsTotalCache);
   const [loading, setLoading] = useState(!academiesCache || !sportsCache);
   const [error, setError] = useState<string | null>(null);
   const [retryKey, setRetryKey] = useState(0);
@@ -69,8 +77,10 @@ export function useHomepageData() {
       try {
         const [a, s] = await Promise.all([fetchAcademies(), fetchSports()]);
         if (!cancelled) {
-          setAcademies(a);
-          setSports(s);
+          setAcademies(a.items);
+          setAcademiesTotal(a.total);
+          setSports(s.items);
+          setSportsTotal(s.total);
           setError(null);
         }
       } catch (err) {
@@ -97,5 +107,5 @@ export function useHomepageData() {
     setRetryKey((k) => k + 1);
   }, []);
 
-  return { academies, sports, loading, error, refetch };
+  return { academies, sports, academiesTotal, sportsTotal, loading, error, refetch };
 }

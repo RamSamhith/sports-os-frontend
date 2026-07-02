@@ -1,7 +1,9 @@
 import dynamic from 'next/dynamic';
 import { Hero } from '@/components/home/hero';
-import { StatsSection } from '@/components/home/stats-section';
 import { FeaturedAcademies } from '@/components/home/featured-academies';
+import { FeaturedCoaches } from '@/components/home/featured-coaches';
+import { TrustSection } from '@/components/home/trust-section';
+import { StatsSection } from '@/components/home/stats-section';
 import { TestimonialsSection } from '@/components/home/testimonials-section';
 import { CtaSection } from '@/components/home/cta-section';
 import { HomepageAuthModal } from '@/components/auth/homepage-auth-modal';
@@ -43,13 +45,15 @@ export default function HomePage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
       <Hero />
-      <FeaturedSports />
+      <PersonalizedHome />
       <FeaturedAcademies />
       <CitiesSection />
+      <FeaturedSports />
+      <FeaturedCoaches />
+      <TrustSection />
       <StatsSection />
       <TestimonialsSection />
       <CtaSection />
-      <PersonalizedHome />
       <HomepageAuthModal />
     </>
   );

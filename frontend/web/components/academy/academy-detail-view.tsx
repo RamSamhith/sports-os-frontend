@@ -17,7 +17,7 @@ import { LastUpdated } from '@/components/trust/last-updated';
 import { CertificationIndicator } from '@/components/trust/certification-indicator';
 import { ProtectedLink } from '@/components/auth/protected-link';
 import { ReviewsSection } from '@/components/reviews/reviews-section';
-import { ImageWithFallback } from '@/components/ui/image-with-fallback';
+import { AcademyImage } from '@/components/ui/academy-image';
 import { AcademyDetailSkeleton } from '@/components/feedback/skeletons';
 import { SectionNav, useSectionObserver } from '@/components/ui/section-nav';
 import { getAcademy, getAcademies } from '@/lib/api/academies';
@@ -76,7 +76,13 @@ export function AcademyDetailView({ slug }: { slug: string }) {
           addView({ id: res.data.id, slug: res.data.slug, type: 'academy', name: res.data.name });
           const coachesRes = await getCoaches({ pageSize: 100 });
           if (!cancelled && coachesRes.ok) {
-            setCoaches((coachesRes.data.items ?? []).filter((c) => c.academyId === res.data.id));
+            const allCoaches = coachesRes.data.items ?? [];
+            const academySports = new Set(res.data.sportsOffered ?? []);
+            const matched = allCoaches.filter((c) => {
+              if (c.academyId === res.data.id) return true;
+              return (c.sportsCoached ?? []).some((s) => academySports.has(s));
+            });
+            setCoaches(matched);
           }
           const relatedRes = await getAcademies({ pageSize: 100 });
           if (!cancelled && relatedRes.ok) {
@@ -186,8 +192,11 @@ export function AcademyDetailView({ slug }: { slug: string }) {
 
         {/* Gallery */}
         <div className="bg-muted/40 relative h-56 w-full overflow-hidden rounded-xl md:h-72 lg:h-80">
-          <ImageWithFallback
-            src={academy.coverImage ?? `/images/academies/${academy.slug}.svg`}
+          <AcademyImage
+            coverImage={academy.coverImage}
+            slug={academy.slug}
+            sportsOffered={academy.sportsOffered}
+            name={academy.name}
             alt={`${academy.name} cover image`}
             fill
             sizes="(max-width: 1024px) 100vw, 1024px"
@@ -514,8 +523,11 @@ export function AcademyDetailView({ slug }: { slug: string }) {
                 >
                   <div className="flex items-start gap-3">
                     <div className="bg-muted relative h-14 w-14 shrink-0 overflow-hidden rounded-lg">
-                      <ImageWithFallback
-                        src={a.coverImage ?? `/images/academies/${a.slug}.svg`}
+                      <AcademyImage
+                        coverImage={a.coverImage}
+                        slug={a.slug}
+                        sportsOffered={a.sportsOffered}
+                        name={a.name}
                         alt={a.name}
                         fill
                         sizes="56px"

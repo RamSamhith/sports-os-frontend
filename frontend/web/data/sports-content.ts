@@ -1387,8 +1387,8 @@ export const sportsContent: Record<string, SportContent> = {
         a: "Children can begin air rifle training from age 10-12. Safety and proper coaching are essential from the start.",
       },
       {
-        q: "Is shooting expensive to get into?",
-        a: "Initial costs include equipment and range fees. Air rifle/pistol is more affordable than firearm shooting. Many ranges offer rental equipment for beginners.",
+        q: "Is shooting equipment easy to get started with?",
+        a: "Beginners can start with air rifle or air pistol which are widely available. Many ranges offer rental equipment so you can try before investing in your own gear.",
       },
       {
         q: "Do I need good eyesight for shooting?",

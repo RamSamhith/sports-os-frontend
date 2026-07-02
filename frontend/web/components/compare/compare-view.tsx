@@ -7,6 +7,7 @@ import { CompareTableSkeleton } from '@/components/feedback/skeletons';
 import { toast } from 'sonner';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { AcademyImage } from '@/components/ui/academy-image';
 import { ImageWithFallback } from '@/components/ui/image-with-fallback';
 import { EmptyState } from '@/components/feedback/empty-state';
 import { VerifiedBadge } from '@/components/trust/verified-badge';
@@ -19,6 +20,7 @@ import { getSport } from '@/lib/api/sports';
 import type { Academy } from '@/types/domain/academy';
 import type { Coach } from '@/types/domain/coach';
 import type { Sport } from '@/types/domain/sport';
+import { sportsContent } from '@/data/sports-content';
 
 type Entity =
   | { kind: 'academy'; entity: Academy }
@@ -175,13 +177,26 @@ export function CompareView() {
 function CompareCard({ slot, onRemove }: { slot: Entity; onRemove: () => void }) {
   const { kind, entity } = slot;
   const href = kind === 'academy' ? `/academies/${(entity as Academy).slug}` : kind === 'coach' ? `/coaches/${(entity as Coach).slug}` : `/sports/${(entity as Sport).slug}`;
-  const imageSrc = kind === 'academy' ? ((entity as Academy).coverImage ?? `/images/academies/${(entity as Academy).slug}.svg`) : kind === 'coach' ? ((entity as Coach).avatar ?? '') : ((entity as Sport).coverImage ?? '');
+  const imageSrc = kind === 'coach' ? ((entity as Coach).avatar ?? '') : kind === 'sport' ? ((entity as Sport).coverImage ?? '') : '';
   const sublabel = kind === 'academy' ? `${(entity as Academy).location.city}, ${(entity as Academy).location.state}` : kind === 'coach' ? `${(entity as Coach).location.city} · ${(entity as Coach).experienceYears}+ yrs` : (entity as Sport).category;
 
   return (
     <Card className="overflow-hidden">
       <div className="bg-muted/40 relative aspect-[16/10] w-full">
-        <ImageWithFallback src={imageSrc} alt={`${sublabel} cover`} fill sizes="(max-width: 768px) 100vw, 33vw" className="object-cover" />
+        {kind === 'academy' ? (
+          <AcademyImage
+            coverImage={(entity as Academy).coverImage}
+            slug={(entity as Academy).slug}
+            sportsOffered={(entity as Academy).sportsOffered}
+            name={(entity as Academy).name}
+            alt={`${sublabel} cover`}
+            fill
+            sizes="(max-width: 768px) 100vw, 33vw"
+            className="object-cover"
+          />
+        ) : (
+          <ImageWithFallback src={imageSrc} alt={`${sublabel} cover`} fill sizes="(max-width: 768px) 100vw, 33vw" className="object-cover" />
+        )}
         {kind !== 'sport' ? (
           <div className="absolute top-3 left-3">
             <VerifiedBadge status={(entity as Academy | Coach).verificationStatus} />
@@ -257,6 +272,17 @@ function ComparisonTable({ slots }: { slots: Entity[] }) {
   const anyCoach = slots.some((s) => s.kind === 'coach');
   const anySport = slots.some((s) => s.kind === 'sport');
 
+  const allSportSlugs = slots
+    .filter((s) => s.kind === 'sport')
+    .map((s) => (s.entity as Sport).slug);
+
+  const sportsContentData = React.useMemo(() => {
+    const slugs = slots
+      .filter((s) => s.kind === 'sport')
+      .map((s) => (s.entity as Sport).slug);
+    return slugs.map((slug) => sportsContent[slug]).filter(Boolean);
+  }, [slots]);
+
   if (anyAcademy || anyCoach) {
     rows.push({ key: 'rating', label: 'Rating', type: 'numeric', values: slots.map((s) => s.kind === 'sport' ? '—' : ((s.entity as Academy | Coach).rating?.average ?? 0).toFixed(1)) });
     rows.push({ key: 'verification', label: 'Verification', type: 'status', values: slots.map((s) => s.kind === 'sport' ? '—' : (s.entity as Academy | Coach).verificationStatus) });
@@ -264,7 +290,34 @@ function ComparisonTable({ slots }: { slots: Entity[] }) {
   }
   if (anySport) {
     rows.push({ key: 'category', label: 'Category', type: 'text', values: slots.map((s) => s.kind === 'sport' ? (s.entity as Sport).category : '—') });
+    rows.push({ key: 'sportType', label: 'Sport Type', type: 'text', values: slots.map((s) => s.kind === 'sport' ? (s.entity as Sport).sportType || '—' : '—') });
     rows.push({ key: 'age', label: 'Age range', type: 'text', values: slots.map((s) => { if (s.kind !== 'sport') return '—'; const r = (s.entity as Sport).explorationGuidance?.ageSuitability; return r?.min !== undefined && r?.max !== undefined ? `${r.min}–${r.max}` : r?.min !== undefined ? `${r.min}+` : '—'; }) });
+    rows.push({ key: 'difficulty', label: 'Difficulty', type: 'text', values: allSportSlugs.map((slug, i) => sportsContentData[i]?.beginnerDifficulty || '—') });
+    rows.push({ key: 'fitness', label: 'Fitness Level', type: 'text', values: slots.map((s) => s.kind === 'sport' ? (s.entity as Sport).fitnessLevelRequired || '—' : '—') });
+    rows.push({ key: 'olympic', label: 'Olympic Sport', type: 'text', values: allSportSlugs.map((slug, i) => sportsContentData[i]?.olympic ? 'Yes' : 'No') });
+    rows.push({ key: 'indoorOutdoor', label: 'Indoor / Outdoor', type: 'text', values: slots.map((s) => s.kind === 'sport' ? ((s.entity as Sport).sportType ?? '—') : '—') });
+    rows.push({ key: 'individualTeam', label: 'Individual / Team', type: 'text', values: allSportSlugs.map((slug, i) => sportsContentData[i]?.individualOrTeam || '—') });
+    rows.push({ key: 'beginner', label: 'Beginner Friendly', type: 'text', values: slots.map((s) => s.kind === 'sport' ? ((s.entity as Sport).beginnerFriendly ? 'Yes' : 'No') : '—') });
+    rows.push({ key: 'endurance', label: 'Endurance', type: 'text', values: slots.map((s) => s.kind === 'sport' ? 'Varies' : '—') });
+    rows.push({ key: 'strength', label: 'Strength', type: 'text', values: slots.map((s) => s.kind === 'sport' ? 'Varies' : '—') });
+    rows.push({ key: 'agility', label: 'Agility', type: 'text', values: slots.map((s) => s.kind === 'sport' ? 'Varies' : '—') });
+    rows.push({ key: 'flexibility', label: 'Flexibility', type: 'text', values: slots.map((s) => s.kind === 'sport' ? 'Varies' : '—') });
+    rows.push({ key: 'coordination', label: 'Coordination', type: 'text', values: slots.map((s) => s.kind === 'sport' ? 'Varies' : '—') });
+    rows.push({ key: 'mentalFocus', label: 'Mental Focus', type: 'text', values: slots.map((s) => s.kind === 'sport' ? 'Varies' : '—') });
+    rows.push({ key: 'reactionSpeed', label: 'Reaction Speed', type: 'text', values: slots.map((s) => s.kind === 'sport' ? 'Varies' : '—') });
+    rows.push({ key: 'calories', label: 'Calories Burned', type: 'text', values: slots.map((s) => s.kind === 'sport' ? 'Varies' : '—') });
+    rows.push({ key: 'equipment', label: 'Equipment Required', type: 'text', values: allSportSlugs.map((slug, i) => (sportsContentData[i]?.equipment ?? []).join(', ') || '—') });
+    rows.push({ key: 'trainingFreq', label: 'Training Frequency', type: 'text', values: slots.map((s) => s.kind === 'sport' ? (s.entity as Sport).trainingFrequency || '—' : '—') });
+    rows.push({ key: 'injuryRisk', label: 'Injury Risk', type: 'text', values: slots.map((s) => s.kind === 'sport' ? (s.entity as Sport).injuryRisk || '—' : '—') });
+    rows.push({ key: 'competitionPath', label: 'Competition Path', type: 'text', values: allSportSlugs.map((slug, i) => {
+      const comps = sportsContentData[i]?.competitions;
+      if (!comps) return '—';
+      const path = [];
+      if (comps.state?.length) path.push('District/State');
+      if (comps.national?.length) path.push('National');
+      if (comps.international?.length) path.push('International');
+      return path.join(' → ') || '—';
+    })});
   }
   rows.push({ key: 'sports', label: 'Sports', type: 'text', values: slots.map((s) => s.kind === 'academy' ? (s.entity as Academy).sportsOffered?.join(', ') ?? '' : s.kind === 'coach' ? (s.entity as Coach).sportsCoached?.join(', ') ?? '' : (s.entity as Sport).name) });
   if (anyAcademy) {
@@ -273,6 +326,20 @@ function ComparisonTable({ slots }: { slots: Entity[] }) {
   }
   if (anyCoach) {
     rows.push({ key: 'specialization', label: 'Specialisation', type: 'text', values: slots.map((s) => s.kind === 'coach' ? (s.entity as Coach).specialization?.join(', ') ?? '' : '—') });
+  }
+  if (anySport) {
+    rows.push({ key: 'bestFor', label: 'Best For', type: 'text', values: allSportSlugs.map((slug, i) => {
+      const ageR = (slots.find((s) => s.kind === 'sport')?.entity as Sport | undefined)?.explorationGuidance?.ageSuitability;
+      const groups = [];
+      if (!ageR || (ageR.min ?? 0) <= 12) groups.push('Kids');
+      if (!ageR || (ageR.min ?? 0) <= 18) groups.push('Students');
+      if (!ageR || (ageR.max ?? 99) >= 18) groups.push('Adults');
+      const content = sportsContentData[i];
+      if (content?.careerOpportunities?.length) groups.push('Professionals');
+      const benefits = content?.benefits;
+      if (benefits?.physical?.length) groups.push('Fitness');
+      return groups.join(', ') || 'All ages';
+    })});
   }
 
   return (
