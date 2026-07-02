@@ -3,12 +3,12 @@
 import * as React from 'react';
 import Link from 'next/link';
 import { motion, useReducedMotion } from 'framer-motion';
-import { Bookmark, BookmarkCheck, GitCompare, MapPin, Star, Navigation, Shield, Clock, Users, Trophy, Heart } from 'lucide-react';
+import { Bookmark, BookmarkCheck, GitCompare, MapPin, Star, Navigation, Shield, Users, Trophy } from 'lucide-react';
 import { toast } from 'sonner';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { ImageWithFallback } from '@/components/ui/image-with-fallback';
+import { AcademyImage } from '@/components/ui/academy-image';
 import { VerifiedBadge } from '@/components/trust/verified-badge';
 import { useShortlist } from '@/lib/hooks/use-shortlist';
 import { useCompare } from '@/lib/hooks/use-compare';
@@ -38,7 +38,6 @@ export const AcademyCardPlaceholder = React.memo(function AcademyCardPlaceholder
   } = academy;
   const sportSlugs = (sportsOffered ?? []).slice(0, 3);
   const moreCount = (sportsOffered ?? []).length - sportSlugs.length;
-  const imageSrc = coverImage ?? `/images/academies/${slug}.svg`;
   const avg = typeof rating === 'number' ? rating : (rating?.average ?? 0);
   const cnt = typeof rating === 'number' ? 0 : (rating?.count ?? 0);
   const rankingScore = Math.round((avg / 5) * 100 + Math.min(cnt, 100));
@@ -68,21 +67,16 @@ export const AcademyCardPlaceholder = React.memo(function AcademyCardPlaceholder
         className="bg-muted/40 relative block aspect-[16/10] w-full overflow-hidden focus-visible:ring-ring focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
         aria-label={`${name}, ${location?.city ?? 'Unknown'}`}
       >
-        <ImageWithFallback
-          src={imageSrc}
+        <AcademyImage
+          coverImage={coverImage}
+          slug={slug}
+          sportsOffered={sportsOffered}
+          name={name}
           alt={`${name} cover image`}
           fill
           sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
           priority={priority}
           className="object-cover transition-transform duration-500 ease-out group-hover:scale-[1.04]"
-          fallback={
-            <div className="flex h-full w-full flex-col items-center justify-center gap-1 p-4 text-center">
-              <span className="bg-background/30 text-foreground/80 grid h-10 w-10 place-items-center rounded-md text-sm font-semibold uppercase backdrop-blur-sm">
-                {name.charAt(0)}
-              </span>
-              <span className="text-foreground/80 line-clamp-1 text-xs font-medium">{name}</span>
-            </div>
-          }
         />
         <div className="absolute top-3 left-3 flex gap-2">
           <VerifiedBadge status={verificationStatus} />

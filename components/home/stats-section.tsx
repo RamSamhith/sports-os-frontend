@@ -9,6 +9,10 @@ import { StatsSkeleton } from '@/components/feedback/skeletons';
 import { AlertTriangle } from 'lucide-react';
 
 function formatCount(n: number) {
+  if (n >= 1000) {
+    const rounded = Math.floor(n / 100) * 100;
+    return `${new Intl.NumberFormat('en-IN').format(rounded)}+`;
+  }
   return new Intl.NumberFormat('en-IN').format(n);
 }
 
@@ -19,17 +23,17 @@ interface Stat {
 }
 
 export function StatsSection() {
-  const { academies, sports, loading, error } = useHomepageData();
+  const { academies, sports, academiesTotal, sportsTotal, loading, error } = useHomepageData();
 
   const stats = React.useMemo<Stat[]>(() => {
     if (loading || error) return [];
     const cities = new Set(academies.map(a => a.location.city));
     return [
-      { label: 'Academies', value: formatCount(academies.length), href: '/academies' },
-      { label: 'Sports', value: formatCount(sports.length), href: '/sports' },
+      { label: 'Academies', value: formatCount(academiesTotal || academies.length), href: '/academies' },
+      { label: 'Sports', value: formatCount(sportsTotal || sports.length), href: '/sports' },
       { label: 'Cities', value: formatCount(cities.size), href: '/search' },
     ];
-  }, [academies, sports, loading, error]);
+  }, [academies, sports, academiesTotal, sportsTotal, loading, error]);
 
   if (loading) {
     return (

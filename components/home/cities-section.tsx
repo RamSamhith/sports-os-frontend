@@ -24,7 +24,7 @@ function cityToSlug(name: string) {
 }
 
 export function CitiesSection() {
-  const { academies, loading, error, refetch } = useHomepageData();
+  const { academies, academiesTotal, loading, error, refetch } = useHomepageData();
   const scrollRef = React.useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = React.useState(false);
   const [canScrollRight, setCanScrollRight] = React.useState(true);
@@ -132,7 +132,7 @@ export function CitiesSection() {
           <div>
             <h2 className="text-xl font-semibold tracking-tight md:text-2xl">Explore by city</h2>
             <p className="text-muted-foreground text-xs">
-              {allCities.length} cities with {academies.length} academies
+              {allCities.length} cities with {academiesTotal || academies.length} academies
             </p>
           </div>
           <div className="flex items-center gap-1">

@@ -5,9 +5,9 @@ import Link from 'next/link';
 import {
   Trophy, Target, Users, Clock, Dumbbell, Heart,
   Brain, Briefcase, GraduationCap, Medal, MapPin, Star,
-  Timer, IndianRupee, ChevronDown, ChevronRight,
+  Timer, ChevronDown, ChevronRight,
   Zap, Activity, HelpCircle, Lightbulb,
-  ArrowLeft,
+  ArrowLeft, Shield, AlertTriangle, Sparkles, Flame,
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -84,7 +84,7 @@ export function SportDetailView({ sport }: SportDetailViewProps) {
     origin, popularityInIndia, popularityWorldwide, icon, coverImage,
     howToPlay, objectiveOfGame, teamSize, matchDuration, scoringSystem,
     playingSurface, requiredEquipment, ageGroups, beginnerFriendly, olympicSport,
-    estimatedMonthlyCost, trainingFrequency, averageLearningTime,
+    trainingFrequency, averageLearningTime,
     injuryRisk, fitnessLevelRequired,
     physicalBenefits, mentalBenefits,
     careerOpportunities, scholarships, professionalLeagues,
@@ -159,8 +159,8 @@ export function SportDetailView({ sport }: SportDetailViewProps) {
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         <StatCard icon={Users} label="Team Size" value={teamSize ?? 'N/A'} />
         <StatCard icon={Clock} label="Duration" value={matchDuration ?? 'N/A'} />
-        <StatCard icon={IndianRupee} label="Monthly Cost" value={estimatedMonthlyCost ?? 'N/A'} />
         <StatCard icon={Timer} label="Learning Time" value={averageLearningTime ?? 'N/A'} />
+        <StatCard icon={Heart} label="Fitness Level" value={fitnessLevelRequired ?? 'N/A'} />
       </div>
 
       {/* Tagline */}
@@ -339,6 +339,206 @@ export function SportDetailView({ sport }: SportDetailViewProps) {
             </div>
           </AccordionSection>
         )}
+
+        {/* Skills Developed */}
+        <AccordionSection title="Skills Developed" icon={Brain}>
+          <div className="flex flex-col gap-2">
+            {staticContent?.benefits?.mental && (
+              <div>
+                <span className="text-muted-foreground text-[10px] tracking-widest uppercase">Mental Skills</span>
+                <div className="mt-1.5 flex flex-col gap-1">
+                  {(staticContent.benefits.mental).map((b) => (
+                    <div key={b} className="flex items-start gap-2 text-sm">
+                      <Brain className="text-primary mt-0.5 h-3 w-3 shrink-0" />
+                      <span>{b}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+            {staticContent?.benefits?.physical && (
+              <div className="mt-2">
+                <span className="text-muted-foreground text-[10px] tracking-widest uppercase">Physical Skills</span>
+                <div className="mt-1.5 flex flex-col gap-1">
+                  {(staticContent.benefits.physical).map((b) => (
+                    <div key={b} className="flex items-start gap-2 text-sm">
+                      <Zap className="text-primary mt-0.5 h-3 w-3 shrink-0" />
+                      <span>{b}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        </AccordionSection>
+
+        {/* Who Should Play */}
+        <AccordionSection title="Who Should Play" icon={Users}>
+          <p className="text-muted-foreground text-sm leading-relaxed">
+            {name} is suitable for a wide range of ages and skill levels.
+          </p>
+          <div className="mt-3 grid grid-cols-2 gap-2 text-sm">
+            {ageText && (
+              <div className="bg-muted/30 rounded-lg border p-2.5">
+                <span className="text-muted-foreground text-[10px] tracking-widest uppercase">Age Groups</span>
+                <p className="mt-0.5 font-medium">{ageText}</p>
+              </div>
+            )}
+            {beginnerFriendly !== undefined && (
+              <div className="bg-muted/30 rounded-lg border p-2.5">
+                <span className="text-muted-foreground text-[10px] tracking-widest uppercase">Beginner Friendly</span>
+                <p className="mt-0.5 font-medium">{beginnerFriendly ? 'Yes — Great for starters' : 'Requires prior training'}</p>
+              </div>
+            )}
+          </div>
+          <div className="mt-3 bg-muted/30 rounded-lg border p-2.5">
+            <span className="text-muted-foreground text-[10px] tracking-widest uppercase">Who Benefits Most</span>
+            <p className="mt-0.5 text-sm">
+              {staticContent?.benefits?.physical?.length ? 'Great for fitness enthusiasts' : ''}
+              {staticContent?.benefits?.mental?.length ? ' and those looking to develop mental discipline' : ''}.
+              Suitable for recreational play and competitive pathways alike.
+            </p>
+          </div>
+        </AccordionSection>
+
+        {/* Training Tips */}
+        <AccordionSection title="Training Tips" icon={Flame}>
+          <div className="flex flex-col gap-3">
+            <div className="bg-muted/30 rounded-lg border p-2.5">
+              <span className="text-muted-foreground text-[10px] tracking-widest uppercase flex items-center gap-1">
+                <Activity className="h-3 w-3" /> Warm-up
+              </span>
+              <p className="mt-1 text-sm">Start with light cardio (5-10 mins) to increase heart rate, followed by dynamic stretches targeting the muscles used in {name.toLowerCase()}. Sport-specific drills at low intensity prepare the body for training.</p>
+            </div>
+            <div className="bg-muted/30 rounded-lg border p-2.5">
+              <span className="text-muted-foreground text-[10px] tracking-widest uppercase flex items-center gap-1">
+                <Heart className="h-3 w-3" /> Cool-down
+              </span>
+              <p className="mt-1 text-sm">End each session with static stretches held for 15-30 seconds per muscle group. Deep breathing helps lower heart rate gradually. Hydration and light mobility work aid recovery.</p>
+            </div>
+          </div>
+        </AccordionSection>
+
+        {/* Competition Pathway */}
+        <AccordionSection title="Competition Pathway" icon={Trophy}>
+          <div className="flex flex-col gap-3">
+            <div className="flex flex-wrap gap-2">
+              <Badge variant="secondary" className="bg-emerald-500/10 text-emerald-600 border-emerald-500/20">District</Badge>
+              <Badge variant="secondary" className="bg-blue-500/10 text-blue-600 border-blue-500/20">State</Badge>
+              <Badge variant="secondary" className="bg-purple-500/10 text-purple-600 border-purple-500/20">National</Badge>
+              <Badge variant="secondary" className="bg-amber-500/10 text-amber-600 border-amber-500/20">International</Badge>
+              {olympicSport && (
+                <Badge variant="secondary" className="bg-yellow-500/10 text-yellow-600 border-yellow-500/20">Olympics</Badge>
+              )}
+              <Badge variant="secondary" className="bg-rose-500/10 text-rose-600 border-rose-500/20">Asian Games</Badge>
+            </div>
+            {staticContent?.competitions && (
+              <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
+                {staticContent.competitions.state && staticContent.competitions.state.length > 0 && (
+                  <div className="bg-muted/30 rounded-lg border p-2.5">
+                    <span className="text-muted-foreground text-[10px] tracking-widest uppercase">District / State</span>
+                    <ul className="mt-1 space-y-0.5">
+                      {staticContent.competitions.state.slice(0, 3).map((c) => (
+                        <li key={c} className="text-xs flex items-start gap-1">
+                          <span className="text-primary mt-0.5">•</span>
+                          <span>{c}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+                {staticContent.competitions.national && staticContent.competitions.national.length > 0 && (
+                  <div className="bg-muted/30 rounded-lg border p-2.5">
+                    <span className="text-muted-foreground text-[10px] tracking-widest uppercase">National</span>
+                    <ul className="mt-1 space-y-0.5">
+                      {staticContent.competitions.national.slice(0, 3).map((c) => (
+                        <li key={c} className="text-xs flex items-start gap-1">
+                          <span className="text-primary mt-0.5">•</span>
+                          <span>{c}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+                {staticContent.competitions.international && staticContent.competitions.international.length > 0 && (
+                  <div className="bg-muted/30 rounded-lg border p-2.5">
+                    <span className="text-muted-foreground text-[10px] tracking-widest uppercase">International</span>
+                    <ul className="mt-1 space-y-0.5">
+                      {staticContent.competitions.international.slice(0, 3).map((c) => (
+                        <li key={c} className="text-xs flex items-start gap-1">
+                          <span className="text-primary mt-0.5">•</span>
+                          <span>{c}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </div>
+            )}
+            <p className="text-muted-foreground text-xs">Progress from local tournaments to national championships and international representation through consistent training and competitive performance.</p>
+          </div>
+        </AccordionSection>
+
+        {/* Common Injuries & Recovery */}
+        <AccordionSection title="Common Injuries & Recovery" icon={AlertTriangle}>
+          <div className="flex flex-col gap-2">
+            <div className="bg-muted/30 rounded-lg border p-2.5">
+              <span className="text-muted-foreground text-[10px] tracking-widest uppercase">Common Injuries</span>
+              <p className="mt-1 text-sm">Common {name.toLowerCase()} injuries include sprains, strains, and overuse injuries depending on the intensity of play. Proper warm-up, technique, and rest days help prevent most issues.</p>
+            </div>
+            <div className="bg-muted/30 rounded-lg border p-2.5">
+              <span className="text-muted-foreground text-[10px] tracking-widest uppercase">Recovery Tips</span>
+              <p className="mt-1 text-sm">Rest, ice, compression, and elevation (RICE) for acute injuries. Gradual return to play after full recovery. Work with a sports physiotherapist for personalized rehabilitation.</p>
+            </div>
+          </div>
+        </AccordionSection>
+
+        {/* Why Choose This Sport */}
+        <AccordionSection title={`Why Choose ${name}`} icon={Sparkles}>
+          <div className="flex flex-col gap-2">
+            <p className="text-muted-foreground text-sm leading-relaxed">
+              {staticContent?.tagline || `${name} offers a unique combination of physical fitness, mental development, and competitive opportunities.`}
+            </p>
+            <div className="mt-2 grid grid-cols-1 gap-2 sm:grid-cols-2">
+              {staticContent?.benefits?.physical && staticContent.benefits.physical.length > 0 && (
+                <div className="flex items-start gap-2 text-sm">
+                  <Heart className="text-primary mt-0.5 h-4 w-4 shrink-0" />
+                  <div>
+                    <span className="font-medium">Physical Development</span>
+                    <p className="text-muted-foreground text-xs">Build {staticContent.benefits.physical.slice(0, 2).join(', ').toLowerCase()}</p>
+                  </div>
+                </div>
+              )}
+              {staticContent?.benefits?.mental && staticContent.benefits.mental.length > 0 && (
+                <div className="flex items-start gap-2 text-sm">
+                  <Brain className="text-primary mt-0.5 h-4 w-4 shrink-0" />
+                  <div>
+                    <span className="font-medium">Mental Growth</span>
+                    <p className="text-muted-foreground text-xs">Develop {staticContent.benefits.mental.slice(0, 2).join(', ').toLowerCase()}</p>
+                  </div>
+                </div>
+              )}
+              {olympicSport && (
+                <div className="flex items-start gap-2 text-sm">
+                  <Medal className="text-primary mt-0.5 h-4 w-4 shrink-0" />
+                  <div>
+                    <span className="font-medium">Olympic Sport</span>
+                    <p className="text-muted-foreground text-xs">Compete at the highest international level</p>
+                  </div>
+                </div>
+              )}
+              {beginnerFriendly && (
+                <div className="flex items-start gap-2 text-sm">
+                  <Shield className="text-primary mt-0.5 h-4 w-4 shrink-0" />
+                  <div>
+                    <span className="font-medium">Beginner Friendly</span>
+                    <p className="text-muted-foreground text-xs">Easy to start with minimal prior experience</p>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </AccordionSection>
 
         {(popularityInIndia || popularityWorldwide) && (
           <AccordionSection title="Popularity" icon={Medal}>

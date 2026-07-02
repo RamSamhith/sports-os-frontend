@@ -47,23 +47,26 @@ export default function CityPage() {
       try {
         const [academiesRes, coachesRes] = await Promise.all([
           getAcademies({ pageSize: 200 }),
-          getCoaches({ pageSize: 200 }),
+          getCoaches({ city: cityName, pageSize: 100 }),
         ]);
         if (cancelled) return;
 
         if (academiesRes.ok) {
-          setAllAcademies(academiesRes.data.items);
-          const cityAcademies = academiesRes.data.items.filter(
-            (a) => (a.location?.city ?? '').toLowerCase() === cityName.toLowerCase()
-          );
+          const items = academiesRes.data.items;
+          setAllAcademies(items);
+          const normalizedCity = cityName.toLowerCase().trim();
+          const cityAcademies = items.filter((a) => {
+            const academyCity = (a.location?.city ?? '').toLowerCase().trim();
+            const academyCitySlug = a.location?.city
+              ? a.location.city.toLowerCase().replace(/\s+/g, '-')
+              : '';
+            return academyCity === normalizedCity || academyCitySlug === normalizedCity;
+          });
           setAcademies(cityAcademies);
         }
 
         if (coachesRes.ok) {
-          const cityCoaches = coachesRes.data.items.filter(
-            (c) => (c.location?.city ?? '').toLowerCase() === cityName.toLowerCase()
-          );
-          setCoaches(cityCoaches);
+          setCoaches(coachesRes.data.items);
         }
       } catch {
         // network error — leave arrays empty
