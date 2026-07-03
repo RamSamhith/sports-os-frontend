@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { useRouter } from 'next/navigation';
 import { SharedLayout } from '@/components/motion/shared-layout';
 import { OtpInput } from '@/components/ui/otp-input';
-import { Loader2, CheckCircle2, ShieldCheck, RotateCcw, Pencil, Mail } from 'lucide-react';
+import { Loader2, CheckCircle2, ShieldCheck, RotateCcw, Pencil } from 'lucide-react';
 import { useAuth } from '@/lib/hooks/use-auth';
 import { verifyOtp, sendOtp } from '@/lib/api/auth';
 
@@ -47,45 +47,50 @@ export default function VerifySignupPage() {
     setIsVerifying(true);
     setError('');
 
-    const res = await verifyOtp({ email, otp: code });
+    try {
+      const res = await verifyOtp({ email, otp: code });
 
-    if (!res.ok) {
-      setError(res.error.message);
-      setOtp('');
+      if (!res.ok) {
+        setError(res.error.message);
+        setOtp('');
+        setIsVerifying(false);
+        return;
+      }
+
+      // Store token
+      try {
+        localStorage.setItem('sportsos:auth-token', res.data.token);
+      } catch { /* ignore */ }
+
+      setProfile({ name: res.data.user.name, email: res.data.user.email, phone: res.data.user.phone || '' });
+      setOnboarding({
+        age: res.data.user.age ?? null,
+        gender: res.data.user.gender ?? null,
+        sportInterests: res.data.user.sportInterests || [],
+        skillLevel: res.data.user.skillLevel ?? null,
+        goals: res.data.user.goals || '',
+        location: res.data.user.location || '',
+        children: (res.data.user.children || []).map((c) => ({
+          id: c.id,
+          parentId: c.parentId,
+          name: c.name,
+          age: c.age,
+          gender: c.gender,
+          sportInterests: c.sportInterests || [],
+          skillLevel: c.skillLevel,
+          createdAt: c.createdAt,
+          updatedAt: c.updatedAt,
+        })),
+      });
+      setAuth(true, res.data.user.onboardingCompleted ?? false);
+
+      try {
+        sessionStorage.removeItem('sportsos:verify-email');
+      } catch { /* ignore */ }
+    } catch {
+      setError('Network error. Please try again.');
       setIsVerifying(false);
-      return;
     }
-
-    // Store token
-    try {
-      localStorage.setItem('sportsos:auth-token', res.data.token);
-    } catch { /* ignore */ }
-
-    setProfile({ name: res.data.user.name, email: res.data.user.email, phone: res.data.user.phone || '' });
-    setOnboarding({
-      age: res.data.user.age ?? null,
-      gender: res.data.user.gender ?? null,
-      sportInterests: res.data.user.sportInterests || [],
-      skillLevel: res.data.user.skillLevel ?? null,
-      goals: res.data.user.goals || '',
-      location: res.data.user.location || '',
-      children: (res.data.user.children || []).map((c) => ({
-        id: c.id,
-        parentId: c.parentId,
-        name: c.name,
-        age: c.age,
-        gender: c.gender,
-        sportInterests: c.sportInterests || [],
-        skillLevel: c.skillLevel,
-        createdAt: c.createdAt,
-        updatedAt: c.updatedAt,
-      })),
-    });
-    setAuth(true, res.data.user.onboardingCompleted ?? false);
-
-    try {
-      sessionStorage.removeItem('sportsos:verify-email');
-    } catch { /* ignore */ }
   }, [email, setAuth, setProfile, setOnboarding]);
 
   useEffect(() => {
@@ -100,7 +105,11 @@ export default function VerifySignupPage() {
     setOtp('');
     setError('');
 
-    await sendOtp({ email });
+    try {
+      await sendOtp({ email });
+    } catch {
+      // Network error — user can retry after cooldown
+    }
   }
 
   function handleEditContact() {

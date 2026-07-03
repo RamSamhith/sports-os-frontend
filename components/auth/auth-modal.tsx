@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback, useEffect, useRef } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { motion, useReducedMotion, AnimatePresence, type Variants } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import * as Dialog from '@radix-ui/react-dialog';
@@ -14,7 +14,7 @@ import { login as apiLogin, register as apiRegister } from '@/lib/api/auth';
 import { useGoogleAuth, handleSocialAuth } from '@/lib/hooks/use-social-auth';
 import { trackLogin, trackSignup, trackOAuthAttempt, trackOAuthSuccess, trackOAuthError, trackGuestStarted } from '@/lib/analytics/events';
 import { validatePassword } from '@/lib/utils/validators';
-import { Loader2, ArrowLeft, X } from 'lucide-react';
+import { Loader2, ArrowLeft, Eye, EyeOff, X } from 'lucide-react';
 import { ease, duration } from '@/components/motion/constants';
 
 type ModalView = 'choose' | 'login' | 'register';
@@ -254,7 +254,7 @@ function ChooseView({
       </CardHeader>
       <CardContent className="flex flex-col gap-3">
         {socialError && (
-          <div className="rounded-md bg-destructive/10 px-3 py-2 text-sm text-destructive">
+          <div role="alert" className="rounded-md bg-destructive/10 px-3 py-2 text-sm text-destructive">
             {socialError}
           </div>
         )}
@@ -326,6 +326,7 @@ function LoginView({
   const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState<FieldErrors>({});
   const [serverError, setServerError] = useState<string | null>(null);
   const [touched, setTouched] = useState<Record<string, boolean>>({});
@@ -455,19 +456,29 @@ function LoginView({
             {errors.email && <p id={errorId('email')} role="alert" className="text-destructive text-xs">{errors.email}</p>}
           </motion.div>
           <motion.div variants={reduced ? undefined : formFieldVariants} initial="hidden" animate="visible" transition={{ delay: 0.1 }} className="flex flex-col gap-1.5">
-            <Label htmlFor="modal-login-password">Password</Label>
-            <Input
-              id="modal-login-password"
-              type="password"
-              placeholder="At least 8 characters"
-              value={password}
-              onChange={(e) => handleChange('password', e.target.value)}
-              onBlur={(e) => handleBlur('password', e.target.value)}
-              aria-invalid={!!errors.password}
-              aria-describedby={errors.password ? errorId('password') : undefined}
-              disabled={isSubmitting}
-              autoComplete="current-password"
-            />
+            <div className="flex items-center justify-between">
+              <Label htmlFor="modal-login-password">Password</Label>
+              <button type="button" onClick={() => router.push('/forgot-password')} className="text-primary text-xs hover:underline">
+                Forgot password?
+              </button>
+            </div>
+            <div className="relative">
+              <Input
+                id="modal-login-password"
+                type={showPassword ? 'text' : 'password'}
+                placeholder="At least 8 characters"
+                value={password}
+                onChange={(e) => handleChange('password', e.target.value)}
+                onBlur={(e) => handleBlur('password', e.target.value)}
+                aria-invalid={!!errors.password}
+                aria-describedby={errors.password ? errorId('password') : undefined}
+                disabled={isSubmitting}
+                autoComplete="current-password"
+              />
+              <button type="button" onClick={() => setShowPassword(v => !v)} className="text-muted-foreground hover:text-foreground absolute right-3 top-1/2 -translate-y-1/2" tabIndex={-1} aria-label={showPassword ? 'Hide password' : 'Show password'}>
+                {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+              </button>
+            </div>
             {errors.password && <p id={errorId('password')} role="alert" className="text-destructive text-xs">{errors.password}</p>}
           </motion.div>
           <motion.div variants={reduced ? undefined : formFieldVariants} initial="hidden" animate="visible" transition={{ delay: 0.15 }}>
@@ -510,6 +521,8 @@ function RegisterView({
   const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [errors, setErrors] = useState<FieldErrors>({});
   const [serverError, setServerError] = useState<string | null>(null);
   const [touched, setTouched] = useState<Record<string, boolean>>({});
@@ -518,11 +531,6 @@ function RegisterView({
   useEffect(() => {
     if (isLoading) return;
     if (!isAuthenticated) return;
-    const isEditing = typeof window !== 'undefined' && sessionStorage.getItem('sportsos:editing-contact') === 'true';
-    if (isEditing) {
-      sessionStorage.removeItem('sportsos:editing-contact');
-      return;
-    }
     if (!onboardingCompleted) {
       router.push('/onboarding/role');
     } else {
@@ -705,34 +713,44 @@ function RegisterView({
           </motion.div>
           <motion.div variants={reduced ? undefined : formFieldVariants} initial="hidden" animate="visible" transition={{ delay: 0.11 }} className="flex flex-col gap-1.5">
             <Label htmlFor="modal-reg-password">Password</Label>
-            <Input
-              id="modal-reg-password"
-              type="password"
-              placeholder="At least 8 characters"
-              value={password}
-              onChange={(e) => handleChange('password', e.target.value)}
-              onBlur={(e) => handleBlur('password', e.target.value)}
-              aria-invalid={!!errors.password}
-              aria-describedby={errors.password ? errorId('password') : undefined}
-              disabled={isSubmitting}
-              autoComplete="new-password"
-            />
+            <div className="relative">
+              <Input
+                id="modal-reg-password"
+                type={showPassword ? 'text' : 'password'}
+                placeholder="At least 8 characters"
+                value={password}
+                onChange={(e) => handleChange('password', e.target.value)}
+                onBlur={(e) => handleBlur('password', e.target.value)}
+                aria-invalid={!!errors.password}
+                aria-describedby={errors.password ? errorId('password') : undefined}
+                disabled={isSubmitting}
+                autoComplete="new-password"
+              />
+              <button type="button" onClick={() => setShowPassword(v => !v)} className="text-muted-foreground hover:text-foreground absolute right-3 top-1/2 -translate-y-1/2" tabIndex={-1} aria-label={showPassword ? 'Hide password' : 'Show password'}>
+                {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+              </button>
+            </div>
             {errors.password && <p id={errorId('password')} role="alert" className="text-destructive text-xs">{errors.password}</p>}
           </motion.div>
           <motion.div variants={reduced ? undefined : formFieldVariants} initial="hidden" animate="visible" transition={{ delay: 0.14 }} className="flex flex-col gap-1.5">
             <Label htmlFor="modal-reg-confirm">Confirm Password</Label>
-            <Input
-              id="modal-reg-confirm"
-              type="password"
-              placeholder="Re-enter password"
-              value={confirmPassword}
-              onChange={(e) => handleChange('confirmPassword', e.target.value)}
-              onBlur={(e) => handleBlur('confirmPassword', e.target.value)}
-              aria-invalid={!!errors.confirmPassword}
-              aria-describedby={errors.confirmPassword ? errorId('confirm') : undefined}
-              disabled={isSubmitting}
-              autoComplete="new-password"
-            />
+            <div className="relative">
+              <Input
+                id="modal-reg-confirm"
+                type={showConfirmPassword ? 'text' : 'password'}
+                placeholder="Re-enter password"
+                value={confirmPassword}
+                onChange={(e) => handleChange('confirmPassword', e.target.value)}
+                onBlur={(e) => handleBlur('confirmPassword', e.target.value)}
+                aria-invalid={!!errors.confirmPassword}
+                aria-describedby={errors.confirmPassword ? errorId('confirm') : undefined}
+                disabled={isSubmitting}
+                autoComplete="new-password"
+              />
+              <button type="button" onClick={() => setShowConfirmPassword(v => !v)} className="text-muted-foreground hover:text-foreground absolute right-3 top-1/2 -translate-y-1/2" tabIndex={-1} aria-label={showConfirmPassword ? 'Hide password' : 'Show password'}>
+                {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+              </button>
+            </div>
             {errors.confirmPassword && <p id={errorId('confirm')} role="alert" className="text-destructive text-xs">{errors.confirmPassword}</p>}
           </motion.div>
           <motion.div variants={reduced ? undefined : formFieldVariants} initial="hidden" animate="visible" transition={{ delay: 0.17 }}>

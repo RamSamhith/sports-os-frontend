@@ -96,7 +96,11 @@ export default function VerifyPhonePage() {
     setResendCooldown(30);
     setOtp('');
     setError('');
-    await sendOtp({ email });
+    try {
+      await sendOtp({ email });
+    } catch {
+      setError('Failed to resend code. Please try again.');
+    }
   }
 
   const screenVariants = {

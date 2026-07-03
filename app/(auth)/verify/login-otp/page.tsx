@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback, Suspense } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { OtpInput } from '@/components/ui/otp-input';
@@ -9,7 +9,6 @@ import { SharedLayout } from '@/components/motion/shared-layout';
 import { useAuth } from '@/lib/hooks/use-auth';
 import { verifyLoginOtp, sendLoginOtp } from '@/lib/api/auth';
 import { Loader2, ArrowLeft } from 'lucide-react';
-import Link from 'next/link';
 
 export default function VerifyLoginOtpPage() {
   return (
@@ -21,7 +20,6 @@ export default function VerifyLoginOtpPage() {
 
 function VerifyLoginOtpContent() {
   const router = useRouter();
-  const searchParams = useSearchParams();
   const { setAuth, setProfile, isAuthenticated, isLoading, onboardingCompleted } = useAuth();
   const [otp, setOtp] = useState('');
   const [error, setError] = useState<string | null>(null);

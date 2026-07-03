@@ -12,8 +12,6 @@ import { trackGuestConversion } from '@/lib/analytics/events';
 import { Loader2, X, Lock } from 'lucide-react';
 import { ease } from '@/components/motion/constants';
 
-type ModalView = 'choose' | 'login';
-
 const overlayVariants = {
   hidden: { opacity: 0 },
   visible: { opacity: 1, transition: { duration: 0.2, ease: ease.standard } },

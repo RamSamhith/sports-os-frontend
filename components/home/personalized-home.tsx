@@ -1,19 +1,17 @@
 'use client'
 
 import { useMemo, useEffect, useState } from 'react'
+import Link from 'next/link'
 import { useAuth } from '@/lib/hooks/use-auth'
 import { useOnboarding } from '@/lib/hooks/use-onboarding'
 import { useChildren } from '@/lib/hooks/use-children'
-import { useRecentlyViewed } from '@/lib/hooks/use-recently-viewed'
-import { getSuggestedAcademies, logMatchingAudit } from '@/lib/utils/matching'
+import { getSuggestedAcademies } from '@/lib/utils/matching'
 import { useHomepageData } from '@/lib/hooks/use-homepage-data'
-import type { OnboardingData, SkillLevel } from '@/lib/hooks/use-onboarding'
-import { MatchingExplanation } from './matching-explanation'
-import { SuggestedAcademies } from './suggested-academies'
-import { ContinueExploring } from './continue-exploring'
-import { YourAcademy } from './your-academy'
-import { Section } from '@/components/layout/section'
 import { Container } from '@/components/layout/container'
+import { School, AlertTriangle } from 'lucide-react'
+import { AcademyCardSkeleton } from '@/components/feedback/skeletons'
+import { AcademyCardPlaceholder } from '@/components/academies/academy-card-placeholder'
+import type { OnboardingData, SkillLevel } from '@/lib/hooks/use-onboarding'
 
 const DEFAULT_LAT = 28.6139
 const DEFAULT_LNG = 77.209
@@ -22,9 +20,8 @@ export function PersonalizedHome() {
   const { role } = useAuth()
   const { data: onboarding, completed, hydrated } = useOnboarding()
   const { activeChild } = useChildren()
-  const { recentAcademies, recentCoaches } = useRecentlyViewed()
-  const { academies: apiAcademies } = useHomepageData()
-  const [coords, setCoords] = useState<{ lat: number; lng: number }>({ lat: DEFAULT_LAT, lng: DEFAULT_LNG })
+  const { academies: apiAcademies, loading, error } = useHomepageData()
+  const [coords, setCoords] = useState({ lat: DEFAULT_LAT, lng: DEFAULT_LNG })
 
   useEffect(() => {
     if (typeof navigator !== 'undefined' && navigator.geolocation) {
@@ -50,86 +47,102 @@ export function PersonalizedHome() {
     }
   }, [onboarding, completed, role, activeChild])
 
-  const suggestions = useMemo(
-    () => {
-      if (!effectiveOnboarding) {
-        return { academies: { primary: [], fallback: [], hasExactMatch: false } }
-      }
-      return {
-        academies: getSuggestedAcademies(apiAcademies, effectiveOnboarding, coords.lat, coords.lng, 6),
-      }
-    },
-    [effectiveOnboarding, apiAcademies, coords]
-  )
+  const isPersonalized = hydrated && completed && effectiveOnboarding
 
-  const { academies: suggestedAcademies } = suggestions
-
-  const lastAcademy = recentAcademies[0]
-  const showContinueExploring = !!lastAcademy
-
-  useEffect(() => {
-    if (completed && effectiveOnboarding && apiAcademies.length > 0) {
-      logMatchingAudit(effectiveOnboarding, apiAcademies, [])
+  const matchingReasons = useMemo(() => {
+    if (!isPersonalized || !effectiveOnboarding) return []
+    const reasons: Array<{ label: string; variant: 'sport' | 'level' | 'location' }> = []
+    const p = effectiveOnboarding.parent
+    if (p?.sportInterests?.length) {
+      p.sportInterests.forEach((s: string) => reasons.push({ label: s.replace(/-/g, ' '), variant: 'sport' }))
     }
-  }, [completed, effectiveOnboarding, apiAcademies])
+    if (p?.skillLevel) reasons.push({ label: p.skillLevel, variant: 'level' })
+    if (p?.location) reasons.push({ label: p.location, variant: 'location' })
+    return reasons.slice(0, 4)
+  }, [isPersonalized, effectiveOnboarding])
 
-  if (!hydrated || !completed || !effectiveOnboarding) return null
+  const academies = useMemo(() => {
+    if (!apiAcademies.length) return []
 
-  const hasContent =
-    suggestedAcademies.primary.length > 0 ||
-    suggestedAcademies.fallback.length > 0 ||
-    showContinueExploring
+    if (isPersonalized) {
+      const result = getSuggestedAcademies(apiAcademies, effectiveOnboarding!, coords.lat, coords.lng, 6)
+      return result.primary.length > 0 ? result.primary.slice(0, 6) : result.fallback.slice(0, 6)
+    }
 
-  if (!hasContent) return null
+    return [...apiAcademies]
+      .sort((a, b) => (b.rating?.average ?? 0) - (a.rating?.average ?? 0))
+      .slice(0, 6)
+  }, [apiAcademies, isPersonalized, effectiveOnboarding, coords])
+
+  const title = isPersonalized ? 'Recommended For You' : 'Top Rated Academies'
+  const subtitle = isPersonalized
+    ? 'Personalised picks based on your interests.'
+    : 'Top-rated, verified academies across India.'
+
+  if (loading) {
+    return (
+      <Container size="lg">
+        <div className="mb-4">
+          <h2 className="text-xl font-semibold tracking-tight md:text-2xl">{title}</h2>
+          <p className="text-muted-foreground text-xs">{subtitle}</p>
+        </div>
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {Array.from({ length: 3 }).map((_, i) => (
+            <AcademyCardSkeleton key={i} />
+          ))}
+        </div>
+      </Container>
+    )
+  }
 
   return (
-    <div className="space-y-0">
-      <Section>
-        <Container size="lg">
-          <YourAcademy />
-        </Container>
-      </Section>
+    <Container size="lg">
+      <div className="mb-4 flex items-end justify-between gap-4">
+        <div>
+          <h2 className="text-xl font-semibold tracking-tight md:text-2xl">{title}</h2>
+          <p className="text-muted-foreground text-xs">{subtitle}</p>
+        </div>
+        <Link href="/academies" className="text-muted-foreground hover:text-foreground text-xs min-h-[44px] flex items-center shrink-0">
+          View all &rarr;
+        </Link>
+      </div>
 
-      {suggestedAcademies.hasExactMatch && (
-        <Section>
-          <Container size="lg">
-            <MatchingExplanation />
-          </Container>
-        </Section>
+      {/* Matching explanation */}
+      {isPersonalized && matchingReasons.length > 0 && (
+        <div className="mb-4 flex flex-wrap items-center gap-2">
+          <span className="text-muted-foreground text-xs">Based on your profile</span>
+          {matchingReasons.map((reason) => (
+            <span
+              key={reason.label}
+              className="border-border/60 bg-card/40 rounded-md border px-2 py-0.5 text-[10px] font-medium capitalize"
+            >
+              {reason.label}
+            </span>
+          ))}
+        </div>
       )}
 
-      {suggestedAcademies.primary.length > 0 && (
-        <Section>
-          <Container size="lg">
-            <SuggestedAcademies
-              academies={suggestedAcademies.primary}
-              title="Recommended For You"
-              viewAllHref="/academies"
-            />
-          </Container>
-        </Section>
+      {error ? (
+        <div className="flex flex-col items-center gap-3 rounded-xl border border-dashed py-12 text-center">
+          <AlertTriangle className="h-10 w-10 text-destructive/40" />
+          <div>
+            <p className="text-foreground font-medium">Failed to load academies</p>
+            <p className="text-sm text-muted-foreground">{error}</p>
+          </div>
+        </div>
+      ) : academies.length === 0 ? (
+        <div className="text-muted-foreground flex flex-col items-center gap-3 rounded-xl border border-dashed py-12 text-center">
+          <School className="h-10 w-10 opacity-40" />
+          <p className="text-foreground font-medium">No academies yet</p>
+          <p className="text-sm">Check back soon.</p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {academies.map((academy, i) => (
+            <AcademyCardPlaceholder key={academy.id} academy={academy} priority={i === 0} />
+          ))}
+        </div>
       )}
-
-      {!suggestedAcademies.hasExactMatch && suggestedAcademies.fallback.length > 0 && (
-        <Section>
-          <Container size="lg">
-            <SuggestedAcademies
-              academies={suggestedAcademies.fallback}
-              title="Explore More Academies"
-              viewAllHref="/academies"
-            />
-          </Container>
-        </Section>
-      )}
-
-      {showContinueExploring && (
-        <Section>
-          <Container size="lg">
-            <ContinueExploring lastAcademy={lastAcademy} lastCoach={recentCoaches[0]} />
-          </Container>
-        </Section>
-      )}
-
-    </div>
+    </Container>
   )
 }
