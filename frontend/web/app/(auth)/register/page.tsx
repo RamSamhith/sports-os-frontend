@@ -413,7 +413,7 @@ export default function RegisterPage() {
                   aria-describedby={errors.password ? errorId('password') : undefined}
                   disabled={isSubmitting}
                 />
-                <button type="button" onClick={() => setShowPassword(v => !v)} className="text-muted-foreground hover:text-foreground absolute right-3 top-1/2 -translate-y-1/2" tabIndex={-1} aria-label={showPassword ? 'Hide password' : 'Show password'}>
+                <button type="button" onClick={() => setShowPassword(v => !v)} className="text-muted-foreground hover:text-foreground absolute right-3 top-1/2 -translate-y-1/2" tabIndex={0} aria-label={showPassword ? 'Hide password' : 'Show password'}>
                   {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </button>
               </div>
@@ -483,7 +483,7 @@ export default function RegisterPage() {
                   aria-describedby={errors.confirmPassword ? errorId('confirmPassword') : undefined}
                   disabled={isSubmitting}
                 />
-                <button type="button" onClick={() => setShowConfirmPassword(v => !v)} className="text-muted-foreground hover:text-foreground absolute right-3 top-1/2 -translate-y-1/2" tabIndex={-1} aria-label={showConfirmPassword ? 'Hide password' : 'Show password'}>
+                <button type="button" onClick={() => setShowConfirmPassword(v => !v)} className="text-muted-foreground hover:text-foreground absolute right-3 top-1/2 -translate-y-1/2" tabIndex={0} aria-label={showConfirmPassword ? 'Hide password' : 'Show password'}>
                   {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </button>
               </div>
