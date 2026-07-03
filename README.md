@@ -7,7 +7,7 @@ TEAM
 
 1)G.Ram Samhith
 
-2)I'm Varshitha
+2)G.Varshitha
 
 3)p.supriya
 
