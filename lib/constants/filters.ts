@@ -1,5 +1,4 @@
 import type { Facility, TrainingLevel } from '@/types/domain/academy';
-import type { SportCategory } from '@/types/domain/sport';
 
 export interface FilterOption<TValue extends string = string> {
   value: TValue;
@@ -24,12 +23,6 @@ export const academyFilterLevels: FilterOption<TrainingLevel>[] = [
   { value: 'intermediate', label: 'Intermediate' },
   { value: 'advanced', label: 'Advanced' },
   { value: 'elite', label: 'Elite' },
-];
-
-export const sportCategories: FilterOption<SportCategory>[] = [
-  { value: 'Indoor', label: 'Indoor' },
-  { value: 'Outdoor', label: 'Outdoor' },
-  { value: 'Both', label: 'Both' },
 ];
 
 export const verificationStatuses = [
