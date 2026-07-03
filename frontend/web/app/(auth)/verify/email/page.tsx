@@ -45,43 +45,48 @@ export default function VerifyEmailPage() {
     setIsVerifying(true);
     setError('');
 
-    const res = await verifyOtp({ email, otp: code });
-
-    if (!res.ok) {
-      setError(res.error.message);
-      setOtp('');
-      setIsVerifying(false);
-      return;
-    }
-
-    // Store token
     try {
-      localStorage.setItem('sportsos:auth-token', res.data.token);
-    } catch { /* ignore */ }
+      const res = await verifyOtp({ email, otp: code });
 
-    setProfile({ name: res.data.user.name, email: res.data.user.email, phone: res.data.user.phone || '' });
-    setOnboarding({
-      age: res.data.user.age ?? null,
-      gender: res.data.user.gender ?? null,
-      sportInterests: res.data.user.sportInterests || [],
-      skillLevel: res.data.user.skillLevel ?? null,
-      goals: res.data.user.goals || '',
-      location: res.data.user.location || '',
-      children: (res.data.user.children || []).map((c) => ({
-        id: c.id,
-        parentId: c.parentId,
-        name: c.name,
-        age: c.age,
-        gender: c.gender,
-        sportInterests: c.sportInterests || [],
-        skillLevel: c.skillLevel,
-        createdAt: c.createdAt,
-        updatedAt: c.updatedAt,
-      })),
-    });
-    setAuth(true, res.data.user.onboardingCompleted);
-    setVerified(true);
-    setIsVerifying(false);
+      if (!res.ok) {
+        setError(res.error.message);
+        setOtp('');
+        setIsVerifying(false);
+        return;
+      }
+
+      // Store token
+      try {
+        localStorage.setItem('sportsos:auth-token', res.data.token);
+      } catch { /* ignore */ }
+
+      setProfile({ name: res.data.user.name, email: res.data.user.email, phone: res.data.user.phone || '' });
+      setOnboarding({
+        age: res.data.user.age ?? null,
+        gender: res.data.user.gender ?? null,
+        sportInterests: res.data.user.sportInterests || [],
+        skillLevel: res.data.user.skillLevel ?? null,
+        goals: res.data.user.goals || '',
+        location: res.data.user.location || '',
+        children: (res.data.user.children || []).map((c) => ({
+          id: c.id,
+          parentId: c.parentId,
+          name: c.name,
+          age: c.age,
+          gender: c.gender,
+          sportInterests: c.sportInterests || [],
+          skillLevel: c.skillLevel,
+          createdAt: c.createdAt,
+          updatedAt: c.updatedAt,
+        })),
+      });
+      setAuth(true, res.data.user.onboardingCompleted);
+      setVerified(true);
+      setIsVerifying(false);
+    } catch {
+      setError('Network error. Please try again.');
+      setIsVerifying(false);
+    }
   }, [profile?.email, setAuth, setProfile, setOnboarding]);
 
   useEffect(() => {
@@ -96,7 +101,11 @@ export default function VerifyEmailPage() {
     setResendCooldown(30);
     setOtp('');
     setError('');
-    await sendOtp({ email });
+    try {
+      await sendOtp({ email });
+    } catch {
+      // Network error — user can retry after cooldown
+    }
   }
 
   const screenVariants = {

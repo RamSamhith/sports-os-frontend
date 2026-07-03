@@ -396,7 +396,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       localStorage.removeItem('sportsos:academy-status');
       localStorage.removeItem('sportsos:selected-academy');
       localStorage.removeItem('sportsos:recently-viewed');
-      localStorage.removeItem('sportsos:onboarding');
+      localStorage.removeItem('sportsos:onboarding-data');
     } catch { /* ignore */ }
   }, []);
 
@@ -425,6 +425,3 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
-
-// Re-export createContext for compatibility with module graph (no-op export)
-export { createContext };

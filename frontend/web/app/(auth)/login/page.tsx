@@ -14,7 +14,7 @@ import { login as apiLogin, sendLoginOtp } from '@/lib/api/auth';
 import { useGoogleAuth, handleSocialAuth } from '@/lib/hooks/use-social-auth';
 import { trackGuestStarted, trackOtpLogin } from '@/lib/analytics/events';
 import { validatePassword } from '@/lib/utils/validators';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Eye, EyeOff } from 'lucide-react';
 
 interface FieldErrors {
   email?: string;
@@ -45,6 +45,7 @@ export default function LoginPage() {
   const [socialError, setSocialError] = useState<string | null>(null);
   const [otpLoading, setOtpLoading] = useState(false);
   const [otpSuccess, setOtpSuccess] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const googleAuth = useGoogleAuth();
 
@@ -139,6 +140,7 @@ export default function LoginPage() {
       if (!res.ok) {
         if (res.error.code === 'EMAIL_NOT_VERIFIED') {
           try { sessionStorage.setItem('sportsos:verify-email', email.trim()); } catch { /* ignore */ }
+          setIsSubmitting(false);
           router.push('/verify/signup');
           return;
         }
@@ -352,19 +354,24 @@ export default function LoginPage() {
                   Forgot password?
                 </Link>
               </div>
-              <Input
-                id="login-password"
-                type="password"
-                placeholder="At least 8 characters"
-                value={password}
-                onChange={(e) => handleChange('password', e.target.value)}
-                onBlur={(e) => handleBlur('password', e.target.value)}
-                required
-                autoComplete="current-password"
-                aria-invalid={!!errors.password}
-                aria-describedby={errors.password ? errorId('password') : undefined}
-                disabled={isSubmitting}
-              />
+              <div className="relative">
+                <Input
+                  id="login-password"
+                  type={showPassword ? 'text' : 'password'}
+                  placeholder="At least 8 characters"
+                  value={password}
+                  onChange={(e) => handleChange('password', e.target.value)}
+                  onBlur={(e) => handleBlur('password', e.target.value)}
+                  required
+                  autoComplete="current-password"
+                  aria-invalid={!!errors.password}
+                  aria-describedby={errors.password ? errorId('password') : undefined}
+                  disabled={isSubmitting}
+                />
+                <button type="button" onClick={() => setShowPassword(v => !v)} className="text-muted-foreground hover:text-foreground absolute right-3 top-1/2 -translate-y-1/2" tabIndex={-1} aria-label={showPassword ? 'Hide password' : 'Show password'}>
+                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </button>
+              </div>
               {errors.password && (
                 <p id={errorId('password')} role="alert" className="text-destructive text-xs">
                   {errors.password}

@@ -10,12 +10,12 @@ import { PhoneInput } from '@/components/ui/phone-input';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { SharedLayout } from '@/components/motion/shared-layout';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '@/lib/hooks/use-auth';
 import { register as apiRegister } from '@/lib/api/auth';
 import { useGoogleAuth, handleSocialAuth } from '@/lib/hooks/use-social-auth';
 import { trackGuestStarted } from '@/lib/analytics/events';
-import { validatePassword } from '@/lib/utils/validators';
+import { validatePassword, getPasswordErrors } from '@/lib/utils/validators';
 
 interface FieldErrors {
   name?: string;
@@ -35,12 +35,10 @@ const fieldVariants = {
   show: { opacity: 1, x: 0, transition: { duration: 0.3, ease: [0.2, 0, 0, 1] } },
 };
 
-const DRAFT_KEY = 'sportsos:signup-draft';
-
 export default function RegisterPage() {
   const reduced = useReducedMotion();
   const router = useRouter();
-  const { setAuth, setProfile, setOnboarding, isAuthenticated, isLoading, verified, onboardingCompleted, enterGuestMode } = useAuth();
+  const { setAuth, setProfile, setOnboarding, isAuthenticated, isLoading, onboardingCompleted, enterGuestMode } = useAuth();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
@@ -52,6 +50,8 @@ export default function RegisterPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [socialLoading, setSocialLoading] = useState<'google' | null>(null);
   const [socialError, setSocialError] = useState<string | null>(null);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const googleAuth = useGoogleAuth();
 
@@ -69,36 +69,12 @@ export default function RegisterPage() {
     }
   }, [googleAuth.loaded]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Restore signup draft when returning from OTP verification or edit flow
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-    try {
-      const raw = sessionStorage.getItem(DRAFT_KEY);
-      if (!raw) return;
-      const parsed = JSON.parse(raw);
-      if (typeof parsed.name === 'string' && typeof parsed.email === 'string' && typeof parsed.phone === 'string') {
-        setName(parsed.name);
-        setEmail(parsed.email);
-        setPhone(parsed.phone);
-      }
-      sessionStorage.removeItem(DRAFT_KEY);
-    } catch {
-      // ignore
-    }
-  }, []);
-
   // Safety-net redirect: fires when auth state changes but the handler
   // did NOT navigate (e.g. edit/verify flow where setAuth is a no-op).
   // The handler is the primary navigation source for fresh registrations.
   useEffect(() => {
     if (isLoading) return;
     if (!isAuthenticated) return;
-    // Edit flow: user came from verify/signup → suppress redirect
-    const isEditing = typeof window !== 'undefined' && sessionStorage.getItem('sportsos:editing-contact') === 'true';
-    if (isEditing) {
-      sessionStorage.removeItem('sportsos:editing-contact');
-      return;
-    }
     if (!onboardingCompleted) {
       router.replace('/onboarding/role');
     } else {
@@ -220,30 +196,35 @@ export default function RegisterPage() {
 
     setIsSubmitting(true);
 
-    const res = await apiRegister({
-      name: name.trim(),
-      email: email.trim(),
-      password,
-      phone: phone.trim(),
-    });
+    try {
+      const res = await apiRegister({
+        name: name.trim(),
+        email: email.trim(),
+        password,
+        phone: phone.trim(),
+      });
 
-    if (!res.ok) {
-      setServerError(res.error.message);
+      if (!res.ok) {
+        setServerError(res.error.message);
+        setIsSubmitting(false);
+        return;
+      }
+
+      // Registration requires email verification
+      if (res.data.requiresVerification) {
+        try {
+          sessionStorage.setItem('sportsos:verify-email', res.data.email);
+        } catch { /* ignore */ }
+        setIsSubmitting(false);
+        router.push('/verify/signup');
+        return;
+      }
+
       setIsSubmitting(false);
-      return;
-    }
-
-    // Registration requires email verification
-    if (res.data.requiresVerification) {
-      try {
-        sessionStorage.setItem('sportsos:verify-email', res.data.email);
-      } catch { /* ignore */ }
+    } catch {
+      setServerError('Network error. Please try again.');
       setIsSubmitting(false);
-      router.push('/verify/signup');
-      return;
     }
-
-    setIsSubmitting(false);
   }
 
   function handleGuestContinue() {
@@ -337,7 +318,7 @@ export default function RegisterPage() {
               noValidate
             >
               {serverError && (
-                <div className="rounded-md bg-destructive/10 px-3 py-2 text-sm text-destructive">
+                <div role="alert" className="rounded-md bg-destructive/10 px-3 py-2 text-sm text-destructive">
                   {serverError}
                 </div>
               )}
@@ -418,19 +399,63 @@ export default function RegisterPage() {
               className="flex flex-col gap-1.5"
             >
               <Label htmlFor="register-password">Password</Label>
-              <Input
-                id="register-password"
-                type="password"
-                placeholder="At least 8 characters"
-                value={password}
-                onChange={(e) => handleChange('password', e.target.value)}
-                onBlur={(e) => handleBlur('password', e.target.value)}
-                required
-                autoComplete="new-password"
-                aria-invalid={!!errors.password}
-                aria-describedby={errors.password ? errorId('password') : undefined}
-                disabled={isSubmitting}
-              />
+              <div className="relative">
+                <Input
+                  id="register-password"
+                  type={showPassword ? 'text' : 'password'}
+                  placeholder="At least 8 characters"
+                  value={password}
+                  onChange={(e) => handleChange('password', e.target.value)}
+                  onBlur={(e) => handleBlur('password', e.target.value)}
+                  required
+                  autoComplete="new-password"
+                  aria-invalid={!!errors.password}
+                  aria-describedby={errors.password ? errorId('password') : undefined}
+                  disabled={isSubmitting}
+                />
+                <button type="button" onClick={() => setShowPassword(v => !v)} className="text-muted-foreground hover:text-foreground absolute right-3 top-1/2 -translate-y-1/2" tabIndex={-1} aria-label={showPassword ? 'Hide password' : 'Show password'}>
+                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </button>
+              </div>
+              {password.length > 0 && (
+                <div className="mt-1 flex flex-col gap-1">
+                  {(() => {
+                    const errors = getPasswordErrors(password);
+                    const count = Object.keys(errors).length;
+                    const strength = count === 0 ? 'strong' : count <= 1 ? 'medium' : 'weak';
+                    return (
+                      <>
+                        <div className="flex gap-1">
+                          {(['weak', 'medium', 'strong'] as const).map((level) => (
+                            <div
+                              key={level}
+                              className={`h-1 flex-1 rounded-full ${
+                                (level === 'weak' && strength === 'weak') ||
+                                (level === 'medium' && (strength === 'medium' || strength === 'strong')) ||
+                                (level === 'strong' && strength === 'strong')
+                                  ? level === 'weak' ? 'bg-red-500' : level === 'medium' ? 'bg-amber-500' : 'bg-green-500'
+                                  : 'bg-muted'
+                              }`}
+                            />
+                          ))}
+                        </div>
+                        <div className="flex flex-wrap gap-x-3 gap-y-0.5 text-[10px] text-muted-foreground">
+                          {[
+                            { key: 'minLength', label: '8+ characters' },
+                            { key: 'uppercase', label: 'Uppercase' },
+                            { key: 'lowercase', label: 'Lowercase' },
+                            { key: 'number', label: 'Number' },
+                          ].map(({ key, label }) => (
+                            <span key={key} className={errors[key] ? 'text-muted-foreground' : 'text-green-600'}>
+                              {errors[key] ? '○' : '✓'} {label}
+                            </span>
+                          ))}
+                        </div>
+                      </>
+                    );
+                  })()}
+                </div>
+              )}
               {errors.password && (
                 <p id={errorId('password')} role="alert" className="text-destructive text-xs">
                   {errors.password}
@@ -444,19 +469,24 @@ export default function RegisterPage() {
               className="flex flex-col gap-1.5"
             >
               <Label htmlFor="register-confirm-password">Confirm Password</Label>
-              <Input
-                id="register-confirm-password"
-                type="password"
-                placeholder="Re-enter your password"
-                value={confirmPassword}
-                onChange={(e) => handleChange('confirmPassword', e.target.value)}
-                onBlur={(e) => handleBlur('confirmPassword', e.target.value)}
-                required
-                autoComplete="new-password"
-                aria-invalid={!!errors.confirmPassword}
-                aria-describedby={errors.confirmPassword ? errorId('confirmPassword') : undefined}
-                disabled={isSubmitting}
-              />
+              <div className="relative">
+                <Input
+                  id="register-confirm-password"
+                  type={showConfirmPassword ? 'text' : 'password'}
+                  placeholder="Re-enter your password"
+                  value={confirmPassword}
+                  onChange={(e) => handleChange('confirmPassword', e.target.value)}
+                  onBlur={(e) => handleBlur('confirmPassword', e.target.value)}
+                  required
+                  autoComplete="new-password"
+                  aria-invalid={!!errors.confirmPassword}
+                  aria-describedby={errors.confirmPassword ? errorId('confirmPassword') : undefined}
+                  disabled={isSubmitting}
+                />
+                <button type="button" onClick={() => setShowConfirmPassword(v => !v)} className="text-muted-foreground hover:text-foreground absolute right-3 top-1/2 -translate-y-1/2" tabIndex={-1} aria-label={showConfirmPassword ? 'Hide password' : 'Show password'}>
+                  {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </button>
+              </div>
               {errors.confirmPassword && (
                 <p id={errorId('confirmPassword')} role="alert" className="text-destructive text-xs">
                   {errors.confirmPassword}

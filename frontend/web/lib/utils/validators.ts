@@ -7,25 +7,6 @@ export const phoneSchema = z
   .min(1, 'Phone number is required')
   .regex(/^\d{10}$/, 'Phone number must be exactly 10 digits');
 
-export function validateEmail(value: string): string {
-  if (!value.trim()) return 'Email is required';
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) return 'Enter a valid email address';
-  return '';
-}
-
-export function validatePhone(value: string): string {
-  if (!value.trim()) return 'Phone number is required';
-  const digits = value.replace(/\D/g, '');
-  if (digits.length !== 10) return 'Phone number must be exactly 10 digits';
-  return '';
-}
-
-export const slugSchema = z
-  .string()
-  .min(1)
-  .max(120)
-  .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, 'Invalid slug');
-
 // Password validation matching backend: min 8 chars, uppercase, lowercase, digit
 export function validatePassword(value: string): string {
   if (!value) return 'Password is required';

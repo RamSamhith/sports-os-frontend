@@ -8,13 +8,13 @@ import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { OtpInput } from '@/components/ui/otp-input';
 import Link from 'next/link';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { SharedLayout } from '@/components/motion/shared-layout';
-import { Loader2, CheckCircle2, ArrowLeft, Mail, Shield } from 'lucide-react';
+import { Loader2, CheckCircle2, ArrowLeft, Mail, Shield, Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '@/lib/hooks/use-auth';
 import { sendForgotPasswordOtp, verifyResetOtp, resetPassword, checkProvider } from '@/lib/api/auth';
 import { trackForgotPasswordStarted, trackPasswordResetSuccess } from '@/lib/analytics/events';
-import { validatePassword, getPasswordErrors } from '@/lib/utils/validators';
+import { getPasswordErrors } from '@/lib/utils/validators';
 
 const FAST = { duration: 0.2, ease: [0.2, 0, 0, 1] as const };
 
@@ -44,6 +44,8 @@ function ForgotPasswordContent() {
   const [passwordErrors, setPasswordErrors] = useState<Record<string, string>>({});
   const [oauthProvider, setOauthProvider] = useState<string>('');
   const [resendCooldown, setResendCooldown] = useState(0);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -96,22 +98,27 @@ function ForgotPasswordContent() {
     setIsSubmitting(true);
     setError('');
 
-    const providerRes = await checkProvider(email.toLowerCase().trim());
-    if (providerRes.ok && providerRes.data.provider && providerRes.data.provider !== 'credentials') {
-      setOauthProvider(providerRes.data.provider);
-      setStep('otp');
+    try {
+      const providerRes = await checkProvider(email.toLowerCase().trim());
+      if (providerRes.ok && providerRes.data.provider && providerRes.data.provider !== 'credentials') {
+        setOauthProvider(providerRes.data.provider);
+        setStep('otp');
+        setIsSubmitting(false);
+        return;
+      }
+
+      const result = await sendForgotPasswordOtp({ email: email.toLowerCase().trim() });
       setIsSubmitting(false);
-      return;
-    }
 
-    const result = await sendForgotPasswordOtp({ email: email.toLowerCase().trim() });
-    setIsSubmitting(false);
-
-    if (result.ok) {
-      setStep('otp');
-      setResendCooldown(30);
-    } else {
-      setError(result.error?.message || 'Something went wrong. Please try again.');
+      if (result.ok) {
+        setStep('otp');
+        setResendCooldown(30);
+      } else {
+        setError(result.error?.message || 'Something went wrong. Please try again.');
+      }
+    } catch {
+      setIsSubmitting(false);
+      setError('Network error. Please try again.');
     }
   }
 
@@ -120,15 +127,20 @@ function ForgotPasswordContent() {
     setIsSubmitting(true);
     setError('');
 
-    const res = await verifyResetOtp({ email: email.toLowerCase().trim(), otp: code });
-    setIsSubmitting(false);
+    try {
+      const res = await verifyResetOtp({ email: email.toLowerCase().trim(), otp: code });
+      setIsSubmitting(false);
 
-    if (res.ok) {
-      setResetToken(res.data.resetToken);
-      setStep('password');
-    } else {
-      setError(res.error?.message || 'Invalid code. Please try again.');
-      setOtp('');
+      if (res.ok) {
+        setResetToken(res.data.resetToken);
+        setStep('password');
+      } else {
+        setError(res.error?.message || 'Invalid code. Please try again.');
+        setOtp('');
+      }
+    } catch {
+      setIsSubmitting(false);
+      setError('Network error. Please try again.');
     }
   }, [email, isSubmitting]);
 
@@ -150,23 +162,32 @@ function ForgotPasswordContent() {
     }
 
     setIsSubmitting(true);
-    const res = await resetPassword({ token: resetToken, password: newPassword });
-    setIsSubmitting(false);
+    try {
+      const res = await resetPassword({ token: resetToken, password: newPassword });
+      setIsSubmitting(false);
 
-    if (res.ok) {
-      trackPasswordResetSuccess();
-      setStep('success');
-    } else {
-      setError(res.error?.message || 'Something went wrong. Please try again.');
+      if (res.ok) {
+        trackPasswordResetSuccess();
+        setStep('success');
+      } else {
+        setError(res.error?.message || 'Something went wrong. Please try again.');
+      }
+    } catch {
+      setIsSubmitting(false);
+      setError('Network error. Please try again.');
     }
   }
 
   async function handleResend() {
     if (resendCooldown > 0) return;
-    const result = await sendForgotPasswordOtp({ email: email.toLowerCase().trim() });
-    if (result.ok) {
-      setResendCooldown(30);
-      setOtp('');
+    try {
+      const result = await sendForgotPasswordOtp({ email: email.toLowerCase().trim() });
+      if (result.ok) {
+        setResendCooldown(30);
+        setOtp('');
+      }
+    } catch {
+      // Network error — user can retry
     }
   }
 
@@ -322,15 +343,20 @@ function ForgotPasswordContent() {
                 <form onSubmit={handlePasswordSubmit} className="mt-6 flex flex-col gap-4" noValidate>
                   <div className="flex flex-col gap-1.5">
                     <Label htmlFor="new-password">New Password</Label>
-                    <Input
-                      id="new-password"
-                      type="password"
-                      placeholder="At least 8 characters"
-                      value={newPassword}
-                      onChange={(e) => { setNewPassword(e.target.value); setPasswordErrors({}); }}
-                      autoComplete="new-password"
-                      disabled={isSubmitting}
-                    />
+                    <div className="relative">
+                      <Input
+                        id="new-password"
+                        type={showNewPassword ? 'text' : 'password'}
+                        placeholder="At least 8 characters"
+                        value={newPassword}
+                        onChange={(e) => { setNewPassword(e.target.value); setPasswordErrors({}); }}
+                        autoComplete="new-password"
+                        disabled={isSubmitting}
+                      />
+                      <button type="button" onClick={() => setShowNewPassword(v => !v)} className="text-muted-foreground hover:text-foreground absolute right-3 top-1/2 -translate-y-1/2" tabIndex={-1} aria-label={showNewPassword ? 'Hide password' : 'Show password'}>
+                        {showNewPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                      </button>
+                    </div>
                     {newPassword.length > 0 && (
                       <div className="mt-1 flex flex-col gap-1">
                         <div className="flex gap-1">
@@ -353,7 +379,6 @@ function ForgotPasswordContent() {
                             { key: 'uppercase', label: 'Uppercase' },
                             { key: 'lowercase', label: 'Lowercase' },
                             { key: 'number', label: 'Number' },
-                            { key: 'special', label: 'Special char' },
                           ].map(({ key, label }) => (
                             <span key={key} className={pwErrors[key] ? 'text-muted-foreground' : 'text-green-600'}>
                               {pwErrors[key] ? '○' : '✓'} {label}
@@ -366,15 +391,20 @@ function ForgotPasswordContent() {
 
                   <div className="flex flex-col gap-1.5">
                     <Label htmlFor="confirm-password">Confirm Password</Label>
-                    <Input
-                      id="confirm-password"
-                      type="password"
-                      placeholder="Re-enter password"
-                      value={confirmPassword}
-                      onChange={(e) => setConfirmPassword(e.target.value)}
-                      autoComplete="new-password"
-                      disabled={isSubmitting}
-                    />
+                    <div className="relative">
+                      <Input
+                        id="confirm-password"
+                        type={showConfirmPassword ? 'text' : 'password'}
+                        placeholder="Re-enter password"
+                        value={confirmPassword}
+                        onChange={(e) => setConfirmPassword(e.target.value)}
+                        autoComplete="new-password"
+                        disabled={isSubmitting}
+                      />
+                      <button type="button" onClick={() => setShowConfirmPassword(v => !v)} className="text-muted-foreground hover:text-foreground absolute right-3 top-1/2 -translate-y-1/2" tabIndex={-1} aria-label={showConfirmPassword ? 'Hide password' : 'Show password'}>
+                        {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                      </button>
+                    </div>
                     {passwordErrors.match && (
                       <p role="alert" className="text-destructive text-xs">{passwordErrors.match}</p>
                     )}

@@ -103,19 +103,6 @@ export async function updateProfile(data: UpdateProfileRequest): Promise<ApiResp
   return patch<User>('/auth/profile', data);
 }
 
-export interface ForgotPasswordRequest {
-  email: string;
-}
-
-export interface ForgotPasswordResponse {
-  message: string;
-}
-
-export async function forgotPassword(data: ForgotPasswordRequest): Promise<ApiResponse<ForgotPasswordResponse>> {
-  const { post } = await import('./client');
-  return post<ForgotPasswordResponse>('/auth/forgot-password', data);
-}
-
 export interface ResetPasswordRequest {
   token: string;
   password: string;
@@ -161,9 +148,13 @@ export interface ForgotPasswordOtpRequest {
   email: string;
 }
 
-export async function sendForgotPasswordOtp(data: ForgotPasswordOtpRequest): Promise<ApiResponse<ForgotPasswordResponse>> {
+export interface ForgotPasswordOtpResponse {
+  message: string;
+}
+
+export async function sendForgotPasswordOtp(data: ForgotPasswordOtpRequest): Promise<ApiResponse<ForgotPasswordOtpResponse>> {
   const { post } = await import('./client');
-  return post<ForgotPasswordResponse>('/auth/forgot-password-otp', data);
+  return post<ForgotPasswordOtpResponse>('/auth/forgot-password-otp', data);
 }
 
 export interface VerifyResetOtpRequest {
@@ -293,11 +284,6 @@ export interface SyncConsentRequest {
 export async function syncConsent(data: SyncConsentRequest): Promise<ApiResponse<User>> {
   const { patch } = await import('./client');
   return patch<User>('/auth/profile', { consent: data });
-}
-
-export async function syncTheme(themePreference: string): Promise<ApiResponse<User>> {
-  const { patch } = await import('./client');
-  return patch<User>('/auth/profile', { themePreference });
 }
 
 // ─── OAuth (Google) ────────────────────────────────────────
