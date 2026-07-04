@@ -215,8 +215,9 @@ export default function RegisterPage() {
       setProfile({ name: res.data.user.name, email: res.data.user.email, phone: res.data.user.phone ?? '' });
       setAuth(true, res.data.user.onboardingCompleted ?? false);
       setIsSubmitting(false);
-    } catch {
-      setServerError('Network error. Please try again.');
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : 'Network error. Please try again.';
+      setServerError(msg.includes('timed out') ? 'Server is starting up. Please try again in a moment.' : 'Network error. Please try again.');
       setIsSubmitting(false);
     }
   }

@@ -83,8 +83,8 @@ export function PersonalizedHome() {
     return (
       <Container size="lg">
         <div className="mb-4">
-          <h2 className="text-xl font-semibold tracking-tight md:text-2xl">{title}</h2>
-          <p className="text-muted-foreground text-xs">{subtitle}</p>
+          <h2 className="text-xl font-semibold tracking-tight sm:text-2xl">{title}</h2>
+          <p className="text-muted-foreground text-sm">{subtitle}</p>
         </div>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {Array.from({ length: 3 }).map((_, i) => (
@@ -99,10 +99,10 @@ export function PersonalizedHome() {
     <Container size="lg">
       <div className="mb-4 flex items-end justify-between gap-4">
         <div>
-          <h2 className="text-xl font-semibold tracking-tight md:text-2xl">{title}</h2>
-          <p className="text-muted-foreground text-xs">{subtitle}</p>
+          <h2 className="text-xl font-semibold tracking-tight sm:text-2xl">{title}</h2>
+          <p className="text-muted-foreground text-sm">{subtitle}</p>
         </div>
-        <Link href="/academies" className="text-muted-foreground hover:text-foreground text-xs min-h-[44px] flex items-center shrink-0">
+        <Link href="/academies" className="text-muted-foreground hover:text-foreground text-sm min-h-[44px] flex items-center shrink-0">
           View all &rarr;
         </Link>
       </div>
@@ -110,11 +110,11 @@ export function PersonalizedHome() {
       {/* Matching explanation */}
       {isPersonalized && matchingReasons.length > 0 && (
         <div className="mb-4 flex flex-wrap items-center gap-2">
-          <span className="text-muted-foreground text-xs">Based on your profile</span>
+          <span className="text-muted-foreground text-sm">Based on your profile</span>
           {matchingReasons.map((reason) => (
             <span
               key={reason.label}
-              className="border-border/60 bg-card/40 rounded-md border px-2 py-0.5 text-[10px] font-medium capitalize"
+              className="border-border/60 bg-card/40 rounded-md border px-2 py-0.5 text-xs font-medium capitalize"
             >
               {reason.label}
             </span>

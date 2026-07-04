@@ -152,8 +152,9 @@ export default function LoginPage() {
       } else {
         router.replace('/onboarding/role');
       }
-    } catch {
-      setServerError('Network error. Please try again.');
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : 'Network error. Please try again.';
+      setServerError(msg.includes('timed out') ? 'Server is starting up. Please try again in a moment.' : 'Network error. Please try again.');
       setIsSubmitting(false);
     }
   }
