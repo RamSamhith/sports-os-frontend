@@ -47,9 +47,13 @@ async function fetchSports(): Promise<{ items: Sport[]; total: number }> {
       const res = await listSports({ status: 'published', limit: 100 });
       if (res.ok) {
         const items = Array.isArray(res.data?.items) ? res.data.items : [];
-        sportsTotalCache = res.data?.pagination?.total ?? items.length;
-        sportsCache = items;
-        return items;
+        // Only use API data if it actually returned sports.
+        // Otherwise fall through to static catalog (same logic as /sports page).
+        if (items.length > 0) {
+          sportsTotalCache = res.data?.pagination?.total ?? items.length;
+          sportsCache = items;
+          return items;
+        }
       }
     } catch {
       // API failed — fall through to static catalog
@@ -91,11 +95,6 @@ export function useHomepageData() {
       } finally {
         if (!cancelled) setLoading(false);
       }
-    }
-
-    if (academiesCache && sportsCache) {
-      setLoading(false);
-      return;
     }
 
     load();

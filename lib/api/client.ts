@@ -99,7 +99,7 @@ async function ensureRefresh(): Promise<string> {
 
 // ─── Timeout ─────────────────────────────────────────────────
 
-const REQUEST_TIMEOUT_MS = 30_000;
+const REQUEST_TIMEOUT_MS = 60_000;
 
 // ─── Core Request Function ───────────────────────────────────
 

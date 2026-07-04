@@ -35,7 +35,7 @@ export function Hero() {
   const { academiesTotal, sportsTotal, loading } = useHomepageData();
 
   return (
-    <section className="relative pt-12 pb-8 md:pt-16 md:pb-10">
+    <section className="relative pt-16 pb-10 md:pt-24 md:pb-14">
       <div className="mx-auto flex w-full max-w-2xl flex-col items-center text-center">
         <motion.div
           initial={reduced ? false : 'hidden'}
@@ -45,7 +45,7 @@ export function Hero() {
         >
           <motion.h1
             variants={reduced ? undefined : fadeUp}
-            className="text-3xl font-bold tracking-tight sm:text-4xl md:text-5xl"
+            className="text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl"
             style={{ textWrap: 'balance' }}
           >
             Find the Right Sports Academy
@@ -53,7 +53,7 @@ export function Hero() {
 
           <motion.p
             variants={reduced ? undefined : fadeUp}
-            className="text-muted-foreground mt-2 max-w-md text-sm sm:text-base"
+            className="text-muted-foreground mt-3 max-w-lg text-base sm:text-lg"
             style={{ textWrap: 'balance' }}
           >
             Verified academies, sports, and cities across India.
@@ -65,7 +65,7 @@ export function Hero() {
           initial={reduced ? false : 'hidden'}
           animate="show"
           variants={reduced ? undefined : fadeUp}
-          className="mt-5 w-full"
+          className="mt-7 w-full"
         >
           <SearchAutocomplete placeholder="Search academies, sports, cities…" size="lg" />
         </motion.div>
@@ -75,13 +75,13 @@ export function Hero() {
           initial={reduced ? false : 'hidden'}
           animate="show"
           variants={reduced ? undefined : stagger}
-          className="mt-4 flex items-center gap-2.5"
+          className="mt-5 flex items-center gap-3"
         >
           {shortcuts.map((s) => (
             <Link
               key={s.label}
               href={s.href}
-              className="group border-border/60 bg-card/40 hover:border-primary/40 hover:bg-primary/5 inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-medium transition-all duration-200 hover:shadow-sm"
+              className="group border-border/60 bg-card/40 hover:border-primary/40 hover:bg-primary/5 inline-flex items-center gap-2 rounded-full border px-5 py-2.5 text-sm font-medium transition-all duration-200 hover:shadow-sm"
             >
               <s.icon className="text-muted-foreground h-4 w-4 transition-colors group-hover:text-primary" />
               {s.label}
@@ -95,12 +95,12 @@ export function Hero() {
             initial={reduced ? false : 'hidden'}
             animate="show"
             variants={reduced ? undefined : stagger}
-            className="mt-5 flex items-center gap-4 text-center"
+            className="mt-6 flex items-center gap-5 text-center"
           >
             <span className="text-muted-foreground text-sm">
               <span className="text-foreground font-semibold">{formatCount(academiesTotal)}</span> academies
             </span>
-            <span className="text-muted-foreground/40">·</span>
+            <span className="text-muted-foreground/30">·</span>
             <span className="text-muted-foreground text-sm">
               <span className="text-foreground font-semibold">{formatCount(sportsTotal)}</span> sports
             </span>

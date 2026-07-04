@@ -11,80 +11,8 @@ import { useSearchQuery } from '@/lib/hooks/use-search-query';
 import { listSports } from '@/lib/api/sports';
 import { sportsCatalog, type CatalogSport } from '@/data/sports-catalog';
 import { SportComparison } from '@/components/sports/sport-comparison';
-import { cn } from '@/lib/utils/cn';
+import { SportCard } from '@/components/sports/sport-card';
 import type { Sport } from '@/types/domain/sport';
-
-const sportGradients: Record<string, string> = {
-  cricket: 'from-blue-600 to-blue-800/60',
-  football: 'from-emerald-600 to-emerald-800/60',
-  basketball: 'from-orange-600 to-orange-800/60',
-  badminton: 'from-violet-600 to-violet-800/60',
-  tennis: 'from-yellow-600 to-yellow-800/60',
-  swimming: 'from-sky-600 to-sky-800/60',
-  athletics: 'from-red-600 to-red-800/60',
-  hockey: 'from-green-600 to-green-800/60',
-  kabaddi: 'from-amber-600 to-amber-800/60',
-  chess: 'from-slate-600 to-slate-800/60',
-  boxing: 'from-rose-600 to-rose-800/60',
-  wrestling: 'from-orange-700 to-orange-900/60',
-  archery: 'from-teal-600 to-teal-800/60',
-  shooting: 'from-zinc-600 to-zinc-800/60',
-  gymnastics: 'from-pink-600 to-pink-800/60',
-  'table-tennis': 'from-cyan-600 to-cyan-800/60',
-  volleyball: 'from-indigo-600 to-indigo-800/60',
-  cycling: 'from-lime-600 to-lime-800/60',
-  skating: 'from-purple-600 to-purple-800/60',
-  rugby: 'from-stone-600 to-stone-800/60',
-  default: 'from-primary/60 to-primary/20',
-};
-
-function CatalogSportCard({ sport }: { sport: CatalogSport }) {
-  const gradient = sportGradients[sport.slug] ?? sportGradients.default;
-  return (
-    <Link
-      href={`/sports/${sport.slug}`}
-      className="group border-border/40 bg-card/40 hover:border-foreground/20 hover:shadow-xl overflow-hidden rounded-xl border transition-all duration-300"
-    >
-      <div className="bg-muted/40 relative aspect-[16/9] w-full overflow-hidden">
-        <ImageWithFallback
-          src={`/images/sports/${sport.slug}.svg`}
-          alt={`${sport.name} cover`}
-          fill
-          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-          className="object-cover transition-transform duration-500 ease-out group-hover:scale-[1.06]"
-          fallback={
-            <div className={`flex h-full w-full items-center justify-center bg-gradient-to-br ${gradient}`}>
-              <span className="text-3xl font-bold text-white/80 drop-shadow-sm">
-                {sport.name.charAt(0)}
-              </span>
-            </div>
-          }
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
-        <div className="absolute bottom-3 left-3 right-3">
-          <h3 className="text-base font-bold text-white drop-shadow-sm line-clamp-1">{sport.name}</h3>
-          <p className="text-white/80 mt-0.5 text-xs line-clamp-1">{sport.shortDescription}</p>
-        </div>
-      </div>
-      <div className="flex flex-col gap-2.5 p-4">
-        <div className="flex flex-wrap gap-1.5">
-          <Badge variant="secondary" className="text-[10px] capitalize">{sport.sportType === 'both' ? 'Individual & Team' : sport.sportType}</Badge>
-          <Badge variant="secondary" className="text-[10px] capitalize">{sport.category}</Badge>
-          <Badge variant="secondary" className={`text-[10px] capitalize ${sport.fitnessLevelRequired === 'Low' ? 'text-emerald-600' : sport.fitnessLevelRequired === 'High' ? 'text-red-600' : 'text-amber-600'}`}>
-            {sport.fitnessLevelRequired}
-          </Badge>
-          {sport.olympicSport && <Badge variant="secondary" className="text-[10px] bg-yellow-500/10 text-yellow-600 border-yellow-500/20">Olympic</Badge>}
-          {sport.beginnerFriendly && <Badge variant="secondary" className="text-[10px] bg-green-500/10 text-green-600 border-green-500/20">Beginner</Badge>}
-        </div>
-        <Button size="lg" className="w-full h-11" asChild>
-          <Link href={`/sports/${sport.slug}`}>
-            Explore {sport.name}
-          </Link>
-        </Button>
-      </div>
-    </Link>
-  );
-}
 
 export function SportsListing({ hideSearch = false }: { hideSearch?: boolean } = {}) {
   const { query, setQuery } = useSearchQuery();
@@ -166,7 +94,48 @@ export function SportsListing({ hideSearch = false }: { hideSearch?: boolean } =
         </p>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {filteredCatalog.map((sport) => (
-            <CatalogSportCard key={sport.slug} sport={sport} />
+            <SportCard key={sport.slug} sport={{
+              id: sport.slug,
+              slug: sport.slug,
+              name: sport.name,
+              category: sport.category,
+              sportType: sport.sportType,
+              shortDescription: sport.shortDescription,
+              fullDescription: sport.shortDescription,
+              origin: '',
+              popularityInIndia: '',
+              popularityWorldwide: '',
+              icon: `/images/sports/${sport.slug}.svg`,
+              coverImage: `/images/sports/${sport.slug}.svg`,
+              howToPlay: '',
+              objectiveOfGame: '',
+              teamSize: '',
+              matchDuration: '',
+              scoringSystem: '',
+              playingSurface: '',
+              requiredEquipment: [],
+              ageGroups: sport.suitableFor.join(', '),
+              beginnerFriendly: sport.beginnerFriendly,
+              olympicSport: sport.olympicSport,
+              estimatedMonthlyCost: '',
+              playingSeason: 'All Year' as const,
+              trainingFrequency: '',
+              averageLearningTime: '',
+              injuryRisk: 'Medium' as const,
+              fitnessLevelRequired: sport.fitnessLevelRequired,
+              suitableFor: sport.suitableFor as ('Kids' | 'Teens' | 'Adults' | 'Seniors')[],
+              individualOrTeam: (sport.sportType === 'both' ? 'Both' : sport.sportType === 'team' ? 'Team' : 'Individual') as 'Individual' | 'Team' | 'Both',
+              indoorOutdoor: sport.category as 'Indoor' | 'Outdoor' | 'Both',
+              physicalBenefits: [],
+              mentalBenefits: [],
+              skillsDeveloped: [],
+              careerOpportunities: [],
+              scholarships: [],
+              professionalLeagues: [],
+              tournaments: [],
+              competitionPathway: { levels: [] },
+              status: 'published' as const,
+            }} />
           ))}
         </div>
       </div>
@@ -212,13 +181,54 @@ export function SportsListing({ hideSearch = false }: { hideSearch?: boolean } =
       ) : hasApiSports ? (
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {filteredSports.map((sport) => (
-            <SportCardApi key={sport.id} sport={sport} />
+            <SportCard key={sport.id} sport={sport} />
           ))}
         </div>
       ) : (
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {filteredCatalog.map((sport) => (
-            <CatalogSportCard key={sport.slug} sport={sport} />
+            <SportCard key={sport.slug} sport={{
+              id: sport.slug,
+              slug: sport.slug,
+              name: sport.name,
+              category: sport.category,
+              sportType: sport.sportType,
+              shortDescription: sport.shortDescription,
+              fullDescription: sport.shortDescription,
+              origin: '',
+              popularityInIndia: '',
+              popularityWorldwide: '',
+              icon: `/images/sports/${sport.slug}.svg`,
+              coverImage: `/images/sports/${sport.slug}.svg`,
+              howToPlay: '',
+              objectiveOfGame: '',
+              teamSize: '',
+              matchDuration: '',
+              scoringSystem: '',
+              playingSurface: '',
+              requiredEquipment: [],
+              ageGroups: sport.suitableFor.join(', '),
+              beginnerFriendly: sport.beginnerFriendly,
+              olympicSport: sport.olympicSport,
+              estimatedMonthlyCost: '',
+              playingSeason: 'All Year' as const,
+              trainingFrequency: '',
+              averageLearningTime: '',
+              injuryRisk: 'Medium' as const,
+              fitnessLevelRequired: sport.fitnessLevelRequired,
+              suitableFor: sport.suitableFor as ('Kids' | 'Teens' | 'Adults' | 'Seniors')[],
+              individualOrTeam: (sport.sportType === 'both' ? 'Both' : sport.sportType === 'team' ? 'Team' : 'Individual') as 'Individual' | 'Team' | 'Both',
+              indoorOutdoor: sport.category as 'Indoor' | 'Outdoor' | 'Both',
+              physicalBenefits: [],
+              mentalBenefits: [],
+              skillsDeveloped: [],
+              careerOpportunities: [],
+              scholarships: [],
+              professionalLeagues: [],
+              tournaments: [],
+              competitionPathway: { levels: [] },
+              status: 'published' as const,
+            }} />
           ))}
         </div>
       )}
@@ -228,59 +238,5 @@ export function SportsListing({ hideSearch = false }: { hideSearch?: boolean } =
         <SportComparison />
       </div>
     </div>
-  );
-}
-
-function SportCardApi({ sport }: { sport: Sport }) {
-  const slug = sport.slug;
-  const name = sport.name;
-  const gradient = sportGradients[slug] ?? sportGradients.default;
-  const difficulty = sport.fitnessLevelRequired ?? 'Medium';
-  const participation = sport.individualOrTeam ?? 'Both';
-  const environment = sport.indoorOutdoor ?? 'Both';
-
-  return (
-    <Link
-      href={`/sports/${slug}`}
-      className="group border-border/40 bg-card/40 hover:border-foreground/20 hover:shadow-xl overflow-hidden rounded-xl border transition-all duration-300"
-    >
-      <div className="bg-muted/40 relative aspect-[16/9] w-full overflow-hidden">
-        <ImageWithFallback
-          src={sport.coverImage || `/images/sports/${slug}.svg`}
-          alt={`${name} cover`}
-          fill
-          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-          className="object-cover transition-transform duration-500 ease-out group-hover:scale-[1.06]"
-          fallback={
-            <div className={`flex h-full w-full items-center justify-center bg-gradient-to-br ${gradient}`}>
-              <span className="text-3xl font-bold text-white/80 drop-shadow-sm">
-                {name.charAt(0)}
-              </span>
-            </div>
-          }
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
-        <div className="absolute bottom-3 left-3 right-3">
-          <h3 className="text-base font-bold text-white drop-shadow-sm line-clamp-1">{name}</h3>
-          <p className="text-white/80 mt-0.5 text-xs line-clamp-1">{sport.shortDescription}</p>
-        </div>
-      </div>
-      <div className="flex flex-col gap-2.5 p-4">
-        <div className="flex flex-wrap gap-1.5">
-          <Badge variant="secondary" className="text-[10px] capitalize">{participation}</Badge>
-          <Badge variant="secondary" className="text-[10px] capitalize">{environment}</Badge>
-          <Badge variant="secondary" className={`text-[10px] capitalize ${difficulty === 'Low' ? 'text-emerald-600' : difficulty === 'High' ? 'text-red-600' : 'text-amber-600'}`}>
-            {difficulty}
-          </Badge>
-          {sport.olympicSport && <Badge variant="secondary" className="text-[10px] bg-yellow-500/10 text-yellow-600 border-yellow-500/20">Olympic</Badge>}
-          {sport.beginnerFriendly && <Badge variant="secondary" className="text-[10px] bg-green-500/10 text-green-600 border-green-500/20">Beginner</Badge>}
-        </div>
-        <Button size="lg" className="w-full h-11" asChild>
-          <Link href={`/sports/${slug}`}>
-            Explore {name}
-          </Link>
-        </Button>
-      </div>
-    </Link>
   );
 }
