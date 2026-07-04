@@ -68,7 +68,7 @@ function AccordionSection({
 
 function StatCard({ icon: Icon, label, value }: { icon: React.ElementType; label: string; value: string }) {
   return (
-    <div className="bg-muted/30 flex items-start gap-3 rounded-lg border p-3">
+    <div className="bg-muted/30 flex items-start gap-3 rounded-xl border border-border/40 p-4 transition-colors hover:border-foreground/20">
       <Icon className="text-primary mt-0.5 h-4 w-4 shrink-0" />
       <div className="flex flex-col gap-0.5">
         <span className="text-muted-foreground text-[10px] tracking-widest uppercase">{label}</span>
@@ -110,7 +110,7 @@ export function SportDetailView({ sport }: SportDetailViewProps) {
         <Link href="/sports"><ArrowLeft className="h-4 w-4 mr-1" /> Back to sports</Link>
       </Button>
       {/* Hero */}
-      <div className="relative overflow-hidden rounded-2xl">
+      <div className="relative overflow-hidden rounded-2xl border border-border/40">
         <div className="bg-muted/40 relative aspect-[21/9] w-full">
           <ImageWithFallback
             src={imageSrc}
@@ -119,20 +119,20 @@ export function SportDetailView({ sport }: SportDetailViewProps) {
             sizes="(max-width: 768px) 100vw, 66vw"
             className="object-cover"
             fallback={
-              <div className="bg-primary/10 flex h-full w-full items-center justify-center">
-                <span className="text-primary/40 text-6xl font-bold">{name.charAt(0)}</span>
+              <div className="bg-gradient-to-br from-primary/20 to-primary/5 flex h-full w-full items-center justify-center">
+                <span className="text-primary/30 text-6xl font-bold">{name.charAt(0)}</span>
               </div>
             }
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-          <div className="absolute bottom-0 left-0 p-6">
-            <div className="flex items-center gap-3 mb-2">
-              <span className="bg-muted/60 relative h-10 w-10 shrink-0 overflow-hidden rounded-lg backdrop-blur-sm">
+          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+          <div className="absolute bottom-0 left-0 p-6 sm:p-8">
+            <div className="flex items-center gap-3 mb-3">
+              <span className="bg-muted/60 relative h-11 w-11 shrink-0 overflow-hidden rounded-xl backdrop-blur-sm border border-white/20">
                 <ImageWithFallback
                   src={iconSrc}
                   alt={`${name} icon`}
                   fill
-                  sizes="40px"
+                  sizes="44px"
                   className="object-contain p-1"
                   fallback={
                     <span className="bg-primary/15 text-foreground/80 grid h-full w-full place-items-center text-sm font-semibold uppercase">
@@ -142,9 +142,9 @@ export function SportDetailView({ sport }: SportDetailViewProps) {
                 />
               </span>
               <div>
-                <h1 className="text-2xl font-bold text-white md:text-3xl">{name}</h1>
-                <div className="flex items-center gap-2">
-                  <Badge variant="secondary" className="bg-white/20 text-white border-white/20 text-[10px]">{category}</Badge>
+                <h1 className="text-2xl font-bold text-white sm:text-3xl md:text-4xl tracking-tight">{name}</h1>
+                <div className="flex items-center gap-2 mt-1">
+                  <Badge variant="secondary" className="bg-white/20 text-white border-white/20 text-[10px] backdrop-blur-sm">{category}</Badge>
                   <Badge variant="secondary" className="bg-white/20 text-white border-white/20 text-[10px] capitalize">{sportType}</Badge>
                   {olympicSport && <Badge variant="secondary" className="bg-yellow-500/20 text-yellow-200 border-yellow-500/20 text-[10px]">Olympic</Badge>}
                   {beginnerFriendly && <Badge variant="secondary" className="bg-green-500/20 text-green-200 border-green-500/20 text-[10px]">Beginner Friendly</Badge>}
