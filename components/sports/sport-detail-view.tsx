@@ -5,10 +5,10 @@ import Link from 'next/link';
 import {
   Trophy, Target, Users, Clock, Dumbbell, Heart,
   Brain, Briefcase, GraduationCap, Medal, MapPin, Star,
-  Timer, ChevronDown, ChevronRight,
+  ChevronDown, ChevronRight,
   Zap, Activity, HelpCircle, Lightbulb,
   ArrowLeft, Shield, AlertTriangle, Sparkles, Flame,
-  TrendingUp, IndianRupee, Calendar, Swords, BarChart3, Info,
+  TrendingUp, Swords, BarChart3,
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -169,10 +169,9 @@ export function SportDetailView({ sport }: SportDetailViewProps) {
       </div>
 
       {/* Quick Stats */}
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
         <StatCard icon={Users} label="Team Size" value={teamSize ?? 'N/A'} />
         <StatCard icon={Clock} label="Duration" value={matchDuration ?? 'N/A'} />
-        <StatCard icon={Timer} label="Learning Time" value={sc?.averageLearningTime ?? 'N/A'} />
         <StatCard icon={Heart} label="Fitness Level" value={sport.fitnessLevelRequired ?? 'N/A'} />
       </div>
 
@@ -211,8 +210,6 @@ export function SportDetailView({ sport }: SportDetailViewProps) {
             </div>
           )}
           <div className="mt-3 grid grid-cols-2 gap-2">
-            {sc?.estimatedMonthlyCost && <MiniStat icon={IndianRupee} label="Monthly cost" value={sc.estimatedMonthlyCost} />}
-            {sc?.playingSeason && <MiniStat icon={Calendar} label="Season" value={sc.playingSeason} />}
             {sc?.injuryRisk && <MiniStat icon={AlertTriangle} label="Injury risk" value={sc.injuryRisk} />}
             {sc?.trainingFrequency && <MiniStat icon={Activity} label="Training" value={sc.trainingFrequency} />}
           </div>

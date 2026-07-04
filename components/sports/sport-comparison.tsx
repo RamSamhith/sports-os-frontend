@@ -44,13 +44,6 @@ const comparisonRows: ComparisonRow[] = [
     },
   },
   {
-    label: 'Monthly Cost',
-    getValue: (s) => {
-      const sc = sportsContent[s.slug];
-      return sc?.estimatedMonthlyCost ?? 'N/A';
-    },
-  },
-  {
     label: 'Training',
     getValue: (s) => {
       const sc = sportsContent[s.slug];
@@ -58,24 +51,10 @@ const comparisonRows: ComparisonRow[] = [
     },
   },
   {
-    label: 'Learning Time',
-    getValue: (s) => {
-      const sc = sportsContent[s.slug];
-      return sc?.averageLearningTime ?? 'N/A';
-    },
-  },
-  {
     label: 'Injury Risk',
     getValue: (s) => {
       const sc = sportsContent[s.slug];
       return sc?.injuryRisk ?? 'N/A';
-    },
-  },
-  {
-    label: 'Season',
-    getValue: (s) => {
-      const sc = sportsContent[s.slug];
-      return sc?.playingSeason ?? 'N/A';
     },
   },
   {

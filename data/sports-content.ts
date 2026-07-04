@@ -10,9 +10,6 @@ export interface SportContent {
   skills: string[];
   trainingPath: string;
   trainingFrequency: string;
-  averageLearningTime: string;
-  estimatedMonthlyCost: string;
-  playingSeason: string;
   injuryRisk: 'Low' | 'Medium' | 'High';
   popularityInIndia: string;
   popularityWorldwide: string;
@@ -62,9 +59,6 @@ export const sportsContent: Record<string, SportContent> = {
     trainingPath:
       "Start with soft-ball cricket at school or local clubs to learn basic batting, bowling, and fielding. Progress to age-group tournaments (Under-14, Under-16, Under-19) through district and state associations. Elite players enter Ranji Trophy, IPL, and eventually national selection via BCCI pathways.",
     trainingFrequency: "4-6 days/week",
-    averageLearningTime: "2-3 years to become match-ready",
-    estimatedMonthlyCost: "₹2,000 – ₹10,000",
-    playingSeason: "October – March (outdoor season)",
     injuryRisk: "Medium",
     popularityInIndia: "Most popular sport — 1.4 billion fans",
     popularityWorldwide: "Top 3 globally, dominant in South Asia, Australia, UK",
@@ -154,9 +148,6 @@ export const sportsContent: Record<string, SportContent> = {
     trainingPath:
       "Begin with local football clubs or school teams to learn dribbling, passing, and positioning. Progress through district and state leagues, aiming for junior national competitions. Top players are scouted for ISL, I-League, or national camp selections.",
     trainingFrequency: "4-5 days/week",
-    averageLearningTime: "1-2 years to become match-ready",
-    estimatedMonthlyCost: "₹1,500 – ₹8,000",
-    playingSeason: "August – March (monsoon and winter leagues)",
     injuryRisk: "Medium",
     popularityInIndia: "Growing rapidly — ISL has boosted viewership to 200M+ annually",
     popularityWorldwide: "Most popular sport in the world with 4 billion+ fans globally",
@@ -244,9 +235,6 @@ export const sportsContent: Record<string, SportContent> = {
     trainingPath:
       "Start at school or local clubs learning dribbling, shooting, and defensive fundamentals. Compete in district and state championships to build competitive experience. Top performers can join national camps, UBA, or Basketball India League teams.",
     trainingFrequency: "4-5 days/week",
-    averageLearningTime: "1-2 years to build game-ready skills",
-    estimatedMonthlyCost: "₹1,000 – ₹6,000",
-    playingSeason: "Year-round (indoor sport)",
     injuryRisk: "Medium",
     popularityInIndia: "Strong school-level presence, growing through UBA and BCL leagues",
     popularityWorldwide: "Top 3 globally, massive following in USA, China, and Europe",
@@ -335,9 +323,6 @@ export const sportsContent: Record<string, SportContent> = {
     trainingPath:
       "Start at a local badminton academy or school program to learn grip, footwork, and basic strokes. Progress through district and state ranking tournaments to gain competitive exposure. Top performers enter national camps and can aim for BWF World Tour and Olympic selection via BAI.",
     trainingFrequency: "5-6 days/week",
-    averageLearningTime: "1-2 years for competitive readiness",
-    estimatedMonthlyCost: "₹2,000 – ₹10,000",
-    playingSeason: "Year-round (indoor sport)",
     injuryRisk: "Medium",
     popularityInIndia: "One of India's top Olympic sports — Sindhu and Nehwal are national icons",
     popularityWorldwide: "Huge in Asia (China, Indonesia, Japan), growing in Europe and Americas",
@@ -426,9 +411,6 @@ export const sportsContent: Record<string, SportContent> = {
     trainingPath:
       "Begin with coaching at a tennis club or academy to learn strokes, serve, and court movement. Compete in AITA junior ranking tournaments to build competitive experience. Advanced players progress through ITF junior circuits and can aim for ATP/WTA Tour or national team selection.",
     trainingFrequency: "4-5 days/week",
-    averageLearningTime: "2-3 years to reach competitive level",
-    estimatedMonthlyCost: "₹3,000 – ₹15,000",
-    playingSeason: "Year-round (different surfaces per season)",
     injuryRisk: "Medium",
     popularityInIndia: "Elite following — Sania Mirza and doubles pairs made it mainstream",
     popularityWorldwide: "Top 5 globally, massive following in Europe, USA, and Australia",
@@ -517,9 +499,6 @@ export const sportsContent: Record<string, SportContent> = {
     trainingPath:
       "Start at a local club or school with basic ball control, serve, and footwork drills. Compete in TTFI district and state ranking events to build competitive experience. Top players enter national championships and can aim for WTT events and Olympic selection.",
     trainingFrequency: "5-6 days/week",
-    averageLearningTime: "1-2 years for competitive play",
-    estimatedMonthlyCost: "₹800 – ₹5,000",
-    playingSeason: "Year-round (indoor sport)",
     injuryRisk: "Low",
     popularityInIndia: "Growing — Sharath Kamal and Manika Batra have boosted participation",
     popularityWorldwide: "Dominant in China, huge in Asia, growing in Europe and Americas",
@@ -608,9 +587,6 @@ export const sportsContent: Record<string, SportContent> = {
     trainingPath:
       "Begin with water familiarization and learning basic strokes at a local pool or swim school. Progress through district and state aquatics championships to build competitive times. Elite swimmers train at national camps and can qualify for World Aquatics events and the Olympics via SWFI.",
     trainingFrequency: "5-6 days/week",
-    averageLearningTime: "2-3 years to master all four strokes",
-    estimatedMonthlyCost: "₹2,000 – ₹12,000 (pool fees vary widely)",
-    playingSeason: "Year-round (indoor pools)",
     injuryRisk: "Low",
     popularityInIndia: "Niche but growing — Sajan Prakash and Srihari Nataraj inspiring new generation",
     popularityWorldwide: "Core Olympic sport with huge followings in USA, Australia, and Europe",
@@ -698,9 +674,6 @@ export const sportsContent: Record<string, SportContent> = {
     trainingPath:
       "Start at school or local athletics clubs to identify your event and learn proper technique. Compete in district and state meets to build race experience and qualifying marks. Elite athletes enter national camps and can aim for Federation Cup, Diamond League, and Olympic qualification via AFI.",
     trainingFrequency: "5-6 days/week",
-    averageLearningTime: "2-3 years to reach competitive level",
-    estimatedMonthlyCost: "₹500 – ₹5,000",
-    playingSeason: "September – June (outdoor track season)",
     injuryRisk: "Medium",
     popularityInIndia: "Neeraj Chopra's gold sparked a revolution — javelin and middle distance booming",
     popularityWorldwide: "Foundation of the Olympics — track and field has global prestige",
@@ -789,9 +762,6 @@ export const sportsContent: Record<string, SportContent> = {
     trainingPath:
       "Begin at a local akhada (traditional wrestling gym) or sports academy to learn basics of stance, takedowns, and escapes. Compete in district and state championships to build competitive experience. Top wrestlers enter national camps and aim for Asian Games and Olympic selection via WFI.",
     trainingFrequency: "6 days/week",
-    averageLearningTime: "3-5 years to reach competitive level",
-    estimatedMonthlyCost: "₹1,000 – ₹5,000",
-    playingSeason: "Year-round (indoor and outdoor competitions)",
     injuryRisk: "High",
     popularityInIndia: "Deep roots in Haryana and Punjab — Olympic medal tradition since 2008",
     popularityWorldwide: "Olympic staple with strong followings in Iran, Russia, USA, and Turkey",
@@ -881,9 +851,6 @@ export const sportsContent: Record<string, SportContent> = {
     trainingPath:
       "Start at a local boxing gym to learn basic stance, jab, cross, and defensive moves. Compete in state and national amateur boxing championships to build ring experience. Top boxers can aim for India Open, World Championships, and Olympic selection via BFI.",
     trainingFrequency: "5-6 days/week",
-    averageLearningTime: "2-3 years to become competition-ready",
-    estimatedMonthlyCost: "₹1,500 – ₹8,000",
-    playingSeason: "Year-round (indoor sport)",
     injuryRisk: "High",
     popularityInIndia: "Growing — Vijender Singh and Lovlina Borgohain are Olympic icons from Haryana and Assam",
     popularityWorldwide: "Massive global following with major pro circuits in USA, UK, Japan, and Mexico",
@@ -972,9 +939,6 @@ export const sportsContent: Record<string, SportContent> = {
     trainingPath:
       "Begin at a local karate dojo to learn basic stances, strikes, and kata. Progress through belt grades (kyu levels) and compete in district and state championships. Elite karatekas can enter national championships and represent India at Asian and World Karate Championships.",
     trainingFrequency: "3-5 days/week",
-    averageLearningTime: "2-4 years to earn a black belt",
-    estimatedMonthlyCost: "₹1,000 – ₹6,000",
-    playingSeason: "Year-round (indoor competitions)",
     injuryRisk: "Low",
     popularityInIndia: "Growing through dojos in metros — strong in Maharashtra and South India",
     popularityWorldwide: "Huge global following with 100M+ practitioners worldwide, strongest in Japan and Europe",
@@ -1061,9 +1025,6 @@ export const sportsContent: Record<string, SportContent> = {
     trainingPath:
       "Begin at a judo club or sports academy to learn breakfalls (ukemi), basic throws, and groundwork. Progress through belt grades (kyu/dan levels) and compete in district and state championships. Elite judokas can enter national camps and aim for Asian Games and Olympic selection via JFI.",
     trainingFrequency: "4-5 days/week",
-    averageLearningTime: "3-5 years to reach advanced belt level",
-    estimatedMonthlyCost: "₹1,500 – ₹7,000",
-    playingSeason: "Year-round (indoor sport)",
     injuryRisk: "Medium",
     popularityInIndia: "Niche but growing — Asian-level medalists emerging from North-East India",
     popularityWorldwide: "Olympic staple with massive following in Japan, France, and South Korea",
@@ -1150,9 +1111,6 @@ export const sportsContent: Record<string, SportContent> = {
     trainingPath:
       "Start at local kabaddi clubs or school teams to learn raiding techniques and defensive formations. Compete in district and state championships to gain match experience. Top players are scouted for Pro Kabaddi League and national team selection via AKFI.",
     trainingFrequency: "5-6 days/week",
-    averageLearningTime: "1-2 years to become match-ready",
-    estimatedMonthlyCost: "₹500 – ₹3,000",
-    playingSeason: "Year-round (indoor and outdoor courts)",
     injuryRisk: "High",
     popularityInIndia: "India's indigenous sport — PKL is the 2nd most-watched league after IPL",
     popularityWorldwide: "Primarily South Asian but growing through international tournaments and diaspora",
@@ -1242,9 +1200,6 @@ export const sportsContent: Record<string, SportContent> = {
     trainingPath:
       "Start at local hockey clubs or school programs to learn basic stick skills and game rules. Compete in district and state championships to gain competitive experience. Top players enter national camps and can aim for Hockey India League and Olympic selection via HI.",
     trainingFrequency: "5-6 days/week",
-    averageLearningTime: "2-3 years to reach competitive level",
-    estimatedMonthlyCost: "₹1,500 – ₹8,000",
-    playingSeason: "October – March (outdoor season on turf)",
     injuryRisk: "Medium",
     popularityInIndia: "India's most decorated Olympic sport — 8 gold medals, Odisha government backing",
     popularityWorldwide: "Strong in Netherlands, Australia, Pakistan, and Germany — Olympic premier sport",
@@ -1332,9 +1287,6 @@ export const sportsContent: Record<string, SportContent> = {
     trainingPath:
       "Learn the basic rules and pieces through local chess clubs or online platforms. Compete in district and state chess championships to gain rating points. Top players aim for FIDE titles (FM, IM, GM) and can represent India in Chess Olympiad and World Championship events via AICF.",
     trainingFrequency: "5-7 days/week",
-    averageLearningTime: "3-5 years to reach competitive rating",
-    estimatedMonthlyCost: "₹500 – ₹4,000",
-    playingSeason: "Year-round (indoor and online)",
     injuryRisk: "Low",
     popularityInIndia: "Viswanathan Anand made India a chess powerhouse — 80+ grandmasters",
     popularityWorldwide: "Global mind sport with 600M+ players, massive online growth post-COVID",
@@ -1423,9 +1375,6 @@ export const sportsContent: Record<string, SportContent> = {
     trainingPath:
       "Start with basic balance and skating drills at a local rink or skating club. Progress through district and state championships to gain competitive experience. Top skaters enter national championships (RSFI) and can aim for Asian Championships and World Skate Games.",
     trainingFrequency: "4-5 days/week",
-    averageLearningTime: "1-2 years for basic proficiency",
-    estimatedMonthlyCost: "₹1,000 – ₹5,000",
-    playingSeason: "Year-round (indoor rinks available)",
     injuryRisk: "Medium",
     popularityInIndia: "Strong speed skating tradition — 100+ Asian Championship medals",
     popularityWorldwide: "Growing globally, ice skating huge in winter sports nations",
@@ -1513,9 +1462,6 @@ export const sportsContent: Record<string, SportContent> = {
     trainingPath:
       "Begin at a local archery club or range to learn proper stance, draw, and release technique. Compete in district and state archery championships to build competitive experience. Elite archers can aim for national camps and Olympic selection via AAI.",
     trainingFrequency: "5-6 days/week",
-    averageLearningTime: "2-3 years to become competition-ready",
-    estimatedMonthlyCost: "₹2,000 – ₹10,000",
-    playingSeason: "Year-round (outdoor in dry season, indoor in monsoon)",
     injuryRisk: "Low",
     popularityInIndia: "Strong in Jharkhand and North-East — Deepika Kumari was world No. 1",
     popularityWorldwide: "Olympic staple with growing popularity in South Korea, USA, and Europe",
@@ -1603,9 +1549,6 @@ export const sportsContent: Record<string, SportContent> = {
     trainingPath:
       "Begin with air rifle or air pistol at a local shooting range to learn safety, stance, and aiming. Compete in district and state shooting championships to build competitive experience. Elite shooters can aim for national championships and Olympic selection via NRAI.",
     trainingFrequency: "4-5 days/week",
-    averageLearningTime: "2-3 years to reach competitive level",
-    estimatedMonthlyCost: "₹3,000 – ₹15,000 (equipment costs high)",
-    playingSeason: "Year-round (indoor sport)",
     injuryRisk: "Low",
     popularityInIndia: "Abhinav Bindra's gold sparked growth — Manu Bhaker is the new face",
     popularityWorldwide: "Olympic core sport, massive in USA, China, South Korea, and Germany",
@@ -1693,9 +1636,6 @@ export const sportsContent: Record<string, SportContent> = {
     trainingPath:
       "Begin with basic yoga classes at a local studio or online to learn foundational postures and breathing. Progress through regular practice to intermediate and advanced asanas. Competitive yogis can participate in state and national championships and aim for Asian and World Yogasana Championships.",
     trainingFrequency: "5-7 days/week",
-    averageLearningTime: "1-2 years for intermediate practice",
-    estimatedMonthlyCost: "₹500 – ₹3,000",
-    playingSeason: "Year-round (practice-based sport)",
     injuryRisk: "Low",
     popularityInIndia: "India's gift to the world — 300M+ global practitioners, International Yoga Day",
     popularityWorldwide: "Global wellness phenomenon — most practiced mind-body practice worldwide",
@@ -1783,9 +1723,6 @@ export const sportsContent: Record<string, SportContent> = {
     trainingPath:
       "Begin at a gymnastics academy with foundational flexibility, strength, and basic skill training. Progress through age-group competitions at district and state levels. Elite gymnasts can enter national camps and aim for Asian Games and Olympic selection via GFI.",
     trainingFrequency: "5-6 days/week",
-    averageLearningTime: "3-5 years to reach competitive level",
-    estimatedMonthlyCost: "₹2,000 – ₹10,000",
-    playingSeason: "Year-round (indoor sport)",
     injuryRisk: "High",
     popularityInIndia: "Dipa Karmakar inspired a generation — Khelo India boosting participation",
     popularityWorldwide: "Olympic marquee sport, massive in USA, China, Russia, and Japan",
@@ -1873,9 +1810,6 @@ export const sportsContent: Record<string, SportContent> = {
     trainingPath:
       "Start with school or college teams to learn fundamentals — serving, passing, setting, and spiking. Join local volleyball clubs for structured coaching. Compete in inter-school and district tournaments. State-level volleyball federations conduct selection trials for national championships and Pro Volleyball League.",
     trainingFrequency: "4-5 days/week",
-    averageLearningTime: "1-2 years to become match-ready",
-    estimatedMonthlyCost: "₹1,000 – ₹5,000",
-    playingSeason: "All Year",
     injuryRisk: "Medium",
     popularityInIndia: "Very popular in school and college circuits; growing professional scene",
     popularityWorldwide: "Top 5 globally, massive in Brazil, Japan, Italy, Russia",
@@ -1965,9 +1899,6 @@ export const sportsContent: Record<string, SportContent> = {
     trainingPath:
       "Start with regular cycling for fitness and commute. Join local cycling groups for group rides and technique tips. Progress to competitive events — time trials, gran fondos, and state championships. Elite riders train for national championships and international tours under Cycling Federation of India.",
     trainingFrequency: "5-6 days/week",
-    averageLearningTime: "3-6 months for basic fitness, 2+ years for competitive",
-    estimatedMonthlyCost: "₹2,000 – ₹15,000 (bike maintenance, gear)",
-    playingSeason: "All Year (monsoon restricted in some regions)",
     injuryRisk: "Low",
     popularityInIndia: "Growing urban fitness culture; competitive scene developing",
     popularityWorldwide: "Massive globally — Tour de France is iconic; billion+ riders worldwide",
@@ -2057,9 +1988,6 @@ export const sportsContent: Record<string, SportContent> = {
     trainingPath:
       "Start with touch or tag rugby (non-contact) to learn ball handling and rules. Progress to contact rugby at school or university clubs. Join state-level rugby unions for structured coaching. Represent India through Rugby India's national team pathway.",
     trainingFrequency: "4-5 days/week",
-    averageLearningTime: "2-3 years for competitive readiness",
-    estimatedMonthlyCost: "₹1,500 – ₹6,000",
-    playingSeason: "September – March (outdoor season)",
     injuryRisk: "High",
     popularityInIndia: "Niche but growing — strong university circuit",
     popularityWorldwide: "Massive in New Zealand, Australia, UK, France, South Africa",
