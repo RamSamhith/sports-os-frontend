@@ -1,5 +1,9 @@
 export type SkillLevel = 'beginner' | 'intermediate' | 'advanced' | 'competitive';
 
+export type BudgetRange = 'free' | 'budget' | 'moderate' | 'premium' | 'elite';
+export type TrainingFrequency = 'occasional' | 'weekly' | 'regular' | 'daily';
+export type CompetitionLevel = 'recreational' | 'local' | 'state' | 'national' | 'international';
+
 export interface AthleteOnboardingData {
   age: number;
   gender: 'male' | 'female' | 'other' | 'prefer_not_to_say';
@@ -7,6 +11,9 @@ export interface AthleteOnboardingData {
   sportInterests: string[];
   skillLevel: SkillLevel;
   goals: string;
+  budget: BudgetRange;
+  trainingFrequency: TrainingFrequency;
+  competitionLevel: CompetitionLevel;
 }
 
 export interface ParentOnboardingData {
@@ -15,6 +22,9 @@ export interface ParentOnboardingData {
   location: string;
   sportInterests: string[];
   skillLevel: SkillLevel;
+  budget: BudgetRange;
+  trainingFrequency: TrainingFrequency;
+  competitionLevel: CompetitionLevel;
 }
 
 export interface OnboardingData {

@@ -6,7 +6,7 @@ import { siteConfig } from '@/config/site';
 
 export function Footer() {
   return (
-    <footer className="border-border/40 bg-background/40 mt-24 border-t">
+    <footer className="border-border/40 bg-background/40 mt-12 border-t">
       <Container className="py-12">
         <div className="grid grid-cols-2 gap-10 md:grid-cols-4">
           <div className="col-span-2">

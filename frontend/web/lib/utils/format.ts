@@ -1,15 +1,7 @@
-export function formatNumber(value: number, options?: Intl.NumberFormatOptions): string {
-  return new Intl.NumberFormat('en-IN', options).format(value);
-}
-
 export function formatDistance(km: number): string {
   if (km < 1) return `${Math.round(km * 1000)} m`;
   if (km < 10) return `${km.toFixed(1)} km`;
   return `${Math.round(km)} km`;
-}
-
-export function formatRating(value: number, fractionDigits = 1): string {
-  return value.toFixed(fractionDigits);
 }
 
 export function formatRelativeTime(input: string | Date): string {
@@ -33,9 +25,4 @@ export function formatRelativeTime(input: string | Date): string {
     }
   }
   return '';
-}
-
-export function truncate(text: string, max = 160): string {
-  if (text.length <= max) return text;
-  return text.slice(0, max - 1).trimEnd() + '…';
 }

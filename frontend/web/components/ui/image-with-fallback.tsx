@@ -6,6 +6,29 @@ import { cn } from '@/lib/utils/cn';
 import { Skeleton } from '@/components/ui/skeleton';
 import { cloudinarySrcSet, isCloudinaryConfigured } from '@/lib/images/cloudinary';
 
+const ALLOWED_IMAGE_HOSTNAMES = new Set([
+  'images.unsplash.com',
+  'res.cloudinary.com',
+]);
+
+function isAllowedImageSrc(url: string): boolean {
+  if (url.startsWith('/')) return true;
+  try {
+    const parsed = new URL(url);
+    if (parsed.protocol !== 'https:' && parsed.protocol !== 'http:') return false;
+    if (ALLOWED_IMAGE_HOSTNAMES.has(parsed.hostname)) return true;
+    for (const allowed of ALLOWED_IMAGE_HOSTNAMES) {
+      if (allowed.startsWith('*.')) {
+        const suffix = allowed.slice(1);
+        if (parsed.hostname.endsWith(suffix)) return true;
+      }
+    }
+    return false;
+  } catch {
+    return false;
+  }
+}
+
 export interface ImageWithFallbackProps extends Omit<ImageProps, 'src' | 'alt'> {
   src?: string | null;
   alt: string;
@@ -23,7 +46,7 @@ export function ImageWithFallback({
 }: ImageWithFallbackProps) {
   const [errored, setErrored] = React.useState(false);
   const [loaded, setLoaded] = React.useState(false);
-  const hasImage = Boolean(src) && !errored;
+  const hasImage = Boolean(src) && !errored && isAllowedImageSrc(src!);
 
   React.useEffect(() => {
     setErrored(false);

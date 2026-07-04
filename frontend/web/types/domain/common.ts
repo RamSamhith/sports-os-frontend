@@ -9,9 +9,3 @@ export interface Pagination {
   total: number;
   hasMore: boolean;
 }
-
-export interface SortOption<TKey extends string = string> {
-  key: TKey;
-  label: string;
-  default?: boolean;
-}

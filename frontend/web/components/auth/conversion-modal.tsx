@@ -12,8 +12,6 @@ import { trackGuestConversion } from '@/lib/analytics/events';
 import { Loader2, X, Lock } from 'lucide-react';
 import { ease } from '@/components/motion/constants';
 
-type ModalView = 'choose' | 'login';
-
 const overlayVariants = {
   hidden: { opacity: 0 },
   visible: { opacity: 1, transition: { duration: 0.2, ease: ease.standard } },
@@ -90,12 +88,6 @@ export function ConversionModal({ open, onOpenChange, actionLabel }: ConversionM
     router.push('/register');
   }
 
-  function handleOtpLogin() {
-    trackGuestConversion('otp_login');
-    onOpenChange(false);
-    router.push('/login');
-  }
-
   return (
     <Dialog.Root open={open} onOpenChange={onOpenChange}>
       <AnimatePresence>
@@ -160,9 +152,6 @@ export function ConversionModal({ open, onOpenChange, actionLabel }: ConversionM
 
                     <Button variant="outline" className="w-full h-11" onClick={handleEmailLogin}>
                       Sign in with email
-                    </Button>
-                    <Button variant="outline" className="w-full h-11" onClick={handleOtpLogin}>
-                      Continue with OTP
                     </Button>
 
                     <div className="mt-2 text-center text-sm text-muted-foreground">

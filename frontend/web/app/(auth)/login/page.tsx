@@ -10,11 +10,11 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { SharedLayout } from '@/components/motion/shared-layout';
 import { useAuth } from '@/lib/hooks/use-auth';
-import { login as apiLogin, sendLoginOtp } from '@/lib/api/auth';
+import { login as apiLogin } from '@/lib/api/auth';
 import { useGoogleAuth, handleSocialAuth } from '@/lib/hooks/use-social-auth';
-import { trackGuestStarted, trackOtpLogin } from '@/lib/analytics/events';
+import { trackGuestStarted } from '@/lib/analytics/events';
 import { validatePassword } from '@/lib/utils/validators';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Eye, EyeOff } from 'lucide-react';
 
 interface FieldErrors {
   email?: string;
@@ -43,8 +43,7 @@ export default function LoginPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [socialLoading, setSocialLoading] = useState<'google' | null>(null);
   const [socialError, setSocialError] = useState<string | null>(null);
-  const [otpLoading, setOtpLoading] = useState(false);
-  const [otpSuccess, setOtpSuccess] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const googleAuth = useGoogleAuth();
 
@@ -137,11 +136,6 @@ export default function LoginPage() {
     try {
       const res = await apiLogin({ email: email.trim(), password });
       if (!res.ok) {
-        if (res.error.code === 'EMAIL_NOT_VERIFIED') {
-          try { sessionStorage.setItem('sportsos:verify-email', email.trim()); } catch { /* ignore */ }
-          router.push('/verify/signup');
-          return;
-        }
         setServerError(res.error.message);
         setIsSubmitting(false);
         return;
@@ -172,66 +166,10 @@ export default function LoginPage() {
     googleAuth.prompt();
   }
 
-  async function handleOtpLogin() {
-    if (!email.trim()) {
-      setErrors({ email: 'Enter your email to receive a login code' });
-      return;
-    }
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      setErrors({ email: 'Enter a valid email address' });
-      return;
-    }
-    setServerError(null);
-    setOtpLoading(true);
-    try {
-      const res = await sendLoginOtp({ email: email.trim() });
-      if (!res.ok) {
-        setServerError(res.error.message);
-        setOtpLoading(false);
-        return;
-      }
-      trackOtpLogin();
-      try {
-        sessionStorage.setItem('sportsos:verify-email', email.trim());
-      } catch { /* ignore */ }
-      setOtpSuccess(true);
-      setOtpLoading(false);
-    } catch {
-      setServerError('Network error. Please try again.');
-      setOtpLoading(false);
-    }
-  }
-
   function handleGuestContinue() {
     trackGuestStarted();
     enterGuestMode();
     router.replace('/');
-  }
-
-  if (otpSuccess) {
-    return (
-      <SharedLayout layoutId="auth-card">
-        <Card className="w-full max-w-sm">
-          <CardHeader>
-            <CardTitle className="text-2xl">Check your email</CardTitle>
-            <CardDescription>
-              We sent a 6-digit code to <strong>{email}</strong>
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="flex flex-col gap-4">
-            <p className="text-muted-foreground text-sm">
-              Enter the code on the next screen to sign in.
-            </p>
-            <Button onClick={() => router.push('/verify/login-otp')} className="w-full" size="lg">
-              Enter code
-            </Button>
-            <Button variant="ghost" onClick={() => { setOtpSuccess(false); setEmail(''); }} className="w-full">
-              Use a different email
-            </Button>
-          </CardContent>
-        </Card>
-      </SharedLayout>
-    );
   }
 
   const errorId = (field: string) => `login-${field}-error`;
@@ -352,19 +290,24 @@ export default function LoginPage() {
                   Forgot password?
                 </Link>
               </div>
-              <Input
-                id="login-password"
-                type="password"
-                placeholder="At least 8 characters"
-                value={password}
-                onChange={(e) => handleChange('password', e.target.value)}
-                onBlur={(e) => handleBlur('password', e.target.value)}
-                required
-                autoComplete="current-password"
-                aria-invalid={!!errors.password}
-                aria-describedby={errors.password ? errorId('password') : undefined}
-                disabled={isSubmitting}
-              />
+              <div className="relative">
+                <Input
+                  id="login-password"
+                  type={showPassword ? 'text' : 'password'}
+                  placeholder="At least 8 characters"
+                  value={password}
+                  onChange={(e) => handleChange('password', e.target.value)}
+                  onBlur={(e) => handleBlur('password', e.target.value)}
+                  required
+                  autoComplete="current-password"
+                  aria-invalid={!!errors.password}
+                  aria-describedby={errors.password ? errorId('password') : undefined}
+                  disabled={isSubmitting}
+                />
+                <button type="button" onClick={() => setShowPassword(v => !v)} className="text-muted-foreground hover:text-foreground absolute right-3 top-1/2 -translate-y-1/2" tabIndex={0} aria-label={showPassword ? 'Hide password' : 'Show password'}>
+                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </button>
+              </div>
               {errors.password && (
                 <p id={errorId('password')} role="alert" className="text-destructive text-xs">
                   {errors.password}
@@ -395,31 +338,6 @@ export default function LoginPage() {
               </Button>
             </motion.div>
           </motion.form>
-
-          <div className="relative my-4">
-            <div className="absolute inset-0 flex items-center">
-              <span className="w-full border-t" />
-            </div>
-            <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-card text-muted-foreground px-2">or</span>
-            </div>
-          </div>
-
-          <Button
-            variant="ghost"
-            className="w-full"
-            onClick={handleOtpLogin}
-            disabled={otpLoading || isSubmitting}
-          >
-            {otpLoading ? (
-              <>
-                <Loader2 className="h-4 w-4 animate-spin" />
-                Sending code…
-              </>
-            ) : (
-              'Continue with OTP'
-            )}
-          </Button>
 
           <p className="text-muted-foreground mt-4 text-center text-xs">
             Don&apos;t have an account?{' '}

@@ -6,17 +6,12 @@ import Link from 'next/link';
 import { Container } from '@/components/layout/container';
 import { Section } from '@/components/layout/section';
 import { Breadcrumbs } from '@/components/seo/breadcrumbs';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { AcademyCardPlaceholder } from '@/components/academies/academy-card-placeholder';
-import { CoachImage } from '@/components/ui/coach-image';
 import { LocationMap } from '@/components/academy/location-map';
 import { getAcademies } from '@/lib/api/academies';
-import { getCoaches } from '@/lib/api/coaches';
-import { VerifiedBadge } from '@/components/trust/verified-badge';
-import { MapPin, Star, Trophy, ArrowLeft, Filter, Navigation } from 'lucide-react';
+import { MapPin, Trophy, ArrowLeft, Filter, Navigation } from 'lucide-react';
 import type { Academy } from '@/types/domain/academy';
-import type { Coach } from '@/types/domain/coach';
 
 const nearbyCities: Record<string, string[]> = {
   'bengaluru': ['mumbai', 'chennai', 'hyderabad', 'pune'],
@@ -35,9 +30,9 @@ export default function CityPage() {
   const cityName = decodeURIComponent(citySlug).replace(/-/g, ' ');
 
   const [academies, setAcademies] = React.useState<Academy[]>([]);
-  const [coaches, setCoaches] = React.useState<Coach[]>([]);
   const [allAcademies, setAllAcademies] = React.useState<Academy[]>([]);
   const [loading, setLoading] = React.useState(true);
+  const [error, setError] = React.useState<string | null>(null);
   const [sortBy, setSortBy] = React.useState<'top-rated' | 'most-reviewed' | 'name'>('top-rated');
 
   React.useEffect(() => {
@@ -45,10 +40,7 @@ export default function CityPage() {
     async function load() {
       setLoading(true);
       try {
-        const [academiesRes, coachesRes] = await Promise.all([
-          getAcademies({ pageSize: 200 }),
-          getCoaches({ city: cityName, pageSize: 100 }),
-        ]);
+        const academiesRes = await getAcademies({ pageSize: 200 });
         if (cancelled) return;
 
         if (academiesRes.ok) {
@@ -63,13 +55,11 @@ export default function CityPage() {
             return academyCity === normalizedCity || academyCitySlug === normalizedCity;
           });
           setAcademies(cityAcademies);
-        }
-
-        if (coachesRes.ok) {
-          setCoaches(coachesRes.data.items);
+        } else {
+          setError('Failed to load academies. Please try again.');
         }
       } catch {
-        // network error — leave arrays empty
+        setError('Network error. Please check your connection and try again.');
       } finally {
         if (!cancelled) setLoading(false);
       }
@@ -150,6 +140,35 @@ export default function CityPage() {
     );
   }
 
+  if (error) {
+    return (
+      <Section>
+        <Container>
+          <Breadcrumbs
+            items={[
+              { label: 'Home', href: '/' },
+              { label: cityName },
+            ]}
+            className="mb-3"
+          />
+          <Button asChild variant="ghost" className="mb-3 -ml-2 min-h-[44px]">
+            <Link href="/"><ArrowLeft className="h-4 w-4 mr-1" /> Back to home</Link>
+          </Button>
+          <div className="border-border/60 bg-card/40 flex flex-col items-center gap-4 rounded-xl border border-dashed py-16 text-center">
+            <div className="bg-destructive/10 grid h-16 w-16 place-items-center rounded-full">
+              <MapPin className="h-8 w-8 text-destructive/60" />
+            </div>
+            <div className="max-w-sm">
+              <p className="text-foreground text-lg font-semibold">Something went wrong</p>
+              <p className="text-muted-foreground mt-1 text-sm">{error}</p>
+            </div>
+            <Button onClick={() => window.location.reload()}>Try Again</Button>
+          </div>
+        </Container>
+      </Section>
+    );
+  }
+
   return (
     <Section spacing="sm">
       <Container>
@@ -171,7 +190,7 @@ export default function CityPage() {
             Sports Academies in {cityName}
           </h1>
           <p className="text-muted-foreground mt-1 text-sm">
-            {academies.length} academies · {coaches.length} coaches · {topSports.length} sports
+            {academies.length} academies · {topSports.length} sports
           </p>
         </div>
 
@@ -257,61 +276,6 @@ export default function CityPage() {
               <Button asChild>
                 <Link href="/search">Search all academies</Link>
               </Button>
-            </div>
-          </div>
-        )}
-
-        {/* Top Coaches */}
-        {coaches.length > 0 && (
-          <div className="mt-8">
-            <h2 className="text-lg font-semibold mb-3">
-              Top Coaches in {cityName}
-            </h2>
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
-              {coaches
-                .sort((a, b) => (b.rating?.average ?? 0) - (a.rating?.average ?? 0))
-                .slice(0, 6)
-                .map((coach) => (
-                  <Link
-                    key={coach.id}
-                    href={`/coaches/${coach.slug}`}
-                    className="group border-border/60 bg-card/40 hover:border-foreground/20 rounded-xl border p-3 transition-colors"
-                  >
-                    <div className="flex items-start gap-3">
-                      <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-full">
-                        <CoachImage
-                          avatar={coach.avatar}
-                          sportsCoached={coach.sportsCoached}
-                          name={coach.name}
-                          alt={coach.name}
-                          fill
-                          sizes="48px"
-                          className="object-cover"
-                        />
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <div className="flex items-center gap-1.5">
-                          <h3 className="text-sm font-semibold line-clamp-1 group-hover:underline">{coach.name}</h3>
-                          <VerifiedBadge status={coach.verificationStatus} />
-                        </div>
-                        <div className="text-muted-foreground flex items-center gap-2 text-xs">
-                          <span className="flex items-center gap-0.5">
-                            <Star className="h-3 w-3 fill-amber-400 text-amber-400" />
-                            {(coach.rating?.average ?? 0).toFixed(1)}
-                          </span>
-                          <span>{coach.experienceYears}+ yrs</span>
-                        </div>
-                        <div className="flex flex-wrap gap-1 mt-1">
-                          {(coach.sportsCoached ?? []).slice(0, 2).map((s) => (
-                            <Badge key={s} variant="secondary" className="text-[10px] px-1 py-0 capitalize">
-                              {s.replace(/-/g, ' ')}
-                            </Badge>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-                  </Link>
-                ))}
             </div>
           </div>
         )}

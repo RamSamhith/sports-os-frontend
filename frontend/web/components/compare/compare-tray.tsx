@@ -17,7 +17,6 @@ function getCompareLabel(items: Array<{ entityType: string; id: string }>): stri
   if (allSame) {
     const typeLabels: Record<string, string> = {
       academy: 'Academies',
-      coach: 'Coaches',
       sport: 'Sports',
     };
     return `Compare ${items.length} ${typeLabels[types[0]] ?? 'Items'}`;

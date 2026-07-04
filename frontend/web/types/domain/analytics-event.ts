@@ -38,7 +38,6 @@ export type AnalyticsEventName =
   | 'guest.conversion'
   | 'auth.forgot_password_started'
   | 'auth.password_reset_success'
-  | 'auth.otp_login'
   | 'profile.child_add'
   | 'profile.child_switch'
   | 'error.client'

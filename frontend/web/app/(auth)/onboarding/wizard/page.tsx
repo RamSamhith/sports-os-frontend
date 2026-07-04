@@ -5,25 +5,18 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
-import { Textarea } from '@/components/ui/textarea';
 import { WizardShell } from '@/components/onboarding/wizard-shell';
 import { LocationPicker } from '@/components/ui/location-picker';
 import { useAuth } from '@/lib/hooks/use-auth';
-import { useOnboarding, type OnboardingData, type SkillLevel } from '@/lib/hooks/use-onboarding';
+import { useOnboarding, type OnboardingData, type SkillLevel, type BudgetRange, type TrainingFrequency, type CompetitionLevel } from '@/lib/hooks/use-onboarding';
 import { useChildren } from '@/lib/hooks/use-children';
 import { saveOnboarding } from '@/lib/api/auth';
-import { createAcademy, type CreateAcademyPayload } from '@/lib/api/academies';
-import { createCoach, type CreateCoachPayload } from '@/lib/api/coaches';
 import { sportTaxonomy } from '@/lib/constants/sport-taxonomy';
-import { Check } from 'lucide-react';
+import { Check, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils/cn';
-import { parseLocationInput } from '@/lib/utils/location-parser';
-import type { Facility, TrainingLevel } from '@/types/domain/academy';
 
-const ATHLETE_STEPS = ['Age', 'Gender', 'Location', 'Sports', 'Skill', 'Goals'];
-const PARENT_STEPS = ["Child's Name", "Child's Age", 'Location', 'Sports', 'Skill'];
-const COACH_STEPS = ['Name', 'Location', 'Sports', 'Skill', 'Experience', 'Bio'];
-const ACADEMY_STEPS = ['Location', 'Sports', 'Name', 'About', 'Facilities', 'Contact'];
+const ATHLETE_STEPS = ['Age', 'Gender', 'Location', 'Sports', 'Skill', 'Goals', 'Budget', 'Frequency', 'Competition'];
+const PARENT_STEPS = ["Child's Name", "Child's Age", 'Location', 'Sports', 'Skill', 'Budget', 'Frequency', 'Competition'];
 
 const SKILL_LEVELS: { value: SkillLevel; label: string; description: string }[] = [
   { value: 'beginner', label: 'Beginner', description: 'Just starting out' },
@@ -32,33 +25,34 @@ const SKILL_LEVELS: { value: SkillLevel; label: string; description: string }[] 
   { value: 'competitive', label: 'Competitive', description: 'Tournament / elite' },
 ];
 
+const BUDGET_OPTIONS: { value: BudgetRange; label: string; description: string }[] = [
+  { value: 'free', label: 'Free', description: 'No cost programs' },
+  { value: 'budget', label: 'Budget', description: 'Under ₹2,000/month' },
+  { value: 'moderate', label: 'Moderate', description: '₹2,000 – ₹5,000/month' },
+  { value: 'premium', label: 'Premium', description: '₹5,000 – ₹15,000/month' },
+  { value: 'elite', label: 'Elite', description: 'Above ₹15,000/month' },
+];
+
+const FREQUENCY_OPTIONS: { value: TrainingFrequency; label: string; description: string }[] = [
+  { value: 'occasional', label: 'Occasional', description: '1-2 times/month' },
+  { value: 'weekly', label: 'Weekly', description: '1-2 times/week' },
+  { value: 'regular', label: 'Regular', description: '3-5 times/week' },
+  { value: 'daily', label: 'Daily', description: 'Every day' },
+];
+
+const COMPETITION_OPTIONS: { value: CompetitionLevel; label: string; description: string }[] = [
+  { value: 'recreational', label: 'Recreational', description: 'Just for fun' },
+  { value: 'local', label: 'Local', description: 'City-level events' },
+  { value: 'state', label: 'State', description: 'State-level tournaments' },
+  { value: 'national', label: 'National', description: 'Nationwide competitions' },
+  { value: 'international', label: 'International', description: 'International events' },
+];
+
 const GENDER_OPTIONS = [
   { value: 'male' as const, label: 'Male' },
   { value: 'female' as const, label: 'Female' },
   { value: 'other' as const, label: 'Other' },
   { value: 'prefer_not_to_say' as const, label: 'Prefer not to say' },
-];
-
-const FACILITY_OPTIONS: { label: string; value: Facility }[] = [
-  { label: 'Indoor Court', value: 'indoor' },
-  { label: 'Outdoor Court', value: 'outdoor' },
-  { label: 'Gym / Fitness Center', value: 'gym' },
-  { label: 'Swimming Pool', value: 'physio' },
-  { label: 'Artificial Turf', value: 'ground' },
-  { label: 'Track & Field', value: 'ground' },
-  { label: 'Shooting Range', value: 'equipment' },
-  { label: 'Archery Range', value: 'equipment' },
-  { label: 'Recovery Room', value: 'physio' },
-  { label: 'Cafeteria', value: 'changing_room' },
-  { label: 'Parking', value: 'parking' },
-  { label: 'Hostel / Dormitory', value: 'changing_room' },
-];
-
-const TRAINING_LEVELS: { value: TrainingLevel; label: string }[] = [
-  { value: 'beginner', label: 'Beginner' },
-  { value: 'intermediate', label: 'Intermediate' },
-  { value: 'advanced', label: 'Advanced' },
-  { value: 'elite', label: 'Professional' },
 ];
 
 export default function OnboardingWizardPage() {
@@ -73,12 +67,13 @@ function OnboardingWizardContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const isEdit = searchParams.get('edit') === 'true';
-  const { isAuthenticated, isLoading, role, verified, completeOnboarding: markAuthComplete, setOnboarding } = useAuth();
+  const { isAuthenticated, isLoading, role, completeOnboarding: markAuthComplete, setOnboarding } = useAuth();
   const { completed, athleteData, parentData, completeOnboarding, updateOnboardingData, hydrated } = useOnboarding();
   const { children, addChild } = useChildren();
   const isParent = role === 'parent';
   const [step, setStep] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showCompleteScreen, setShowCompleteScreen] = useState(false);
 
   // Form state
   const [age, setAge] = useState('');
@@ -87,21 +82,10 @@ function OnboardingWizardContent() {
   const [sports, setSports] = useState<string[]>([]);
   const [skillLevel, setSkillLevel] = useState<SkillLevel | ''>('');
   const [goals, setGoals] = useState('');
+  const [budget, setBudget] = useState<BudgetRange | ''>('');
+  const [trainingFrequency, setTrainingFrequency] = useState<TrainingFrequency | ''>('');
+  const [competitionLevel, setCompetitionLevel] = useState<CompetitionLevel | ''>('');
   const [childName, setChildName] = useState('');
-
-  // Academy form state
-  const [academyName, setAcademyName] = useState('');
-  const [academyDescription, setAcademyDescription] = useState('');
-  const [facilities, setFacilities] = useState<Facility[]>([]);
-  const [trainingLevels, setTrainingLevels] = useState<TrainingLevel[]>(['beginner', 'intermediate']);
-  const [contactPhone, setContactPhone] = useState('');
-  const [contactEmail, setContactEmail] = useState('');
-  const [contactWebsite, setContactWebsite] = useState('');
-
-  // Coach form state
-  const [coachName, setCoachName] = useState('');
-  const [experienceYears, setExperienceYears] = useState('');
-  const [coachBio, setCoachBio] = useState('');
 
   // Pre-fill from existing onboarding data (edit mode)
   useEffect(() => {
@@ -112,6 +96,9 @@ function OnboardingWizardContent() {
         setLocation(parentData.location);
         setSports(parentData.sportInterests);
         setSkillLevel(parentData.skillLevel);
+        setBudget(parentData.budget ?? '');
+        setTrainingFrequency(parentData.trainingFrequency ?? '');
+        setCompetitionLevel(parentData.competitionLevel ?? '');
       } else if (!isParent && athleteData) {
         setAge(String(athleteData.age));
         setGender(athleteData.gender);
@@ -119,11 +106,14 @@ function OnboardingWizardContent() {
         setSports(athleteData.sportInterests);
         setSkillLevel(athleteData.skillLevel);
         setGoals(athleteData.goals);
+        setBudget(athleteData.budget ?? '');
+        setTrainingFrequency(athleteData.trainingFrequency ?? '');
+        setCompetitionLevel(athleteData.competitionLevel ?? '');
       }
     }
   }, [isEdit, completed, isParent, parentData, athleteData]);
 
-  const steps = isParent ? PARENT_STEPS : role === 'coach' ? COACH_STEPS : role === 'academy_owner' ? ACADEMY_STEPS : ATHLETE_STEPS;
+  const steps = isParent ? PARENT_STEPS : ATHLETE_STEPS;
 
   useEffect(() => {
     if (isLoading) return;
@@ -138,7 +128,7 @@ function OnboardingWizardContent() {
     if (completed && !isEdit) {
       router.replace('/');
     }
-  }, [isLoading, isAuthenticated, verified, role, completed, isEdit, router]);
+  }, [isLoading, isAuthenticated, role, completed, isEdit, router]);
 
   const canNext = useCallback(() => {
     if (isParent) {
@@ -148,28 +138,9 @@ function OnboardingWizardContent() {
         case 2: return location.trim().length >= 1;
         case 3: return sports.length > 0;
         case 4: return skillLevel !== '';
-        default: return false;
-      }
-    }
-    if (role === 'coach') {
-      switch (step) {
-        case 0: return coachName.trim().length >= 1;
-        case 1: return location.trim().length >= 1;
-        case 2: return sports.length > 0;
-        case 3: return skillLevel !== '';
-        case 4: return experienceYears !== '' && Number(experienceYears) >= 0;
-        case 5: return true;
-        default: return false;
-      }
-    }
-    if (role === 'academy_owner') {
-      switch (step) {
-        case 0: return location.trim().length >= 1;
-        case 1: return sports.length > 0;
-        case 2: return academyName.trim().length >= 2;
-        case 3: return true;
-        case 4: return facilities.length > 0;
-        case 5: return true;
+        case 5: return budget !== '';
+        case 6: return trainingFrequency !== '';
+        case 7: return competitionLevel !== '';
         default: return false;
       }
     }
@@ -180,9 +151,12 @@ function OnboardingWizardContent() {
       case 3: return sports.length > 0;
       case 4: return skillLevel !== '';
       case 5: return true;
+      case 6: return budget !== '';
+      case 7: return trainingFrequency !== '';
+      case 8: return competitionLevel !== '';
       default: return false;
     }
-  }, [step, isParent, role, age, gender, location, sports, skillLevel, childName, academyName, facilities, experienceYears, coachName]);
+  }, [step, isParent, age, gender, location, sports, skillLevel, childName, budget, trainingFrequency, competitionLevel]);
 
   async function handleComplete() {
     if (isSubmitting) return;
@@ -197,28 +171,9 @@ function OnboardingWizardContent() {
           location: location.trim(),
           sportInterests: sports,
           skillLevel: skillLevel as SkillLevel,
-        },
-      };
-    } else if (role === 'coach') {
-      data = {
-        athlete: {
-          age: 0,
-          gender: 'prefer_not_to_say' as const,
-          location: location.trim(),
-          sportInterests: sports,
-          skillLevel: skillLevel as SkillLevel,
-          goals: coachBio.trim(),
-        },
-      };
-    } else if (role === 'academy_owner') {
-      data = {
-        athlete: {
-          age: 0,
-          gender: 'prefer_not_to_say' as const,
-          location: location.trim(),
-          sportInterests: sports,
-          skillLevel: 'intermediate' as SkillLevel,
-          goals: '',
+          budget: budget as BudgetRange,
+          trainingFrequency: trainingFrequency as TrainingFrequency,
+          competitionLevel: competitionLevel as CompetitionLevel,
         },
       };
     } else {
@@ -230,6 +185,9 @@ function OnboardingWizardContent() {
           sportInterests: sports,
           skillLevel: skillLevel as SkillLevel,
           goals: goals.trim(),
+          budget: budget as BudgetRange,
+          trainingFrequency: trainingFrequency as TrainingFrequency,
+          competitionLevel: competitionLevel as CompetitionLevel,
         },
       };
     }
@@ -245,6 +203,9 @@ function OnboardingWizardContent() {
         sportInterests: sports,
         skillLevel: skillLevel as string,
         location: location.trim(),
+        budget: budget || undefined,
+        trainingFrequency: trainingFrequency || undefined,
+        competitionLevel: competitionLevel || undefined,
       };
       if (isParent) {
         onboardingUpdate.children = [{
@@ -253,7 +214,7 @@ function OnboardingWizardContent() {
           sportInterests: sports,
           skillLevel: skillLevel as string,
         }];
-      } else if (role !== 'coach' && role !== 'academy_owner') {
+      } else {
         onboardingUpdate.age = Number(age);
         onboardingUpdate.gender = gender;
         onboardingUpdate.goals = goals.trim();
@@ -262,11 +223,11 @@ function OnboardingWizardContent() {
 
       saveOnboarding({
         role: role || undefined,
-        age: isParent || role === 'coach' || role === 'academy_owner' ? undefined : Number(age),
-        gender: isParent || role === 'coach' || role === 'academy_owner' ? undefined : gender || undefined,
+        age: isParent ? undefined : Number(age),
+        gender: isParent ? undefined : gender || undefined,
         sportInterests: sports,
         skillLevel: skillLevel as string || undefined,
-        goals: role === 'coach' || role === 'academy_owner' ? goals.trim() || undefined : isParent ? undefined : goals.trim() || undefined,
+        goals: isParent ? undefined : goals.trim() || undefined,
         location: location.trim() || undefined,
         children: isParent ? [{
           name: childName.trim(),
@@ -284,45 +245,30 @@ function OnboardingWizardContent() {
           skillLevel: data.parent.skillLevel,
         });
       }
-
-      // Auto-create academy or coach record via API
-      if (role === 'academy_owner') {
-        const locationData = parseLocationInput(location.trim());
-        const payload: CreateAcademyPayload = {
-          name: academyName.trim(),
-          description: academyDescription.trim() || undefined,
-          location: locationData,
-          contact: {
-            phone: contactPhone.trim() || undefined,
-            email: contactEmail.trim() || undefined,
-            website: contactWebsite.trim() || undefined,
-          },
-          sportsOffered: sports,
-          facilities: facilities,
-          trainingLevels: trainingLevels,
-        };
-        createAcademy(payload).catch(() => { /* non-blocking */ });
-      }
-
-      if (role === 'coach') {
-        const locationData = parseLocationInput(location.trim());
-        const payload: CreateCoachPayload = {
-          name: coachName.trim(),
-          sportsCoached: sports,
-          specialization: sports,
-          experienceYears: Number(experienceYears) || 0,
-          bio: coachBio.trim() || undefined,
-          location: locationData,
-          contact: {
-            phone: undefined,
-            email: undefined,
-          },
-        };
-        createCoach(payload).catch(() => { /* non-blocking */ });
-      }
     }
 
-    router.push(isEdit ? '/profile/personal' : '/');
+    if (isEdit) {
+      router.push('/profile/personal');
+    } else {
+      setShowCompleteScreen(true);
+      setTimeout(() => router.push('/'), 2000);
+    }
+  }
+
+  if (showCompleteScreen) {
+    return (
+      <div className="flex min-h-[60vh] flex-col items-center justify-center gap-6 text-center">
+        <div className="bg-primary/10 ring-primary/20 grid h-16 w-16 place-items-center rounded-2xl ring-1">
+          <Loader2 className="text-primary h-8 w-8 animate-spin" />
+        </div>
+        <div className="space-y-2">
+          <h1 className="text-2xl font-semibold tracking-tight">Setting up your profile</h1>
+          <p className="text-muted-foreground text-sm">
+            Preparing your personalised recommendations...
+          </p>
+        </div>
+      </div>
+    );
   }
 
   function toggleSport(slug: string) {
@@ -332,24 +278,36 @@ function OnboardingWizardContent() {
   }
 
   const titles: Record<number, string> = {
-    0: isParent ? "What's your child's name?" : role === 'coach' ? "What's your name?" : role === 'academy_owner' ? 'Where is your academy?' : 'How old are you?',
-    1: isParent ? "How old is your child?" : role === 'coach' ? 'Where are you based?' : role === 'academy_owner' ? 'Which sports do you offer?' : 'What is your gender?',
-    2: role === 'academy_owner' ? "What's the academy name?" : role === 'coach' ? 'Which sports do you coach?' : 'Where are you located?',
-    3: role === 'academy_owner' ? 'Tell us about your academy' : role === 'coach' ? "What's your skill level?" : 'Which sports interest you?',
-    4: role === 'academy_owner' ? 'What facilities do you offer?' : role === 'coach' ? 'Years of experience?' : "What's your skill level?",
-    5: role === 'academy_owner' ? 'Contact details (optional)' : role === 'coach' ? 'Short bio' : 'Any goals in mind?',
+    0: isParent ? "What's your child's name?" : 'How old are you?',
+    1: isParent ? "How old is your child?" : 'What is your gender?',
+    2: 'Where are you located?',
+    3: 'Which sports interest you?',
+    4: "What's your skill level?",
+    5: 'Any goals in mind?',
+    6: 'What is your monthly budget?',
+    7: 'How often do you train?',
+    8: 'What competition level are you targeting?',
   };
 
   const subtitles: Record<number, string | undefined> = {
-    0: isParent ? undefined : role === 'coach' ? 'This will appear on your coach profile.' : undefined,
-    1: isParent ? 'This helps us recommend age-appropriate programs.' : role === 'coach' ? 'We use this to find nearby athletes.' : undefined,
-    2: role === 'academy_owner' ? 'This is how athletes will identify your academy.' : role === 'coach' ? 'Select all that apply.' : 'We use this to find nearby academies and coaches.',
-    3: role === 'academy_owner' ? 'Brief description of your academy (optional).' : role === 'coach' ? undefined : 'Select all that apply.',
-    4: role === 'academy_owner' ? 'Select at least one facility type.' : role === 'coach' ? 'Optional — tell athletes about yourself.' : undefined,
-    5: role === 'academy_owner' ? 'Help athletes reach you.' : role === 'coach' ? 'Optional — helps athletes know you better.' : 'Optional — helps us personalise your experience.',
+    0: isParent ? undefined : undefined,
+    1: isParent ? 'This helps us recommend age-appropriate programs.' : undefined,
+    2: 'We use this to find nearby academies.',
+    3: 'Select all that apply.',
+    4: undefined,
+    5: 'Optional — helps us personalise your experience.',
+    6: 'We use this to match programs in your budget.',
+    7: 'This helps us recommend the right training schedule.',
+    8: 'We tailor recommendations to your ambition level.',
   };
 
-  if (isLoading || !hydrated || (completed && !isEdit)) return null;
+  if (isLoading || !hydrated || (completed && !isEdit)) {
+    return (
+      <div className="flex min-h-[50vh] items-center justify-center">
+        <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+      </div>
+    );
+  }
 
   return (
     <WizardShell
@@ -371,7 +329,7 @@ function OnboardingWizardContent() {
       isLastStep={step === steps.length - 1}
     >
       <div className="flex flex-col gap-4">
-        {/* Step 0: Age / Child Name / Location (coach/academy) */}
+        {/* Step 0: Age (athlete) / Child Name (parent) */}
         {step === 0 && isParent && (
           <div className="flex flex-col gap-1.5">
             <Label htmlFor="wizard-child-name">Child&apos;s name</Label>
@@ -386,7 +344,7 @@ function OnboardingWizardContent() {
           </div>
         )}
 
-        {step === 0 && !isParent && role !== 'coach' && role !== 'academy_owner' && (
+        {step === 0 && !isParent && (
           <div className="flex flex-col gap-1.5">
             <Label htmlFor="wizard-age">Your age</Label>
             <Input
@@ -410,45 +368,8 @@ function OnboardingWizardContent() {
           </div>
         )}
 
-        {step === 0 && (role === 'academy_owner') && (
-          <div className="flex flex-col gap-1.5">
-            <Label htmlFor="wizard-location">City</Label>
-            <LocationPicker
-              value={location}
-              onChange={setLocation}
-              placeholder="e.g. Bengaluru"
-            />
-          </div>
-        )}
-
-        {step === 0 && role === 'coach' && (
-          <div className="flex flex-col gap-1.5">
-            <Label htmlFor="wizard-coach-name">Your name</Label>
-            <Input
-              id="wizard-coach-name"
-              placeholder="e.g. Priya Sharma"
-              value={coachName}
-              onChange={(e) => setCoachName(e.target.value)}
-              autoFocus
-              autoComplete="off"
-            />
-          </div>
-        )}
-
-        {/* Step 1: Gender (athlete) / Child Age (parent) / Location (coach) / Sports (academy) */}
-        {step === 1 && role === 'coach' && (
-          <div className="flex flex-col gap-1.5">
-            <Label htmlFor="wizard-location">City</Label>
-            <LocationPicker
-              value={location}
-              onChange={setLocation}
-              placeholder="e.g. Bengaluru"
-            />
-          </div>
-        )}
-
-        {/* Step 1: Gender (athlete) / Child Age (parent) / Sports (coach/academy) */}
-        {step === 1 && !isParent && role !== 'coach' && role !== 'academy_owner' && (
+        {/* Step 1: Gender (athlete) / Child Age (parent) */}
+        {step === 1 && !isParent && (
           <div className="grid grid-cols-2 gap-2" role="radiogroup" aria-label="Select gender">
             {GENDER_OPTIONS.map((opt) => {
               const isSelected = gender === opt.value;
@@ -501,36 +422,8 @@ function OnboardingWizardContent() {
           </div>
         )}
 
-        {step === 1 && role === 'academy_owner' && (
-          <div className="flex flex-wrap gap-2" role="group" aria-label="Select sports">
-            {sportTaxonomy.map((s) => {
-              const active = sports.includes(s.slug);
-              return (
-                <Badge
-                  key={s.slug}
-                  variant={active ? 'default' : 'outline'}
-                  role="checkbox"
-                  aria-checked={active}
-                  aria-label={s.name}
-                  tabIndex={0}
-                  onClick={() => toggleSport(s.slug)}
-                  onKeyDown={(e) => {
-                    if (e.key === ' ' || e.key === 'Enter') {
-                      e.preventDefault();
-                      toggleSport(s.slug);
-                    }
-                  }}
-                  className="cursor-pointer select-none"
-                >
-                  {s.name}
-                </Badge>
-              );
-            })}
-          </div>
-        )}
-
-        {/* Step 2: Location (athlete/parent) / Sports (coach) / Academy Name */}
-        {step === 2 && role !== 'coach' && role !== 'academy_owner' && (
+        {/* Step 2: Location */}
+        {step === 2 && (
           <div className="flex flex-col gap-1.5">
             <Label htmlFor="wizard-location">City</Label>
             <LocationPicker
@@ -541,7 +434,8 @@ function OnboardingWizardContent() {
           </div>
         )}
 
-        {step === 2 && role === 'coach' && (
+        {/* Step 3: Sports */}
+        {step === 3 && (
           <div className="flex flex-wrap gap-2" role="group" aria-label="Select sports">
             {sportTaxonomy.map((s) => {
               const active = sports.includes(s.slug);
@@ -569,51 +463,8 @@ function OnboardingWizardContent() {
           </div>
         )}
 
-        {step === 2 && role === 'academy_owner' && (
-          <div className="flex flex-col gap-1.5">
-            <Label htmlFor="wizard-academy-name">Academy name</Label>
-            <Input
-              id="wizard-academy-name"
-              placeholder="e.g. Champions Sports Academy"
-              value={academyName}
-              onChange={(e) => setAcademyName(e.target.value)}
-              autoFocus
-              autoComplete="off"
-            />
-          </div>
-        )}
-
-        {/* Step 3: Sports (athlete/parent) / Experience (coach) / Description (academy) */}
-        {step === 3 && role !== 'coach' && (
-          <div className="flex flex-wrap gap-2" role="group" aria-label="Select sports">
-            {sportTaxonomy.map((s) => {
-              const active = sports.includes(s.slug);
-              return (
-                <Badge
-                  key={s.slug}
-                  variant={active ? 'default' : 'outline'}
-                  role="checkbox"
-                  aria-checked={active}
-                  aria-label={s.name}
-                  tabIndex={0}
-                  onClick={() => toggleSport(s.slug)}
-                  onKeyDown={(e) => {
-                    if (e.key === ' ' || e.key === 'Enter') {
-                      e.preventDefault();
-                      toggleSport(s.slug);
-                    }
-                  }}
-                  className="cursor-pointer select-none"
-                >
-                  {s.name}
-                </Badge>
-              );
-            })}
-          </div>
-        )}
-
-        {/* Step 3: Sports (athlete/parent) / Skill (coach) / Description (academy) */}
-        {step === 3 && role === 'coach' && (
+        {/* Step 4: Skill Level */}
+        {step === 4 && (
           <div className="grid grid-cols-2 gap-2" role="radiogroup" aria-label="Select skill level">
             {SKILL_LEVELS.map((level) => {
               const isSelected = skillLevel === level.value;
@@ -645,127 +496,8 @@ function OnboardingWizardContent() {
           </div>
         )}
 
-        {step === 3 && role === 'academy_owner' && (
-          <div className="flex flex-col gap-1.5">
-            <Label htmlFor="wizard-academy-desc">About your academy</Label>
-            <Textarea
-              id="wizard-academy-desc"
-              placeholder="Tell athletes what makes your academy special..."
-              value={academyDescription}
-              onChange={(e) => setAcademyDescription(e.target.value)}
-              rows={4}
-              autoFocus
-            />
-          </div>
-        )}
-
-        {/* Step 4: Skill Level (athlete/parent) / Bio (coach) / Facilities (academy) */}
-        {step === 4 && !isParent && (
-          <div className="grid grid-cols-2 gap-2" role="radiogroup" aria-label="Select skill level">
-            {SKILL_LEVELS.map((level) => {
-              const isSelected = skillLevel === level.value;
-              return (
-                <button
-                  key={level.value}
-                  type="button"
-                  role="radio"
-                  aria-checked={isSelected}
-                  onClick={() => setSkillLevel(level.value)}
-                  className={cn(
-                    'rounded-lg border-2 px-4 py-3 text-left transition-all',
-                    'focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none',
-                    isSelected
-                      ? 'border-primary bg-primary/5'
-                      : 'border-border/60 bg-background/60 hover:border-primary/30',
-                  )}
-                >
-                  <div className="flex items-center justify-between">
-                    <span className={cn('text-sm font-medium', isSelected ? 'text-primary' : 'text-foreground')}>
-                      {level.label}
-                    </span>
-                    {isSelected && <Check className="h-4 w-4 text-primary" />}
-                  </div>
-                  <span className="text-muted-foreground text-xs">{level.description}</span>
-                </button>
-              );
-            })}
-          </div>
-        )}
-
-        {step === 4 && role === 'coach' && (
-          <div className="flex flex-col gap-1.5">
-            <Label htmlFor="wizard-experience">Years of coaching experience</Label>
-            <Input
-              id="wizard-experience"
-              type="text"
-              inputMode="numeric"
-              pattern="[0-9]*"
-              min={0}
-              max={50}
-              placeholder="e.g. 5"
-              value={experienceYears}
-              onChange={(e) => {
-                const val = e.target.value.replace(/\D/g, '')
-                if (val === '' || (Number(val) >= 0 && Number(val) <= 50)) {
-                  setExperienceYears(val)
-                }
-              }}
-              autoFocus
-              autoComplete="off"
-            />
-          </div>
-        )}
-
-        {step === 4 && role === 'academy_owner' && (
-          <div className="flex flex-wrap gap-2" role="group" aria-label="Select facilities">
-            {FACILITY_OPTIONS.map((f) => {
-              const active = facilities.includes(f.value);
-              return (
-                <Badge
-                  key={f.value}
-                  variant={active ? 'default' : 'outline'}
-                  role="checkbox"
-                  aria-checked={active}
-                  aria-label={f.label}
-                  tabIndex={0}
-                  onClick={() => {
-                    setFacilities((prev) =>
-                      prev.includes(f.value) ? prev.filter((x) => x !== f.value) : [...prev, f.value],
-                    );
-                  }}
-                  onKeyDown={(e) => {
-                    if (e.key === ' ' || e.key === 'Enter') {
-                      e.preventDefault();
-                      setFacilities((prev) =>
-                        prev.includes(f.value) ? prev.filter((x) => x !== f.value) : [...prev, f.value],
-                      );
-                    }
-                  }}
-                  className="cursor-pointer select-none"
-                >
-                  {f.label}
-                </Badge>
-              );
-            })}
-          </div>
-        )}
-
-        {/* Step 5: Goals (athlete) / Bio (coach) / Contact (academy) */}
-        {step === 5 && role === 'coach' && (
-          <div className="flex flex-col gap-1.5">
-            <Label htmlFor="wizard-bio">Short bio</Label>
-            <Textarea
-              id="wizard-bio"
-              placeholder="e.g. Certified tennis coach with 5 years of experience training juniors..."
-              value={coachBio}
-              onChange={(e) => setCoachBio(e.target.value)}
-              rows={3}
-              autoFocus
-            />
-          </div>
-        )}
-
-        {step === 5 && !isParent && role !== 'coach' && (
+        {/* Step 5: Goals (athlete only) */}
+        {step === 5 && !isParent && (
           <div className="flex flex-col gap-1.5">
             <Label htmlFor="wizard-goals">Your goals</Label>
             <Input
@@ -778,39 +510,102 @@ function OnboardingWizardContent() {
           </div>
         )}
 
-        {step === 5 && role === 'academy_owner' && (
-          <div className="flex flex-col gap-3">
-            <div className="flex flex-col gap-1.5">
-              <Label htmlFor="wizard-contact-phone">Phone number</Label>
-              <Input
-                id="wizard-contact-phone"
-                type="tel"
-                placeholder="e.g. 9876543210"
-                value={contactPhone}
-                onChange={(e) => setContactPhone(e.target.value)}
-                autoFocus
-              />
-            </div>
-            <div className="flex flex-col gap-1.5">
-              <Label htmlFor="wizard-contact-email">Email</Label>
-              <Input
-                id="wizard-contact-email"
-                type="email"
-                placeholder="e.g. contact@championsacademy.com"
-                value={contactEmail}
-                onChange={(e) => setContactEmail(e.target.value)}
-              />
-            </div>
-            <div className="flex flex-col gap-1.5">
-              <Label htmlFor="wizard-contact-website">Website</Label>
-              <Input
-                id="wizard-contact-website"
-                type="url"
-                placeholder="e.g. https://championsacademy.com"
-                value={contactWebsite}
-                onChange={(e) => setContactWebsite(e.target.value)}
-              />
-            </div>
+        {/* Budget Step */}
+        {step === (isParent ? 5 : 6) && (
+          <div className="grid grid-cols-2 gap-2" role="radiogroup" aria-label="Select budget range">
+            {BUDGET_OPTIONS.map((option) => {
+              const isSelected = budget === option.value;
+              return (
+                <button
+                  key={option.value}
+                  type="button"
+                  role="radio"
+                  aria-checked={isSelected}
+                  onClick={() => setBudget(option.value)}
+                  className={cn(
+                    'rounded-lg border-2 px-4 py-3 text-left transition-all',
+                    'focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none',
+                    isSelected
+                      ? 'border-primary bg-primary/5'
+                      : 'border-border/60 bg-background/60 hover:border-primary/30',
+                  )}
+                >
+                  <div className="flex items-center justify-between">
+                    <span className={cn('text-sm font-medium', isSelected ? 'text-primary' : 'text-foreground')}>
+                      {option.label}
+                    </span>
+                    {isSelected && <Check className="h-4 w-4 text-primary" />}
+                  </div>
+                  <span className="text-muted-foreground text-xs">{option.description}</span>
+                </button>
+              );
+            })}
+          </div>
+        )}
+
+        {/* Training Frequency Step */}
+        {step === (isParent ? 6 : 7) && (
+          <div className="grid grid-cols-2 gap-2" role="radiogroup" aria-label="Select training frequency">
+            {FREQUENCY_OPTIONS.map((option) => {
+              const isSelected = trainingFrequency === option.value;
+              return (
+                <button
+                  key={option.value}
+                  type="button"
+                  role="radio"
+                  aria-checked={isSelected}
+                  onClick={() => setTrainingFrequency(option.value)}
+                  className={cn(
+                    'rounded-lg border-2 px-4 py-3 text-left transition-all',
+                    'focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none',
+                    isSelected
+                      ? 'border-primary bg-primary/5'
+                      : 'border-border/60 bg-background/60 hover:border-primary/30',
+                  )}
+                >
+                  <div className="flex items-center justify-between">
+                    <span className={cn('text-sm font-medium', isSelected ? 'text-primary' : 'text-foreground')}>
+                      {option.label}
+                    </span>
+                    {isSelected && <Check className="h-4 w-4 text-primary" />}
+                  </div>
+                  <span className="text-muted-foreground text-xs">{option.description}</span>
+                </button>
+              );
+            })}
+          </div>
+        )}
+
+        {/* Competition Level Step */}
+        {step === (isParent ? 7 : 8) && (
+          <div className="grid grid-cols-2 gap-2" role="radiogroup" aria-label="Select competition level">
+            {COMPETITION_OPTIONS.map((option) => {
+              const isSelected = competitionLevel === option.value;
+              return (
+                <button
+                  key={option.value}
+                  type="button"
+                  role="radio"
+                  aria-checked={isSelected}
+                  onClick={() => setCompetitionLevel(option.value)}
+                  className={cn(
+                    'rounded-lg border-2 px-4 py-3 text-left transition-all',
+                    'focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none',
+                    isSelected
+                      ? 'border-primary bg-primary/5'
+                      : 'border-border/60 bg-background/60 hover:border-primary/30',
+                  )}
+                >
+                  <div className="flex items-center justify-between">
+                    <span className={cn('text-sm font-medium', isSelected ? 'text-primary' : 'text-foreground')}>
+                      {option.label}
+                    </span>
+                    {isSelected && <Check className="h-4 w-4 text-primary" />}
+                  </div>
+                  <span className="text-muted-foreground text-xs">{option.description}</span>
+                </button>
+              );
+            })}
           </div>
         )}
       </div>

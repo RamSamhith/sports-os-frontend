@@ -11,6 +11,29 @@ interface AcademyImageProps extends Omit<ImageWithFallbackProps, 'src' | 'fallba
   fallback?: React.ReactNode;
 }
 
+const ALLOWED_IMAGE_HOSTNAMES = new Set([
+  'images.unsplash.com',
+  'res.cloudinary.com',
+]);
+
+function isAllowedImageSrc(url: string): boolean {
+  if (url.startsWith('/')) return true;
+  try {
+    const parsed = new URL(url);
+    if (parsed.protocol !== 'https:' && parsed.protocol !== 'http:') return false;
+    if (ALLOWED_IMAGE_HOSTNAMES.has(parsed.hostname)) return true;
+    for (const allowed of ALLOWED_IMAGE_HOSTNAMES) {
+      if (allowed.startsWith('*.')) {
+        const suffix = allowed.slice(1);
+        if (parsed.hostname.endsWith(suffix)) return true;
+      }
+    }
+    return false;
+  } catch {
+    return false;
+  }
+}
+
 const sportImageVariants: Record<string, string[]> = {
   cricket: [
     'https://images.unsplash.com/photo-1531415074968-036ba1b575da?w=800&h=600&fit=crop',
@@ -139,7 +162,7 @@ export function AcademyImage({
   const sport = sportsOffered?.[0];
 
   const src = React.useMemo(() => {
-    if (coverImage) return coverImage;
+    if (coverImage && isAllowedImageSrc(coverImage)) return coverImage;
     if (sport) {
       const variant = pickVariant(sport, slug);
       if (variant) return variant;

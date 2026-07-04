@@ -3,7 +3,7 @@
 import { createContext, useContext } from 'react';
 import type { UserRole } from '@/types/domain/user';
 
-export type OnboardingRole = 'athlete' | 'parent' | 'coach' | 'academy_owner';
+export type OnboardingRole = 'athlete' | 'parent';
 
 export interface UserProfile {
   name: string;
@@ -36,8 +36,6 @@ export interface AuthContextValue {
   role: UserRole | null;
   /** Whether the user has completed the onboarding role selection. */
   onboardingCompleted: boolean;
-  /** Whether the user has completed OTP verification after signup. */
-  verified: boolean;
 
   /** User profile data (name, email, phone). */
   profile: UserProfile;
@@ -59,8 +57,6 @@ export interface AuthContextValue {
   setRole: (role: UserRole) => void;
   /** Mark onboarding as complete (called after role selection). */
   completeOnboarding: () => void;
-  /** Mark OTP verification as complete. */
-  setVerified: (verified: boolean) => void;
   /** Update user profile data. */
   setProfile: (profile: Partial<UserProfile>) => void;
   /** Update onboarding data from backend response. */

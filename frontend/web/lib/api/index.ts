@@ -1,8 +1,25 @@
 export * from './client';
-export { register, login, sendOtp, verifyOtp, logout } from './auth';
+export {
+  register,
+  login,
+  logout,
+  getMe,
+  saveOnboarding,
+  updateProfile,
+  resetPassword,
+  getSessions,
+  revokeSession,
+  revokeAllSessions,
+  changePassword,
+  changeEmail,
+  changePhone,
+  deleteAccount,
+  syncPreferences,
+  syncConsent,
+  signInWithGoogle,
+} from './auth';
 export * from './children';
 export * from './academies';
-export * from './coaches';
 export * from './enquiries';
 export * from './sports';
 export * from './shortlist';

@@ -12,8 +12,6 @@ import { LogOut } from 'lucide-react';
 const allItems = [
   { href: '/profile/personal', label: 'Personal' },
   { href: '/profile/children', label: 'Children', parentOnly: true },
-  { href: '/profile/academy', label: 'My Academy', roleOnly: 'academy_owner' },
-  { href: '/profile/coach', label: 'My Coach Profile', roleOnly: 'coach' },
   { href: '/profile/preferences', label: 'Preferences' },
   { href: '/profile/saved', label: 'Saved' },
   { href: '/profile/enquiries', label: 'Enquiries' },

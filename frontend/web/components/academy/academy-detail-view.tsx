@@ -18,19 +18,32 @@ import { CertificationIndicator } from '@/components/trust/certification-indicat
 import { ProtectedLink } from '@/components/auth/protected-link';
 import { ReviewsSection } from '@/components/reviews/reviews-section';
 import { AcademyImage } from '@/components/ui/academy-image';
+import { ImageWithFallback } from '@/components/ui/image-with-fallback';
 import { AcademyDetailSkeleton } from '@/components/feedback/skeletons';
 import { SectionNav, useSectionObserver } from '@/components/ui/section-nav';
 import { getAcademy, getAcademies } from '@/lib/api/academies';
-import { getCoaches } from '@/lib/api/coaches';
 import { useRecentlyViewed } from '@/lib/hooks/use-recently-viewed';
+import { get as apiGet } from '@/lib/api/client';
 import type { Academy } from '@/types/domain/academy';
-import type { Coach } from '@/types/domain/coach';
 import {
   Globe, Mail, Phone, AlertTriangle, Star, MapPin,
   Clock, Award, ChevronRight, Users, ArrowLeft,
   Shield, CheckCircle2, Building2, PhoneCall, Dumbbell, MessageCircle,
   Info, Trophy, MapPinned, MessageSquareText,
 } from 'lucide-react';
+
+interface AcademyCoach {
+  id: string;
+  slug: string;
+  name: string;
+  avatar?: string;
+  sportsCoached?: string[];
+  experienceYears?: number;
+  certifications?: { name: string; issuer: string; year: number }[];
+  bio?: string;
+  achievements?: string[];
+  rating?: { average?: number; count?: number };
+}
 
 const facilityLabels: Record<string, string> = {
   indoor: 'Indoor',
@@ -46,7 +59,7 @@ const facilityLabels: Record<string, string> = {
 
 export function AcademyDetailView({ slug }: { slug: string }) {
   const [academy, setAcademy] = React.useState<Academy | null>(null);
-  const [coaches, setCoaches] = React.useState<Coach[]>([]);
+  const [coaches, setCoaches] = React.useState<AcademyCoach[]>([]);
   const [related, setRelated] = React.useState<Academy[]>([]);
   const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState<string | null>(null);
@@ -74,15 +87,9 @@ export function AcademyDetailView({ slug }: { slug: string }) {
         if (res.ok) {
           setAcademy(res.data);
           addView({ id: res.data.id, slug: res.data.slug, type: 'academy', name: res.data.name });
-          const coachesRes = await getCoaches({ pageSize: 100 });
+          const coachesRes = await apiGet<{ items: AcademyCoach[] }>(`/coaches/academy/${res.data.id}`);
           if (!cancelled && coachesRes.ok) {
-            const allCoaches = coachesRes.data.items ?? [];
-            const academySports = new Set(res.data.sportsOffered ?? []);
-            const matched = allCoaches.filter((c) => {
-              if (c.academyId === res.data.id) return true;
-              return (c.sportsCoached ?? []).some((s) => academySports.has(s));
-            });
-            setCoaches(matched);
+            setCoaches(coachesRes.data.items ?? []);
           }
           const relatedRes = await getAcademies({ pageSize: 100 });
           if (!cancelled && relatedRes.ok) {
@@ -113,8 +120,6 @@ export function AcademyDetailView({ slug }: { slug: string }) {
   }, [slug, addView]);
 
   const facilityCount = (academy?.facilities ?? []).length;
-  const coachCount = coaches.length;
-  const totalExperience = coaches.reduce((sum, c) => sum + c.experienceYears, 0);
 
   const sectionConfig = React.useMemo(() => {
     if (!academy) return [];
@@ -270,9 +275,7 @@ export function AcademyDetailView({ slug }: { slug: string }) {
         <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-6">
           {[
             { icon: Shield, label: 'Verified', value: academy.verificationStatus === 'verified' ? 'Yes' : 'Pending' },
-            { icon: Clock, label: 'Experience', value: totalExperience > 0 ? `${totalExperience}+ yrs` : 'N/A' },
             { icon: Dumbbell, label: 'Sports', value: `${(academy.sportsOffered ?? []).length}` },
-            { icon: Users, label: 'Coaches', value: `${coachCount}` },
             { icon: PhoneCall, label: 'Response', value: '< 24 hrs' },
             { icon: Building2, label: 'Facilities', value: `${facilityCount}` },
           ].map((item) => (
@@ -335,50 +338,58 @@ export function AcademyDetailView({ slug }: { slug: string }) {
           </Card>
         )}
 
-        {/* Coaches */}
+        {/* Coaches at this Academy */}
         {coaches.length > 0 && (
           <Card id="coaches" className="mt-4 scroll-mt-24">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-lg flex items-center gap-2">
-                <Users className="h-5 w-5 text-muted-foreground" />
-                Certified Coaches ({coaches.length})
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="pt-0">
+            <CardContent className="p-4">
+              <div className="flex items-center gap-2 mb-3">
+                <Users className="h-4 w-4 text-muted-foreground" />
+                <h2 className="text-sm font-semibold">Coaches at this academy</h2>
+              </div>
               <div className="grid gap-3 sm:grid-cols-2">
-                {coaches.map((coach) => (
-                  <Link
+                {coaches.slice(0, 6).map((coach) => (
+                  <div
                     key={coach.id}
-                    href={`/coaches/${coach.slug}`}
-                    className="group flex items-center gap-3 rounded-lg border border-border/50 p-3 transition-colors hover:border-foreground/20 hover:bg-accent/5"
+                    className="border-border/50 bg-card/40 flex items-start gap-3 rounded-lg border p-3"
                   >
-                    <div className="bg-muted flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-xs font-semibold uppercase">
-                      {(coach.name || '?').split(' ').map((n) => n[0]).join('').slice(0, 2)}
+                    <div className="bg-muted relative h-11 w-11 shrink-0 overflow-hidden rounded-full">
+                      {coach.avatar ? (
+                        <ImageWithFallback
+                          src={coach.avatar}
+                          alt={coach.name}
+                          fill
+                          sizes="44px"
+                          className="object-cover"
+                          fallback={
+                            <div className="flex h-full w-full items-center justify-center text-xs font-semibold uppercase text-muted-foreground">
+                              {(coach.name || '?').split(' ').map((n) => n[0]).join('').slice(0, 2)}
+                            </div>
+                          }
+                        />
+                      ) : (
+                        <div className="flex h-full w-full items-center justify-center text-xs font-semibold uppercase text-muted-foreground">
+                          {(coach.name || '?').split(' ').map((n) => n[0]).join('').slice(0, 2)}
+                        </div>
+                      )}
                     </div>
                     <div className="min-w-0 flex-1">
-                      <div className="flex items-center gap-1.5">
-                        <p className="text-sm font-semibold line-clamp-1">{coach.name}</p>
-                        <VerifiedBadge status={coach.verificationStatus} />
-                      </div>
+                      <p className="text-sm font-semibold line-clamp-1">{coach.name}</p>
                       <div className="text-muted-foreground flex items-center gap-2 text-xs">
-                        <span className="flex items-center gap-0.5">
-                          <Clock className="h-3 w-3" />
-                          {coach.experienceYears}+ yrs
-                        </span>
-                        <span className="flex items-center gap-0.5">
-                          <Star className="h-3 w-3 fill-amber-400 text-amber-400" />
-                          {(coach.rating?.average ?? 0).toFixed(1)}
-                        </span>
-                        {(coach.certifications ?? []).length > 0 && (
-                          <span className="flex items-center gap-0.5">
-                            <Award className="h-3 w-3" />
-                            {(coach.certifications ?? []).length} cert
-                          </span>
+                        {(coach.sportsCoached ?? []).length > 0 && (
+                          <span className="capitalize">{coach.sportsCoached![0].replace(/-/g, ' ')}</span>
+                        )}
+                        {coach.experienceYears != null && coach.experienceYears > 0 && (
+                          <>
+                            <span>·</span>
+                            <span>{coach.experienceYears}+ yrs</span>
+                          </>
                         )}
                       </div>
+                      {coach.bio && (
+                        <p className="text-muted-foreground mt-1 line-clamp-2 text-xs">{coach.bio}</p>
+                      )}
                     </div>
-                    <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground" />
-                  </Link>
+                  </div>
                 ))}
               </div>
             </CardContent>

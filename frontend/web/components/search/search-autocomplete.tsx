@@ -2,24 +2,28 @@
 
 import * as React from 'react';
 import { useRouter } from 'next/navigation';
-import { Search, X, Loader2, MapPin, Trophy, Users, School, ArrowRight } from 'lucide-react';
+import { Search, X, Loader2, MapPin, Trophy, School, ArrowRight } from 'lucide-react';
 import { cn } from '@/lib/utils/cn';
 import { useDebounce } from '@/lib/hooks/use-debounce';
 import { getAcademies } from '@/lib/api/academies';
-import { getCoaches } from '@/lib/api/coaches';
 import { listSports } from '@/lib/api/sports';
 import type { Academy } from '@/types/domain/academy';
-import type { Coach } from '@/types/domain/coach';
 import type { Sport } from '@/types/domain/sport';
 
 interface Suggestion {
   id: string;
-  type: 'academy' | 'coach' | 'sport' | 'city' | 'navigation';
+  type: 'academy' | 'sport' | 'city' | 'navigation';
   title: string;
   subtitle?: string;
   href: string;
   icon: React.ReactNode;
 }
+
+const GROUP_LABELS: Record<string, string> = {
+  academy: 'ACADEMIES',
+  sport: 'SPORTS',
+  city: 'CITIES',
+};
 
 function highlightMatch(text: string, query: string): React.ReactNode {
   if (!query.trim()) return text;
@@ -86,7 +90,6 @@ export function SearchAutocomplete({
   const inputRef = React.useRef<HTMLInputElement>(null);
   const listRef = React.useRef<HTMLDivElement>(null);
   const academiesRef = React.useRef<Academy[]>([]);
-  const coachesRef = React.useRef<Coach[]>([]);
   const sportsRef = React.useRef<Sport[]>([]);
   const dataLoadedRef = React.useRef(false);
   const containerRef = React.useRef<HTMLDivElement>(null);
@@ -103,14 +106,12 @@ export function SearchAutocomplete({
       if (dataLoadedRef.current) return;
       setLoading(true);
       try {
-        const [academiesRes, coachesRes, sportsRes] = await Promise.all([
+        const [academiesRes, sportsRes] = await Promise.all([
           getAcademies({ pageSize: 200 }),
-          getCoaches({ pageSize: 200 }),
           listSports({ status: 'published', limit: 100 }),
         ]);
         if (cancelled) return;
         if (academiesRes.ok) academiesRef.current = academiesRes.data.items;
-        if (coachesRes.ok) coachesRef.current = coachesRes.data.items;
         if (sportsRes.ok) sportsRef.current = sportsRes.data.items;
         dataLoadedRef.current = true;
       } catch {
@@ -148,24 +149,6 @@ export function SearchAutocomplete({
           subtitle: `${a.location?.city ?? ''}, ${a.location?.state ?? ''}`.replace(/^,\s*/, ''),
           href: `/academies/${a.slug}`,
           icon: <School className="h-4 w-4" />,
-        });
-      }
-    }
-
-    for (const c of coachesRef.current) {
-      if (seen.has(`coach:${c.id}`)) continue;
-      const titleMatch = c.name.toLowerCase().includes(q);
-      const cityMatch = c.location?.city?.toLowerCase().includes(q);
-      const sportMatch = c.sportsCoached?.some(s => s.toLowerCase().includes(q));
-      if (titleMatch || cityMatch || sportMatch) {
-        seen.add(`coach:${c.id}`);
-        results.push({
-          id: c.id,
-          type: 'coach',
-          title: c.name,
-          subtitle: `${c.location?.city ?? ''} · ${c.experienceYears}+ yrs`,
-          href: `/coaches/${c.slug}`,
-          icon: <Users className="h-4 w-4" />,
         });
       }
     }
@@ -273,7 +256,7 @@ export function SearchAutocomplete({
 
   React.useEffect(() => {
     if (activeIndex >= 0 && listRef.current) {
-      const item = listRef.current.querySelector(`[data-index="${activeIndex}"]`);
+      const item = listRef.current.querySelector(`[data-suggestion-index="${activeIndex}"]`);
       item?.scrollIntoView({ block: 'nearest' });
     }
   }, [activeIndex]);
@@ -300,7 +283,7 @@ export function SearchAutocomplete({
           aria-label="Search"
           autoComplete="off"
           className={cn(
-            'bg-background placeholder:text-muted-foreground focus-visible:ring-ring w-full rounded-xl border bg-transparent pl-10 pr-10 shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium focus-visible:outline-none focus-visible:ring-2 disabled:cursor-not-allowed disabled:opacity-50',
+            'bg-background placeholder:text-muted-foreground w-full rounded-xl border bg-transparent pl-10 pr-10 shadow-sm transition-all duration-200 file:border-0 file:bg-transparent file:text-sm file:font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:border-primary/40 focus-visible:shadow-md hover:border-border/80 hover:shadow-md disabled:cursor-not-allowed disabled:opacity-50',
             inputSizeClass,
           )}
         />
@@ -324,34 +307,47 @@ export function SearchAutocomplete({
           aria-label="Search suggestions"
           className="bg-popover absolute top-full z-50 mt-2 w-full overflow-hidden rounded-xl border shadow-lg"
         >
-          {suggestions.map((s, i) => (
-            <button
-              key={s.id}
-              id={`search-suggestion-${i}`}
-              data-index={i}
-              role="option"
-              aria-selected={i === activeIndex}
-              onClick={() => navigate(s.href)}
-              onMouseEnter={() => setActiveIndex(i)}
-              className={cn(
-                'flex w-full items-center gap-3 px-4 py-3 text-left text-sm transition-colors',
-                i === activeIndex ? 'bg-accent text-accent-foreground' : 'hover:bg-accent/50',
-              )}
-            >
-              <span className="text-muted-foreground shrink-0">{s.icon}</span>
-              <div className="min-w-0 flex-1">
-                <p className="font-medium truncate">
-                  {highlightMatch(s.title, query)}
-                </p>
-                {s.subtitle && (
-                  <p className="text-muted-foreground truncate text-xs">{s.subtitle}</p>
-                )}
-              </div>
-              {s.type === 'navigation' && (
-                <ArrowRight className="text-muted-foreground h-4 w-4 shrink-0" />
-              )}
-            </button>
-          ))}
+          {(() => {
+            let lastType = '';
+            return suggestions.map((s, i) => {
+              const showHeader = s.type !== 'navigation' && s.type !== lastType;
+              lastType = s.type;
+              return (
+                <React.Fragment key={s.id}>
+                  {showHeader && (
+                    <div className="text-muted-foreground px-4 pt-2.5 pb-1 text-[10px] font-medium tracking-wider">
+                      {GROUP_LABELS[s.type] ?? s.type}
+                    </div>
+                  )}
+                  <button
+                    id={`search-suggestion-${i}`}
+                    data-suggestion-index={i}
+                    role="option"
+                    aria-selected={i === activeIndex}
+                    onClick={() => navigate(s.href)}
+                    onMouseEnter={() => setActiveIndex(i)}
+                    className={cn(
+                      'flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm transition-colors',
+                      i === activeIndex ? 'bg-accent text-accent-foreground' : 'hover:bg-accent/50',
+                    )}
+                  >
+                    <span className="text-muted-foreground shrink-0">{s.icon}</span>
+                    <div className="min-w-0 flex-1">
+                      <p className="font-medium truncate">
+                        {highlightMatch(s.title, query)}
+                      </p>
+                      {s.subtitle && (
+                        <p className="text-muted-foreground truncate text-xs">{s.subtitle}</p>
+                      )}
+                    </div>
+                    {s.type === 'navigation' && (
+                      <ArrowRight className="text-muted-foreground h-4 w-4 shrink-0" />
+                    )}
+                  </button>
+                </React.Fragment>
+              );
+            });
+          })()}
         </div>
       )}
 

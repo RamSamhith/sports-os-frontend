@@ -10,29 +10,6 @@ import { Button } from '@/components/ui/button';
 import { ease, duration } from '@/components/motion/constants';
 import type { Sport } from '@/types/domain/sport';
 
-const sportBenefits: Record<string, string[]> = {
-  cricket: ['Teamwork', 'Hand-eye coordination', 'Fitness'],
-  football: ['Stamina', 'Speed', 'Team spirit'],
-  badminton: ['Agility', 'Reflexes', 'Endurance'],
-  tennis: ['Coordination', 'Speed', 'Core strength'],
-  'table-tennis': ['Reflexes', 'Hand-eye coordination', 'Wrist flexibility'],
-  swimming: ['Full body workout', 'Lung capacity', 'Flexibility'],
-  athletics: ['Speed', 'Power', 'Discipline'],
-  wrestling: ['Full-body strength', 'Grip strength', 'Endurance'],
-  boxing: ['Speed', 'Power', 'Core stability'],
-  karate: ['Flexibility', 'Discipline', 'Speed'],
-  judo: ['Balance', 'Coordination', 'Mental discipline'],
-  kabaddi: ['Strength', 'Lung capacity', 'Tactical awareness'],
-  hockey: ['Stamina', 'Agility', 'Stick-handling'],
-  chess: ['Focus', 'Pattern recognition', 'Memory'],
-  skating: ['Balance', 'Leg strength', 'Flexibility'],
-  archery: ['Steady hand', 'Core stability', 'Visual focus'],
-  shooting: ['Composure', 'Steady hand', 'Visual focus'],
-  yoga: ['Flexibility', 'Balance', 'Breath control'],
-  gymnastics: ['Flexibility', 'Spatial awareness', 'Strength'],
-  basketball: ['Height coordination', 'Agility', 'Endurance'],
-};
-
 const sportGradients: Record<string, string> = {
   cricket: 'from-blue-600 to-blue-800/60',
   football: 'from-emerald-600 to-emerald-800/60',
@@ -45,20 +22,21 @@ const sportGradients: Record<string, string> = {
   default: 'from-primary/60 to-primary/20',
 };
 
+const difficultyColor: Record<string, string> = {
+  Low: 'text-emerald-600',
+  Medium: 'text-amber-600',
+  High: 'text-red-600',
+};
+
 export const SportCard = React.memo(function SportCard({ sport }: { sport: Sport }) {
   const reduced = useReducedMotion();
-  const { slug, name, sportType, coverImage, shortDescription, explorationGuidance, id } = sport;
+  const { slug, name, coverImage } = sport;
   const imageSrc = coverImage ?? `/images/sports/${slug}.svg`;
-  const ageRange = explorationGuidance?.ageSuitability;
-  const ageText =
-    ageRange?.min !== undefined && ageRange?.max !== undefined
-      ? `${ageRange.min}–${ageRange.max} yrs`
-      : ageRange?.min !== undefined
-        ? `${ageRange.min}+ yrs`
-        : null;
-
-  const benefits = sport.physicalBenefits?.slice(0, 3) ?? sportBenefits[slug] ?? [];
   const gradient = sportGradients[slug] ?? sportGradients.default;
+
+  const difficulty = sport.fitnessLevelRequired ?? 'Medium';
+  const participation = sport.individualOrTeam ?? 'Both';
+  const environment = sport.indoorOutdoor ?? 'Both';
 
   return (
     <motion.div
@@ -89,30 +67,17 @@ export const SportCard = React.memo(function SportCard({ sport }: { sport: Sport
           <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
           <div className="absolute bottom-3 left-3 right-3">
             <h3 className="text-base font-bold text-white drop-shadow-sm line-clamp-1">{name}</h3>
-            <div className="flex items-center gap-2 mt-0.5">
-              <span className="bg-white/20 text-white/80 rounded-full px-2 py-0.5 text-[10px] capitalize backdrop-blur-sm">
-                {sportType}
-              </span>
-              {ageText && (
-                <span className="text-white/70 text-xs">{ageText}</span>
-              )}
-            </div>
           </div>
         </Link>
-        <div className="flex flex-col gap-3 p-4">
-          {shortDescription && (
-            <p className="text-muted-foreground text-xs line-clamp-2 leading-relaxed">{shortDescription}</p>
-          )}
-          {benefits.length > 0 && (
-            <div className="flex flex-wrap gap-1">
-              {benefits.map((benefit) => (
-                <Badge key={benefit} variant="secondary" className="text-[10px]">
-                  {benefit}
-                </Badge>
-              ))}
-            </div>
-          )}
-          <Button size="lg" className="w-full h-11 mt-1" asChild>
+        <div className="flex flex-col gap-2.5 p-4">
+          <div className="flex flex-wrap gap-1.5">
+            <Badge variant="secondary" className="text-[10px] capitalize">{participation}</Badge>
+            <Badge variant="secondary" className="text-[10px] capitalize">{environment}</Badge>
+            <Badge variant="secondary" className={`text-[10px] capitalize ${difficultyColor[difficulty] ?? ''}`}>
+              {difficulty}
+            </Badge>
+          </div>
+          <Button size="lg" className="w-full h-10" asChild>
             <Link href={`/sports/${slug}`}>
               Explore {name}
             </Link>

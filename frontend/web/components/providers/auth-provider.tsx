@@ -25,7 +25,6 @@ interface PersistedAuthState {
   isAuthenticated: boolean;
   role: UserRole | null;
   onboardingCompleted: boolean;
-  verified: boolean;
 }
 
 interface PersistedProfile {
@@ -57,21 +56,20 @@ const defaultOnboarding: PersistedOnboarding = {
   children: [],
 };
 
-const VALID_ROLES: readonly UserRole[] = ['athlete', 'parent', 'coach', 'academy_owner', 'admin'];
+const VALID_ROLES: readonly UserRole[] = ['athlete', 'parent', 'admin'];
 
 function readState(): PersistedAuthState {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return { isAuthenticated: false, role: null, onboardingCompleted: false, verified: false };
+    if (!raw) return { isAuthenticated: false, role: null, onboardingCompleted: false };
     const parsed = JSON.parse(raw);
     return {
       isAuthenticated: !!parsed.isAuthenticated,
       role: VALID_ROLES.includes(parsed.role) ? parsed.role : null,
       onboardingCompleted: !!parsed.onboardingCompleted,
-      verified: !!parsed.verified,
     };
   } catch {
-    return { isAuthenticated: false, role: null, onboardingCompleted: false, verified: false };
+    return { isAuthenticated: false, role: null, onboardingCompleted: false };
   }
 }
 
@@ -170,7 +168,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     isAuthenticated: false,
     role: null,
     onboardingCompleted: false,
-    verified: false,
   });
   const [profile, setProfileState] = useState<UserProfile>({ ...defaultProfile });
   const [onboarding, setOnboardingState] = useState<PersistedOnboarding>({ ...defaultOnboarding });
@@ -256,7 +253,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           }));
         } else if (res.ok === false && res.error?.code === 'UNAUTHORIZED') {
           // Session fully expired (refresh token also invalid) — sign out
-          setState({ isAuthenticated: false, role: null, onboardingCompleted: false, verified: false });
+    setState({ isAuthenticated: false, role: null, onboardingCompleted: false });
           setProfileState({ ...defaultProfile });
           setOnboardingState({ ...defaultOnboarding });
           try { localStorage.removeItem('sportsos:auth-token'); } catch { /* ignore */ }
@@ -294,7 +291,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return {
         ...prev,
         isAuthenticated: authenticated,
-        verified: authenticated ? true : prev.verified,
         onboardingCompleted: onboarded ?? prev.onboardingCompleted,
       };
     });
@@ -311,13 +307,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setState((prev) => {
       if (prev.onboardingCompleted) return prev;
       return { ...prev, onboardingCompleted: true };
-    });
-  }, []);
-
-  const setVerified = useCallback((verified: boolean) => {
-    setState((prev) => {
-      if (prev.verified === verified) return prev;
-      return { ...prev, verified };
     });
   }, []);
 
@@ -372,7 +361,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const signOut = useCallback(() => {
     // Notify backend to revoke refresh token and clear cookie
     apiLogout().catch(() => {});
-    setState({ isAuthenticated: false, role: null, onboardingCompleted: false, verified: false });
+    setState({ isAuthenticated: false, role: null, onboardingCompleted: false });
     setProfileState({ ...defaultProfile });
     setOnboardingState({ ...defaultOnboarding });
     setIsGuest(false);
@@ -396,7 +385,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       localStorage.removeItem('sportsos:academy-status');
       localStorage.removeItem('sportsos:selected-academy');
       localStorage.removeItem('sportsos:recently-viewed');
-      localStorage.removeItem('sportsos:onboarding');
+      localStorage.removeItem('sportsos:onboarding-data');
     } catch { /* ignore */ }
   }, []);
 
@@ -407,24 +396,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       isGuest,
       role: state.role,
       onboardingCompleted: state.onboardingCompleted,
-      verified: state.verified,
       profile,
       onboarding,
       setAuth,
       setRole,
       completeOnboarding,
-      setVerified,
       setProfile,
       setOnboarding,
       enterGuestMode,
       convertGuestToUser,
       signOut,
     }),
-    [state, hydrated, isGuest, profile, onboarding, setAuth, setRole, completeOnboarding, setVerified, setProfile, setOnboarding, enterGuestMode, convertGuestToUser, signOut],
+    [state, hydrated, isGuest, profile, onboarding, setAuth, setRole, completeOnboarding, setProfile, setOnboarding, enterGuestMode, convertGuestToUser, signOut],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
-
-// Re-export createContext for compatibility with module graph (no-op export)
-export { createContext };

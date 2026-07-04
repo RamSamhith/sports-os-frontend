@@ -14,18 +14,6 @@ export function AcademyCardSkeleton() {
   );
 }
 
-export function CoachCardSkeleton() {
-  return (
-    <div className="border-border/60 bg-card/50 flex items-center gap-3 rounded-xl border p-4">
-      <Skeleton className="h-12 w-12 rounded-full" />
-      <div className="flex flex-1 flex-col gap-2">
-        <Skeleton className="h-4 w-1/2" />
-        <Skeleton className="h-3 w-1/3" />
-      </div>
-    </div>
-  );
-}
-
 export function SportCardSkeleton() {
   return (
     <div className="border-border/60 bg-card/50 flex flex-col gap-2 rounded-xl border p-4">
@@ -146,29 +134,13 @@ export function AcademyDetailSkeleton() {
       <div className="flex flex-col gap-3">
         <Skeleton className="h-5 w-1/4" />
         {Array.from({ length: 3 }).map((_, i) => (
-          <CoachCardSkeleton key={i} />
-        ))}
-      </div>
-    </div>
-  );
-}
-
-export function CoachDetailSkeleton() {
-  return (
-    <div className="flex flex-col gap-6">
-      <div className="flex items-center gap-4">
-        <Skeleton className="h-20 w-20 rounded-full" />
-        <div className="flex flex-col gap-2">
-          <Skeleton className="h-6 w-40" />
-          <Skeleton className="h-4 w-24" />
-          <Skeleton className="h-4 w-32" />
-        </div>
-      </div>
-      <Skeleton className="h-32 w-full rounded-xl" />
-      <div className="flex flex-col gap-2">
-        <Skeleton className="h-4 w-32" />
-        {Array.from({ length: 2 }).map((_, i) => (
-          <AcademyCardSkeleton key={i} />
+          <div key={i} className="border-border/60 bg-card/50 flex items-center gap-3 rounded-xl border p-4">
+            <Skeleton className="h-12 w-12 rounded-full" />
+            <div className="flex flex-1 flex-col gap-2">
+              <Skeleton className="h-4 w-1/2" />
+              <Skeleton className="h-3 w-1/3" />
+            </div>
+          </div>
         ))}
       </div>
     </div>

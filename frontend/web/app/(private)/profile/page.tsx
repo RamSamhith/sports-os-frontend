@@ -8,14 +8,10 @@ import { Badge } from '@/components/ui/badge';
 import { useAuth } from '@/lib/hooks/use-auth';
 import { useOnboarding } from '@/lib/hooks/use-onboarding';
 import { useChildren } from '@/lib/hooks/use-children';
-import { useAcademySelection } from '@/lib/hooks/use-academy-selection';
 import { ConversionModal } from '@/components/auth/conversion-modal';
 import { getMatchingCriteria } from '@/lib/utils/matching';
 import { sportTaxonomy } from '@/lib/constants/sport-taxonomy';
-import { getAcademies } from '@/lib/api/academies';
-import { MyAcademyCard } from '@/components/profile/my-academy-card';
-import { Pencil, MapPin, Target, Trophy, User, Users, Sparkles, School, Search, Shield } from 'lucide-react';
-import type { Academy } from '@/types/domain/academy';
+import { Pencil, MapPin, Target, Trophy, User, Users, Sparkles, Shield } from 'lucide-react';
 
 function getSportName(slug: string): string {
   return sportTaxonomy.find((s) => s.slug === slug)?.name ?? slug;
@@ -51,30 +47,8 @@ export default function ProfilePage() {
   const { role, isGuest, isAuthenticated } = useAuth();
   const { athleteData, parentData, completed } = useOnboarding();
   const { activeChild } = useChildren();
-  const { selectedAcademyId } = useAcademySelection();
   const isParent = role === 'parent';
   const [showUpgrade, setShowUpgrade] = React.useState(false);
-  const [academies, setAcademies] = React.useState<Academy[]>([]);
-  const [academiesLoading, setAcademiesLoading] = React.useState(true);
-
-  React.useEffect(() => {
-    let cancelled = false;
-    (async () => {
-      try {
-        const res = await getAcademies({ pageSize: 200 });
-        if (!cancelled && res.ok) setAcademies(res.data.items ?? []);
-      } catch {
-        // silently fail — MyAcademyCard will show nothing
-      } finally {
-        if (!cancelled) setAcademiesLoading(false);
-      }
-    })();
-    return () => { cancelled = true; };
-  }, []);
-
-  const selectedAcademy = selectedAcademyId
-    ? academies.find((a) => a.id === selectedAcademyId || a.slug === selectedAcademyId)
-    : null;
 
   return (
     <div className="flex flex-col gap-4">
@@ -220,32 +194,6 @@ export default function ProfilePage() {
                 ))}
               </div>
             )}
-          </CardContent>
-        </Card>
-      )}
-
-      <MyAcademyCard academies={academies} />
-
-      {!selectedAcademyId && (
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex flex-col items-center text-center gap-3">
-              <div className="bg-muted/50 grid h-12 w-12 place-items-center rounded-full">
-                <School className="h-5 w-5 text-muted-foreground" />
-              </div>
-              <div>
-                <p className="text-sm font-semibold">No academy selected yet</p>
-                <p className="text-muted-foreground text-xs mt-1">
-                  Browse academies and select one as your primary academy.
-                </p>
-              </div>
-              <Button size="sm" asChild>
-                <Link href="/academies">
-                  <Search className="h-3.5 w-3.5 mr-1" />
-                  Browse Academies
-                </Link>
-              </Button>
-            </div>
           </CardContent>
         </Card>
       )}

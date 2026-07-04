@@ -595,11 +595,6 @@ export function SportDetailView({ sport }: SportDetailViewProps) {
               Explore {name} Academies <ChevronRight className="ml-1 h-3.5 w-3.5" />
             </Link>
           </Button>
-          <Button asChild variant="outline" size="sm" className="min-h-[44px]">
-            <Link href={`/coaches?sport=${slug}`}>
-              Explore {name} Coaches <ChevronRight className="ml-1 h-3.5 w-3.5" />
-            </Link>
-          </Button>
         </div>
       </div>
     </div>

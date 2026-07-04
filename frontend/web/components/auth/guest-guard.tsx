@@ -36,18 +36,14 @@ export function GuestGuard({ children, fallback, onGuard, actionLabel }: GuestGu
   }
 
   // Guest or unauthenticated users: intercept click
-  if (isGuest || !isAuthenticated) {
-    return (
-      <>
-        {fallback ?? (
-          <div onClick={handleGuard} className="cursor-pointer">
-            {children}
-          </div>
-        )}
-        <ConversionModal open={showConversion} onOpenChange={setShowConversion} actionLabel={actionLabel} />
-      </>
-    );
-  }
-
-  return <>{children}</>;
+  return (
+    <>
+      {fallback ?? (
+        <div onClick={handleGuard} className="cursor-pointer">
+          {children}
+        </div>
+      )}
+      <ConversionModal open={showConversion} onOpenChange={setShowConversion} actionLabel={actionLabel} />
+    </>
+  );
 }

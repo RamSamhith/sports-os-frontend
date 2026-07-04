@@ -131,7 +131,7 @@ export function ShortlistProvider({ children }: ShortlistProviderProps) {
                   : `${d.location?.city ?? ''} · ${d.experienceYears ?? ''}+ yrs`,
                 href: it.itemType === 'academy'
                   ? `/academies/${d.slug ?? it.itemId}`
-                  : `/coaches/${d.slug ?? it.itemId}`,
+                  : `/academies/${d.slug ?? it.itemId}`,
               };
             }
             backendIdMap[key] = it.id;
