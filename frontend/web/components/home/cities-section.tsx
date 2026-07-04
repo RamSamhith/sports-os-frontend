@@ -44,8 +44,8 @@ export function CitiesSection() {
     return (
       <Container size="lg">
         <div className="mb-4">
-          <h2 className="text-xl font-semibold tracking-tight md:text-2xl">Explore by City</h2>
-          <p className="text-muted-foreground text-xs">Find academies in your city.</p>
+          <h2 className="text-xl font-semibold tracking-tight sm:text-2xl">Explore by City</h2>
+          <p className="text-muted-foreground text-sm">Find academies in your city.</p>
         </div>
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
           {Array.from({ length: 8 }).map((_, i) => (
@@ -60,8 +60,8 @@ export function CitiesSection() {
     return (
       <Container size="lg">
         <div className="mb-4">
-          <h2 className="text-xl font-semibold tracking-tight md:text-2xl">Explore by City</h2>
-          <p className="text-muted-foreground text-xs">Find academies in your city.</p>
+          <h2 className="text-xl font-semibold tracking-tight sm:text-2xl">Explore by City</h2>
+          <p className="text-muted-foreground text-sm">Find academies in your city.</p>
         </div>
         <div className="flex flex-col items-center gap-3 rounded-xl border border-dashed py-12 text-center">
           <AlertTriangle className="h-10 w-10 text-destructive/40" />
@@ -84,7 +84,7 @@ export function CitiesSection() {
       <div className="mb-4 flex items-end justify-between gap-4">
         <div>
           <h2 className="text-xl font-semibold tracking-tight md:text-2xl">Explore by City</h2>
-          <p className="text-muted-foreground text-xs">
+          <p className="text-muted-foreground text-sm">
             {allCities.length} cities with academies across India
           </p>
         </div>
@@ -95,28 +95,28 @@ export function CitiesSection() {
           <Link
             key={city.name}
             href={`/cities/${city.slug}`}
-            className="group border-border/60 bg-card/40 hover:border-primary/40 hover:bg-primary/5 flex flex-col justify-between rounded-xl border p-4 transition-all"
+            className="group border-border/40 bg-card/40 hover:border-foreground/20 hover:bg-primary/5 flex flex-col justify-between rounded-xl border p-4 transition-all duration-300 hover:shadow-lg"
           >
             <div>
               <div className="flex items-center gap-1.5">
                 <MapPin className="text-muted-foreground h-3.5 w-3.5 shrink-0" />
                 <h3 className="text-sm font-semibold">{city.name}</h3>
               </div>
-              <p className="text-muted-foreground mt-1 text-xs">
+              <p className="text-muted-foreground mt-1 text-sm">
                 {city.academyCount} academ{city.academyCount === 1 ? 'y' : 'ies'}
               </p>
               <div className="mt-2 flex flex-wrap gap-1">
                 {city.topSports.map((sport) => (
                   <span
                     key={sport}
-                    className="bg-muted/60 text-muted-foreground rounded px-1.5 py-0.5 text-[10px] capitalize"
+                    className="bg-muted/60 text-muted-foreground rounded px-1.5 py-0.5 text-xs capitalize"
                   >
                     {sport.replace(/-/g, ' ')}
                   </span>
                 ))}
               </div>
             </div>
-            <div className="text-muted-foreground mt-3 flex items-center gap-1 text-[10px] group-hover:text-primary transition-colors">
+            <div className="text-muted-foreground mt-3 flex items-center gap-1 text-xs group-hover:text-primary transition-colors">
               <span>Explore</span>
               <ChevronRight className="h-3 w-3 transition-transform group-hover:translate-x-0.5" />
             </div>
@@ -126,7 +126,7 @@ export function CitiesSection() {
 
       {allCities.length > 8 && (
         <div className="mt-4 text-center">
-          <Link href="/cities" className="text-muted-foreground hover:text-foreground text-xs">
+          <Link href="/cities" className="text-muted-foreground hover:text-foreground text-sm">
             +{allCities.length - 8} more cities &rarr;
           </Link>
         </div>

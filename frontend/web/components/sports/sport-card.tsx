@@ -77,7 +77,7 @@ export const SportCard = React.memo(function SportCard({ sport }: { sport: Sport
               {difficulty}
             </Badge>
           </div>
-          <Button size="lg" className="w-full h-10" asChild>
+          <Button size="lg" className="w-full h-11" asChild>
             <Link href={`/sports/${slug}`}>
               Explore {name}
             </Link>

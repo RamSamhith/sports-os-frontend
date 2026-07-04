@@ -16,8 +16,8 @@ export function FeaturedSports() {
     return (
       <Container size="lg">
         <div className="mb-4">
-          <h2 className="text-xl font-semibold tracking-tight md:text-2xl">Popular Sports</h2>
-          <p className="text-muted-foreground text-xs">Sports, difficulty levels, and pathways.</p>
+          <h2 className="text-xl font-semibold tracking-tight sm:text-2xl">Popular Sports</h2>
+          <p className="text-muted-foreground text-sm">Sports, difficulty levels, and pathways.</p>
         </div>
         <div className="flex justify-center py-8">
           <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
@@ -30,8 +30,8 @@ export function FeaturedSports() {
     return (
       <Container size="lg">
         <div className="mb-4">
-          <h2 className="text-xl font-semibold tracking-tight md:text-2xl">Popular Sports</h2>
-          <p className="text-muted-foreground text-xs">Sports, difficulty levels, and pathways.</p>
+          <h2 className="text-xl font-semibold tracking-tight sm:text-2xl">Popular Sports</h2>
+          <p className="text-muted-foreground text-sm">Sports, difficulty levels, and pathways.</p>
         </div>
         <div className="flex flex-col items-center gap-3 rounded-xl border border-dashed py-12 text-center">
           <AlertTriangle className="h-10 w-10 text-destructive/40" />
@@ -53,10 +53,10 @@ export function FeaturedSports() {
     <Container size="lg">
       <div className="mb-4 flex items-end justify-between gap-4">
         <div>
-          <h2 className="text-xl font-semibold tracking-tight md:text-2xl">Popular Sports</h2>
-          <p className="text-muted-foreground text-xs">Sports, difficulty levels, and pathways.</p>
+          <h2 className="text-xl font-semibold tracking-tight sm:text-2xl">Popular Sports</h2>
+          <p className="text-muted-foreground text-sm">Sports, difficulty levels, and pathways.</p>
         </div>
-        <Link href="/sports" className="text-muted-foreground hover:text-foreground text-xs min-h-[44px] flex items-center shrink-0">
+        <Link href="/sports" className="text-muted-foreground hover:text-foreground text-sm min-h-[44px] flex items-center shrink-0">
           View all &rarr;
         </Link>
       </div>

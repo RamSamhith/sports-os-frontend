@@ -53,7 +53,7 @@ export default function HomePage() {
       />
       <Hero />
 
-      <div className="space-y-10 pb-12">
+      <div className="space-y-12 pb-16">
         <PersonalizedHome />
         <FeaturedSports />
         <CitiesSection />
