@@ -3,10 +3,15 @@
 import * as React from 'react';
 import Link from 'next/link';
 import { motion, useReducedMotion } from 'framer-motion';
+import { Bookmark, BookmarkCheck, GitCompare, Users, Clock, Star } from 'lucide-react';
+import { toast } from 'sonner';
 import { ImageWithFallback } from '@/components/ui/image-with-fallback';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { useShortlist } from '@/lib/hooks/use-shortlist';
+import { useCompare } from '@/lib/hooks/use-compare';
+import { sportsContent } from '@/data/sports-content';
 import { ease, duration } from '@/components/motion/constants';
 import type { Sport } from '@/types/domain/sport';
 
@@ -34,9 +39,17 @@ export const SportCard = React.memo(function SportCard({ sport }: { sport: Sport
   const imageSrc = coverImage ?? `/images/sports/${slug}.svg`;
   const gradient = sportGradients[slug] ?? sportGradients.default;
 
+  const { has: hasShortlist, addWithMeta: addToShortlist, remove: removeFromShortlist } = useShortlist();
+  const { has: hasCompare, addWithMeta: addToCompare, remove: removeFromCompare, canAdd: canAddToCompare, maxItems } = useCompare();
+
+  const isSaved = hasShortlist('sport', slug);
+  const isCompared = hasCompare('sport', slug);
+
   const difficulty = sport.fitnessLevelRequired ?? 'Medium';
   const participation = sport.individualOrTeam ?? 'Both';
   const environment = sport.indoorOutdoor ?? 'Both';
+
+  const sc = sportsContent[slug];
 
   return (
     <motion.div
@@ -65,6 +78,75 @@ export const SportCard = React.memo(function SportCard({ sport }: { sport: Sport
             }
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
+
+          {/* Action buttons */}
+          <div className="absolute top-3 right-3 flex gap-1.5">
+            <Button
+              size="icon-touch"
+              variant={isSaved ? 'default' : 'secondary'}
+              className="bg-background/80 backdrop-blur-sm hover:bg-background/95 shadow-sm"
+              aria-label={isSaved ? `Remove ${name} from shortlist` : `Save ${name}`}
+              aria-pressed={isSaved}
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                if (isSaved) {
+                  removeFromShortlist('sport', slug);
+                  toast(`Removed ${name} from shortlist`);
+                } else {
+                  addToShortlist('sport', slug, {
+                    label: name,
+                    sublabel: `${sport.category} sport`,
+                    href: `/sports/${slug}`,
+                  });
+                  toast.success(`Saved ${name}`);
+                }
+              }}
+            >
+              {isSaved ? <BookmarkCheck className="h-4 w-4" /> : <Bookmark className="h-4 w-4" />}
+            </Button>
+            <Button
+              size="icon-touch"
+              variant={isCompared ? 'default' : 'secondary'}
+              className="bg-background/80 backdrop-blur-sm hover:bg-background/95 shadow-sm"
+              aria-label={isCompared ? `Remove ${name} from compare` : `Compare ${name}`}
+              aria-pressed={isCompared}
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                if (isCompared) {
+                  removeFromCompare('sport', slug);
+                  toast(`Removed ${name} from compare`);
+                } else if (canAddToCompare('sport', slug)) {
+                  addToCompare('sport', slug, {
+                    label: name,
+                    sublabel: `${sport.category} sport`,
+                    href: `/sports/${slug}`,
+                  });
+                  toast.success(`Added ${name} to compare`);
+                } else {
+                  toast.error(`You can compare up to ${maxItems} items.`);
+                }
+              }}
+            >
+              <GitCompare aria-hidden className="h-4 w-4" />
+            </Button>
+          </div>
+
+          {/* Badges */}
+          <div className="absolute top-3 left-3 flex gap-1.5">
+            {sport.olympicSport && (
+              <Badge variant="secondary" className="bg-yellow-500/20 text-yellow-200 border-yellow-500/20 text-[10px] backdrop-blur-sm">
+                <Star className="h-3 w-3 mr-0.5 fill-current" /> Olympic
+              </Badge>
+            )}
+            {sport.beginnerFriendly && (
+              <Badge variant="secondary" className="bg-green-500/20 text-green-200 border-green-500/20 text-[10px] backdrop-blur-sm">
+                Beginner
+              </Badge>
+            )}
+          </div>
+
           <div className="absolute bottom-3 left-3 right-3">
             <h3 className="text-base font-bold text-white drop-shadow-sm line-clamp-1">{name}</h3>
           </div>
@@ -76,7 +158,20 @@ export const SportCard = React.memo(function SportCard({ sport }: { sport: Sport
             <Badge variant="secondary" className={`text-[10px] capitalize ${difficultyColor[difficulty] ?? ''}`}>
               {difficulty}
             </Badge>
+            {sport.teamSize && (
+              <Badge variant="secondary" className="text-[10px]">
+                <Users className="h-3 w-3 mr-0.5" /> {sport.teamSize}
+              </Badge>
+            )}
+            {sport.matchDuration && (
+              <Badge variant="secondary" className="text-[10px]">
+                <Clock className="h-3 w-3 mr-0.5" /> {sport.matchDuration}
+              </Badge>
+            )}
           </div>
+          {sc?.tagline && (
+            <p className="text-muted-foreground text-xs line-clamp-2 leading-relaxed">{sc.tagline}</p>
+          )}
           <Button size="lg" className="w-full h-11" asChild>
             <Link href={`/sports/${slug}`}>
               Explore {name}

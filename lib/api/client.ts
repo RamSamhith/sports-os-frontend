@@ -222,7 +222,7 @@ async function request<T>(
       ok: false,
       error: {
         code: isAbort ? 'TIMEOUT' : 'NETWORK_ERROR',
-        message: isAbort ? 'Request timed out. Please try again.' : message,
+        message: isAbort ? 'Request timed out. Please try again.' : 'Network error. Please check your connection and try again.',
       },
     };
   }

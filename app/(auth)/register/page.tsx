@@ -69,18 +69,6 @@ export default function RegisterPage() {
     }
   }, [googleAuth.loaded]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Safety-net redirect: fires when auth state changes but the handler
-  // did NOT navigate. The handler is the primary navigation source for fresh registrations.
-  useEffect(() => {
-    if (isLoading) return;
-    if (!isAuthenticated) return;
-    if (!onboardingCompleted) {
-      router.replace('/onboarding/role');
-    } else {
-      router.replace('/');
-    }
-  }, [isLoading, isAuthenticated, onboardingCompleted, router]);
-
   function validate(): FieldErrors {
     const e: FieldErrors = {};
 

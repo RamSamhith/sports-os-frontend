@@ -33,7 +33,7 @@ const fieldVariants = {
 export default function LoginPage() {
   const reduced = useReducedMotion();
   const router = useRouter();
-  const { setAuth, setProfile, isAuthenticated, isLoading, onboardingCompleted, enterGuestMode } = useAuth();
+  const { setAuth, setProfile, enterGuestMode } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errors, setErrors] = useState<FieldErrors>({});
@@ -45,17 +45,6 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
 
   const googleAuth = useGoogleAuth();
-
-  useEffect(() => {
-    if (isLoading) return;
-    if (isAuthenticated) {
-      if (onboardingCompleted) {
-        router.replace('/');
-      } else {
-        router.replace('/onboarding/role');
-      }
-    }
-  }, [isLoading, isAuthenticated, onboardingCompleted, router]);
 
   useEffect(() => {
     if (googleAuth.loaded) {

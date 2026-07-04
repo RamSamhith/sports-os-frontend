@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { getAcademies } from '@/lib/api/academies';
 import { listSports } from '@/lib/api/sports';
+import { sportsCatalog } from '@/data/sports-catalog';
 import type { Academy } from '@/types/domain/academy';
 import type { Sport } from '@/types/domain/sport';
 
@@ -50,12 +51,14 @@ async function fetchSports(): Promise<{ items: Sport[]; total: number }> {
         sportsCache = items;
         return items;
       }
-      return [];
     } catch {
-      return [];
-    } finally {
-      sportsPromise = null;
+      // API failed — fall through to static catalog
     }
+
+    // Fallback: use the static sports catalog count (23 sports)
+    sportsTotalCache = sportsCatalog.length;
+    sportsCache = sportsCatalog.map((s) => ({ id: s.slug, slug: s.slug, name: s.name } as unknown as Sport));
+    return sportsCache;
   })();
 
   return sportsPromise.then((items) => ({ items, total: sportsTotalCache }));
