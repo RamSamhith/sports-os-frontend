@@ -13,7 +13,6 @@ import { useAuth } from '@/lib/hooks/use-auth';
 import { login as apiLogin } from '@/lib/api/auth';
 import { useGoogleAuth, handleSocialAuth } from '@/lib/hooks/use-social-auth';
 import { trackGuestStarted } from '@/lib/analytics/events';
-import { validatePassword } from '@/lib/utils/validators';
 import { Loader2, Eye, EyeOff } from 'lucide-react';
 
 interface FieldErrors {
@@ -76,8 +75,7 @@ export default function LoginPage() {
     const e: FieldErrors = {};
     if (!email.trim()) e.email = 'Email is required';
     else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) e.email = 'Enter a valid email address';
-    const pwErr = validatePassword(password);
-    if (pwErr) e.password = pwErr;
+    if (!password) e.password = 'Password is required';
     return e;
   }
 
@@ -87,8 +85,7 @@ export default function LoginPage() {
       if (!value.trim()) e.email = 'Email is required';
       else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) e.email = 'Enter a valid email address';
     } else if (field === 'password') {
-      const pwErr = validatePassword(value);
-      if (pwErr) e.password = pwErr;
+      if (!value) e.password = 'Password is required';
     }
     return e;
   }

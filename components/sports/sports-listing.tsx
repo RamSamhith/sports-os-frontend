@@ -1,7 +1,7 @@
 'use client';
 
 import * as React from 'react';
-import { Loader2, AlertTriangle, Trophy, Search } from 'lucide-react';
+import { Loader2, AlertTriangle, Trophy, Search, ArrowLeftRight, ChevronDown } from 'lucide-react';
 import Link from 'next/link';
 import { SearchInput } from '@/components/ui/search-input';
 import { Button } from '@/components/ui/button';
@@ -10,6 +10,8 @@ import { ImageWithFallback } from '@/components/ui/image-with-fallback';
 import { useSearchQuery } from '@/lib/hooks/use-search-query';
 import { listSports } from '@/lib/api/sports';
 import { sportsCatalog, type CatalogSport } from '@/data/sports-catalog';
+import { SportComparison } from '@/components/sports/sport-comparison';
+import { cn } from '@/lib/utils/cn';
 import type { Sport } from '@/types/domain/sport';
 
 const sportGradients: Record<string, string> = {
@@ -220,6 +222,11 @@ export function SportsListing({ hideSearch = false }: { hideSearch?: boolean } =
           ))}
         </div>
       )}
+
+      {/* Sport Comparison Section */}
+      <div className="mt-8">
+        <SportComparison />
+      </div>
     </div>
   );
 }

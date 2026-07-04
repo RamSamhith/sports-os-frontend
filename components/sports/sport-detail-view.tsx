@@ -8,6 +8,7 @@ import {
   Timer, ChevronDown, ChevronRight,
   Zap, Activity, HelpCircle, Lightbulb,
   ArrowLeft, Shield, AlertTriangle, Sparkles, Flame,
+  TrendingUp, IndianRupee, Calendar, Swords, BarChart3, Info,
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -25,25 +26,28 @@ function AccordionSection({
   title,
   icon: Icon,
   defaultOpen = false,
+  badge,
   children,
 }: {
   title: string;
   icon: React.ElementType;
   defaultOpen?: boolean;
+  badge?: string;
   children: React.ReactNode;
 }) {
   const [open, setOpen] = React.useState(defaultOpen);
 
   return (
-    <div className="border-border/40 overflow-hidden rounded-xl border">
+    <div className="border-border/40 overflow-hidden rounded-xl border transition-colors hover:border-foreground/20">
       <button
         onClick={() => setOpen(!open)}
-        className="flex w-full items-center justify-between gap-3 p-4 text-left transition-colors hover:bg-muted/30"
+        className="flex w-full items-center justify-between gap-3 p-4 text-left transition-colors hover:bg-muted/20"
         aria-expanded={open}
       >
         <div className="flex items-center gap-2.5">
           <Icon className="text-primary h-4 w-4 shrink-0" />
           <span className="text-sm font-semibold">{title}</span>
+          {badge && <Badge variant="secondary" className="text-[10px] h-5">{badge}</Badge>}
         </div>
         <ChevronDown
           className={cn(
@@ -54,7 +58,7 @@ function AccordionSection({
       </button>
       <div
         className={cn(
-          'grid transition-all duration-200 ease-in-out',
+          'grid transition-all duration-300 ease-in-out',
           open ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0',
         )}
       >
@@ -66,14 +70,26 @@ function AccordionSection({
   );
 }
 
-function StatCard({ icon: Icon, label, value }: { icon: React.ElementType; label: string; value: string }) {
+function StatCard({ icon: Icon, label, value, accent }: { icon: React.ElementType; label: string; value: string; accent?: string }) {
   return (
-    <div className="bg-muted/30 flex items-start gap-3 rounded-xl border border-border/40 p-4 transition-colors hover:border-foreground/20">
-      <Icon className="text-primary mt-0.5 h-4 w-4 shrink-0" />
-      <div className="flex flex-col gap-0.5">
-        <span className="text-muted-foreground text-[10px] tracking-widest uppercase">{label}</span>
-        <span className="text-sm font-medium">{value}</span>
+    <div className="bg-muted/30 flex items-start gap-3 rounded-xl border border-border/40 p-3.5 transition-all hover:border-foreground/20 hover:bg-muted/40">
+      <div className={cn('grid h-8 w-8 shrink-0 place-items-center rounded-lg', accent || 'bg-primary/10')}>
+        <Icon className={cn('h-4 w-4', accent ? 'text-current' : 'text-primary')} />
       </div>
+      <div className="flex flex-col gap-0.5 min-w-0">
+        <span className="text-muted-foreground text-[10px] tracking-widest uppercase">{label}</span>
+        <span className="text-sm font-medium truncate">{value}</span>
+      </div>
+    </div>
+  );
+}
+
+function MiniStat({ icon: Icon, label, value }: { icon: React.ElementType; label: string; value: string }) {
+  return (
+    <div className="flex items-center gap-2 text-xs">
+      <Icon className="text-muted-foreground h-3 w-3 shrink-0" />
+      <span className="text-muted-foreground">{label}:</span>
+      <span className="font-medium">{value}</span>
     </div>
   );
 }
@@ -81,14 +97,10 @@ function StatCard({ icon: Icon, label, value }: { icon: React.ElementType; label
 export function SportDetailView({ sport }: SportDetailViewProps) {
   const {
     name, slug, category, sportType, shortDescription, fullDescription,
-    origin, popularityInIndia, popularityWorldwide, icon, coverImage,
+    origin, icon, coverImage,
     howToPlay, objectiveOfGame, teamSize, matchDuration, scoringSystem,
     playingSurface, requiredEquipment, ageGroups, beginnerFriendly, olympicSport,
-    trainingFrequency, averageLearningTime,
-    injuryRisk, fitnessLevelRequired,
-    physicalBenefits, mentalBenefits,
-    careerOpportunities, scholarships, professionalLeagues,
-    tournaments, explorationGuidance,
+    explorationGuidance,
   } = sport;
 
   const imageSrc = coverImage || `/images/sports/${slug}.svg`;
@@ -101,7 +113,7 @@ export function SportDetailView({ sport }: SportDetailViewProps) {
         ? `${ageRange.min}+ years`
         : ageGroups;
 
-  const staticContent = sportsContent[slug];
+  const sc = sportsContent[slug];
   const competitions = competitionsBySport(slug);
 
   return (
@@ -109,6 +121,7 @@ export function SportDetailView({ sport }: SportDetailViewProps) {
       <Button asChild variant="ghost" className="-ml-2 min-h-[44px] self-start">
         <Link href="/sports"><ArrowLeft className="h-4 w-4 mr-1" /> Back to sports</Link>
       </Button>
+
       {/* Hero */}
       <div className="relative overflow-hidden rounded-2xl border border-border/40">
         <div className="bg-muted/40 relative aspect-[21/9] w-full">
@@ -143,9 +156,9 @@ export function SportDetailView({ sport }: SportDetailViewProps) {
               </span>
               <div>
                 <h1 className="text-2xl font-bold text-white sm:text-3xl md:text-4xl tracking-tight">{name}</h1>
-                <div className="flex items-center gap-2 mt-1">
+                <div className="flex items-center gap-2 mt-1 flex-wrap">
                   <Badge variant="secondary" className="bg-white/20 text-white border-white/20 text-[10px] backdrop-blur-sm">{category}</Badge>
-                  <Badge variant="secondary" className="bg-white/20 text-white border-white/20 text-[10px] capitalize">{sportType}</Badge>
+                  <Badge variant="secondary" className="bg-white/20 text-white border-white/20 text-[10px] capitalize">{sportType === 'both' ? 'Individual & Team' : sportType}</Badge>
                   {olympicSport && <Badge variant="secondary" className="bg-yellow-500/20 text-yellow-200 border-yellow-500/20 text-[10px]">Olympic</Badge>}
                   {beginnerFriendly && <Badge variant="secondary" className="bg-green-500/20 text-green-200 border-green-500/20 text-[10px]">Beginner Friendly</Badge>}
                 </div>
@@ -159,21 +172,36 @@ export function SportDetailView({ sport }: SportDetailViewProps) {
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         <StatCard icon={Users} label="Team Size" value={teamSize ?? 'N/A'} />
         <StatCard icon={Clock} label="Duration" value={matchDuration ?? 'N/A'} />
-        <StatCard icon={Timer} label="Learning Time" value={averageLearningTime ?? 'N/A'} />
-        <StatCard icon={Heart} label="Fitness Level" value={fitnessLevelRequired ?? 'N/A'} />
+        <StatCard icon={Timer} label="Learning Time" value={sc?.averageLearningTime ?? 'N/A'} />
+        <StatCard icon={Heart} label="Fitness Level" value={sport.fitnessLevelRequired ?? 'N/A'} />
       </div>
 
       {/* Tagline */}
-      {staticContent?.tagline && (
-        <p className="text-muted-foreground text-center text-sm italic">{staticContent.tagline}</p>
+      {sc?.tagline && (
+        <p className="text-muted-foreground text-center text-sm italic px-4">{sc.tagline}</p>
+      )}
+
+      {/* Key Differences - Premium highlight */}
+      {sc?.keyDifferences && (
+        <div className="bg-gradient-to-r from-primary/5 via-primary/10 to-primary/5 rounded-xl border border-primary/20 p-4">
+          <div className="flex items-start gap-3">
+            <div className="bg-primary/10 grid h-8 w-8 shrink-0 place-items-center rounded-lg">
+              <Swords className="text-primary h-4 w-4" />
+            </div>
+            <div>
+              <span className="text-primary text-[10px] tracking-widest uppercase font-medium">What Makes {name} Unique</span>
+              <p className="text-muted-foreground mt-1 text-sm leading-relaxed">{sc.keyDifferences}</p>
+            </div>
+          </div>
+        </div>
       )}
 
       {/* Accordion Sections */}
       <div className="flex flex-col gap-3">
         <AccordionSection title={`About ${name}`} icon={Star} defaultOpen>
           <p className="text-muted-foreground text-sm leading-relaxed">{shortDescription}</p>
-          {(staticContent?.about || fullDescription) && (
-            <p className="text-muted-foreground mt-2 text-sm leading-relaxed">{staticContent?.about || fullDescription}</p>
+          {(sc?.about || fullDescription) && (
+            <p className="text-muted-foreground mt-2 text-sm leading-relaxed">{sc?.about || fullDescription}</p>
           )}
           {origin && (
             <div className="mt-3 flex items-center gap-2 text-sm">
@@ -182,27 +210,33 @@ export function SportDetailView({ sport }: SportDetailViewProps) {
               <span>{origin}</span>
             </div>
           )}
+          <div className="mt-3 grid grid-cols-2 gap-2">
+            {sc?.estimatedMonthlyCost && <MiniStat icon={IndianRupee} label="Monthly cost" value={sc.estimatedMonthlyCost} />}
+            {sc?.playingSeason && <MiniStat icon={Calendar} label="Season" value={sc.playingSeason} />}
+            {sc?.injuryRisk && <MiniStat icon={AlertTriangle} label="Injury risk" value={sc.injuryRisk} />}
+            {sc?.trainingFrequency && <MiniStat icon={Activity} label="Training" value={sc.trainingFrequency} />}
+          </div>
         </AccordionSection>
 
         <AccordionSection title="Rules & Gameplay" icon={Target}>
-          <p className="text-muted-foreground text-sm leading-relaxed">{staticContent?.rules || howToPlay}</p>
+          <p className="text-muted-foreground text-sm leading-relaxed">{sc?.rules || howToPlay}</p>
           {objectiveOfGame && (
             <div className="mt-3 bg-muted/30 rounded-lg border p-3">
               <span className="text-muted-foreground text-[10px] tracking-widest uppercase">Objective</span>
               <p className="mt-1 text-sm">{objectiveOfGame}</p>
             </div>
           )}
-          {staticContent?.individualOrTeam && (
+          {sc?.individualOrTeam && (
             <div className="mt-2">
-              <Badge variant="outline" className="capitalize">{staticContent.individualOrTeam}</Badge>
+              <Badge variant="outline" className="capitalize">{sc.individualOrTeam}</Badge>
             </div>
           )}
         </AccordionSection>
 
         <AccordionSection title="Equipment Needed" icon={Dumbbell}>
-          {(staticContent?.equipment || requiredEquipment) && (
+          {(sc?.equipment || requiredEquipment) && (
             <div className="flex flex-wrap gap-1.5">
-              {(staticContent?.equipment || requiredEquipment || []).map((item) => (
+              {(sc?.equipment || requiredEquipment || []).map((item) => (
                 <span key={item} className="inline-flex items-center rounded-full border border-border/60 bg-muted/50 px-2.5 py-1 text-xs text-muted-foreground">
                   {item}
                 </span>
@@ -216,11 +250,11 @@ export function SportDetailView({ sport }: SportDetailViewProps) {
         </AccordionSection>
 
         <AccordionSection title="Health & Fitness Benefits" icon={Heart}>
-          {(staticContent?.benefits?.physical || physicalBenefits) && (
+          {(sc?.benefits?.physical || sport.physicalBenefits) && (
             <div className="mb-3">
               <span className="text-muted-foreground text-[10px] tracking-widest uppercase">Physical Benefits</span>
               <div className="mt-1.5 flex flex-col gap-1">
-                {(staticContent?.benefits?.physical || physicalBenefits || []).map((b) => (
+                {(sc?.benefits?.physical || sport.physicalBenefits || []).map((b) => (
                   <div key={b} className="flex items-start gap-2 text-sm">
                     <Zap className="text-primary mt-0.5 h-3 w-3 shrink-0" />
                     <span>{b}</span>
@@ -229,11 +263,11 @@ export function SportDetailView({ sport }: SportDetailViewProps) {
               </div>
             </div>
           )}
-          {(staticContent?.benefits?.mental || mentalBenefits) && (
+          {(sc?.benefits?.mental || sport.mentalBenefits) && (
             <div>
               <span className="text-muted-foreground text-[10px] tracking-widest uppercase">Mental Benefits</span>
               <div className="mt-1.5 flex flex-col gap-1">
-                {(staticContent?.benefits?.mental || mentalBenefits || []).map((b) => (
+                {(sc?.benefits?.mental || sport.mentalBenefits || []).map((b) => (
                   <div key={b} className="flex items-start gap-2 text-sm">
                     <Brain className="text-primary mt-0.5 h-3 w-3 shrink-0" />
                     <span>{b}</span>
@@ -244,61 +278,34 @@ export function SportDetailView({ sport }: SportDetailViewProps) {
           )}
         </AccordionSection>
 
+        {/* Skills Developed - uses new `skills` field */}
+        {sc?.skills && sc.skills.length > 0 && (
+          <AccordionSection title="Skills You'll Develop" icon={BarChart3}>
+            <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+              {sc.skills.map((skill, i) => (
+                <div key={i} className="flex items-start gap-2 text-sm bg-muted/30 rounded-lg border p-2.5">
+                  <Sparkles className="text-primary mt-0.5 h-3 w-3 shrink-0" />
+                  <span>{skill}</span>
+                </div>
+              ))}
+            </div>
+          </AccordionSection>
+        )}
+
         <AccordionSection title="Training Roadmap" icon={Activity}>
           <p className="text-muted-foreground text-sm leading-relaxed">
-            {staticContent?.trainingPath || `Start with basic ${name.toLowerCase()} fundamentals at a local academy. Progress through skill development, match play, and competitive training.`}
+            {sc?.trainingPath || `Start with basic ${name.toLowerCase()} fundamentals at a local academy. Progress through skill development, match play, and competitive training.`}
           </p>
           <div className="mt-3 grid grid-cols-2 gap-2 text-xs">
-            {ageText && <div><span className="text-muted-foreground">Age to start:</span> {ageText}</div>}
-            {trainingFrequency && <div><span className="text-muted-foreground">Training:</span> {trainingFrequency}</div>}
-            {fitnessLevelRequired && <div><span className="text-muted-foreground">Fitness:</span> {fitnessLevelRequired}</div>}
-            {injuryRisk && <div><span className="text-muted-foreground">Injury risk:</span> {injuryRisk}</div>}
+            {ageText && <MiniStat icon={Users} label="Age to start" value={ageText} />}
+            {sc?.trainingFrequency && <MiniStat icon={Activity} label="Frequency" value={sc.trainingFrequency} />}
+            {sport.fitnessLevelRequired && <MiniStat icon={Heart} label="Fitness" value={sport.fitnessLevelRequired} />}
+            {sc?.injuryRisk && <MiniStat icon={AlertTriangle} label="Injury risk" value={sc.injuryRisk} />}
           </div>
         </AccordionSection>
 
-        <AccordionSection title="Career Opportunities" icon={Briefcase}>
-          {(staticContent?.careerOpportunities || careerOpportunities) && (
-            <div className="mb-3">
-              <span className="text-muted-foreground text-[10px] tracking-widest uppercase">Career Paths</span>
-              <div className="mt-1.5 flex flex-col gap-1">
-                {(staticContent?.careerOpportunities || careerOpportunities || []).map((c) => (
-                  <div key={c} className="flex items-start gap-2 text-sm">
-                    <Briefcase className="text-primary mt-0.5 h-3 w-3 shrink-0" />
-                    <span>{c}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-          {scholarships && scholarships.length > 0 && (
-            <div className="mb-3">
-              <span className="text-muted-foreground text-[10px] tracking-widest uppercase">Scholarships</span>
-              <div className="mt-1.5 flex flex-col gap-1">
-                {scholarships.map((s) => (
-                  <div key={s} className="flex items-start gap-2 text-sm">
-                    <GraduationCap className="text-primary mt-0.5 h-3 w-3 shrink-0" />
-                    <span>{s}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-          {professionalLeagues && professionalLeagues.length > 0 && (
-            <div>
-              <span className="text-muted-foreground text-[10px] tracking-widest uppercase">Professional Leagues</span>
-              <div className="mt-1.5 flex flex-wrap gap-1.5">
-                {professionalLeagues.map((l) => (
-                  <span key={l} className="inline-flex items-center rounded-full border border-warning/20 bg-warning/5 px-2 py-0.5 text-[11px] font-medium text-warning">
-                    {l}
-                  </span>
-                ))}
-              </div>
-            </div>
-          )}
-        </AccordionSection>
-
         {competitions.length > 0 && (
-          <AccordionSection title="Competitions" icon={Trophy}>
+          <AccordionSection title="Competitions & Pathway" icon={Trophy} badge={`${competitions.length} competitions`}>
             <div className="flex flex-col gap-4">
               {(['state', 'national', 'international'] as const).map((level) => {
                 const levelComps = competitions.filter((c) => c.level === level);
@@ -308,10 +315,10 @@ export function SportDetailView({ sport }: SportDetailViewProps) {
                     <span className="text-muted-foreground text-[10px] tracking-widest uppercase capitalize">{level}</span>
                     <div className="mt-1.5 flex flex-col gap-2">
                       {levelComps.map((c) => (
-                        <div key={c.id} className="rounded-lg border p-2.5">
+                        <div key={c.id} className="rounded-lg border p-2.5 hover:bg-muted/20 transition-colors">
                           <div className="flex items-start justify-between gap-2">
                             <span className="text-sm font-medium">{c.name}</span>
-                            <span className="text-muted-foreground text-[10px]">{c.organiser}</span>
+                            <span className="text-muted-foreground text-[10px] shrink-0">{c.organiser}</span>
                           </div>
                           <p className="text-muted-foreground mt-1 text-xs">{c.whyImportant}</p>
                         </div>
@@ -324,243 +331,115 @@ export function SportDetailView({ sport }: SportDetailViewProps) {
           </AccordionSection>
         )}
 
-        {tournaments && tournaments.length > 0 && (
-          <AccordionSection title="Major Tournaments" icon={Medal}>
-            <div className="flex flex-col gap-2">
-              {tournaments.map((t) => (
-                <div key={t.tournamentName} className="rounded-lg border p-2.5">
-                  <div className="flex items-start justify-between gap-2">
-                    <span className="text-sm font-medium">{t.tournamentName}</span>
-                    <span className="text-muted-foreground text-[10px]">{t.frequency}</span>
-                  </div>
-                  <p className="text-muted-foreground mt-1 text-xs">{t.shortDescription}</p>
+        {sc?.competitions && (
+          <AccordionSection title="Competition Pathway" icon={Medal}>
+            <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
+              {sc.competitions.state && sc.competitions.state.length > 0 && (
+                <div className="bg-muted/30 rounded-lg border p-2.5">
+                  <span className="text-muted-foreground text-[10px] tracking-widest uppercase">District / State</span>
+                  <ul className="mt-1 space-y-0.5">
+                    {sc.competitions.state.slice(0, 3).map((c) => (
+                      <li key={c} className="text-xs flex items-start gap-1">
+                        <span className="text-primary mt-0.5">•</span>
+                        <span>{c}</span>
+                      </li>
+                    ))}
+                  </ul>
                 </div>
-              ))}
+              )}
+              {sc.competitions.national && sc.competitions.national.length > 0 && (
+                <div className="bg-muted/30 rounded-lg border p-2.5">
+                  <span className="text-muted-foreground text-[10px] tracking-widest uppercase">National</span>
+                  <ul className="mt-1 space-y-0.5">
+                    {sc.competitions.national.slice(0, 3).map((c) => (
+                      <li key={c} className="text-xs flex items-start gap-1">
+                        <span className="text-primary mt-0.5">•</span>
+                        <span>{c}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+              {sc.competitions.international && sc.competitions.international.length > 0 && (
+                <div className="bg-muted/30 rounded-lg border p-2.5">
+                  <span className="text-muted-foreground text-[10px] tracking-widest uppercase">International</span>
+                  <ul className="mt-1 space-y-0.5">
+                    {sc.competitions.international.slice(0, 3).map((c) => (
+                      <li key={c} className="text-xs flex items-start gap-1">
+                        <span className="text-primary mt-0.5">•</span>
+                        <span>{c}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
             </div>
           </AccordionSection>
         )}
 
-        {/* Skills Developed */}
-        <AccordionSection title="Skills Developed" icon={Brain}>
-          <div className="flex flex-col gap-2">
-            {staticContent?.benefits?.mental && (
-              <div>
-                <span className="text-muted-foreground text-[10px] tracking-widest uppercase">Mental Skills</span>
-                <div className="mt-1.5 flex flex-col gap-1">
-                  {(staticContent.benefits.mental).map((b) => (
-                    <div key={b} className="flex items-start gap-2 text-sm">
-                      <Brain className="text-primary mt-0.5 h-3 w-3 shrink-0" />
-                      <span>{b}</span>
-                    </div>
-                  ))}
-                </div>
+        <AccordionSection title="Career Opportunities" icon={Briefcase}>
+          {(sc?.careerOpportunities || sport.careerOpportunities) && (
+            <div className="mb-3">
+              <span className="text-muted-foreground text-[10px] tracking-widest uppercase">Career Paths</span>
+              <div className="mt-1.5 flex flex-col gap-1">
+                {(sc?.careerOpportunities || sport.careerOpportunities || []).map((c) => (
+                  <div key={c} className="flex items-start gap-2 text-sm">
+                    <Briefcase className="text-primary mt-0.5 h-3 w-3 shrink-0" />
+                    <span>{c}</span>
+                  </div>
+                ))}
               </div>
-            )}
-            {staticContent?.benefits?.physical && (
-              <div className="mt-2">
-                <span className="text-muted-foreground text-[10px] tracking-widest uppercase">Physical Skills</span>
-                <div className="mt-1.5 flex flex-col gap-1">
-                  {(staticContent.benefits.physical).map((b) => (
-                    <div key={b} className="flex items-start gap-2 text-sm">
-                      <Zap className="text-primary mt-0.5 h-3 w-3 shrink-0" />
-                      <span>{b}</span>
-                    </div>
-                  ))}
-                </div>
+            </div>
+          )}
+          {sport.scholarships && sport.scholarships.length > 0 && (
+            <div className="mb-3">
+              <span className="text-muted-foreground text-[10px] tracking-widest uppercase">Scholarships</span>
+              <div className="mt-1.5 flex flex-col gap-1">
+                {sport.scholarships.map((s) => (
+                  <div key={s} className="flex items-start gap-2 text-sm">
+                    <GraduationCap className="text-primary mt-0.5 h-3 w-3 shrink-0" />
+                    <span>{s}</span>
+                  </div>
+                ))}
               </div>
-            )}
-          </div>
-        </AccordionSection>
-
-        {/* Who Should Play */}
-        <AccordionSection title="Who Should Play" icon={Users}>
-          <p className="text-muted-foreground text-sm leading-relaxed">
-            {name} is suitable for a wide range of ages and skill levels.
-          </p>
-          <div className="mt-3 grid grid-cols-2 gap-2 text-sm">
-            {ageText && (
-              <div className="bg-muted/30 rounded-lg border p-2.5">
-                <span className="text-muted-foreground text-[10px] tracking-widest uppercase">Age Groups</span>
-                <p className="mt-0.5 font-medium">{ageText}</p>
+            </div>
+          )}
+          {sport.professionalLeagues && sport.professionalLeagues.length > 0 && (
+            <div>
+              <span className="text-muted-foreground text-[10px] tracking-widest uppercase">Professional Leagues</span>
+              <div className="mt-1.5 flex flex-wrap gap-1.5">
+                {sport.professionalLeagues.map((l) => (
+                  <span key={l} className="inline-flex items-center rounded-full border border-warning/20 bg-warning/5 px-2 py-0.5 text-[11px] font-medium text-warning">
+                    {l}
+                  </span>
+                ))}
               </div>
-            )}
-            {beginnerFriendly !== undefined && (
-              <div className="bg-muted/30 rounded-lg border p-2.5">
-                <span className="text-muted-foreground text-[10px] tracking-widest uppercase">Beginner Friendly</span>
-                <p className="mt-0.5 font-medium">{beginnerFriendly ? 'Yes — Great for starters' : 'Requires prior training'}</p>
-              </div>
-            )}
-          </div>
-          <div className="mt-3 bg-muted/30 rounded-lg border p-2.5">
-            <span className="text-muted-foreground text-[10px] tracking-widest uppercase">Who Benefits Most</span>
-            <p className="mt-0.5 text-sm">
-              {staticContent?.benefits?.physical?.length ? 'Great for fitness enthusiasts' : ''}
-              {staticContent?.benefits?.mental?.length ? ' and those looking to develop mental discipline' : ''}.
-              Suitable for recreational play and competitive pathways alike.
-            </p>
-          </div>
+            </div>
+          )}
         </AccordionSection>
 
-        {/* Training Tips */}
-        <AccordionSection title="Training Tips" icon={Flame}>
-          <div className="flex flex-col gap-3">
-            <div className="bg-muted/30 rounded-lg border p-2.5">
-              <span className="text-muted-foreground text-[10px] tracking-widest uppercase flex items-center gap-1">
-                <Activity className="h-3 w-3" /> Warm-up
-              </span>
-              <p className="mt-1 text-sm">Start with light cardio (5-10 mins) to increase heart rate, followed by dynamic stretches targeting the muscles used in {name.toLowerCase()}. Sport-specific drills at low intensity prepare the body for training.</p>
-            </div>
-            <div className="bg-muted/30 rounded-lg border p-2.5">
-              <span className="text-muted-foreground text-[10px] tracking-widest uppercase flex items-center gap-1">
-                <Heart className="h-3 w-3" /> Cool-down
-              </span>
-              <p className="mt-1 text-sm">End each session with static stretches held for 15-30 seconds per muscle group. Deep breathing helps lower heart rate gradually. Hydration and light mobility work aid recovery.</p>
-            </div>
-          </div>
-        </AccordionSection>
-
-        {/* Competition Pathway */}
-        <AccordionSection title="Competition Pathway" icon={Trophy}>
-          <div className="flex flex-col gap-3">
-            <div className="flex flex-wrap gap-2">
-              <Badge variant="secondary" className="bg-emerald-500/10 text-emerald-600 border-emerald-500/20">District</Badge>
-              <Badge variant="secondary" className="bg-blue-500/10 text-blue-600 border-blue-500/20">State</Badge>
-              <Badge variant="secondary" className="bg-purple-500/10 text-purple-600 border-purple-500/20">National</Badge>
-              <Badge variant="secondary" className="bg-amber-500/10 text-amber-600 border-amber-500/20">International</Badge>
-              {olympicSport && (
-                <Badge variant="secondary" className="bg-yellow-500/10 text-yellow-600 border-yellow-500/20">Olympics</Badge>
-              )}
-              <Badge variant="secondary" className="bg-rose-500/10 text-rose-600 border-rose-500/20">Asian Games</Badge>
-            </div>
-            {staticContent?.competitions && (
-              <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
-                {staticContent.competitions.state && staticContent.competitions.state.length > 0 && (
-                  <div className="bg-muted/30 rounded-lg border p-2.5">
-                    <span className="text-muted-foreground text-[10px] tracking-widest uppercase">District / State</span>
-                    <ul className="mt-1 space-y-0.5">
-                      {staticContent.competitions.state.slice(0, 3).map((c) => (
-                        <li key={c} className="text-xs flex items-start gap-1">
-                          <span className="text-primary mt-0.5">•</span>
-                          <span>{c}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-                {staticContent.competitions.national && staticContent.competitions.national.length > 0 && (
-                  <div className="bg-muted/30 rounded-lg border p-2.5">
-                    <span className="text-muted-foreground text-[10px] tracking-widest uppercase">National</span>
-                    <ul className="mt-1 space-y-0.5">
-                      {staticContent.competitions.national.slice(0, 3).map((c) => (
-                        <li key={c} className="text-xs flex items-start gap-1">
-                          <span className="text-primary mt-0.5">•</span>
-                          <span>{c}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-                {staticContent.competitions.international && staticContent.competitions.international.length > 0 && (
-                  <div className="bg-muted/30 rounded-lg border p-2.5">
-                    <span className="text-muted-foreground text-[10px] tracking-widest uppercase">International</span>
-                    <ul className="mt-1 space-y-0.5">
-                      {staticContent.competitions.international.slice(0, 3).map((c) => (
-                        <li key={c} className="text-xs flex items-start gap-1">
-                          <span className="text-primary mt-0.5">•</span>
-                          <span>{c}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-              </div>
-            )}
-            <p className="text-muted-foreground text-xs">Progress from local tournaments to national championships and international representation through consistent training and competitive performance.</p>
-          </div>
-        </AccordionSection>
-
-        {/* Common Injuries & Recovery */}
-        <AccordionSection title="Common Injuries & Recovery" icon={AlertTriangle}>
-          <div className="flex flex-col gap-2">
-            <div className="bg-muted/30 rounded-lg border p-2.5">
-              <span className="text-muted-foreground text-[10px] tracking-widest uppercase">Common Injuries</span>
-              <p className="mt-1 text-sm">Common {name.toLowerCase()} injuries include sprains, strains, and overuse injuries depending on the intensity of play. Proper warm-up, technique, and rest days help prevent most issues.</p>
-            </div>
-            <div className="bg-muted/30 rounded-lg border p-2.5">
-              <span className="text-muted-foreground text-[10px] tracking-widest uppercase">Recovery Tips</span>
-              <p className="mt-1 text-sm">Rest, ice, compression, and elevation (RICE) for acute injuries. Gradual return to play after full recovery. Work with a sports physiotherapist for personalized rehabilitation.</p>
-            </div>
-          </div>
-        </AccordionSection>
-
-        {/* Why Choose This Sport */}
-        <AccordionSection title={`Why Choose ${name}`} icon={Sparkles}>
-          <div className="flex flex-col gap-2">
-            <p className="text-muted-foreground text-sm leading-relaxed">
-              {staticContent?.tagline || `${name} offers a unique combination of physical fitness, mental development, and competitive opportunities.`}
-            </p>
-            <div className="mt-2 grid grid-cols-1 gap-2 sm:grid-cols-2">
-              {staticContent?.benefits?.physical && staticContent.benefits.physical.length > 0 && (
-                <div className="flex items-start gap-2 text-sm">
-                  <Heart className="text-primary mt-0.5 h-4 w-4 shrink-0" />
-                  <div>
-                    <span className="font-medium">Physical Development</span>
-                    <p className="text-muted-foreground text-xs">Build {staticContent.benefits.physical.slice(0, 2).join(', ').toLowerCase()}</p>
-                  </div>
-                </div>
-              )}
-              {staticContent?.benefits?.mental && staticContent.benefits.mental.length > 0 && (
-                <div className="flex items-start gap-2 text-sm">
-                  <Brain className="text-primary mt-0.5 h-4 w-4 shrink-0" />
-                  <div>
-                    <span className="font-medium">Mental Growth</span>
-                    <p className="text-muted-foreground text-xs">Develop {staticContent.benefits.mental.slice(0, 2).join(', ').toLowerCase()}</p>
-                  </div>
-                </div>
-              )}
-              {olympicSport && (
-                <div className="flex items-start gap-2 text-sm">
-                  <Medal className="text-primary mt-0.5 h-4 w-4 shrink-0" />
-                  <div>
-                    <span className="font-medium">Olympic Sport</span>
-                    <p className="text-muted-foreground text-xs">Compete at the highest international level</p>
-                  </div>
-                </div>
-              )}
-              {beginnerFriendly && (
-                <div className="flex items-start gap-2 text-sm">
-                  <Shield className="text-primary mt-0.5 h-4 w-4 shrink-0" />
-                  <div>
-                    <span className="font-medium">Beginner Friendly</span>
-                    <p className="text-muted-foreground text-xs">Easy to start with minimal prior experience</p>
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-        </AccordionSection>
-
-        {(popularityInIndia || popularityWorldwide) && (
-          <AccordionSection title="Popularity" icon={Medal}>
-            {popularityInIndia && (
+        {/* Popularity - merged into a single section */}
+        {(sc?.popularityInIndia || sc?.popularityWorldwide) && (
+          <AccordionSection title="Popularity" icon={TrendingUp}>
+            {sc.popularityInIndia && (
               <div className="mb-2 bg-muted/30 rounded-lg border p-3">
                 <span className="text-muted-foreground text-[10px] tracking-widest uppercase">In India</span>
-                <p className="mt-1 text-sm">{popularityInIndia}</p>
+                <p className="mt-1 text-sm">{sc.popularityInIndia}</p>
               </div>
             )}
-            {popularityWorldwide && (
+            {sc.popularityWorldwide && (
               <div className="bg-muted/30 rounded-lg border p-3">
                 <span className="text-muted-foreground text-[10px] tracking-widest uppercase">Worldwide</span>
-                <p className="mt-1 text-sm">{popularityWorldwide}</p>
+                <p className="mt-1 text-sm">{sc.popularityWorldwide}</p>
               </div>
             )}
           </AccordionSection>
         )}
 
-        {staticContent?.funFacts && staticContent.funFacts.length > 0 && (
+        {sc?.funFacts && sc.funFacts.length > 0 && (
           <AccordionSection title="Fun Facts" icon={Lightbulb}>
             <div className="flex flex-col gap-2">
-              {staticContent.funFacts.map((fact, i) => (
+              {sc.funFacts.map((fact, i) => (
                 <div key={i} className="flex items-start gap-2 text-sm">
                   <span className="text-primary mt-0.5 text-xs">•</span>
                   <span>{fact}</span>
@@ -570,10 +449,10 @@ export function SportDetailView({ sport }: SportDetailViewProps) {
           </AccordionSection>
         )}
 
-        {staticContent?.faqs && staticContent.faqs.length > 0 && (
-          <AccordionSection title="FAQs" icon={HelpCircle}>
+        {sc?.faqs && sc.faqs.length > 0 && (
+          <AccordionSection title="FAQs" icon={HelpCircle} badge={`${sc.faqs.length} questions`}>
             <div className="flex flex-col gap-3">
-              {staticContent.faqs.map((faq, i) => (
+              {sc.faqs.map((faq, i) => (
                 <div key={i}>
                   <p className="text-sm font-medium">{faq.q}</p>
                   <p className="text-muted-foreground mt-0.5 text-sm">{faq.a}</p>
@@ -593,6 +472,11 @@ export function SportDetailView({ sport }: SportDetailViewProps) {
           <Button asChild variant="default" size="sm" className="min-h-[44px]">
             <Link href={`/academies?sport=${slug}`}>
               Explore {name} Academies <ChevronRight className="ml-1 h-3.5 w-3.5" />
+            </Link>
+          </Button>
+          <Button asChild variant="outline" size="sm" className="min-h-[44px]">
+            <Link href={`/sports`}>
+              Compare Sports <BarChart3 className="ml-1 h-3.5 w-3.5" />
             </Link>
           </Button>
         </div>
