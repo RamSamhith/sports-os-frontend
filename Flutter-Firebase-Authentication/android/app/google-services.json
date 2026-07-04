@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "856695819338",
+    "project_id": "sportsos-64168",
+    "storage_bucket": "sportsos-64168.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:856695819338:android:92dc3cc84e0ef665d92ab3",
+        "android_client_info": {
+          "package_name": "com.kmabd.sportsos"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "856695819338-9rifl6v06h2s8p9gidd6diisi0j9d4gb.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.kmabd.sportsos",
+            "certificate_hash": "d25c556d0547186889820dde92a2ae7f74e1e118"
+          }
+        },
+        {
+          "client_id": "856695819338-hjarh6dpbpoueoaa9ulimgkko9oapi6p.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyByzk3qTuzaSFkZ3hkRkf5fKKQ3IoWgpaU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "856695819338-hjarh6dpbpoueoaa9ulimgkko9oapi6p.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
