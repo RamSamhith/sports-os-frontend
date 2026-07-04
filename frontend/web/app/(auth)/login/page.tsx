@@ -13,7 +13,6 @@ import { useAuth } from '@/lib/hooks/use-auth';
 import { login as apiLogin } from '@/lib/api/auth';
 import { useGoogleAuth, handleSocialAuth } from '@/lib/hooks/use-social-auth';
 import { trackGuestStarted } from '@/lib/analytics/events';
-import { validatePassword } from '@/lib/utils/validators';
 import { Loader2, Eye, EyeOff } from 'lucide-react';
 
 interface FieldErrors {
@@ -34,7 +33,7 @@ const fieldVariants = {
 export default function LoginPage() {
   const reduced = useReducedMotion();
   const router = useRouter();
-  const { setAuth, setProfile, isAuthenticated, isLoading, onboardingCompleted, enterGuestMode } = useAuth();
+  const { setAuth, setProfile, enterGuestMode } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errors, setErrors] = useState<FieldErrors>({});
@@ -46,17 +45,6 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
 
   const googleAuth = useGoogleAuth();
-
-  useEffect(() => {
-    if (isLoading) return;
-    if (isAuthenticated) {
-      if (onboardingCompleted) {
-        router.replace('/');
-      } else {
-        router.replace('/onboarding/role');
-      }
-    }
-  }, [isLoading, isAuthenticated, onboardingCompleted, router]);
 
   useEffect(() => {
     if (googleAuth.loaded) {
@@ -76,8 +64,7 @@ export default function LoginPage() {
     const e: FieldErrors = {};
     if (!email.trim()) e.email = 'Email is required';
     else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) e.email = 'Enter a valid email address';
-    const pwErr = validatePassword(password);
-    if (pwErr) e.password = pwErr;
+    if (!password) e.password = 'Password is required';
     return e;
   }
 
@@ -87,8 +74,7 @@ export default function LoginPage() {
       if (!value.trim()) e.email = 'Email is required';
       else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) e.email = 'Enter a valid email address';
     } else if (field === 'password') {
-      const pwErr = validatePassword(value);
-      if (pwErr) e.password = pwErr;
+      if (!value) e.password = 'Password is required';
     }
     return e;
   }

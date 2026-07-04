@@ -4,15 +4,63 @@ import { Section } from '@/components/layout/section';
 import { Breadcrumbs } from '@/components/seo/breadcrumbs';
 import { SportDetailView } from '@/components/sports/sport-detail-view';
 import { PathwaySection } from '@/components/sports/pathway-section';
+import { RelatedAcademies } from '@/components/sports/related-academies';
 import { SportDisclaimer } from '@/components/sports/sport-disclaimer';
 import { notFound } from 'next/navigation';
 import { competitionsBySport } from '@/data/competitions';
+import { sportsContent } from '@/data/sports-content';
+import { getCatalogSport } from '@/data/sports-catalog';
 import { siteConfig } from '@/config/site';
 import { getSport } from '@/lib/api/sports';
 
 async function fetchSport(slug: string) {
   const res = await getSport(slug);
-  return res.ok ? res.data : null;
+  if (res.ok) return res.data;
+  const catalog = getCatalogSport(slug);
+  if (!catalog) return null;
+  const sc = sportsContent[slug];
+  return {
+    id: catalog.slug,
+    slug: catalog.slug,
+    name: catalog.name,
+    category: catalog.category,
+    sportType: catalog.sportType,
+    shortDescription: catalog.shortDescription,
+    fullDescription: sc?.about || catalog.shortDescription,
+    origin: sc?.origin || '',
+    popularityInIndia: sc?.popularityInIndia || '',
+    popularityWorldwide: sc?.popularityWorldwide || '',
+    icon: `/images/sports/${catalog.slug}.svg`,
+    coverImage: `/images/sports/${catalog.slug}-cover.jpg`,
+    howToPlay: sc?.howToPlay || sc?.rules || '',
+    objectiveOfGame: sc?.objectiveOfGame || '',
+    teamSize: sc?.teamSize || '',
+    matchDuration: sc?.matchDuration || '',
+    scoringSystem: sc?.scoringSystem || '',
+    playingSurface: sc?.playingSurface || '',
+    requiredEquipment: sc?.equipment || [],
+    ageGroups: catalog.suitableFor.join(', '),
+    beginnerFriendly: catalog.beginnerFriendly,
+    olympicSport: catalog.olympicSport,
+    estimatedMonthlyCost: '',
+    playingSeason: 'All Year' as const,
+    trainingFrequency: sc?.trainingFrequency || '',
+    averageLearningTime: sc?.averageLearningTime || '',
+    injuryRisk: (sc?.injuryRisk || 'Medium') as 'Low' | 'Medium' | 'High',
+    fitnessLevelRequired: catalog.fitnessLevelRequired,
+    suitableFor: catalog.suitableFor as ('Kids' | 'Teens' | 'Adults' | 'Seniors')[],
+    individualOrTeam: (catalog.sportType === 'both' ? 'Both' : catalog.sportType === 'team' ? 'Team' : 'Individual') as 'Individual' | 'Team' | 'Both',
+    indoorOutdoor: catalog.category as 'Indoor' | 'Outdoor' | 'Both',
+    physicalBenefits: sc?.benefits?.physical || [],
+    mentalBenefits: sc?.benefits?.mental || [],
+    skillsDeveloped: sc?.skills || [],
+    careerOpportunities: sc?.careerOpportunities || [],
+    scholarships: [],
+    professionalLeagues: [],
+    tournaments: [],
+    competitionPathway: { levels: [] },
+    status: 'published' as const,
+  };
 }
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
@@ -76,6 +124,7 @@ export default async function SportDetailPage({ params }: { params: Promise<{ sl
               sportName={name}
               competitions={competitions}
             />
+            <RelatedAcademies sportSlug={sportSlug} sportName={name} />
             <SportDisclaimer />
           </div>
         </div>

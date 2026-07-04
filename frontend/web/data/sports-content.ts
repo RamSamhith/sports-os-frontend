@@ -7,12 +7,26 @@ export interface SportContent {
   beginnerDifficulty: 'Easy' | 'Moderate' | 'Challenging';
   equipment: string[];
   benefits: { physical: string[]; mental: string[] };
+  skills: string[];
   trainingPath: string;
+  trainingFrequency: string;
+  injuryRisk: 'Low' | 'Medium' | 'High';
+  popularityInIndia: string;
+  popularityWorldwide: string;
   careerOpportunities: string[];
   competitions: { state: string[]; national: string[]; international: string[] };
   majorTournaments: string[];
   funFacts: string[];
   faqs: { q: string; a: string }[];
+  keyDifferences?: string;
+  teamSize: string;
+  matchDuration: string;
+  howToPlay: string;
+  objectiveOfGame: string;
+  scoringSystem: string;
+  playingSurface: string;
+  averageLearningTime: string;
+  origin: string;
 }
 
 export const sportsContent: Record<string, SportContent> = {
@@ -25,6 +39,14 @@ export const sportsContent: Record<string, SportContent> = {
     individualOrTeam: "team",
     olympic: false,
     beginnerDifficulty: "Moderate",
+    teamSize: "11 players per side",
+    matchDuration: "T20: ~3 hours, ODI: ~8 hours, Test: Up to 5 days",
+    howToPlay: "Two teams alternate between batting and bowling. Batsmen score runs by hitting the ball and running between wickets. Bowlers try to dismiss batsmen through various delivery types. Fielders assist by catching or running out batsmen.",
+    objectiveOfGame: "Score more runs than the opposing team within the allotted overs or innings.",
+    scoringSystem: "Runs scored by batsmen — 1 per run between wickets, 4 for boundary, 6 for over-boundary. Wickets end a batsman's innings.",
+    playingSurface: "Grass or hybrid turf oval field with a 22-yard flat pitch at the center",
+    averageLearningTime: "2-3 years to develop basic competence",
+    origin: "England, 16th century",
     equipment: [
       "Cricket bat",
       "Leather ball",
@@ -44,8 +66,18 @@ export const sportsContent: Record<string, SportContent> = {
         "Builds patience and concentration over long sessions",
       ],
     },
+    skills: [
+      "Batting technique and shot selection",
+      "Bowling variations and accuracy",
+      "Fielding and catching reflexes",
+      "Game awareness and tactical decision-making",
+    ],
     trainingPath:
       "Start with soft-ball cricket at school or local clubs to learn basic batting, bowling, and fielding. Progress to age-group tournaments (Under-14, Under-16, Under-19) through district and state associations. Elite players enter Ranji Trophy, IPL, and eventually national selection via BCCI pathways.",
+    trainingFrequency: "4-6 days/week",
+    injuryRisk: "Medium",
+    popularityInIndia: "Most popular sport — 1.4 billion fans",
+    popularityWorldwide: "Top 3 globally, dominant in South Asia, Australia, UK",
     careerOpportunities: [
       "Professional player (domestic and international)",
       "Cricket coaching and academies",
@@ -93,6 +125,7 @@ export const sportsContent: Record<string, SportContent> = {
         a: "Perform consistently in district-level tournaments and age-group competitions. State associations conduct trials and selection matches for higher levels.",
       },
     ],
+    keyDifferences: "Cricket combines individual skill (batting, bowling) with deep team strategy. Unlike football or basketball, it alternates between individual duels (batsman vs bowler) and coordinated team play. Three formats (Test, ODI, T20) range from 5-day endurance to 3-hour sprints.",
   },
 
   football: {
@@ -104,6 +137,14 @@ export const sportsContent: Record<string, SportContent> = {
     individualOrTeam: "team",
     olympic: true,
     beginnerDifficulty: "Easy",
+    teamSize: "11 players per side",
+    matchDuration: "90 minutes (two 45-minute halves)",
+    howToPlay: "Players dribble, pass, and shoot a ball to score goals. Teams coordinate attacking and defensive formations. The goalkeeper is the only player allowed to use hands within the penalty area.",
+    objectiveOfGame: "Score more goals than the opposing team within 90 minutes.",
+    scoringSystem: "One goal per ball entering the net. Highest total wins.",
+    playingSurface: "Grass or artificial turf rectangular pitch (100-110m x 64-75m)",
+    averageLearningTime: "1-2 years to develop basic skills",
+    origin: "England, 19th century",
     equipment: [
       "Football (size 4 or 5)",
       "Football boots (cleats)",
@@ -122,8 +163,18 @@ export const sportsContent: Record<string, SportContent> = {
         "Develops spatial awareness and tactical thinking",
       ],
     },
+    skills: [
+      "Dribbling and ball control",
+      "Passing accuracy and vision",
+      "Shooting and finishing",
+      "Tackling and defensive positioning",
+    ],
     trainingPath:
       "Begin with local football clubs or school teams to learn dribbling, passing, and positioning. Progress through district and state leagues, aiming for junior national competitions. Top players are scouted for ISL, I-League, or national camp selections.",
+    trainingFrequency: "4-5 days/week",
+    injuryRisk: "Medium",
+    popularityInIndia: "Growing rapidly — ISL has boosted viewership to 200M+ annually",
+    popularityWorldwide: "Most popular sport in the world with 4 billion+ fans globally",
     careerOpportunities: [
       "Professional footballer (domestic leagues and abroad)",
       "Football coaching and youth development",
@@ -170,6 +221,7 @@ export const sportsContent: Record<string, SportContent> = {
         a: "The Indian Super League is India's top professional football league, featuring franchise teams from across the country.",
       },
     ],
+    keyDifferences: "Football is a continuous-flow team sport with constant movement and no stoppages between plays (unlike cricket or baseball). Its simplicity — just a ball and open space — makes it the most accessible team sport globally. The 90-minute non-stop format demands unique aerobic endurance.",
   },
 
   basketball: {
@@ -181,6 +233,14 @@ export const sportsContent: Record<string, SportContent> = {
     individualOrTeam: "team",
     olympic: true,
     beginnerDifficulty: "Moderate",
+    teamSize: "5 players per side",
+    matchDuration: "48 minutes (four 12-minute quarters)",
+    howToPlay: "Two teams of five try to score by shooting a ball through the opponent's hoop. Players dribble to move and pass to teammates. Defense involves blocking shots and stealing the ball.",
+    objectiveOfGame: "Score more points than the opposing team by shooting the ball through the opponent's hoop.",
+    scoringSystem: "2 points per field goal, 3 points per three-pointer, 1 point per free throw",
+    playingSurface: "Hardwood indoor court (28m x 15m)",
+    averageLearningTime: "1-2 years to develop basic competence",
+    origin: "USA, 1891",
     equipment: [
       "Basketball (size 5, 6, or 7)",
       "Basketball shoes (high-top recommended)",
@@ -198,8 +258,18 @@ export const sportsContent: Record<string, SportContent> = {
         "Develops spatial awareness and court vision",
       ],
     },
+    skills: [
+      "Dribbling and ball handling",
+      "Shooting form and accuracy",
+      "Defensive footwork and positioning",
+      "Court vision and playmaking",
+    ],
     trainingPath:
       "Start at school or local clubs learning dribbling, shooting, and defensive fundamentals. Compete in district and state championships to build competitive experience. Top performers can join national camps, UBA, or Basketball India League teams.",
+    trainingFrequency: "4-5 days/week",
+    injuryRisk: "Medium",
+    popularityInIndia: "Strong school-level presence, growing through UBA and BCL leagues",
+    popularityWorldwide: "Top 3 globally, massive following in USA, China, and Europe",
     careerOpportunities: [
       "Professional basketball player",
       "Basketball coaching and personal training",
@@ -246,6 +316,7 @@ export const sportsContent: Record<string, SportContent> = {
         a: "Basketball has a strong school-level presence in India and is growing professionally through leagues like UBA and BCL.",
       },
     ],
+    keyDifferences: "Basketball is a high-tempo indoor sport played on a confined court with continuous scoring, unlike football's occasional goals. The shot clock forces constant action, and the combination of height, speed, and precision shooting creates a unique athletic profile unmatched by other team sports.",
   },
 
   badminton: {
@@ -257,6 +328,14 @@ export const sportsContent: Record<string, SportContent> = {
     individualOrTeam: "both",
     olympic: true,
     beginnerDifficulty: "Easy",
+    teamSize: "1 or 2 players per side",
+    matchDuration: "40-60 minutes (best of 3 games to 21 points)",
+    howToPlay: "Players hit a shuttlecock over a net using racquets. The shuttlecock must land within the opponent's court boundaries. Singles and doubles formats are played.",
+    objectiveOfGame: "Win rallies by landing the shuttlecock in the opponent's court or forcing errors.",
+    scoringSystem: "Rally scoring to 21 points per game. Best of 3 games wins the match.",
+    playingSurface: "Indoor court with wooden or synthetic flooring (13.4m x 6.1m)",
+    averageLearningTime: "6 months to 1 year for basic skills",
+    origin: "British India, 19th century",
     equipment: [
       "Badminton racquet",
       "Shuttlecocks (feather or synthetic)",
@@ -275,8 +354,18 @@ export const sportsContent: Record<string, SportContent> = {
         "Teaches resilience and sportsmanship",
       ],
     },
+    skills: [
+      "Net play and shot precision",
+      "Smash power and timing",
+      "Footwork and court coverage",
+      "Deceptive shot-making",
+    ],
     trainingPath:
       "Start at a local badminton academy or school program to learn grip, footwork, and basic strokes. Progress through district and state ranking tournaments to gain competitive exposure. Top performers enter national camps and can aim for BWF World Tour and Olympic selection via BAI.",
+    trainingFrequency: "5-6 days/week",
+    injuryRisk: "Medium",
+    popularityInIndia: "One of India's top Olympic sports — Sindhu and Nehwal are national icons",
+    popularityWorldwide: "Huge in Asia (China, Indonesia, Japan), growing in Europe and Americas",
     careerOpportunities: [
       "Professional badminton player",
       "Badminton coaching and academy ownership",
@@ -323,6 +412,7 @@ export const sportsContent: Record<string, SportContent> = {
         a: "Focus on wrist strength, proper grip, body rotation, and timing drills. Regular practice with a coach helps refine technique.",
       },
     ],
+    keyDifferences: "Badminton is the fastest racquet sport — shuttlecock speeds exceed 400 km/h. Unlike tennis, it uses a feathered projectile that decelerates rapidly, demanding explosive reflexes in a smaller court. The lightweight shuttlecock enables deceptive shots impossible in other racquet sports.",
   },
 
   tennis: {
@@ -334,6 +424,14 @@ export const sportsContent: Record<string, SportContent> = {
     individualOrTeam: "both",
     olympic: true,
     beginnerDifficulty: "Moderate",
+    teamSize: "1 (singles) or 2 (doubles) per side",
+    matchDuration: "1-3 hours depending on format",
+    howToPlay: "Players hit a ball over a net into the opponent's court using racquets. The ball must bounce once before being returned. Points progress through a unique scoring system.",
+    objectiveOfGame: "Win points by hitting the ball so the opponent cannot return it within court boundaries.",
+    scoringSystem: "Points: 15, 30, 40, Game. Games form sets, sets form matches. Must win by 2 clear games in a set.",
+    playingSurface: "Clay, grass, hard court, or carpet (23.77m x 8.23m singles)",
+    averageLearningTime: "1-2 years for intermediate play",
+    origin: "England, 19th century",
     equipment: [
       "Tennis racquet",
       "Tennis balls",
@@ -352,8 +450,18 @@ export const sportsContent: Record<string, SportContent> = {
         "Builds discipline through rigorous training routines",
       ],
     },
+    skills: [
+      "Serve power and placement",
+      "Forehand and backhand technique",
+      "Net approach and volleying",
+      "Tactical point construction",
+    ],
     trainingPath:
       "Begin with coaching at a tennis club or academy to learn strokes, serve, and court movement. Compete in AITA junior ranking tournaments to build competitive experience. Advanced players progress through ITF junior circuits and can aim for ATP/WTA Tour or national team selection.",
+    trainingFrequency: "4-5 days/week",
+    injuryRisk: "Medium",
+    popularityInIndia: "Elite following — Sania Mirza and doubles pairs made it mainstream",
+    popularityWorldwide: "Top 5 globally, massive following in Europe, USA, and Australia",
     careerOpportunities: [
       "Professional tennis player",
       "Tennis coaching and academy management",
@@ -400,6 +508,7 @@ export const sportsContent: Record<string, SportContent> = {
         a: "Participate in AITA-organized ranking tournaments at district, state, and national levels. Points are awarded based on tournament category and finish.",
       },
     ],
+    keyDifferences: "Tennis is unique in combining explosive power with endurance across multiple surfaces (clay, grass, hard court), each demanding different playing styles. The individual nature of singles means players must be self-reliant, and Grand Slams can last 5+ hours, testing physical and mental limits unlike any other sport.",
   },
 
   "table-tennis": {
@@ -411,6 +520,14 @@ export const sportsContent: Record<string, SportContent> = {
     individualOrTeam: "both",
     olympic: true,
     beginnerDifficulty: "Easy",
+    teamSize: "1 or 2 players per side",
+    matchDuration: "30-60 minutes (best of 5 or 7 games to 11 points)",
+    howToPlay: "Players hit a lightweight ball back and forth across a net on a table using paddles. The ball must bounce once on each side. Various spin techniques are used.",
+    objectiveOfGame: "Win rallies by making the ball bounce twice on the opponent's side or forcing errors.",
+    scoringSystem: "Rally scoring to 11 points per game. Best of 5 or 7 games wins the match.",
+    playingSurface: "Indoor table tennis table (2.74m x 1.525m)",
+    averageLearningTime: "3-6 months for basic competence",
+    origin: "England, 19th century",
     equipment: [
       "Table tennis racket (paddle)",
       "Table tennis balls",
@@ -429,8 +546,18 @@ export const sportsContent: Record<string, SportContent> = {
         "Teaches composure under pressure",
       ],
     },
+    skills: [
+      "Spin generation and variation",
+      "Fast-paced rally endurance",
+      "Service tactics and third-ball attack",
+      "Close-to-table reflexes",
+    ],
     trainingPath:
       "Start at a local club or school with basic ball control, serve, and footwork drills. Compete in TTFI district and state ranking events to build competitive experience. Top players enter national championships and can aim for WTT events and Olympic selection.",
+    trainingFrequency: "5-6 days/week",
+    injuryRisk: "Low",
+    popularityInIndia: "Growing — Sharath Kamal and Manika Batra have boosted participation",
+    popularityWorldwide: "Dominant in China, huge in Asia, growing in Europe and Americas",
     careerOpportunities: [
       "Professional table tennis player",
       "Table tennis coaching",
@@ -477,6 +604,7 @@ export const sportsContent: Record<string, SportContent> = {
         a: "Focus on brushing the ball at an angle rather than hitting it flat. Wrist snap and a fast forearm motion create more spin.",
       },
     ],
+    keyDifferences: "Table tennis has the fastest reaction times in any sport — rallies happen in under 0.5 seconds. The 2.74m table creates an intimate, high-speed duel where spin (up to 150 RPM) makes the ball behave unpredictably. It's the only sport where the projectile can curve mid-air due to spin alone.",
   },
 
   swimming: {
@@ -488,6 +616,14 @@ export const sportsContent: Record<string, SportContent> = {
     individualOrTeam: "both",
     olympic: true,
     beginnerDifficulty: "Moderate",
+    teamSize: "1-4 swimmers (relay events)",
+    matchDuration: "20-90 seconds per race, depending on distance",
+    howToPlay: "Swimmers race across a pool using one of four Olympic strokes: freestyle, backstroke, breaststroke, or butterfly. Each stroke has specific technique rules.",
+    objectiveOfGame: "Be the first swimmer to touch the wall at the end of the race distance.",
+    scoringSystem: "Timed races — fastest swimmer wins. Touchpads record times to 0.01 seconds.",
+    playingSurface: "Indoor or outdoor swimming pool (25m or 50m lanes)",
+    averageLearningTime: "6 months to 1 year for stroke proficiency",
+    origin: "Prehistoric era, competitive form from 19th century",
     equipment: [
       "Swimsuit",
       "Goggles",
@@ -506,8 +642,18 @@ export const sportsContent: Record<string, SportContent> = {
         "Boosts confidence through progressive skill mastery",
       ],
     },
+    skills: [
+      "Stroke efficiency and technique",
+      "Breathing control and rhythm",
+      "Start and turn speed",
+      "Endurance pacing strategy",
+    ],
     trainingPath:
       "Begin with water familiarization and learning basic strokes at a local pool or swim school. Progress through district and state aquatics championships to build competitive times. Elite swimmers train at national camps and can qualify for World Aquatics events and the Olympics via SWFI.",
+    trainingFrequency: "5-6 days/week",
+    injuryRisk: "Low",
+    popularityInIndia: "Niche but growing — Sajan Prakash and Srihari Nataraj inspiring new generation",
+    popularityWorldwide: "Core Olympic sport with huge followings in USA, Australia, and Europe",
     careerOpportunities: [
       "Competitive swimmer",
       "Swimming coach and instructor",
@@ -554,6 +700,7 @@ export const sportsContent: Record<string, SportContent> = {
         a: "Focus on technique (streamline body position, efficient strokes), build endurance through regular training, and incorporate interval sets.",
       },
     ],
+    keyDifferences: "Swimming is the only sport where athletes compete in water, making technique paramount over raw power. Four distinct strokes (freestyle, backstroke, breaststroke, butterfly) each require unique biomechanics. Water resistance means efficiency matters more than strength, creating a sport where technique can beat bigger opponents.",
   },
 
   athletics: {
@@ -565,6 +712,14 @@ export const sportsContent: Record<string, SportContent> = {
     individualOrTeam: "both",
     olympic: true,
     beginnerDifficulty: "Easy",
+    teamSize: "Individual or relay teams of 4",
+    matchDuration: "Seconds (sprints) to hours (marathon)",
+    howToPlay: "Athletes compete in running, jumping, throwing, and walking events. Each event has specific rules about technique, lanes, and measurement.",
+    objectiveOfGame: "Achieve the fastest time, longest distance, or highest jump/throw.",
+    scoringSystem: "Timed events: fastest wins. Field events: longest/highest distance counts. Multi-events: point-based.",
+    playingSurface: "Running track (400m oval) and field areas",
+    averageLearningTime: "1-2 years for event-specific technique",
+    origin: "Ancient Greece, 776 BC",
     equipment: [
       "Running shoes (event-specific spikes)",
       "Track suit and competition kit",
@@ -582,8 +737,18 @@ export const sportsContent: Record<string, SportContent> = {
         "Develops focus and determination",
       ],
     },
+    skills: [
+      "Sprint acceleration and top-end speed",
+      "Endurance pacing and race strategy",
+      "Technique in jumps or throws",
+      "Start-block and transition mechanics",
+    ],
     trainingPath:
       "Start at school or local athletics clubs to identify your event and learn proper technique. Compete in district and state meets to build race experience and qualifying marks. Elite athletes enter national camps and can aim for Federation Cup, Diamond League, and Olympic qualification via AFI.",
+    trainingFrequency: "5-6 days/week",
+    injuryRisk: "Medium",
+    popularityInIndia: "Neeraj Chopra's gold sparked a revolution — javelin and middle distance booming",
+    popularityWorldwide: "Foundation of the Olympics — track and field has global prestige",
     careerOpportunities: [
       "Professional athlete (sprints, distance, jumps, throws)",
       "Athletics coaching and personal training",
@@ -630,6 +795,7 @@ export const sportsContent: Record<string, SportContent> = {
         a: "Incorporate interval training, strength exercises (squats, lunges), proper form drills, and adequate rest into your routine.",
       },
     ],
+    keyDifferences: "Athletics is the purest test of human physical ability — speed, strength, endurance, and coordination distilled into measurable performances. Unlike team sports, it's you vs the clock or field. With 40+ Olympic events from 100m sprints to marathons, it offers more competitive variety than any other sport.",
   },
 
   wrestling: {
@@ -641,6 +807,14 @@ export const sportsContent: Record<string, SportContent> = {
     individualOrTeam: "individual",
     olympic: true,
     beginnerDifficulty: "Challenging",
+    teamSize: "Individual (with team scoring in dual meets)",
+    matchDuration: "6 minutes (two 3-minute periods)",
+    howToPlay: "Two wrestlers compete on a mat, attempting takedowns, pins, and reversals. The wrestler with more points or a pin wins.",
+    objectiveOfGame: "Pin the opponent's shoulders to the mat or score more points through takedowns and reversals.",
+    scoringSystem: "Takedown: 2 points, Reversal: 1 point, Near fall: 2-4 points, Pin: automatic win",
+    playingSurface: "Circular wrestling mat (9m diameter)",
+    averageLearningTime: "2-3 years for competitive proficiency",
+    origin: "Ancient Mesopotamia, 3000 BC",
     equipment: [
       "Wrestling singlet",
       "Wrestling shoes",
@@ -659,8 +833,18 @@ export const sportsContent: Record<string, SportContent> = {
         "Develops tactical awareness and quick adaptation",
       ],
     },
+    skills: [
+      "Takedown technique and timing",
+      "Defensive positioning and escapes",
+      "Ground control and pinning",
+      "Strength and grip dominance",
+    ],
     trainingPath:
       "Begin at a local akhada (traditional wrestling gym) or sports academy to learn basics of stance, takedowns, and escapes. Compete in district and state championships to build competitive experience. Top wrestlers enter national camps and aim for Asian Games and Olympic selection via WFI.",
+    trainingFrequency: "6 days/week",
+    injuryRisk: "High",
+    popularityInIndia: "Deep roots in Haryana and Punjab — Olympic medal tradition since 2008",
+    popularityWorldwide: "Olympic staple with strong followings in Iran, Russia, USA, and Turkey",
     careerOpportunities: [
       "Professional wrestler (domestic and international)",
       "Wrestling coach and akhada instructor",
@@ -707,6 +891,7 @@ export const sportsContent: Record<string, SportContent> = {
         a: "Freestyle allows attacks on the entire body, while Greco-Roman restricts holds to above the waist, emphasizing upper-body throws.",
       },
     ],
+    keyDifferences: "Wrestling is the oldest combat sport — no striking, purely grappling. Unlike boxing or karate, victories come from pins or points, not knockouts. The weight-class system ensures fair matches, and the akhada tradition in India gives it a cultural depth no other combat sport has in the subcontinent.",
   },
 
   boxing: {
@@ -718,6 +903,14 @@ export const sportsContent: Record<string, SportContent> = {
     individualOrTeam: "individual",
     olympic: true,
     beginnerDifficulty: "Challenging",
+    teamSize: "Individual",
+    matchDuration: "3-12 rounds of 3 minutes each",
+    howToPlay: "Two boxers throw punches at each other in a roped ring, wearing gloves. Boxers score by landing punches on the opponent's scoring zone.",
+    objectiveOfGame: "Win by knockout, technical knockout, or judges' decision based on clean punches landed.",
+    scoringSystem: "10-point must system: winner of round gets 10, loser gets 9 or fewer. Judges score rounds.",
+    playingSurface: "Boxing ring (6.1m x 6.1m)",
+    averageLearningTime: "2-3 years for competitive readiness",
+    origin: "Ancient Greece, 688 BC",
     equipment: [
       "Boxing gloves",
       "Boxing shoes",
@@ -737,8 +930,18 @@ export const sportsContent: Record<string, SportContent> = {
         "Teaches strategic thinking and composure under pressure",
       ],
     },
+    skills: [
+      "Jab-cross combination speed",
+      "Head movement and defensive slipping",
+      "Footwork and ring control",
+      "Punching power and accuracy",
+    ],
     trainingPath:
       "Start at a local boxing gym to learn basic stance, jab, cross, and defensive moves. Compete in state and national amateur boxing championships to build ring experience. Top boxers can aim for India Open, World Championships, and Olympic selection via BFI.",
+    trainingFrequency: "5-6 days/week",
+    injuryRisk: "High",
+    popularityInIndia: "Growing — Vijender Singh and Lovlina Borgohain are Olympic icons from Haryana and Assam",
+    popularityWorldwide: "Massive global following with major pro circuits in USA, UK, Japan, and Mexico",
     careerOpportunities: [
       "Professional boxer (amateur or pro)",
       "Boxing coach and trainer",
@@ -785,6 +988,7 @@ export const sportsContent: Record<string, SportContent> = {
         a: "Boxing builds excellent reflexes, distance awareness, and striking skills that are highly effective for self-defense.",
       },
     ],
+    keyDifferences: "Boxing is 'the sweet science' — the only combat sport where punches are the sole weapon. Unlike MMA or karate, it strips fighting down to just fists, footwork, and head movement. This simplicity creates deep tactical battles where ring IQ often beats raw power, making it unique among combat sports.",
   },
 
   karate: {
@@ -796,6 +1000,14 @@ export const sportsContent: Record<string, SportContent> = {
     individualOrTeam: "both",
     olympic: false,
     beginnerDifficulty: "Moderate",
+    teamSize: "Individual or team events",
+    matchDuration: "2-3 minutes per bout",
+    howToPlay: "Competitors score points by landing controlled strikes (punches, kicks, knee strikes) on the opponent's body or head. Kata (forms) is a separate discipline.",
+    objectiveOfGame: "Score points through effective techniques or win by ippon (full point).",
+    scoringSystem: "Ippon (full point), Waza-ari (half point). Highest total or first to ippon wins.",
+    playingSurface: "Dojo mat area (8m x 8m competition area)",
+    averageLearningTime: "2-4 years to reach competitive level",
+    origin: "Okinawa, Japan, 19th century",
     equipment: [
       "Karate gi (uniform)",
       "Karate belt (indicating rank)",
@@ -814,8 +1026,18 @@ export const sportsContent: Record<string, SportContent> = {
         "Teaches self-control and emotional regulation",
       ],
     },
+    skills: [
+      "Precision striking (punches and kicks)",
+      "Kata (form) execution",
+      "Kumite (sparring) tactics",
+      "Balance and stance stability",
+    ],
     trainingPath:
       "Begin at a local karate dojo to learn basic stances, strikes, and kata. Progress through belt grades (kyu levels) and compete in district and state championships. Elite karatekas can enter national championships and represent India at Asian and World Karate Championships.",
+    trainingFrequency: "3-5 days/week",
+    injuryRisk: "Low",
+    popularityInIndia: "Growing through dojos in metros — strong in Maharashtra and South India",
+    popularityWorldwide: "Huge global following with 100M+ practitioners worldwide, strongest in Japan and Europe",
     careerOpportunities: [
       "Professional karate competitor",
       "Karate instructor and dojo owner",
@@ -861,6 +1083,7 @@ export const sportsContent: Record<string, SportContent> = {
         a: "Yes. Karate teaches practical striking, blocking, and awareness skills that are effective for self-defense situations.",
       },
     ],
+    keyDifferences: "Karate uniquely combines striking with philosophical discipline — 'karate ni sentei nashi' (no first attack in karate). Unlike boxing or kickboxing, it includes kata (pre-arranged forms) as a competitive element, blending martial effectiveness with artistic expression. The belt ranking system provides clear progression milestones.",
   },
 
   judo: {
@@ -872,6 +1095,14 @@ export const sportsContent: Record<string, SportContent> = {
     individualOrTeam: "both",
     olympic: true,
     beginnerDifficulty: "Moderate",
+    teamSize: "Individual or team events",
+    matchDuration: "4 minutes (two 2-minute periods)",
+    howToPlay: "Two judokas attempt to throw, pin, or submit the opponent using grappling techniques. An ippon from a perfect throw ends the bout immediately.",
+    objectiveOfGame: "Score ippon through a perfect throw, or accumulate more score through lesser techniques.",
+    scoringSystem: "Ippon (instant win), Waza-ari (half point). Two waza-ari equals ippon.",
+    playingSurface: "Judo tatami mat (14m x 14m competition area)",
+    averageLearningTime: "2-3 years for intermediate level",
+    origin: "Japan, 1882",
     equipment: [
       "Judo gi (uniform)",
       "Judo belt",
@@ -889,8 +1120,18 @@ export const sportsContent: Record<string, SportContent> = {
         "Develops confidence through controlled physical contact",
       ],
     },
+    skills: [
+      "Throw execution and timing",
+      "Breakfall safety technique",
+      "Groundwork and pins",
+      "Balance breaking (kuzushi)",
+    ],
     trainingPath:
       "Begin at a judo club or sports academy to learn breakfalls (ukemi), basic throws, and groundwork. Progress through belt grades (kyu/dan levels) and compete in district and state championships. Elite judokas can enter national camps and aim for Asian Games and Olympic selection via JFI.",
+    trainingFrequency: "4-5 days/week",
+    injuryRisk: "Medium",
+    popularityInIndia: "Niche but growing — Asian-level medalists emerging from North-East India",
+    popularityWorldwide: "Olympic staple with massive following in Japan, France, and South Korea",
     careerOpportunities: [
       "Professional judo athlete",
       "Judo coach and instructor",
@@ -936,6 +1177,7 @@ export const sportsContent: Record<string, SportContent> = {
         a: "Judo emphasizes throws and pins, while BJJ focuses more on ground submissions. Both share common grappling roots.",
       },
     ],
+    keyDifferences: "Judo's principle of 'maximum efficiency with minimum effort' (seiryoku zenyo) makes it unique — using an opponent's force against them. Unlike wrestling, judo scores ippon (instant win) from a perfect throw, creating explosive, decisive moments. The emphasis on throws over ground fighting distinguishes it from BJJ.",
   },
 
   kabaddi: {
@@ -947,6 +1189,14 @@ export const sportsContent: Record<string, SportContent> = {
     individualOrTeam: "team",
     olympic: false,
     beginnerDifficulty: "Moderate",
+    teamSize: "7 players per side",
+    matchDuration: "40 minutes (two 20-minute halves)",
+    howToPlay: "Two teams take turns sending a 'raider' into the opponent's half. The raider must tag defenders and return to their half in a single breath while chanting 'kabaddi'.",
+    objectiveOfGame: "Score points by raiding (tagging defenders) and defending (tackling raiders). Highest total wins.",
+    scoringSystem: "Touch point: 1 per defender tagged. Bonus point: 1 for crossing bonus line. Tackle point: 1 for stopping raider.",
+    playingSurface: "Kabaddi mat or court (13m x 10m)",
+    averageLearningTime: "1-2 years for competitive play",
+    origin: "Ancient India",
     equipment: [
       "Kabaddi mat or court",
       "Jersey and shorts",
@@ -964,8 +1214,18 @@ export const sportsContent: Record<string, SportContent> = {
         "Develops team coordination and trust",
       ],
     },
+    skills: [
+      "Raiding technique and touch points",
+      "Dubki and escape moves",
+      "Defensive chain tackle coordination",
+      "Breath control and stamina",
+    ],
     trainingPath:
       "Start at local kabaddi clubs or school teams to learn raiding techniques and defensive formations. Compete in district and state championships to gain match experience. Top players are scouted for Pro Kabaddi League and national team selection via AKFI.",
+    trainingFrequency: "5-6 days/week",
+    injuryRisk: "High",
+    popularityInIndia: "India's indigenous sport — PKL is the 2nd most-watched league after IPL",
+    popularityWorldwide: "Primarily South Asian but growing through international tournaments and diaspora",
     careerOpportunities: [
       "Professional kabaddi player (PKL and international)",
       "Kabaddi coaching",
@@ -1012,6 +1272,7 @@ export const sportsContent: Record<string, SportContent> = {
         a: "Absolutely. Women's kabaddi is growing rapidly, with PKL women's teams and international competitions offering equal opportunities.",
       },
     ],
+    keyDifferences: "Kabaddi is uniquely Indian — the only major team sport where a single player (raider) faces the entire opposing team while holding their breath and chanting 'kabaddi'. This breath-control element exists in no other sport. It combines the physicality of wrestling with the tactical coordination of team defense.",
   },
 
   hockey: {
@@ -1023,6 +1284,14 @@ export const sportsContent: Record<string, SportContent> = {
     individualOrTeam: "team",
     olympic: true,
     beginnerDifficulty: "Moderate",
+    teamSize: "11 players per side",
+    matchDuration: "60 minutes (four 15-minute quarters)",
+    howToPlay: "Two teams of eleven players use curved sticks to hit a ball into the opponent's goal. Only the goalkeeper can use their body to stop the ball.",
+    objectiveOfGame: "Score more goals than the opposing team within four quarters.",
+    scoringSystem: "One goal per ball entering the net. Highest total wins.",
+    playingSurface: "Artificial turf field (91.4m x 55m)",
+    averageLearningTime: "1-2 years for basic competence",
+    origin: "England, 19th century",
     equipment: [
       "Hockey stick",
       "Hockey ball",
@@ -1042,8 +1311,18 @@ export const sportsContent: Record<string, SportContent> = {
         "Builds discipline through rigorous training routines",
       ],
     },
+    skills: [
+      "Stick handling and dribbling",
+      "Drag flick and penalty corner skills",
+      "Positional play and game sense",
+      "Tackling and intercepting passes",
+    ],
     trainingPath:
       "Start at local hockey clubs or school programs to learn basic stick skills and game rules. Compete in district and state championships to gain competitive experience. Top players enter national camps and can aim for Hockey India League and Olympic selection via HI.",
+    trainingFrequency: "5-6 days/week",
+    injuryRisk: "Medium",
+    popularityInIndia: "India's most decorated Olympic sport — 8 gold medals, Odisha government backing",
+    popularityWorldwide: "Strong in Netherlands, Australia, Pakistan, and Germany — Olympic premier sport",
     careerOpportunities: [
       "Professional hockey player",
       "Hockey coaching and development",
@@ -1090,6 +1369,7 @@ export const sportsContent: Record<string, SportContent> = {
         a: "India's dominance was built on exceptional stick skills, speed, and tactical intelligence, with legends like Dhyan Chand leading the way.",
       },
     ],
+    keyDifferences: "Field hockey is the only major team sport played with an implement (stick), creating a unique skill set combining stick handling with running. Unlike football, the ball can travel at 150+ km/h off a drag flick, and 11 players per side on a turf field creates a fast-paced, continuous-flow game unlike any other.",
   },
 
   chess: {
@@ -1101,6 +1381,14 @@ export const sportsContent: Record<string, SportContent> = {
     individualOrTeam: "individual",
     olympic: false,
     beginnerDifficulty: "Easy",
+    teamSize: "Individual",
+    matchDuration: "10 minutes to 6+ hours depending on time control",
+    howToPlay: "Two players each control 16 pieces on an 8x8 board, trying to checkmate the opponent's king. Each piece type moves differently.",
+    objectiveOfGame: "Checkmate the opponent's king — put it under attack with no legal escape.",
+    scoringSystem: "Win: 1 point, Draw: 0.5 points, Loss: 0 points. Rating changes based on opponent strength.",
+    playingSurface: "Chess board on a table (64 squares, 8x8 grid)",
+    averageLearningTime: "6 months to 1 year for basic proficiency",
+    origin: "India, 6th century AD",
     equipment: [
       "Chess board and pieces",
       "Chess clock",
@@ -1118,8 +1406,18 @@ export const sportsContent: Record<string, SportContent> = {
         "Teaches patience, planning, and decision-making",
       ],
     },
+    skills: [
+      "Opening theory and preparation",
+      "Tactical pattern recognition",
+      "Endgame technique and calculation",
+      "Time management and mental stamina",
+    ],
     trainingPath:
       "Learn the basic rules and pieces through local chess clubs or online platforms. Compete in district and state chess championships to gain rating points. Top players aim for FIDE titles (FM, IM, GM) and can represent India in Chess Olympiad and World Championship events via AICF.",
+    trainingFrequency: "5-7 days/week",
+    injuryRisk: "Low",
+    popularityInIndia: "Viswanathan Anand made India a chess powerhouse — 80+ grandmasters",
+    popularityWorldwide: "Global mind sport with 600M+ players, massive online growth post-COVID",
     careerOpportunities: [
       "Professional chess player",
       "Chess coaching and academy",
@@ -1166,6 +1464,7 @@ export const sportsContent: Record<string, SportContent> = {
         a: "Study tactics, analyze your games, play regularly in rated tournaments, and consider working with a chess coach.",
       },
     ],
+    keyDifferences: "Chess is the only 'sport' played entirely in the mind — no physical movement beyond moving pieces. It's the only competitive activity where a 10-year-old can beat a 50-year-old through pure mental calculation. No other sport has a rating system (ELO) that so precisely measures skill across millions of players worldwide.",
   },
 
   skating: {
@@ -1177,6 +1476,14 @@ export const sportsContent: Record<string, SportContent> = {
     individualOrTeam: "both",
     olympic: false,
     beginnerDifficulty: "Moderate",
+    teamSize: "Individual or relay teams of 4",
+    matchDuration: "30 seconds to several hours depending on event",
+    howToPlay: "Skaters race or perform on inline, quad, or ice skates. Speed skating races cover set distances; artistic skating is judged on technique and presentation.",
+    objectiveOfGame: "Speed skating: fastest time wins. Artistic: highest score from judges based on technique and presentation.",
+    scoringSystem: "Speed events: timed races, fastest wins. Artistic: judge-scored on technical merit and artistic impression.",
+    playingSurface: "Skating rink or velodrome surface",
+    averageLearningTime: "1-2 years for competitive skill level",
+    origin: "Netherlands, 18th century",
     equipment: [
       "Inline or quad skates",
       "Helmet",
@@ -1195,8 +1502,18 @@ export const sportsContent: Record<string, SportContent> = {
         "Develops spatial awareness and focus",
       ],
     },
+    skills: [
+      "Balance and edge control",
+      "Speed technique and aerodynamics",
+      "Artistic expression and choreography",
+      "Cornering and overtaking tactics",
+    ],
     trainingPath:
       "Start with basic balance and skating drills at a local rink or skating club. Progress through district and state championships to gain competitive experience. Top skaters enter national championships (RSFI) and can aim for Asian Championships and World Skate Games.",
+    trainingFrequency: "4-5 days/week",
+    injuryRisk: "Medium",
+    popularityInIndia: "Strong speed skating tradition — 100+ Asian Championship medals",
+    popularityWorldwide: "Growing globally, ice skating huge in winter sports nations",
     careerOpportunities: [
       "Professional speed or artistic skater",
       "Skating coach and instructor",
@@ -1242,6 +1559,7 @@ export const sportsContent: Record<string, SportContent> = {
         a: "Not necessarily. Roller skating and ice skating are different disciplines. Choose the one that interests you or is more accessible in your area.",
       },
     ],
+    keyDifferences: "Skating is unique in being a sport where the athlete is on wheels or blades — gliding rather than running. Speed skating combines aerodynamic tuck positions with high-speed cornering at 50+ km/h. Artistic skating blends dance with athletics, making it the only sport where performance is scored on both technical skill and artistic presentation.",
   },
 
   archery: {
@@ -1253,6 +1571,14 @@ export const sportsContent: Record<string, SportContent> = {
     individualOrTeam: "both",
     olympic: true,
     beginnerDifficulty: "Moderate",
+    teamSize: "Individual or team events",
+    matchDuration: "1-3 hours depending on format",
+    howToPlay: "Archers shoot arrows at a target from set distances (70m in Olympic recurve). Points are scored based on how close the arrow lands to the center.",
+    objectiveOfGame: "Score the highest total points by landing arrows closest to the bullseye.",
+    scoringSystem: "10 points for innermost ring, decreasing to 1 for outermost. Highest total score wins.",
+    playingSurface: "Outdoor range with flat shooting line and target butts",
+    averageLearningTime: "1-2 years for consistent accuracy",
+    origin: "Prehistoric era, competitive form from 14th century",
     equipment: [
       "Recurve or compound bow",
       "Arrows",
@@ -1271,8 +1597,18 @@ export const sportsContent: Record<string, SportContent> = {
         "Builds confidence through precision improvement",
       ],
     },
+    skills: [
+      "Anchor point consistency",
+      "Release and follow-through technique",
+      "Wind reading and adjustment",
+      "Mental focus and shot routine",
+    ],
     trainingPath:
       "Begin at a local archery club or range to learn proper stance, draw, and release technique. Compete in district and state archery championships to build competitive experience. Elite archers can aim for national camps and Olympic selection via AAI.",
+    trainingFrequency: "5-6 days/week",
+    injuryRisk: "Low",
+    popularityInIndia: "Strong in Jharkhand and North-East — Deepika Kumari was world No. 1",
+    popularityWorldwide: "Olympic staple with growing popularity in South Korea, USA, and Europe",
     careerOpportunities: [
       "Professional archer",
       "Archery coaching and range management",
@@ -1318,6 +1654,7 @@ export const sportsContent: Record<string, SportContent> = {
         a: "Recurve bows are used in Olympic competition and rely on arm strength, while compound bows use a pulley system for increased power and accuracy.",
       },
     ],
+    keyDifferences: "Archery is the only sport where athletes aim at a stationary target from a fixed distance — no opponent interference. It's a duel of mental focus, not physical contact. The difference between gold and elimination can be 1mm at 70m, making it the most precision-dependent Olympic sport with no equivalent in skill demand.",
   },
 
   shooting: {
@@ -1329,6 +1666,14 @@ export const sportsContent: Record<string, SportContent> = {
     individualOrTeam: "both",
     olympic: true,
     beginnerDifficulty: "Challenging",
+    teamSize: "Individual or team events",
+    matchDuration: "1-3 hours depending on event",
+    howToPlay: "Shooters aim at targets from various distances using different firearms. In Olympic events, rifle and pistol shooters fire a set number of shots at stationary targets.",
+    objectiveOfGame: "Score the highest total points by placing shots closest to the center of the target.",
+    scoringSystem: "Points scored per shot based on proximity to center (10.9 maximum in Olympic events). Highest total wins.",
+    playingSurface: "Indoor or outdoor shooting range with electronic target systems",
+    averageLearningTime: "2-3 years for competitive precision",
+    origin: "19th century, competitive sport from 1896 Olympics",
     equipment: [
       "Air rifle or pistol",
       "Competition ammunition",
@@ -1347,8 +1692,18 @@ export const sportsContent: Record<string, SportContent> = {
         "Develops patience and precision-oriented thinking",
       ],
     },
+    skills: [
+      "Breath control and trigger squeeze",
+      "Sight alignment and aiming stability",
+      "Mental focus and shot routine",
+      "Wind and environmental adjustment",
+    ],
     trainingPath:
       "Begin with air rifle or air pistol at a local shooting range to learn safety, stance, and aiming. Compete in district and state shooting championships to build competitive experience. Elite shooters can aim for national championships and Olympic selection via NRAI.",
+    trainingFrequency: "4-5 days/week",
+    injuryRisk: "Low",
+    popularityInIndia: "Abhinav Bindra's gold sparked growth — Manu Bhaker is the new face",
+    popularityWorldwide: "Olympic core sport, massive in USA, China, South Korea, and Germany",
     careerOpportunities: [
       "Professional shooter (Olympic and international)",
       "Shooting coach and range instructor",
@@ -1395,6 +1750,7 @@ export const sportsContent: Record<string, SportContent> = {
         a: "Good vision helps, but shooting glasses can correct vision issues. The skill is more about focus, stability, and technique than perfect eyesight.",
       },
     ],
+    keyDifferences: "Shooting is the only Olympic sport where athletes must control their heartbeat — shooters aim with heart rates as low as 40 BPM. No other sport demands such extreme physiological stillness combined with pinpoint precision. The mental battle is internal, with no external opponent, making it unique in competitive sports.",
   },
 
   yoga: {
@@ -1406,6 +1762,14 @@ export const sportsContent: Record<string, SportContent> = {
     individualOrTeam: "both",
     olympic: false,
     beginnerDifficulty: "Easy",
+    teamSize: "Individual",
+    matchDuration: "15-90 minutes per session",
+    howToPlay: "Practitioners perform a series of physical postures (asanas), breathing techniques (pranayama), and meditation. Competitive yoga is judged on technique, flexibility, and balance.",
+    objectiveOfGame: "Achieve physical and mental balance through postures, breathing, and meditation. In competition, score highest on technique and difficulty.",
+    scoringSystem: "Competitive: judged on posture accuracy, flexibility, balance, and duration. Traditional: no formal scoring.",
+    playingSurface: "Yoga mat on any flat surface, indoor or outdoor",
+    averageLearningTime: "3-6 months for basic postures, years for advanced practice",
+    origin: "Ancient India, 3000 BC",
     equipment: [
       "Yoga mat",
       "Comfortable clothing",
@@ -1423,8 +1787,18 @@ export const sportsContent: Record<string, SportContent> = {
         "Promotes emotional balance and self-awareness",
       ],
     },
+    skills: [
+      "Asana alignment and precision",
+      "Pranayama (breathing) technique",
+      "Flexibility and balance control",
+      "Meditation and mental focus",
+    ],
     trainingPath:
       "Begin with basic yoga classes at a local studio or online to learn foundational postures and breathing. Progress through regular practice to intermediate and advanced asanas. Competitive yogis can participate in state and national championships and aim for Asian and World Yogasana Championships.",
+    trainingFrequency: "5-7 days/week",
+    injuryRisk: "Low",
+    popularityInIndia: "India's gift to the world — 300M+ global practitioners, International Yoga Day",
+    popularityWorldwide: "Global wellness phenomenon — most practiced mind-body practice worldwide",
     careerOpportunities: [
       "Yoga instructor and studio owner",
       "Corporate wellness trainer",
@@ -1470,6 +1844,7 @@ export const sportsContent: Record<string, SportContent> = {
         a: "For general health benefits, 3-5 sessions per week of 30-60 minutes is recommended. Consistency is more important than intensity.",
       },
     ],
+    keyDifferences: "Yoga is the only sport where the competition is against your own body's limitations — no opponent, no ball, no scoreboard in traditional practice. It uniquely integrates physical postures, breath control, and meditation into a single discipline. Unlike any other sport, it improves both athletic performance and mental well-being simultaneously.",
   },
 
   gymnastics: {
@@ -1481,6 +1856,14 @@ export const sportsContent: Record<string, SportContent> = {
     individualOrTeam: "both",
     olympic: true,
     beginnerDifficulty: "Challenging",
+    teamSize: "Individual or team of 4-5",
+    matchDuration: "30 seconds to 90 seconds per routine",
+    howToPlay: "Athletes perform routines on various apparatus (floor, vault, beam, bars for women; floor, vault, rings, pommel horse, parallel bars, high bar for men). Routines are scored on difficulty and execution.",
+    objectiveOfGame: "Execute routines with maximum difficulty and minimal errors to achieve the highest score.",
+    scoringSystem: "Difficulty score (D-score) + Execution score (E-score). Highest total wins. Deductions for errors.",
+    playingSurface: "Gymnastics mats and specialized apparatus on competition floor",
+    averageLearningTime: "3-5 years to reach competitive level",
+    origin: "Ancient Greece, modern form from 19th century",
     equipment: [
       "Gymnastics leotard",
       "Gymnastics mat",
@@ -1499,8 +1882,18 @@ export const sportsContent: Record<string, SportContent> = {
         "Develops courage to attempt challenging moves",
       ],
     },
+    skills: [
+      "Flexibility and split technique",
+      "Acrobatic tumbling and vaulting",
+      "Balance beam and apparatus control",
+      "Strength-to-bodyweight movements",
+    ],
     trainingPath:
       "Begin at a gymnastics academy with foundational flexibility, strength, and basic skill training. Progress through age-group competitions at district and state levels. Elite gymnasts can enter national camps and aim for Asian Games and Olympic selection via GFI.",
+    trainingFrequency: "5-6 days/week",
+    injuryRisk: "High",
+    popularityInIndia: "Dipa Karmakar inspired a generation — Khelo India boosting participation",
+    popularityWorldwide: "Olympic marquee sport, massive in USA, China, Russia, and Japan",
     careerOpportunities: [
       "Professional gymnast",
       "Gymnastics coaching and academy management",
@@ -1546,5 +1939,295 @@ export const sportsContent: Record<string, SportContent> = {
         a: "Yes, adults can start gymnastics, though learning advanced skills takes longer. Many gyms offer adult beginner classes focused on fitness and basic skills.",
       },
     ],
+    keyDifferences: "Gymnastics is the only sport where athletes perform acrobatic feats — flips, twists, and somersaults — on specialized apparatus. The combination of flexibility, strength, and spatial awareness at heights creates a unique risk-reward dynamic. A perfect 10 requires flawless execution, making it the most technically demanding Olympic sport.",
+  },
+
+  volleyball: {
+    tagline: "High-energy net sport — fast rallies, big spikes, and explosive teamwork.",
+    about:
+      "Volleyball is a team sport where two teams of six players each try to ground the ball on the opponent's side of the net. It is hugely popular in India's school and college circuits and is gaining professional traction with the Pro Volleyball League. It demands quick reflexes, vertical jumping ability, and seamless team coordination.",
+    rules:
+      "Each team has six players on court. Teams alternate hitting the ball over the net, with each side allowed a maximum of three touches before returning. Points are scored when the ball lands on the opponent's court or the opponent commits a fault. Sets are played to 25 points (best of 5).",
+    individualOrTeam: "team",
+    olympic: true,
+    beginnerDifficulty: "Easy",
+    teamSize: "6 players per side",
+    matchDuration: "60-90 minutes (best of 5 sets to 25 points)",
+    howToPlay: "Two teams of six players each try to ground the ball on the opponent's side of the net. Each side is allowed a maximum of three touches before returning the ball.",
+    objectiveOfGame: "Win rallies by grounding the ball on the opponent's court or forcing errors. Best of 5 sets wins.",
+    scoringSystem: "Rally scoring to 25 points per set (win by 2). Best of 5 sets wins the match.",
+    playingSurface: "Indoor court with hard surface (18m x 9m)",
+    averageLearningTime: "6 months to 1 year for basic skills",
+    origin: "USA, 1895",
+    equipment: [
+      "Volleyball",
+      "Knee pads",
+      "Sports shoes with good grip",
+      "Jersey and shorts",
+    ],
+    benefits: {
+      physical: [
+        "Builds explosive leg power and vertical jump",
+        "Improves hand-eye coordination and reflexes",
+        "Enhances cardiovascular endurance through constant movement",
+      ],
+      mental: [
+        "Develops quick decision-making under pressure",
+        "Teaches trust and reliance on teammates",
+        "Builds competitive resilience — momentum shifts fast",
+      ],
+    },
+    skills: [
+      "Serving (underhand, overhand, jump serve)",
+      "Spiking and attacking techniques",
+      "Blocking and defensive positioning",
+      "Setting and playmaking coordination",
+    ],
+    trainingPath:
+      "Start with school or college teams to learn fundamentals — serving, passing, setting, and spiking. Join local volleyball clubs for structured coaching. Compete in inter-school and district tournaments. State-level volleyball federations conduct selection trials for national championships and Pro Volleyball League.",
+    trainingFrequency: "4-5 days/week",
+    injuryRisk: "Medium",
+    popularityInIndia: "Very popular in school and college circuits; growing professional scene",
+    popularityWorldwide: "Top 5 globally, massive in Brazil, Japan, Italy, Russia",
+    careerOpportunities: [
+      "Professional player (domestic and international leagues)",
+      "Volleyball coaching and academy training",
+      "Sports management and event organisation",
+      "Physical education and school coaching",
+    ],
+    competitions: {
+      state: [
+        "State Volleyball Championship",
+        "Inter-University Volleyball Tournament",
+      ],
+      national: [
+        "Senior National Volleyball Championship",
+        "Pro Volleyball League",
+        "Vuclip National Volleyball League",
+      ],
+      international: [
+        "FIVB World Championship",
+        "Asian Games Volleyball",
+        "AVC Asian Volleyball Championship",
+      ],
+    },
+    majorTournaments: [
+      "Pro Volleyball League (India)",
+      "FIVB World Championship",
+      "Asian Games Volleyball",
+    ],
+    funFacts: [
+      "Volleyball was invented in 1895 by William G. Morgan as a less intense alternative to basketball.",
+      "India's Pro Volleyball League launched in 2019, featuring teams from 6 cities.",
+      "The longest volleyball rally in professional history lasted 47 minutes.",
+    ],
+    faqs: [
+      {
+        q: "Is volleyball good for height growth?",
+        a: "Volleyball involves jumping and stretching, which promotes healthy bone development, though genetics remain the primary factor in height.",
+      },
+      {
+        q: "Can I play volleyball with近视 (nearsightedness)?",
+        a: "Yes, contact lenses or sports glasses work well. Many competitive players wear corrective lenses during play.",
+      },
+      {
+        q: "What position should a beginner start with?",
+        a: "Outside hitter or back-row defender — these positions offer the best mix of involvement and skill development for beginners.",
+      },
+    ],
+    keyDifferences: "Volleyball is the only major team sport where the ball never touches the ground during rallies — every point is a continuous aerial exchange. Unlike football or basketball, there is no direct physical contact between opponents, making it purely skill-based. The rotation rule ensures every player plays both offense and defense.",
+  },
+
+  cycling: {
+    tagline: "Endurance sport of legs, lungs, and the open road.",
+    about:
+      "Cycling is both a popular recreational activity and a competitive endurance sport in India. From weekend骑行 on city roads to professional track and road racing, cycling builds exceptional cardiovascular fitness. India has a growing cycling culture with events like the Tour of Nilgiris and increasing urban cycling movements.",
+    rules:
+      "In road cycling, competitors race on open or closed roads over set distances. Track cycling takes place on velodromes with specific event formats (sprint, pursuit, keirin). Mountain biking involves off-road terrain. Timed events measure speed or distance; road races measure finishing position.",
+    individualOrTeam: "both",
+    olympic: true,
+    beginnerDifficulty: "Easy",
+    teamSize: "Individual or team of 4-8",
+    matchDuration: "30 minutes to 5+ hours depending on event",
+    howToPlay: "Competitors ride bicycles on roads, tracks, or off-road terrain. Events range from short sprints to multi-stage races covering thousands of kilometers.",
+    objectiveOfGame: "Be the first to cross the finish line or complete the course in the fastest time.",
+    scoringSystem: "Road: first to finish wins. Track: timed events or head-to-head sprints. Points races: accumulated lap and sprint points.",
+    playingSurface: "Roads, velodromes, or off-road trails",
+    averageLearningTime: "6 months to 1 year for fitness cycling, 2-3 years for competitive",
+    origin: "Germany, 19th century",
+    equipment: [
+      "Road or mountain bicycle",
+      "Helmet",
+      "Cycling shorts and jersey",
+      "Water bottles and repair kit",
+      "Cycling shoes (optional)",
+    ],
+    benefits: {
+      physical: [
+        "Builds exceptional cardiovascular endurance",
+        "Strengthens legs, core, and glutes",
+        "Low-impact on joints — sustainable long-term fitness",
+      ],
+      mental: [
+        "Reduces stress through rhythmic, meditative pedalling",
+        "Builds mental toughness for long-distance rides",
+        "Boosts mood through endorphin release from sustained effort",
+      ],
+    },
+    skills: [
+      "Cadence control and gear shifting",
+      "Hill climbing and descent techniques",
+      "Group riding and drafting strategy",
+      "Bike maintenance and roadside repair",
+    ],
+    trainingPath:
+      "Start with regular cycling for fitness and commute. Join local cycling groups for group rides and technique tips. Progress to competitive events — time trials, gran fondos, and state championships. Elite riders train for national championships and international tours under Cycling Federation of India.",
+    trainingFrequency: "5-6 days/week",
+    injuryRisk: "Low",
+    popularityInIndia: "Growing urban fitness culture; competitive scene developing",
+    popularityWorldwide: "Massive globally — Tour de France is iconic; billion+ riders worldwide",
+    careerOpportunities: [
+      "Professional road or track cyclist",
+      "Cycling coaching and tour guiding",
+      "Bicycle mechanics and shop ownership",
+      "Sports physiotherapy for cyclists",
+    ],
+    competitions: {
+      state: [
+        "State Road Cycling Championship",
+        "State Track Cycling Championship",
+      ],
+      national: [
+        "National Road Cycling Championship",
+        "Tour of Nilgiris",
+        "National Track Cycling Championship",
+      ],
+      international: [
+        "UCI Road World Championships",
+        "Asian Cycling Championships",
+        "Tour de France (invitation-based)",
+      ],
+    },
+    majorTournaments: [
+      "Tour of Nilgiris (India)",
+      "UCI Road World Championships",
+      "Asian Cycling Championships",
+    ],
+    funFacts: [
+      "The Tour de France covers approximately 3,500 km over 23 days — riders burn up to 6,000 calories daily.",
+      "India's Tour of Nilgiris is one of Asia's toughest multi-stage bicycle races.",
+      "A professional cyclist's heart rate stays at 70-90% of maximum for hours — a level most people can only sustain for minutes.",
+    ],
+    faqs: [
+      {
+        q: "What type of bicycle should a beginner buy?",
+        a: "A hybrid bicycle (₹15,000–₹30,000) is ideal for beginners — it handles both road and light trail riding comfortably.",
+      },
+      {
+        q: "Is cycling safe on Indian roads?",
+        a: "Use dedicated cycling lanes where available, wear a helmet, use lights, and ride during off-peak hours. Group rides are safer than solo riding.",
+      },
+      {
+        q: "Can cycling help with weight loss?",
+        a: "Yes, cycling burns 400-800 calories per hour depending on intensity, making it one of the most effective fat-burning exercises.",
+      },
+    ],
+    keyDifferences: "Cycling is unique as both a daily transport mode and a competitive sport. Unlike most sports, it covers enormous distances (200-300 km/day in professional racing) over hours, testing sustained aerobic capacity. It is one of the few sports where equipment choice significantly affects performance.",
+  },
+
+  rugby: {
+    tagline: "Full-contact team sport — raw power meets tactical precision.",
+    about:
+      "Rugby is a high-intensity, full-contact team sport that combines the physicality of American football with continuous play. While not yet mainstream in India, rugby is growing through the Rugby India federation and university circuits. The sport is known for its emphasis on sportsmanship — players shake hands regardless of outcome.",
+    rules:
+      "Two teams of 15 players (union) or 13 (league) compete to carry, pass, or kick the ball to score tries (touching the ball down in the opponent's in-goal area) or goals. The ball can only be passed laterally or backward. Tackles are made below the shoulders. A match consists of two 40-minute halves.",
+    individualOrTeam: "team",
+    olympic: true,
+    beginnerDifficulty: "Challenging",
+    teamSize: "15 players (union) or 13 players (league)",
+    matchDuration: "80 minutes (two 40-minute halves)",
+    howToPlay: "Two teams compete to carry, pass, or kick the ball to score tries by touching the ball down in the opponent's in-goal area. The ball can only be passed laterally or backward.",
+    objectiveOfGame: "Score more points than the opposing team through tries, conversions, penalties, and drop goals.",
+    scoringSystem: "Try: 5 points, Conversion: 2 points, Penalty kick: 3 points, Drop goal: 3 points",
+    playingSurface: "Grass or turf field (100m x 70m)",
+    averageLearningTime: "2-3 years for competitive proficiency",
+    origin: "England, 1823",
+    equipment: [
+      "Rugby ball",
+      "Mouthguard",
+      "Rugby boots (studded)",
+      "Scrum cap (optional)",
+      "Padded jersey",
+    ],
+    benefits: {
+      physical: [
+        "Builds full-body strength and explosive power",
+        "Develops exceptional cardiovascular endurance",
+        "Improves tackling, carrying, and functional strength",
+      ],
+      mental: [
+        "Teaches discipline and controlled aggression",
+        "Develops split-second tactical decision-making",
+        "Builds incredible team bonding and brotherhood",
+      ],
+    },
+    skills: [
+      "Tackling technique and ball carrying",
+      "Passing accuracy under pressure",
+      "Rucking and mauling at the breakdown",
+      "Positional awareness and defensive structure",
+    ],
+    trainingPath:
+      "Start with touch or tag rugby (non-contact) to learn ball handling and rules. Progress to contact rugby at school or university clubs. Join state-level rugby unions for structured coaching. Represent India through Rugby India's national team pathway.",
+    trainingFrequency: "4-5 days/week",
+    injuryRisk: "High",
+    popularityInIndia: "Niche but growing — strong university circuit",
+    popularityWorldwide: "Massive in New Zealand, Australia, UK, France, South Africa",
+    careerOpportunities: [
+      "Professional player (domestic and international leagues)",
+      "Rugby coaching and development officer",
+      "Sports strength and conditioning coaching",
+      "Match officiating and refereeing",
+    ],
+    competitions: {
+      state: [
+        "State Rugby Championship",
+        "University Rugby League",
+      ],
+      national: [
+        "All India Rugby Championship",
+        "Rugby India National League",
+      ],
+      international: [
+        "Asian Rugby Championship",
+        "Rugby World Cup",
+        "HSBC World Rugby Sevens Series",
+      ],
+    },
+    majorTournaments: [
+      "All India Rugby Championship",
+      "Asian Rugby Championship",
+      "Rugby World Cup",
+    ],
+    funFacts: [
+      "Rugby was invented in 1823 when William Webb Ellis picked up the ball and ran during a football match at Rugby School.",
+      "The Rugby World Cup final is one of the most-watched sporting events globally, with over 1 billion viewers.",
+      "Rugby players are known for cleaning the changing room after matches — a tradition of humility.",
+    ],
+    faqs: [
+      {
+        q: "Is rugby safe for beginners?",
+        a: "Start with touch or tag rugby (non-contact) before progressing to contact. Proper coaching on tackling technique significantly reduces injury risk.",
+      },
+      {
+        q: "How is rugby different from American football?",
+        a: "Rugby has continuous play (no downs), no protective padding, and the ball is smaller and more rounded. Rugby emphasizes fitness and endurance more than explosive bursts.",
+      },
+      {
+        q: "Can women play rugby?",
+        a: "Absolutely — women's rugby is one of the fastest-growing sports globally. Touch rugby is a great entry point, and full-contact women's rugby is an Olympic sport.",
+      },
+    ],
+    keyDifferences: "Rugby is the only major sport where the ball can be passed only backward, creating a unique flowing attack dynamic. Unlike football (soccer), it allows full-contact tackling and the ball can be carried. Unlike American football, it has continuous play without breaks, requiring extraordinary fitness. The culture of respect — players socialise together after brutal matches — sets it apart.",
   },
 };

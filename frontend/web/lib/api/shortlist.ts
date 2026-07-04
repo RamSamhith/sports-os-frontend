@@ -15,7 +15,7 @@ export async function getMyShortlistPopulated(): Promise<ApiResponse<PopulatedSh
 }
 
 export async function addToShortlist(
-  itemType: 'academy' | 'coach',
+  itemType: 'academy' | 'coach' | 'sport',
   itemId: string,
 ): Promise<ApiResponse<ShortlistItem>> {
   return post<ShortlistItem>('/shortlist', { itemType, itemId });
@@ -28,7 +28,7 @@ export async function removeFromShortlistById(
 }
 
 export async function removeFromShortlistBySlug(
-  itemType: 'academy' | 'coach',
+  itemType: 'academy' | 'coach' | 'sport',
   slug: string,
 ): Promise<ApiResponse<{ itemType: string; itemId: string }>> {
   return del<{ itemType: string; itemId: string }>(`/shortlist/by-slug/${itemType}/${slug}`);
@@ -39,7 +39,7 @@ export async function clearShortlist(): Promise<ApiResponse<{ cleared: boolean }
 }
 
 export async function checkShortlist(
-  itemType: 'academy' | 'coach',
+  itemType: 'academy' | 'coach' | 'sport',
   slug: string,
 ): Promise<ApiResponse<{ inShortlist: boolean }>> {
   return get<{ inShortlist: boolean }>(`/shortlist/check/${itemType}/${slug}`);

@@ -99,7 +99,7 @@ async function ensureRefresh(): Promise<string> {
 
 // ─── Timeout ─────────────────────────────────────────────────
 
-const REQUEST_TIMEOUT_MS = 30_000;
+const REQUEST_TIMEOUT_MS = 60_000;
 
 // ─── Core Request Function ───────────────────────────────────
 
@@ -222,7 +222,7 @@ async function request<T>(
       ok: false,
       error: {
         code: isAbort ? 'TIMEOUT' : 'NETWORK_ERROR',
-        message: isAbort ? 'Request timed out. Please try again.' : message,
+        message: isAbort ? 'Request timed out. Please try again.' : 'Network error. Please check your connection and try again.',
       },
     };
   }
