@@ -158,10 +158,6 @@ export function trackPasswordResetSuccess() {
   track('password_reset_success');
 }
 
-export function trackOtpLogin() {
-  track('otp_login');
-}
-
 // ─── Feedback Events ────────────────────────────────────────
 
 export function trackFeedback(type: string, message: string, page?: string) {

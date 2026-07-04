@@ -2,19 +2,17 @@
 
 import * as React from 'react';
 import { useRouter } from 'next/navigation';
-import { Search, X, Loader2, MapPin, Trophy, Users, School, ArrowRight } from 'lucide-react';
+import { Search, X, Loader2, MapPin, Trophy, School, ArrowRight } from 'lucide-react';
 import { cn } from '@/lib/utils/cn';
 import { useDebounce } from '@/lib/hooks/use-debounce';
 import { getAcademies } from '@/lib/api/academies';
-import { getCoaches } from '@/lib/api/coaches';
 import { listSports } from '@/lib/api/sports';
 import type { Academy } from '@/types/domain/academy';
-import type { Coach } from '@/types/domain/coach';
 import type { Sport } from '@/types/domain/sport';
 
 interface Suggestion {
   id: string;
-  type: 'academy' | 'coach' | 'sport' | 'city' | 'navigation';
+  type: 'academy' | 'sport' | 'city' | 'navigation';
   title: string;
   subtitle?: string;
   href: string;
@@ -23,7 +21,6 @@ interface Suggestion {
 
 const GROUP_LABELS: Record<string, string> = {
   academy: 'ACADEMIES',
-  coach: 'COACHES',
   sport: 'SPORTS',
   city: 'CITIES',
 };
@@ -74,7 +71,6 @@ interface SearchAutocompleteProps {
   onSelect?: (href: string) => void;
   autoFocus?: boolean;
   initialValue?: string;
-  hideCoaches?: boolean;
 }
 
 export function SearchAutocomplete({
@@ -84,7 +80,6 @@ export function SearchAutocomplete({
   onSelect,
   autoFocus = false,
   initialValue = '',
-  hideCoaches = false,
 }: SearchAutocompleteProps) {
   const router = useRouter();
   const [query, setQuery] = React.useState(initialValue);
@@ -95,7 +90,6 @@ export function SearchAutocomplete({
   const inputRef = React.useRef<HTMLInputElement>(null);
   const listRef = React.useRef<HTMLDivElement>(null);
   const academiesRef = React.useRef<Academy[]>([]);
-  const coachesRef = React.useRef<Coach[]>([]);
   const sportsRef = React.useRef<Sport[]>([]);
   const dataLoadedRef = React.useRef(false);
   const containerRef = React.useRef<HTMLDivElement>(null);
@@ -112,23 +106,13 @@ export function SearchAutocomplete({
       if (dataLoadedRef.current) return;
       setLoading(true);
       try {
-        const promises: Promise<unknown>[] = [
+        const [academiesRes, sportsRes] = await Promise.all([
           getAcademies({ pageSize: 200 }),
           listSports({ status: 'published', limit: 100 }),
-        ];
-        if (!hideCoaches) {
-          promises.splice(1, 0, getCoaches({ pageSize: 200 }));
-        }
-        const results = await Promise.all(promises);
+        ]);
         if (cancelled) return;
-        const academiesRes = results[0] as Awaited<ReturnType<typeof getAcademies>>;
-        const sportsRes = results[hideCoaches ? 1 : 2] as Awaited<ReturnType<typeof listSports>>;
         if (academiesRes.ok) academiesRef.current = academiesRes.data.items;
         if (sportsRes.ok) sportsRef.current = sportsRes.data.items;
-        if (!hideCoaches) {
-          const coachesRes = results[1] as Awaited<ReturnType<typeof getCoaches>>;
-          if (coachesRes.ok) coachesRef.current = coachesRes.data.items;
-        }
         dataLoadedRef.current = true;
       } catch {
         // Data will be empty
@@ -138,7 +122,7 @@ export function SearchAutocomplete({
     }
     loadData();
     return () => { cancelled = true; };
-  }, [hideCoaches]);
+  }, []);
 
   React.useEffect(() => {
     if (!debouncedQuery.trim() || debouncedQuery.trim().length < 2) {
@@ -166,26 +150,6 @@ export function SearchAutocomplete({
           href: `/academies/${a.slug}`,
           icon: <School className="h-4 w-4" />,
         });
-      }
-    }
-
-    if (!hideCoaches) {
-      for (const c of coachesRef.current) {
-        if (seen.has(`coach:${c.id}`)) continue;
-        const titleMatch = c.name.toLowerCase().includes(q);
-        const cityMatch = c.location?.city?.toLowerCase().includes(q);
-        const sportMatch = c.sportsCoached?.some(s => s.toLowerCase().includes(q));
-        if (titleMatch || cityMatch || sportMatch) {
-          seen.add(`coach:${c.id}`);
-          results.push({
-            id: c.id,
-            type: 'coach',
-            title: c.name,
-            subtitle: `${c.location?.city ?? ''} · ${c.experienceYears}+ yrs`,
-            href: `/coaches/${c.slug}`,
-            icon: <Users className="h-4 w-4" />,
-          });
-        }
       }
     }
 
@@ -233,7 +197,7 @@ export function SearchAutocomplete({
 
     setSuggestions(limited);
     setActiveIndex(-1);
-  }, [debouncedQuery, hideCoaches]);
+  }, [debouncedQuery]);
 
   React.useEffect(() => {
     if (!open) return;

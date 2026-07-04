@@ -44,6 +44,7 @@ let _logged = false;
 export function logVersionBanner(): void {
   if (_logged || typeof window === 'undefined') return;
   _logged = true;
+  if (process.env.NODE_ENV === 'production') return;
   console.log(
     `%c SportsOS Frontend v${APP_VERSION} %c build ${BUILD_HASH} `,
     'background:#2563eb;color:#fff;padding:2px 6px;border-radius:3px 0 0 3px;font-weight:600',

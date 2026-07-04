@@ -1,8 +1,13 @@
+'use client';
+
 import dynamic from 'next/dynamic';
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { Hero } from '@/components/home/hero';
 import { PersonalizedHome } from '@/components/home/personalized-home';
 import { TrustSection } from '@/components/home/trust-section';
 import { siteConfig } from '@/config/site';
+import { useAuth } from '@/lib/hooks/use-auth';
 
 const FeaturedSports = dynamic(
   () => import('@/components/home/featured-sports').then((m) => m.FeaturedSports),
@@ -15,6 +20,18 @@ const CitiesSection = dynamic(
 );
 
 export default function HomePage() {
+  const router = useRouter();
+  const { isAuthenticated, isLoading, onboardingCompleted } = useAuth();
+
+  useEffect(() => {
+    if (isLoading) return;
+    if (isAuthenticated && !onboardingCompleted) {
+      router.replace('/onboarding/role');
+    }
+  }, [isLoading, isAuthenticated, onboardingCompleted, router]);
+
+  if (isAuthenticated && !onboardingCompleted) return null;
+
   const jsonLd = {
     '@context': 'https://schema.org',
     '@type': 'WebSite',

@@ -70,8 +70,7 @@ export default function RegisterPage() {
   }, [googleAuth.loaded]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Safety-net redirect: fires when auth state changes but the handler
-  // did NOT navigate (e.g. edit/verify flow where setAuth is a no-op).
-  // The handler is the primary navigation source for fresh registrations.
+  // did NOT navigate. The handler is the primary navigation source for fresh registrations.
   useEffect(() => {
     if (isLoading) return;
     if (!isAuthenticated) return;
@@ -210,16 +209,11 @@ export default function RegisterPage() {
         return;
       }
 
-      // Registration requires email verification
-      if (res.data.requiresVerification) {
-        try {
-          sessionStorage.setItem('sportsos:verify-email', res.data.email);
-        } catch { /* ignore */ }
-        setIsSubmitting(false);
-        router.push('/verify/signup');
-        return;
-      }
-
+      try {
+        localStorage.setItem('sportsos:auth-token', res.data.token);
+      } catch { /* ignore */ }
+      setProfile({ name: res.data.user.name, email: res.data.user.email, phone: res.data.user.phone ?? '' });
+      setAuth(true, res.data.user.onboardingCompleted ?? false);
       setIsSubmitting(false);
     } catch {
       setServerError('Network error. Please try again.');

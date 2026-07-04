@@ -12,8 +12,8 @@ const trustItems: Array<{ icon: LucideIcon; title: string; description: string }
   },
   {
     icon: BadgeCheck,
-    title: 'Verified Coaches',
-    description: 'All coaches are background-checked and certified by sports federations.',
+    title: 'Verified Listings',
+    description: 'Coaches and programs are background-checked and certified by sports federations.',
   },
   {
     icon: Star,
@@ -32,7 +32,7 @@ export function TrustSection() {
     <Container size="lg">
       <div className="mb-4">
         <h2 className="text-xl font-semibold tracking-tight md:text-2xl">Why SportsOS</h2>
-        <p className="text-muted-foreground text-xs">Every academy and coach is verified for quality and authenticity.</p>
+        <p className="text-muted-foreground text-xs">Every academy is verified for quality and authenticity.</p>
       </div>
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
         {trustItems.map((item) => (

@@ -362,7 +362,7 @@ export function DesignContent() {
               <SearchBar
                 value={search}
                 onValueChange={setSearch}
-                placeholder="Search academies, coaches, sports…"
+                placeholder="Search academies, sports…"
                 shortcut="⌘K"
               />
               <SearchBar value={searchSm} onValueChange={setSearchSm} size="sm" placeholder="Compact search" />

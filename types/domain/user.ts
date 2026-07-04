@@ -1,6 +1,6 @@
 import type { ThemePreference } from '@/config/theme';
 
-export type UserRole = 'athlete' | 'parent' | 'coach' | 'academy_owner' | 'admin';
+export type UserRole = 'athlete' | 'parent' | 'admin';
 
 export interface UserPreferences {
   defaultSportInterests?: string[]; // sport slugs

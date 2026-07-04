@@ -8,11 +8,12 @@ import { EnquiryForm } from '@/components/enquiry/enquiry-form';
 import { Breadcrumbs } from '@/components/seo/breadcrumbs';
 import { ProfileSkeleton } from '@/components/feedback/skeletons';
 import { getAcademy } from '@/lib/api/academies';
-import { getCoach } from '@/lib/api/coaches';
+import { Button } from '@/components/ui/button';
+import Link from 'next/link';
 
 export default function EnquiryPage() {
   const params = useParams<{ type: string; id: string }>();
-  const type = params.type as 'academy' | 'coach';
+  const type = params.type as 'academy';
   const slug = params.id;
 
   const [target, setTarget] = React.useState<{ name: string; id: string } | null>(null);
@@ -20,15 +21,15 @@ export default function EnquiryPage() {
   const [notFound, setNotFound] = React.useState(false);
 
   React.useEffect(() => {
-    if (type !== 'academy' && type !== 'coach') { setNotFound(true); return; }
+    if (type !== 'academy') { setNotFound(true); return; }
     let cancelled = false;
 
     const fetchTarget = async () => {
       try {
-        const res = type === 'academy' ? await getAcademy(slug) : await getCoach(slug);
+        const res = await getAcademy(slug);
         if (cancelled) return;
         if (res.ok && res.data) {
-          setTarget({ name: (res.data as { name: string }).name, id: res.data.id });
+          setTarget({ name: res.data.name, id: res.data.id });
         } else {
           setNotFound(true);
         }
@@ -46,7 +47,20 @@ export default function EnquiryPage() {
     return (
       <Section>
         <Container size="md">
-          <p className="text-muted-foreground text-center py-12">Not found.</p>
+          <div className="flex flex-col items-center gap-4 py-16 text-center">
+            <p className="text-foreground text-lg font-semibold">Academy not found</p>
+            <p className="text-muted-foreground text-sm">
+              The academy you&apos;re looking for doesn&apos;t exist or may have been removed.
+            </p>
+            <div className="flex gap-2">
+              <Button asChild variant="outline">
+                <Link href="/academies">Browse Academies</Link>
+              </Button>
+              <Button asChild>
+                <Link href="/">Back to Home</Link>
+              </Button>
+            </div>
+          </div>
         </Container>
       </Section>
     );
@@ -68,10 +82,7 @@ export default function EnquiryPage() {
         <Breadcrumbs
           items={[
             { label: 'Home', href: '/' },
-            {
-              label: type === 'academy' ? 'Academies' : 'Coaches',
-              href: type === 'academy' ? '/academies' : '/coaches',
-            },
+            { label: 'Academies', href: '/academies' },
             { label: 'Enquiry' },
           ]}
           className="mb-4"
@@ -82,7 +93,7 @@ export default function EnquiryPage() {
           <span className="text-foreground font-medium">{target?.name}</span>. You'll receive a WhatsApp confirmation.
         </p>
         <div className="mt-6">
-          {target && <EnquiryForm targetType={type} targetId={target.id} />}
+          {target && <EnquiryForm targetType="academy" targetId={target.id} />}
         </div>
       </Container>
     </Section>

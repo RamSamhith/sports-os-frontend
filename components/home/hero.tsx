@@ -67,7 +67,7 @@ export function Hero() {
           variants={reduced ? undefined : fadeUp}
           className="mt-5 w-full"
         >
-          <SearchAutocomplete placeholder="Search academies, sports, cities…" size="lg" hideCoaches />
+          <SearchAutocomplete placeholder="Search academies, sports, cities…" size="lg" />
         </motion.div>
 
         {/* Quick navigation shortcuts */}

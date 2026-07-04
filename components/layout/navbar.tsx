@@ -4,7 +4,7 @@ import * as React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { motion } from 'framer-motion';
-import { Menu, Search, MapPin, Bookmark, User2, Shield } from 'lucide-react';
+import { Menu, Search, MapPin, Bookmark, User2 } from 'lucide-react';
 import { primaryNav } from '@/config/nav';
 import { cn } from '@/lib/utils/cn';
 import { Button } from '@/components/ui/button';
@@ -24,7 +24,7 @@ export function Navbar() {
   const [locationOpen, setLocationOpen] = React.useState(false);
   const commandPalette = useCommandPalette();
   const { location } = useLocation();
-  const { isGuest, profile, role } = useAuth();
+  const { isGuest } = useAuth();
   const [mounted, setMounted] = React.useState(false);
   React.useEffect(() => setMounted(true), []);
 
@@ -119,13 +119,6 @@ export function Navbar() {
                   </Link>
                 </Button>
               )}
-              {role === 'admin' && (
-                <Button variant="ghost" size="icon-touch" aria-label="Admin" asChild>
-                  <Link href="/admin">
-                    <Shield className="h-4 w-4" />
-                  </Link>
-                </Button>
-              )}
             </div>
 
             <Sheet open={open} onOpenChange={setOpen}>
@@ -192,15 +185,6 @@ export function Navbar() {
                     <User2 className="h-4 w-4" />
                     {isGuest ? 'Guest User' : 'Profile'}
                   </Link>
-                  {role === 'admin' && (
-                    <Link
-                      href="/admin"
-                      onClick={() => setOpen(false)}
-                      className="text-muted-foreground hover:text-foreground hover:bg-accent/15 rounded-md px-3 py-2.5 text-sm transition-colors min-h-[44px] flex items-center"
-                    >
-                      Admin Panel
-                    </Link>
-                  )}
                 </div>
               </SheetContent>
             </Sheet>

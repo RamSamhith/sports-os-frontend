@@ -85,7 +85,6 @@ export function PathwaySection({ sportSlug, sportName, competitions }: PathwaySe
         </p>
         <div className="flex flex-wrap gap-2">
           <ExploreLink href={`/academies?sport=${sportSlug}`} label={`Explore ${sportName} Academies`} />
-          <ExploreLink href={`/coaches?sport=${sportSlug}`} label={`Explore ${sportName} Coaches`} />
         </div>
       </div>
 

@@ -9,8 +9,8 @@ export interface RegisterRequest {
 }
 
 export interface RegisterResponse {
-  requiresVerification: boolean;
-  email: string;
+  user: User;
+  token: string;
 }
 
 export interface LoginRequest {
@@ -21,24 +21,6 @@ export interface LoginRequest {
 export interface LoginResponse {
   user: User;
   token: string;
-}
-
-export interface VerifyOtpRequest {
-  email: string;
-  otp: string;
-}
-
-export interface VerifyOtpResponse {
-  user: User;
-  token: string;
-}
-
-export interface ResendOtpRequest {
-  email: string;
-}
-
-export interface ResendOtpResponse {
-  message: string;
 }
 
 export interface OnboardingPayload {
@@ -66,16 +48,6 @@ export async function register(data: RegisterRequest): Promise<ApiResponse<Regis
 export async function login(data: LoginRequest): Promise<ApiResponse<LoginResponse>> {
   const { post } = await import('./client');
   return post<LoginResponse>('/auth/login', data);
-}
-
-export async function sendOtp(data: ResendOtpRequest): Promise<ApiResponse<ResendOtpResponse>> {
-  const { post } = await import('./client');
-  return post<ResendOtpResponse>('/auth/resend-otp', data);
-}
-
-export async function verifyOtp(data: VerifyOtpRequest): Promise<ApiResponse<VerifyOtpResponse>> {
-  const { post } = await import('./client');
-  return post<VerifyOtpResponse>('/auth/verify-otp', data);
 }
 
 export async function logout(): Promise<ApiResponse<void>> {
@@ -115,71 +87,6 @@ export interface ResetPasswordResponse {
 export async function resetPassword(data: ResetPasswordRequest): Promise<ApiResponse<ResetPasswordResponse>> {
   const { post } = await import('./client');
   return post<ResetPasswordResponse>('/auth/reset-password', data);
-}
-
-// ─── OTP Login ───────────────────────────────────────────────
-
-export interface LoginOtpRequest {
-  email: string;
-}
-
-export interface LoginOtpResponse {
-  message: string;
-}
-
-export async function sendLoginOtp(data: LoginOtpRequest): Promise<ApiResponse<LoginOtpResponse>> {
-  const { post } = await import('./client');
-  return post<LoginOtpResponse>('/auth/login-otp', data);
-}
-
-export interface VerifyLoginOtpRequest {
-  email: string;
-  otp: string;
-}
-
-export async function verifyLoginOtp(data: VerifyLoginOtpRequest): Promise<ApiResponse<LoginResponse>> {
-  const { post } = await import('./client');
-  return post<LoginResponse>('/auth/verify-login-otp', data);
-}
-
-// ─── OTP Password Reset ──────────────────────────────────────
-
-export interface ForgotPasswordOtpRequest {
-  email: string;
-}
-
-export interface ForgotPasswordOtpResponse {
-  message: string;
-}
-
-export async function sendForgotPasswordOtp(data: ForgotPasswordOtpRequest): Promise<ApiResponse<ForgotPasswordOtpResponse>> {
-  const { post } = await import('./client');
-  return post<ForgotPasswordOtpResponse>('/auth/forgot-password-otp', data);
-}
-
-export interface VerifyResetOtpRequest {
-  email: string;
-  otp: string;
-}
-
-export interface VerifyResetOtpResponse {
-  resetToken: string;
-}
-
-export async function verifyResetOtp(data: VerifyResetOtpRequest): Promise<ApiResponse<VerifyResetOtpResponse>> {
-  const { post } = await import('./client');
-  return post<VerifyResetOtpResponse>('/auth/verify-reset-otp', data);
-}
-
-// ─── Provider Check ──────────────────────────────────────────
-
-export interface ProviderCheckResponse {
-  provider: string | null;
-}
-
-export async function checkProvider(email: string): Promise<ApiResponse<ProviderCheckResponse>> {
-  const { get } = await import('./client');
-  return get<ProviderCheckResponse>(`/auth/provider/${encodeURIComponent(email)}`);
 }
 
 // ─── Sessions ────────────────────────────────────────────────
@@ -231,9 +138,9 @@ export interface ChangeEmailRequest {
   password: string;
 }
 
-export async function changeEmail(data: ChangeEmailRequest): Promise<ApiResponse<{ message: string; requiresVerification?: boolean }>> {
+export async function changeEmail(data: ChangeEmailRequest): Promise<ApiResponse<{ message: string }>> {
   const { put } = await import('./client');
-  return put<{ message: string; requiresVerification?: boolean }>('/auth/change-email', data);
+  return put<{ message: string }>('/auth/change-email', data);
 }
 
 // ─── Change Phone ────────────────────────────────────────────

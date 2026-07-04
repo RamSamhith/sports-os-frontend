@@ -5,7 +5,7 @@ import { CompareView } from '@/components/compare/compare-view';
 
 export const metadata = {
   title: 'Compare',
-  description: 'Side-by-side comparison of academies, coaches, and sports on SportsOS.',
+  description: 'Side-by-side comparison of academies and sports on SportsOS.',
 };
 
 export default function ComparePage() {

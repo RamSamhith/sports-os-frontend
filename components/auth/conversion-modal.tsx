@@ -88,12 +88,6 @@ export function ConversionModal({ open, onOpenChange, actionLabel }: ConversionM
     router.push('/register');
   }
 
-  function handleOtpLogin() {
-    trackGuestConversion('otp_login');
-    onOpenChange(false);
-    router.push('/login');
-  }
-
   return (
     <Dialog.Root open={open} onOpenChange={onOpenChange}>
       <AnimatePresence>
@@ -158,9 +152,6 @@ export function ConversionModal({ open, onOpenChange, actionLabel }: ConversionM
 
                     <Button variant="outline" className="w-full h-11" onClick={handleEmailLogin}>
                       Sign in with email
-                    </Button>
-                    <Button variant="outline" className="w-full h-11" onClick={handleOtpLogin}>
-                      Continue with OTP
                     </Button>
 
                     <div className="mt-2 text-center text-sm text-muted-foreground">

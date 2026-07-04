@@ -389,13 +389,6 @@ function LoginView({
     try {
       const res = await apiLogin({ email: email.trim(), password });
       if (!res.ok) {
-        if (res.error.code === 'EMAIL_NOT_VERIFIED') {
-          try { sessionStorage.setItem('sportsos:verify-email', email.trim()); } catch { /* ignore */ }
-          setIsSubmitting(false);
-          onSuccess();
-          router.push('/verify/signup');
-          return;
-        }
         setServerError(res.error.message);
         setIsSubmitting(false);
         return;
@@ -628,14 +621,10 @@ function RegisterView({
         setIsSubmitting(false);
         return;
       }
-      if (res.data.requiresVerification) {
-        try { sessionStorage.setItem('sportsos:verify-email', res.data.email); } catch { /* ignore */ }
-        trackSignup('email');
-        setIsSubmitting(false);
-        onOpenChange(false);
-        router.push('/verify/signup');
-        return;
-      }
+      try { localStorage.setItem('sportsos:auth-token', res.data.token); } catch { /* ignore */ }
+      setProfile({ name: res.data.user.name, email: res.data.user.email, phone: res.data.user.phone ?? '' });
+      setAuth(true, res.data.user.onboardingCompleted ?? false);
+      trackSignup('email');
       setIsSubmitting(false);
       onOpenChange(false);
     } catch {

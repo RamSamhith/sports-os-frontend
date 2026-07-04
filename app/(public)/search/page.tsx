@@ -6,7 +6,6 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { SearchInput } from '@/components/ui/search-input';
 import { SearchAutocomplete } from '@/components/search/search-autocomplete';
 import { AcademyListing } from '@/components/academies/academy-listing';
-import { CoachesListing } from '@/components/coaches/coaches-listing';
 import { SportsListing } from '@/components/sports/sports-listing';
 import { Container } from '@/components/layout/container';
 import { Section } from '@/components/layout/section';
@@ -46,7 +45,7 @@ function SearchPageContent() {
   const { isGuest, isAuthenticated } = useAuth();
 
   const [query, setQuery] = React.useState(() => searchParams.get('q') ?? '');
-  const [activeTab, setActiveTab] = React.useState<'all' | 'academies' | 'coaches' | 'sports'>('all');
+  const [activeTab, setActiveTab] = React.useState<'all' | 'academies' | 'sports'>('all');
   const [trendingSports, setTrendingSports] = React.useState<string[]>([]);
   const [topCities, setTopCities] = React.useState<string[]>([]);
 
@@ -104,7 +103,7 @@ function SearchPageContent() {
   };
 
   const handleTabChange = (tab: string) => {
-    setActiveTab(tab as 'all' | 'academies' | 'coaches' | 'sports');
+    setActiveTab(tab as 'all' | 'academies' | 'sports');
   };
 
   const recentQueries = recentItems.map((r) => r.query);
@@ -215,10 +214,9 @@ function SearchPageContent() {
 
         {hasQuery && (
           <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
-            <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4">
+            <TabsList className="grid w-full grid-cols-3">
               <TabsTrigger value="all">All</TabsTrigger>
               <TabsTrigger value="academies">Academies</TabsTrigger>
-              <TabsTrigger value="coaches">Coaches</TabsTrigger>
               <TabsTrigger value="sports">Sports</TabsTrigger>
             </TabsList>
             <TabsContent value="all" className="mt-4">
@@ -228,10 +226,6 @@ function SearchPageContent() {
                   <AcademyListing hideSearch />
                 </section>
                 <section>
-                  <h2 className="text-sm font-semibold mb-2">Coaches</h2>
-                  <CoachesListing hideSearch />
-                </section>
-                <section>
                   <h2 className="text-sm font-semibold mb-2">Sports</h2>
                   <SportsListing hideSearch />
                 </section>
@@ -239,9 +233,6 @@ function SearchPageContent() {
             </TabsContent>
             <TabsContent value="academies" className="mt-4">
               <AcademyListing hideSearch />
-            </TabsContent>
-            <TabsContent value="coaches" className="mt-4">
-              <CoachesListing hideSearch />
             </TabsContent>
             <TabsContent value="sports" className="mt-4">
               <SportsListing hideSearch />
