@@ -52,7 +52,6 @@ export default function ProfilePage() {
 
   return (
     <div className="flex flex-col gap-4">
-      {/* Guest Upgrade Banner */}
       {(isGuest || !isAuthenticated) && (
         <Card className="border-amber-200 bg-amber-50 dark:border-amber-800 dark:bg-amber-950/30">
           <CardContent className="flex items-center gap-3 p-4">
@@ -135,11 +134,6 @@ export default function ProfilePage() {
                   </Badge>
                 ))}
               </div>
-            )}
-            {athleteData.goals && (
-              <p className="text-muted-foreground text-xs">
-                <span className="text-foreground font-medium">Goal:</span> {athleteData.goals}
-              </p>
             )}
           </CardContent>
         </Card>

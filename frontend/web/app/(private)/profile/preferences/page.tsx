@@ -83,7 +83,6 @@ export default function PreferencesPage() {
 
   useEffect(() => {
     const stored = readPreferences();
-    // Merge onboarding data as defaults if preferences are empty
     const merged = {
       city: stored.city || athleteData?.location || parentData?.location || '',
       radius: stored.radius,
@@ -91,7 +90,7 @@ export default function PreferencesPage() {
         ? stored.sports
         : athleteData?.sportInterests || parentData?.sportInterests || [],
       skillLevel: stored.skillLevel || athleteData?.skillLevel || parentData?.skillLevel || '',
-      goals: stored.goals || athleteData?.goals || '',
+      goals: stored.goals || '',
     };
     setCity(merged.city);
     setRadius(merged.radius);
@@ -169,7 +168,6 @@ export default function PreferencesPage() {
     };
     writePreferences(prefs);
 
-    // Sync to backend if authenticated
     setSaving(true);
     const res = await syncPreferences({
       favoriteSports: sports,
@@ -211,7 +209,6 @@ export default function PreferencesPage() {
         </div>
       </CardHeader>
       <CardContent className="flex flex-col gap-6">
-        {/* Location */}
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div className="flex flex-col gap-1.5">
             <Label htmlFor="pref-city">City</Label>
@@ -253,7 +250,6 @@ export default function PreferencesPage() {
           </div>
         </div>
 
-        {/* Sports interests */}
         <div className="flex flex-col gap-2">
           <Label>Sport interests</Label>
           <div className="flex flex-wrap gap-2">
@@ -286,7 +282,6 @@ export default function PreferencesPage() {
           )}
         </div>
 
-        {/* Skill Level */}
         <div className="flex flex-col gap-1.5">
           <Label htmlFor="pref-skill-level">Skill level</Label>
           <Select
@@ -310,7 +305,6 @@ export default function PreferencesPage() {
           </p>
         </div>
 
-        {/* Goals */}
         <div className="flex flex-col gap-1.5">
           <Label htmlFor="pref-goals">Goals</Label>
           <Input
@@ -322,7 +316,6 @@ export default function PreferencesPage() {
           />
         </div>
 
-        {/* Save */}
         <div className="flex items-center justify-end gap-3">
           {saved && (
             <span className="text-success flex items-center gap-1.5 text-sm">
