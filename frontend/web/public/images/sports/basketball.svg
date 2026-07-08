@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 750" role="img" aria-label="Basketball">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#1a140a"/>
+      <stop offset="60%" stop-color="#1a140a" stop-opacity="0.92"/>
+      <stop offset="100%" stop-color="#0c0a04"/>
+    </linearGradient>
+    <radialGradient id="spot" cx="50%" cy="38%" r="60%">
+      <stop offset="0%" stop-color="#fdba74" stop-opacity="0.18"/>
+      <stop offset="100%" stop-color="#fdba74" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="1200" height="750" fill="url(#sky)"/>
+  <rect width="1200" height="750" fill="url(#spot)"/>
+  
+    <rect x="0" y="380" width="1200" height="280" fill="#7c2d12"/>
+    <g stroke="#f1f5f9" stroke-width="3" opacity="0.5" fill="none">
+      <rect x="60" y="120" width="280" height="180"/>
+      <rect x="860" y="120" width="280" height="180"/>
+      <circle cx="200" cy="210" r="55"/>
+      <circle cx="1000" cy="210" r="55"/>
+    </g>
+    <g transform="translate(600 560)">
+      <circle r="80" fill="#fdba74" stroke="#000" stroke-width="3"/>
+      <g fill="none" stroke="#000" stroke-width="3">
+        <line x1="-80" y1="0" x2="80" y2="0"/>
+        <line x1="0" y1="-80" x2="0" y2="80"/>
+        <path d="M-80 -40 Q0 0 80 -40"/>
+        <path d="M-80 40 Q0 0 80 40"/>
+      </g>
+    </g>
+  <g transform="translate(40 700)">
+    <rect x="-8" y="-26" width="640" height="48" rx="8" fill="#000" opacity="0.55"/>
+    <text x="0" y="0" font-family="Inter, system-ui, sans-serif" font-size="22" font-weight="700" fill="#f1f5f9">Basketball</text>
+    <text x="0" y="22" font-family="Inter, system-ui, sans-serif" font-size="13" fill="#cbd5e1">SportsOS</text>
+  </g>
+</svg>

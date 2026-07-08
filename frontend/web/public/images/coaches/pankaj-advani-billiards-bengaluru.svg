@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600" role="img" aria-label="PA">
+
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#1c1407"/>
+      <stop offset="100%" stop-color="#0c0a04"/>
+    </linearGradient>
+    <radialGradient id="spot" cx="50%" cy="40%" r="60%">
+      <stop offset="0%" stop-color="#facc15" stop-opacity="0.2"/>
+      <stop offset="100%" stop-color="#facc15" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="600" height="600" fill="url(#bg)"/>
+  <rect width="600" height="600" fill="url(#spot)"/>
+  <rect x="0" y="0" width="600" height="6" fill="#facc15"/>
+  <!-- Background monogram -->
+  <text x="540" y="540" text-anchor="end" font-family="Inter, system-ui, sans-serif" font-size="220" font-weight="800" fill="#facc15" opacity="0.06">PA</text>
+  <!-- Silhouette -->
+  <g transform="translate(300 320)">
+    <circle cx="0" cy="-60" r="60" fill="#f1f5f9"/>
+    <circle cx="0" cy="-60" r="60" fill="#facc15" opacity="0.18"/>
+    <path d="M-100 160 Q-100 30 0 30 Q100 30 100 160 L100 220 L-100 220 Z" fill="#f1f5f9"/>
+    <path d="M-100 160 Q-100 30 0 30 Q100 30 100 160 L100 220 L-100 220 Z" fill="#facc15" opacity="0.18"/>
+  </g>
+  <!-- Initials -->
+  <text x="300" y="540" text-anchor="middle" font-family="Inter, system-ui, sans-serif" font-size="44" font-weight="700" fill="#f1f5f9" letter-spacing="2">PA</text>
+  <!-- Accent stripe -->
+  
+</svg>

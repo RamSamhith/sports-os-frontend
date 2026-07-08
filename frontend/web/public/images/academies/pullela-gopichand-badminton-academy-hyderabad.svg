@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 750" role="img" aria-label="#f1f5f9">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#0a141f"/>
+      <stop offset="55%" stop-color="#0a141f" stop-opacity="0.92"/>
+      <stop offset="100%" stop-color="#040a14"/>
+    </linearGradient>
+    
+  <radialGradient id="spot" cx="50%" cy="38%" r="60%">
+    <stop offset="0%" stop-color="#22d3ee" stop-opacity="0.18"/>
+    <stop offset="100%" stop-color="#22d3ee" stop-opacity="0"/>
+  </radialGradient>
+  </defs>
+  <rect width="1200" height="750" fill="url(#sky)"/>
+  <rect width="1200" height="750" fill="url(#spot)"/>
+  
+  <rect x="0" y="380" width="1200" height="280" fill="#3b2716"/>
+  <line x1="0" y1="500" x2="1200" y2="500" stroke="#f1f5f9" stroke-width="3" opacity="0.5"/>
+  <g opacity="0.7">
+    <circle cx="300" cy="200" r="40" fill="#fef3c7"/>
+    <circle cx="600" cy="180" r="40" fill="#fef3c7"/>
+    <circle cx="900" cy="200" r="40" fill="#fef3c7"/>
+  </g>
+  <g>
+    <line x1="350" y1="500" x2="850" y2="500" stroke="#f1f5f9" stroke-width="4"/>
+    <line x1="380" y1="500" x2="380" y2="510" stroke="#f1f5f9" stroke-width="0.5" opacity="0.3"/><line x1="420" y1="500" x2="420" y2="510" stroke="#f1f5f9" stroke-width="0.5" opacity="0.3"/><line x1="460" y1="500" x2="460" y2="510" stroke="#f1f5f9" stroke-width="0.5" opacity="0.3"/><line x1="500" y1="500" x2="500" y2="510" stroke="#f1f5f9" stroke-width="0.5" opacity="0.3"/><line x1="540" y1="500" x2="540" y2="510" stroke="#f1f5f9" stroke-width="0.5" opacity="0.3"/><line x1="580" y1="500" x2="580" y2="510" stroke="#f1f5f9" stroke-width="0.5" opacity="0.3"/><line x1="620" y1="500" x2="620" y2="510" stroke="#f1f5f9" stroke-width="0.5" opacity="0.3"/><line x1="660" y1="500" x2="660" y2="510" stroke="#f1f5f9" stroke-width="0.5" opacity="0.3"/><line x1="700" y1="500" x2="700" y2="510" stroke="#f1f5f9" stroke-width="0.5" opacity="0.3"/><line x1="740" y1="500" x2="740" y2="510" stroke="#f1f5f9" stroke-width="0.5" opacity="0.3"/><line x1="780" y1="500" x2="780" y2="510" stroke="#f1f5f9" stroke-width="0.5" opacity="0.3"/><line x1="820" y1="500" x2="820" y2="510" stroke="#f1f5f9" stroke-width="0.5" opacity="0.3"/>
+  </g>
+  <g transform="translate(280 380)">
+    <circle r="14" fill="#fef3c7" stroke="#000" stroke-width="2"/>
+    <g stroke="#000" stroke-width="1.5">
+      <line x1="-12" y1="-6" x2="14" y2="6"/>
+      <line x1="-12" y1="0" x2="14" y2="0"/>
+      <line x1="-12" y1="6" x2="14" y2="-6"/>
+    </g>
+  </g>
+  <g transform="translate(820 360) rotate(20)">
+    <ellipse cx="0" cy="0" rx="40" ry="50" fill="none" stroke="#67e8f9" stroke-width="4"/>
+    <line x1="0" y1="50" x2="0" y2="120" stroke="#000" stroke-width="6"/>
+  </g>
+
+  
+  <g transform="translate(40 700)">
+    <rect x="-8" y="-26" width="780" height="48" rx="8" fill="#000" opacity="0.55"/>
+    <text x="0" y="0" font-family="Inter, system-ui, sans-serif" font-size="22" font-weight="700" fill="#f1f5f9">#f1f5f9</text>
+    <text x="0" y="22" font-family="Inter, system-ui, sans-serif" font-size="13" fill="#cbd5e1">#67e8f9</text>
+  </g>
+</svg>

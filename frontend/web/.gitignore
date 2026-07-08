@@ -44,8 +44,6 @@ pnpm-debug.log*
 .vscode/*
 !.vscode/extensions.json
 !.vscode/settings.json
-!.vscode/launch.json
-!.vscode/tasks.json
 .idea
 
 # OS
@@ -95,13 +93,3 @@ public/sw.js
 public/workbox-*.js
 public/sw.js.map
 public/workbox-*.js.map
-
-# backend (do not include)
-sportsOS-nodejs/
-backend/
-controllers/
-models/
-routes/
-
-# old directory
-frontend-web/

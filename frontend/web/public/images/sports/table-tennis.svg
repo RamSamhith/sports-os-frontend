@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 750" role="img" aria-label="Table Tennis">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#1a140a"/>
+      <stop offset="60%" stop-color="#1a140a" stop-opacity="0.92"/>
+      <stop offset="100%" stop-color="#0c0a04"/>
+    </linearGradient>
+    <radialGradient id="spot" cx="50%" cy="38%" r="60%">
+      <stop offset="0%" stop-color="#fdba74" stop-opacity="0.18"/>
+      <stop offset="100%" stop-color="#fdba74" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="1200" height="750" fill="url(#sky)"/>
+  <rect width="1200" height="750" fill="url(#spot)"/>
+  
+    <rect x="120" y="200" width="960" height="380" rx="6" fill="#1d4ed8" stroke="#0a1224" stroke-width="6"/>
+    <line x1="600" y1="200" x2="600" y2="580" stroke="#fff" stroke-width="3" opacity="0.6"/>
+    <g transform="translate(280 220) rotate(-30)">
+      <ellipse cx="0" cy="0" rx="60" ry="80" fill="#dc2626" stroke="#0a1224" stroke-width="3"/>
+      <rect x="-14" y="64" width="28" height="80" fill="#7c2d12"/>
+    </g>
+    <circle cx="850" cy="430" r="20" fill="#f97316" stroke="#fff" stroke-width="2"/>
+  <g transform="translate(40 700)">
+    <rect x="-8" y="-26" width="640" height="48" rx="8" fill="#000" opacity="0.55"/>
+    <text x="0" y="0" font-family="Inter, system-ui, sans-serif" font-size="22" font-weight="700" fill="#f1f5f9">Table Tennis</text>
+    <text x="0" y="22" font-family="Inter, system-ui, sans-serif" font-size="13" fill="#cbd5e1">SportsOS</text>
+  </g>
+</svg>

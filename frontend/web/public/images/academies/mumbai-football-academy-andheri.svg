@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 750" role="img" aria-label="#f1f5f9">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#082818"/>
+      <stop offset="55%" stop-color="#082818" stop-opacity="0.92"/>
+      <stop offset="100%" stop-color="#04140a"/>
+    </linearGradient>
+    
+  <radialGradient id="spot" cx="50%" cy="38%" r="60%">
+    <stop offset="0%" stop-color="#22c55e" stop-opacity="0.18"/>
+    <stop offset="100%" stop-color="#22c55e" stop-opacity="0"/>
+  </radialGradient>
+  </defs>
+  <rect width="1200" height="750" fill="url(#sky)"/>
+  <rect width="1200" height="750" fill="url(#spot)"/>
+  
+  
+  <g fill="#000" opacity="0.5">
+    <rect x="50" y="420" width="36" height="140"/><rect x="120" y="383" width="44" height="177"/><rect x="190" y="346" width="52" height="214"/><rect x="260" y="309" width="60" height="251"/><rect x="330" y="272" width="36" height="288"/><rect x="400" y="235" width="44" height="325"/><rect x="470" y="398" width="52" height="162"/><rect x="540" y="361" width="60" height="199"/><rect x="610" y="324" width="36" height="236"/><rect x="680" y="287" width="44" height="273"/><rect x="750" y="250" width="52" height="310"/><rect x="820" y="413" width="60" height="147"/><rect x="890" y="376" width="36" height="184"/><rect x="960" y="339" width="44" height="221"/><rect x="1030" y="302" width="52" height="258"/><rect x="1100" y="265" width="60" height="295"/>
+  </g>
+  <ellipse cx="600" cy="640" rx="900" ry="80" fill="#16a34a"/>
+  <ellipse cx="600" cy="640" rx="120" ry="20" fill="none" stroke="#f8fafc" stroke-width="2" opacity="0.7"/>
+  <line x1="600" y1="540" x2="600" y2="740" stroke="#f8fafc" stroke-width="2" opacity="0.7"/>
+  <g transform="translate(600 640)">
+    <circle r="56" fill="#f8fafc" stroke="#000" stroke-width="3"/>
+    <g fill="#000">
+      <polygon points="0,-36 12,-18 -12,-18"/>
+      <polygon points="36,0 18,12 18,-12"/>
+      <polygon points="0,36 12,18 -12,18"/>
+      <polygon points="-36,0 -18,12 -18,-12"/>
+    </g>
+  </g>
+
+  
+  <g transform="translate(40 700)">
+    <rect x="-8" y="-26" width="780" height="48" rx="8" fill="#000" opacity="0.55"/>
+    <text x="0" y="0" font-family="Inter, system-ui, sans-serif" font-size="22" font-weight="700" fill="#f1f5f9">#f1f5f9</text>
+    <text x="0" y="22" font-family="Inter, system-ui, sans-serif" font-size="13" fill="#cbd5e1">#86efac</text>
+  </g>
+</svg>
