@@ -18,7 +18,6 @@ export interface SportContent {
   majorTournaments: string[];
   funFacts: string[];
   faqs: { q: string; a: string }[];
-  formats?: { name: string; description: string; duration?: string; teamSize?: string }[];
   keyDifferences?: string;
   teamSize: string;
   matchDuration: string;
@@ -127,11 +126,6 @@ export const sportsContent: Record<string, SportContent> = {
       },
     ],
     keyDifferences: "Cricket combines individual skill (batting, bowling) with deep team strategy. Unlike football or basketball, it alternates between individual duels (batsman vs bowler) and coordinated team play. Three formats (Test, ODI, T20) range from 5-day endurance to 3-hour sprints.",
-    formats: [
-      { name: 'T20', description: 'Fast-paced 20-over format. Each team bats for 20 overs. High-intensity hitting and aggressive bowling.', duration: '~3 hours', teamSize: '11 per side' },
-      { name: 'ODI', description: 'One Day International. Each team bats for 50 overs. Balance of strategy and entertainment.', duration: '~8 hours', teamSize: '11 per side' },
-      { name: 'Test', description: 'The longest format played over 5 days. Two innings per team. Tests endurance, technique, and mental strength.', duration: 'Up to 5 days', teamSize: '11 per side' },
-    ],
   },
 
   football: {
@@ -228,12 +222,6 @@ export const sportsContent: Record<string, SportContent> = {
       },
     ],
     keyDifferences: "Football is a continuous-flow team sport with constant movement and no stoppages between plays (unlike cricket or baseball). Its simplicity — just a ball and open space — makes it the most accessible team sport globally. The 90-minute non-stop format demands unique aerobic endurance.",
-    formats: [
-      { name: 'FIFA World Cup', description: 'The pinnacle of international football. 32 nations compete every 4 years for the most prestigious trophy in sports.', duration: 'Month-long tournament', teamSize: '11 per side' },
-      { name: 'Continental Championships', description: 'AFC Asian Cup, UEFA Euro, Copa America, AFCON. Top national teams compete for continental glory.', duration: 'Month-long tournament', teamSize: '11 per side' },
-      { name: 'Domestic Leagues', description: 'I-League, ISL (India), Premier League, La Liga, Serie A. League format played over a season.', duration: '90-minute matches', teamSize: '11 per side' },
-      { name: 'Club Competitions', description: 'AFC Champions League, UEFA Champions League. Top club teams from different leagues compete.', duration: 'Two-legged ties', teamSize: '11 per side' },
-    ],
   },
 
   basketball: {
@@ -329,11 +317,6 @@ export const sportsContent: Record<string, SportContent> = {
       },
     ],
     keyDifferences: "Basketball is a high-tempo indoor sport played on a confined court with continuous scoring, unlike football's occasional goals. The shot clock forces constant action, and the combination of height, speed, and precision shooting creates a unique athletic profile unmatched by other team sports.",
-    formats: [
-      { name: 'NBA', description: 'The premier professional basketball league. 30 teams, 82-game regular season plus playoffs.', duration: '48-minute games', teamSize: '5 per side' },
-      { name: 'FIBA International', description: 'Olympics and FIBA World Cup. National teams compete in global tournaments.', duration: '40-minute games', teamSize: '5 per side' },
-      { name: '3x3 Basketball', description: 'Half-court, fast-paced format. Olympic sport since 2020. Quick games, high intensity.', duration: '10 minutes or first to 21', teamSize: '3 per side' },
-    ],
   },
 
   badminton: {
@@ -430,11 +413,6 @@ export const sportsContent: Record<string, SportContent> = {
       },
     ],
     keyDifferences: "Badminton is the fastest racquet sport — shuttlecock speeds exceed 400 km/h. Unlike tennis, it uses a feathered projectile that decelerates rapidly, demanding explosive reflexes in a smaller court. The lightweight shuttlecock enables deceptive shots impossible in other racquet sports.",
-    formats: [
-      { name: 'Singles', description: 'One vs one. Tests individual agility, stamina, and shot precision on the full court.', duration: '40-70 minutes', teamSize: '1 per side' },
-      { name: 'Doubles', description: 'Two vs two. Faster rallies, tactical formations, and net play. Requires strong communication.', duration: '40-60 minutes', teamSize: '2 per side' },
-      { name: 'Mixed Doubles', description: 'One male + one female per team. Strategic pairing with complementary strengths.', duration: '40-60 minutes', teamSize: '1M + 1F per side' },
-    ],
   },
 
   tennis: {
@@ -531,11 +509,6 @@ export const sportsContent: Record<string, SportContent> = {
       },
     ],
     keyDifferences: "Tennis is unique in combining explosive power with endurance across multiple surfaces (clay, grass, hard court), each demanding different playing styles. The individual nature of singles means players must be self-reliant, and Grand Slams can last 5+ hours, testing physical and mental limits unlike any other sport.",
-    formats: [
-      { name: 'Singles', description: 'One vs one. The purest test of individual skill, fitness, and mental toughness.', duration: '1-5 hours', teamSize: '1 per side' },
-      { name: 'Doubles', description: 'Two vs two. Faster reflexes needed at the net, stronger serve-and-volley tactics.', duration: '1-3 hours', teamSize: '2 per side' },
-      { name: 'Grand Slams', description: 'Australian Open, French Open, Wimbledon, US Open. The four most prestigious tournaments.', duration: 'Best of 5 sets (men), Best of 3 (women)', teamSize: '1 per side' },
-    ],
   },
 
   "table-tennis": {
@@ -728,13 +701,6 @@ export const sportsContent: Record<string, SportContent> = {
       },
     ],
     keyDifferences: "Swimming is the only sport where athletes compete in water, making technique paramount over raw power. Four distinct strokes (freestyle, backstroke, breaststroke, butterfly) each require unique biomechanics. Water resistance means efficiency matters more than strength, creating a sport where technique can beat bigger opponents.",
-    formats: [
-      { name: 'Freestyle', description: 'Fastest stroke. Front crawl with alternating arm pulls and flutter kick.', duration: '50m to 1500m races', teamSize: 'Individual' },
-      { name: 'Backstroke', description: 'Swum on the back. Only stroke performed face-up. Requires strong rotation.', duration: '100m to 200m races', teamSize: 'Individual' },
-      { name: 'Breaststroke', description: 'Simultaneous arm and leg movements. Most technical stroke with strict rules.', duration: '100m to 200m races', teamSize: 'Individual' },
-      { name: 'Butterfly', description: 'Most physically demanding. Simultaneous overhead arm recovery with dolphin kick.', duration: '100m to 200m races', teamSize: 'Individual' },
-      { name: 'Medley', description: 'All four strokes in sequence: butterfly, backstroke, breaststroke, freestyle.', duration: '200m individual, 400m relay', teamSize: 'Individual or relay' },
-    ],
   },
 
   athletics: {
@@ -1307,11 +1273,6 @@ export const sportsContent: Record<string, SportContent> = {
       },
     ],
     keyDifferences: "Kabaddi is uniquely Indian — the only major team sport where a single player (raider) faces the entire opposing team while holding their breath and chanting 'kabaddi'. This breath-control element exists in no other sport. It combines the physicality of wrestling with the tactical coordination of team defense.",
-    formats: [
-      { name: 'Standard', description: '7 players per side. Classic format with raiding and defending turns.', duration: '40 minutes (2 x 20)', teamSize: '7 per side' },
-      { name: 'Pro Kabaddi League', description: 'India\'s premier kabaddi league. Fast-paced with timed raids and power-plays.', duration: '80 minutes total', teamSize: '7 per side' },
-      { name: 'Circle Kabaddi', description: 'Outdoor format popular in Punjab. Played in a circle with different rules.', duration: 'Variable', teamSize: '12 per side' },
-    ],
   },
 
   hockey: {
@@ -1409,11 +1370,6 @@ export const sportsContent: Record<string, SportContent> = {
       },
     ],
     keyDifferences: "Field hockey is the only major team sport played with an implement (stick), creating a unique skill set combining stick handling with running. Unlike football, the ball can travel at 150+ km/h off a drag flick, and 11 players per side on a turf field creates a fast-paced, continuous-flow game unlike any other.",
-    formats: [
-      { name: 'Field Hockey', description: 'The standard outdoor format. 11 players on water-based turf. Olympic sport.', duration: '60 minutes (4 x 15)', teamSize: '11 per side' },
-      { name: 'Pro League', description: 'FIH Pro League. Top nations compete in a home-and-away league format.', duration: '60 minutes', teamSize: '11 per side' },
-      { name: 'Indoor Hockey', description: '5 players per side on a smaller hard court. Faster and more technical.', duration: '4 x 10 minute quarters', teamSize: '5 per side' },
-    ],
   },
 
   chess: {

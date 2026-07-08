@@ -74,30 +74,6 @@ export function AcademyListing({ hideSearch = false }: { hideSearch?: boolean } 
   const [levels, setLevels] = React.useState<string[]>(() => readListFromParams(searchParams, 'level'));
   const [statuses, setStatuses] = React.useState<string[]>(() => readListFromParams(searchParams, 'status'));
 
-  // Draft state for filter drawer (applied only on Apply click)
-  const [draftSports, setDraftSports] = React.useState<string[]>(sports);
-  const [draftFacilities, setDraftFacilities] = React.useState<string[]>(facilities);
-  const [draftLevels, setDraftLevels] = React.useState<string[]>(levels);
-  const [draftStatuses, setDraftStatuses] = React.useState<string[]>(statuses);
-
-  const handleApplyFilters = () => {
-    setSports(draftSports);
-    setFacilities(draftFacilities);
-    setLevels(draftLevels);
-    setStatuses(draftStatuses);
-  };
-
-  const handleClearFilters = () => {
-    setSports([]);
-    setFacilities([]);
-    setLevels([]);
-    setStatuses([]);
-    setDraftSports([]);
-    setDraftFacilities([]);
-    setDraftLevels([]);
-    setDraftStatuses([]);
-  };
-
   // Fetch all academies on mount for filter counts
   React.useEffect(() => {
     let cancelled = false;
@@ -375,15 +351,19 @@ export function AcademyListing({ hideSearch = false }: { hideSearch?: boolean } 
             />
           </div>
           <FilterDrawer
-            appliedCount={appliedCount}
-            onApply={handleApplyFilters}
-            onClear={handleClearFilters}
+            appliedCount={sports.length + facilities.length + levels.length + statuses.length}
+            onClear={() => {
+              setSports([]);
+              setFacilities([]);
+              setLevels([]);
+              setStatuses([]);
+            }}
           >
             <FilterGroup
               title="Sport"
               options={dynamicSportOptions}
-              selected={draftSports}
-              onChange={setDraftSports}
+              selected={sports}
+              onChange={setSports}
               maxHeight="200px"
               layoutIdPrefix="filter-sport"
             />
@@ -391,24 +371,24 @@ export function AcademyListing({ hideSearch = false }: { hideSearch?: boolean } 
             <FilterGroup
               title="Facility"
               options={dynamicFacilityOptions}
-              selected={draftFacilities}
-              onChange={setDraftFacilities}
+              selected={facilities}
+              onChange={setFacilities}
               layoutIdPrefix="filter-facility"
             />
             <Separator />
             <FilterGroup
               title="Training level"
               options={dynamicLevelOptions}
-              selected={draftLevels}
-              onChange={setDraftLevels}
+              selected={levels}
+              onChange={setLevels}
               layoutIdPrefix="filter-level"
             />
             <Separator />
             <FilterGroup
               title="Verification"
               options={dynamicStatusOptions}
-              selected={draftStatuses}
-              onChange={setDraftStatuses}
+              selected={statuses}
+              onChange={setStatuses}
               layoutIdPrefix="filter-status"
             />
           </FilterDrawer>

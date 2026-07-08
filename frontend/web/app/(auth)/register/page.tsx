@@ -62,9 +62,9 @@ export default function RegisterPage() {
         handleSocialAuth(credential, {
           setAuth,
           setProfile,
-          onSuccess: (onboarded?: boolean) => {
+          onSuccess: (onboardingCompleted) => {
             setSocialLoading(null);
-            if (onboarded) {
+            if (onboardingCompleted) {
               router.replace('/');
             } else {
               router.replace('/onboarding/role');
@@ -204,21 +204,34 @@ export default function RegisterPage() {
         return;
       }
 
+      const { token, user } = res.data ?? {};
+      if (!token || !user) {
+        setServerError('Registration succeeded but server response was incomplete. Please log in.');
+        setIsSubmitting(false);
+        return;
+      }
+
       try {
-        localStorage.setItem('sportsos:auth-token', res.data.token);
+        localStorage.setItem('sportsos:auth-token', token);
       } catch { /* ignore */ }
-      setProfile({ name: res.data.user.name, email: res.data.user.email, phone: res.data.user.phone ?? '' });
-      setAuth(true, res.data.user.onboardingCompleted ?? false);
+      setProfile({ name: user.name ?? '', email: user.email ?? '', phone: user.phone ?? '' });
+      setAuth(true, user.onboardingCompleted ?? false);
       setIsSubmitting(false);
 
-      if (res.data.user.onboardingCompleted) {
+      if (user.onboardingCompleted) {
         router.replace('/');
       } else {
         router.replace('/onboarding/role');
       }
     } catch (err) {
-      const msg = err instanceof Error ? err.message : 'Network error. Please try again.';
-      setServerError(msg.includes('timed out') ? 'Server is starting up. Please try again in a moment.' : 'Network error. Please try again.');
+      const msg = err instanceof Error ? err.message : '';
+      if (msg.includes('timed out')) {
+        setServerError('Server is starting up. Please try again in a moment.');
+      } else if (msg) {
+        setServerError(msg);
+      } else {
+        setServerError('Network error. Please check your connection and try again.');
+      }
       setIsSubmitting(false);
     }
   }
