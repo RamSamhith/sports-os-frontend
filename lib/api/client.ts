@@ -133,6 +133,17 @@ async function request<T>(
       return { ok: true, data: undefined as T };
     }
 
+    const contentType = res.headers.get('content-type') ?? '';
+    if (!contentType.includes('application/json')) {
+      return {
+        ok: false,
+        error: {
+          code: 'INVALID_RESPONSE',
+          message: res.statusText || 'Server returned an unexpected response. Please try again.',
+        },
+      };
+    }
+
     const json = await res.json();
 
     if (!res.ok) {
@@ -211,7 +222,6 @@ async function request<T>(
       };
     }
 
-    clearTimeout(timeoutId);
     const data = json.data ?? json;
     return { ok: true, data };
   } catch (err) {
@@ -278,6 +288,42 @@ export async function uploadFile<T>(path: string, file: File, fieldName = 'file'
     const json = await res.json();
     if (!res.ok) {
       const err = json.error ?? json;
+
+      // Handle TOKEN_EXPIRED: attempt refresh and retry
+      if (res.status === 401 && err.code === 'TOKEN_EXPIRED') {
+        try {
+          const newToken = await ensureRefresh();
+          const retryHeaders: Record<string, string> = {};
+          if (newToken) retryHeaders['Authorization'] = `Bearer ${newToken}`;
+          const retryFormData = new FormData();
+          retryFormData.append(fieldName, file);
+          const retryRes = await fetch(url, {
+            method: 'POST',
+            headers: retryHeaders,
+            body: retryFormData,
+            credentials: 'include',
+          });
+          const retryJson = await retryRes.json();
+          if (!retryRes.ok) {
+            const retryErr = retryJson.error ?? retryJson;
+            return {
+              ok: false,
+              error: {
+                code: retryErr.code ?? 'UPLOAD_ERROR',
+                message: retryErr.message ?? 'Upload failed',
+                details: retryErr.details,
+              },
+            };
+          }
+          return { ok: true, data: retryJson.data ?? retryJson };
+        } catch {
+          return {
+            ok: false,
+            error: { code: 'UNAUTHORIZED', message: 'Session expired' },
+          };
+        }
+      }
+
       return {
         ok: false,
         error: {

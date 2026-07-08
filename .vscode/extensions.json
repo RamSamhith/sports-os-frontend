@@ -1,0 +1,16 @@
+{
+  "recommendations": [
+    "esbenp.prettier-vscode",
+    "dbaeumer.vscode-eslint",
+    "bradlc.vscode-tailwindcss",
+    "csstools.postcss",
+    "ms-vscode.vscode-typescript-next",
+    "ms-vscode.js-debug",
+    "ms-vscode.js-debug-adapter",
+    "christian-kohler.path-intellisense",
+    "streetsidesoftware.code-spell-checker",
+    "ms-vscode.vscode-react-refactor",
+    " formulahendry.auto-rename-tag",
+    " formulahendry.auto-close-tag"
+  ]
+}

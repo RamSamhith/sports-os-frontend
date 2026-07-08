@@ -1,0 +1,78 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Next.js: Debug Server-Side",
+      "type": "node",
+      "request": "launch",
+      "runtimeExecutable": "node",
+      "runtimeArgs": ["--inspect"],
+      "program": "${workspaceFolder}/node_modules/.bin/next",
+      "args": ["dev"],
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "serverReadyAction": {
+        "pattern": "- Local:.+(https?://.+)",
+        "uriFormat": "%s",
+        "action": "debugWithChrome"
+      },
+      "env": {
+        "NODE_OPTIONS": "--inspect"
+      },
+      "skipFiles": ["<node_internals>/**"],
+      "sourceMaps": true,
+      "outFiles": ["${workspaceFolder}/.next/**"],
+      "internalConsoleOptions": "openOnSessionStart"
+    },
+    {
+      "name": "Next.js: Debug Client-Side (Chrome)",
+      "type": "chrome",
+      "request": "launch",
+      "url": "http://localhost:3000",
+      "webRoot": "${workspaceFolder}",
+      "sourceMapPathOverrides": {
+        "../*": "${webRoot}/*",
+        "../app/*": "${webRoot}/app/*",
+        "../components/*": "${webRoot}/components/*",
+        "../lib/*": "${webRoot}/lib/*",
+        "../config/*": "${webRoot}/config/*"
+      },
+      "skipFiles": ["**/node_modules/**"],
+      "sourceMaps": true,
+      "internalConsoleOptions": "openOnSessionStart"
+    },
+    {
+      "name": "Next.js: Debug Full Stack",
+      "type": "node",
+      "request": "launch",
+      "runtimeExecutable": "node",
+      "runtimeArgs": ["--inspect"],
+      "program": "${workspaceFolder}/node_modules/.bin/next",
+      "args": ["dev"],
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "serverReadyAction": {
+        "pattern": "- Local:.+(https?://.+)",
+        "uriFormat": "%s",
+        "action": "debugWithChrome"
+      },
+      "env": {
+        "NODE_OPTIONS": "--inspect"
+      },
+      "skipFiles": ["<node_internals>/**"],
+      "sourceMaps": true,
+      "outFiles": ["${workspaceFolder}/.next/**"]
+    }
+  ],
+  "compounds": [
+    {
+      "name": "Next.js: Full Stack Debug (Server + Chrome)",
+      "configurations": [
+        "Next.js: Debug Server-Side",
+        "Next.js: Debug Client-Side (Chrome)"
+      ],
+      "stopAll": true,
+      "preLaunchTask": ""
+    }
+  ]
+}

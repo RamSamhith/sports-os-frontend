@@ -8,12 +8,9 @@ import type {
   AthleteOnboardingData,
   ParentOnboardingData,
   SkillLevel,
-  BudgetRange,
-  TrainingFrequency,
-  CompetitionLevel,
 } from '@/types/domain/onboarding';
 
-export type { OnboardingData, AthleteOnboardingData, ParentOnboardingData, SkillLevel, BudgetRange, TrainingFrequency, CompetitionLevel };
+export type { OnboardingData, AthleteOnboardingData, ParentOnboardingData, SkillLevel };
 
 const STORAGE_KEY = 'sportsos:onboarding';
 

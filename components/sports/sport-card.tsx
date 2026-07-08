@@ -3,7 +3,7 @@
 import * as React from 'react';
 import Link from 'next/link';
 import { motion, useReducedMotion } from 'framer-motion';
-import { Bookmark, BookmarkCheck, GitCompare, Users, Clock, Star } from 'lucide-react';
+import { Bookmark, BookmarkCheck, GitCompare, Star } from 'lucide-react';
 import { toast } from 'sonner';
 import { ImageWithFallback } from '@/components/ui/image-with-fallback';
 import { Card } from '@/components/ui/card';
@@ -27,12 +27,6 @@ const sportGradients: Record<string, string> = {
   default: 'from-primary/60 to-primary/20',
 };
 
-const difficultyColor: Record<string, string> = {
-  Low: 'text-emerald-600',
-  Medium: 'text-amber-600',
-  High: 'text-red-600',
-};
-
 export const SportCard = React.memo(function SportCard({ sport }: { sport: Sport }) {
   const reduced = useReducedMotion();
   const { slug, name, coverImage } = sport;
@@ -44,10 +38,6 @@ export const SportCard = React.memo(function SportCard({ sport }: { sport: Sport
 
   const isSaved = hasShortlist('sport', slug);
   const isCompared = hasCompare('sport', slug);
-
-  const difficulty = sport.fitnessLevelRequired ?? 'Medium';
-  const participation = sport.individualOrTeam ?? 'Both';
-  const environment = sport.indoorOutdoor ?? 'Both';
 
   const sc = sportsContent[slug];
 
@@ -152,23 +142,6 @@ export const SportCard = React.memo(function SportCard({ sport }: { sport: Sport
           </div>
         </Link>
         <div className="flex flex-col gap-2.5 p-4">
-          <div className="flex flex-wrap gap-1.5">
-            <Badge variant="secondary" className="text-[10px] capitalize">{participation}</Badge>
-            <Badge variant="secondary" className="text-[10px] capitalize">{environment}</Badge>
-            <Badge variant="secondary" className={`text-[10px] capitalize ${difficultyColor[difficulty] ?? ''}`}>
-              {difficulty}
-            </Badge>
-            {sport.teamSize && (
-              <Badge variant="secondary" className="text-[10px]">
-                <Users className="h-3 w-3 mr-0.5" /> {sport.teamSize}
-              </Badge>
-            )}
-            {sport.matchDuration && (
-              <Badge variant="secondary" className="text-[10px]">
-                <Clock className="h-3 w-3 mr-0.5" /> {sport.matchDuration}
-              </Badge>
-            )}
-          </div>
           {sc?.tagline && (
             <p className="text-muted-foreground text-xs line-clamp-2 leading-relaxed">{sc.tagline}</p>
           )}

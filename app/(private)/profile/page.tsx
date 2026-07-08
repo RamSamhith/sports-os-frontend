@@ -136,11 +136,6 @@ export default function ProfilePage() {
                 ))}
               </div>
             )}
-            {athleteData.goals && (
-              <p className="text-muted-foreground text-xs">
-                <span className="text-foreground font-medium">Goal:</span> {athleteData.goals}
-              </p>
-            )}
           </CardContent>
         </Card>
       )}

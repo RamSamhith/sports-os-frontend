@@ -91,7 +91,7 @@ export default function PreferencesPage() {
         ? stored.sports
         : athleteData?.sportInterests || parentData?.sportInterests || [],
       skillLevel: stored.skillLevel || athleteData?.skillLevel || parentData?.skillLevel || '',
-      goals: stored.goals || athleteData?.goals || '',
+      goals: stored.goals || '',
     };
     setCity(merged.city);
     setRadius(merged.radius);

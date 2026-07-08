@@ -249,7 +249,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           setState((prev) => ({
             ...prev,
             role: validRole || prev.role,
-            onboardingCompleted: !!user.onboardingCompleted,
+            // Never overwrite local onboardingCompleted=true with backend false
+            // (local state is set by completeOnboarding after wizard finishes)
+            onboardingCompleted: prev.onboardingCompleted || !!user.onboardingCompleted,
           }));
         } else if (res.ok === false && res.error?.code === 'UNAUTHORIZED') {
           // Session fully expired (refresh token also invalid) — sign out

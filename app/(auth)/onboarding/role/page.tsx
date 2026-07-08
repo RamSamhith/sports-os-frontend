@@ -119,7 +119,8 @@ export default function RoleSelectionPage() {
     setRole(selected);
     // Persist role to backend (non-blocking)
     saveOnboarding({ role: selected }).catch(() => {});
-    router.push('/onboarding/wizard');
+    // Pass role via URL so wizard doesn't depend on React state commit timing
+    router.push(`/onboarding/wizard?role=${selected}`);
   }
 
   return (

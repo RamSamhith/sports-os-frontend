@@ -1,0 +1,49 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Next.js: Dev Server",
+      "type": "shell",
+      "command": "pnpm",
+      "args": ["dev"],
+      "isBackground": true,
+      "problemMatcher": [],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      }
+    },
+    {
+      "label": "TypeScript: Type Check",
+      "type": "shell",
+      "command": "pnpm",
+      "args": ["typecheck"],
+      "isBackground": false,
+      "problemMatcher": "$tsc",
+      "group": "test"
+    },
+    {
+      "label": "ESLint: Lint",
+      "type": "shell",
+      "command": "pnpm",
+      "args": ["lint"],
+      "isBackground": false,
+      "problemMatcher": [],
+      "group": "test"
+    },
+    {
+      "label": "Next.js: Build",
+      "type": "shell",
+      "command": "pnpm",
+      "args": ["build"],
+      "isBackground": false,
+      "problemMatcher": [],
+      "group": "build"
+    }
+  ]
+}

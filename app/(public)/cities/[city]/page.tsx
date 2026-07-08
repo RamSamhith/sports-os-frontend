@@ -108,8 +108,8 @@ export default function CityPage() {
     return Array.from(nearbyData.values()).slice(0, 4);
   }, [cityName, allAcademies]);
 
-  const avgLat = academies.length > 0 ? academies.reduce((s, a) => s + (a.location.lat || 0), 0) / academies.length : 28.6139;
-  const avgLng = academies.length > 0 ? academies.reduce((s, a) => s + (a.location.lng || 0), 0) / academies.length : 77.2090;
+  const avgLat = academies.length > 0 ? academies.reduce((s, a) => s + (a.location?.lat ?? 0), 0) / academies.length : 28.6139;
+  const avgLng = academies.length > 0 ? academies.reduce((s, a) => s + (a.location?.lng ?? 0), 0) / academies.length : 77.2090;
 
   if (loading) {
     return (

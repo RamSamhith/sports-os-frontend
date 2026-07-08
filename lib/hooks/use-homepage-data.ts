@@ -23,7 +23,7 @@ async function fetchAcademies(): Promise<{ items: Academy[]; total: number }> {
       const res = await getAcademies({ pageSize: 200 });
       if (res.ok) {
         const items = Array.isArray(res.data?.items) ? res.data.items : [];
-        academiesTotalCache = res.data?.pagination?.total ?? items.length;
+        academiesTotalCache = res.data?.pagination?.total || items.length;
         academiesCache = items;
         return items;
       }
@@ -50,7 +50,7 @@ async function fetchSports(): Promise<{ items: Sport[]; total: number }> {
         // Only use API data if it actually returned sports.
         // Otherwise fall through to static catalog (same logic as /sports page).
         if (items.length > 0) {
-          sportsTotalCache = res.data?.pagination?.total ?? items.length;
+          sportsTotalCache = res.data?.pagination?.total || items.length;
           sportsCache = items;
           return items;
         }

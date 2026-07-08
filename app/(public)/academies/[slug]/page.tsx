@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { notFound } from 'next/navigation';
 import { getAcademy } from '@/lib/api/academies';
 import { siteConfig } from '@/config/site';
 import { AcademyDetailView } from '@/components/academy/academy-detail-view';
@@ -51,7 +52,8 @@ export default async function AcademyDetailPage({ params }: Props) {
   const { slug } = await params;
 
   const res = await getAcademy(slug);
-  const academy = res.ok ? res.data : null;
+  if (!res.ok || !res.data) notFound();
+  const academy = res.data;
 
   const jsonLd = academy
     ? {
