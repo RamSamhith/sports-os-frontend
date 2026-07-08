@@ -8,6 +8,7 @@ import {
   Timer, ChevronDown, ChevronRight,
   Zap, Activity, HelpCircle, Lightbulb,
   ArrowLeft, Shield, AlertTriangle, Sparkles, Flame,
+  Layers,
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -183,6 +184,29 @@ export function SportDetailView({ sport }: SportDetailViewProps) {
             </div>
           )}
         </AccordionSection>
+
+        {staticContent?.formats && staticContent.formats.length > 0 && (
+          <AccordionSection title="Game Formats" icon={Layers}>
+            <div className="flex flex-col gap-3">
+              {staticContent.formats.map((format) => (
+                <div key={format.name} className="rounded-lg border p-3">
+                  <div className="flex items-start justify-between gap-2">
+                    <span className="text-sm font-semibold">{format.name}</span>
+                    <div className="flex items-center gap-2 shrink-0">
+                      {format.duration && (
+                        <span className="text-muted-foreground text-[10px]">{format.duration}</span>
+                      )}
+                      {format.teamSize && (
+                        <span className="text-muted-foreground text-[10px]">{format.teamSize}</span>
+                      )}
+                    </div>
+                  </div>
+                  <p className="text-muted-foreground mt-1 text-xs leading-relaxed">{format.description}</p>
+                </div>
+              ))}
+            </div>
+          </AccordionSection>
+        )}
 
         <AccordionSection title="Rules & Gameplay" icon={Target}>
           <p className="text-muted-foreground text-sm leading-relaxed">{staticContent?.rules || howToPlay}</p>

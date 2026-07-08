@@ -53,7 +53,14 @@ export default function LoginPage() {
         handleSocialAuth(credential, {
           setAuth,
           setProfile,
-          onSuccess: () => { setSocialLoading(null); },
+          onSuccess: (onboarded?: boolean) => {
+            setSocialLoading(null);
+            if (onboarded) {
+              router.replace('/');
+            } else {
+              router.replace('/onboarding/role');
+            }
+          },
           onError: (msg) => { setSocialError(msg); setSocialLoading(null); },
         });
       });

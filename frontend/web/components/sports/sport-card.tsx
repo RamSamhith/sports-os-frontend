@@ -7,7 +7,9 @@ import { ImageWithFallback } from '@/components/ui/image-with-fallback';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { GitCompareArrows, Check } from 'lucide-react';
 import { ease, duration } from '@/components/motion/constants';
+import { useCompare } from '@/lib/hooks/use-compare';
 import type { Sport } from '@/types/domain/sport';
 
 const sportGradients: Record<string, string> = {
@@ -37,6 +39,19 @@ export const SportCard = React.memo(function SportCard({ sport }: { sport: Sport
   const difficulty = sport.fitnessLevelRequired ?? 'Medium';
   const participation = sport.individualOrTeam ?? 'Both';
   const environment = sport.indoorOutdoor ?? 'Both';
+
+  const { addWithMeta, remove, has, canAdd } = useCompare();
+  const isCompared = has('sport', slug);
+
+  const handleCompareToggle = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (isCompared) {
+      remove('sport', slug);
+    } else if (canAdd('sport', slug)) {
+      addWithMeta('sport', slug, { label: name, sublabel: sport.category, href: `/sports/${slug}` });
+    }
+  };
 
   return (
     <motion.div
@@ -70,12 +85,24 @@ export const SportCard = React.memo(function SportCard({ sport }: { sport: Sport
           </div>
         </Link>
         <div className="flex flex-col gap-2.5 p-4">
-          <div className="flex flex-wrap gap-1.5">
+          <div className="flex flex-wrap items-center gap-1.5">
             <Badge variant="secondary" className="text-[10px] capitalize">{participation}</Badge>
             <Badge variant="secondary" className="text-[10px] capitalize">{environment}</Badge>
             <Badge variant="secondary" className={`text-[10px] capitalize ${difficultyColor[difficulty] ?? ''}`}>
               {difficulty}
             </Badge>
+            <button
+              type="button"
+              onClick={handleCompareToggle}
+              className={`ml-auto inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-md border transition-colors ${
+                isCompared
+                  ? 'border-primary bg-primary/10 text-primary'
+                  : 'border-border/60 text-muted-foreground hover:border-primary/40 hover:text-foreground'
+              }`}
+              aria-label={isCompared ? `Remove ${name} from compare` : `Add ${name} to compare`}
+            >
+              {isCompared ? <Check className="h-3.5 w-3.5" /> : <GitCompareArrows className="h-3.5 w-3.5" />}
+            </button>
           </div>
           <Button size="lg" className="w-full h-11" asChild>
             <Link href={`/sports/${slug}`}>
