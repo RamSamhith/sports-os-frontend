@@ -16,17 +16,28 @@
     "**/*.log": true,
     "**/sportsOS-nodejs/**": true,
     "**/sports-os-Database/**": true,
-    "**/PJ-RNWG/**": true
+    "**/PJ-RNWG/**": true,
+    "**/frontend/web/**": true,
+    "**/Backend-API/**": true,
+    "**/Database/**": true,
+    "**/Flutter-Firebase-Authentication/**": true,
+    "**/SportsAcademyData-Backend/**": true
   },
   "files.exclude": {
     "**/.next": true,
     "**/node_modules": true,
     "**/sportsOS-nodejs/**": true,
     "**/sports-os-Database/**": true,
-    "**/PJ-RNWG/**": true
+    "**/PJ-RNWG/**": true,
+    "**/frontend/web/**": true,
+    "**/Backend-API/**": true,
+    "**/Database/**": true,
+    "**/Flutter-Firebase-Authentication/**": true,
+    "**/SportsAcademyData-Backend/**": true
   },
   "debug.javascript.warnOnLongPrediction": 5000,
   "debug.javascript.terminalDebugPort": 9229,
+  "debug.javascript.showInlineStepSelector": true,
   "javascript.suggest.autoImports": true,
   "typescript.suggest.autoImports": true,
   "[typescriptreact]": {

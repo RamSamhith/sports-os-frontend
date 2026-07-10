@@ -2,12 +2,12 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Next.js: Debug Server-Side",
+      "name": "Next.js: Full Stack Debug",
       "type": "node",
       "request": "launch",
       "runtimeExecutable": "node",
       "runtimeArgs": ["--inspect"],
-      "program": "${workspaceFolder}/node_modules/.bin/next",
+      "program": "${workspaceFolder}/node_modules/next/dist/bin/next",
       "args": ["dev"],
       "cwd": "${workspaceFolder}",
       "console": "integratedTerminal",
@@ -25,7 +25,25 @@
       "internalConsoleOptions": "openOnSessionStart"
     },
     {
-      "name": "Next.js: Debug Client-Side (Chrome)",
+      "name": "Next.js: Server Only Debug",
+      "type": "node",
+      "request": "launch",
+      "runtimeExecutable": "node",
+      "runtimeArgs": ["--inspect"],
+      "program": "${workspaceFolder}/node_modules/next/dist/bin/next",
+      "args": ["dev"],
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "env": {
+        "NODE_OPTIONS": "--inspect"
+      },
+      "skipFiles": ["<node_internals>/**"],
+      "sourceMaps": true,
+      "outFiles": ["${workspaceFolder}/.next/**"],
+      "internalConsoleOptions": "openOnSessionStart"
+    },
+    {
+      "name": "Chrome: Client Only Debug",
       "type": "chrome",
       "request": "launch",
       "url": "http://localhost:3000",
@@ -35,44 +53,40 @@
         "../app/*": "${webRoot}/app/*",
         "../components/*": "${webRoot}/components/*",
         "../lib/*": "${webRoot}/lib/*",
-        "../config/*": "${webRoot}/config/*"
+        "../config/*": "${webRoot}/config/*",
+        "../types/*": "${webRoot}/types/*",
+        "../data/*": "${webRoot}/data/*"
       },
       "skipFiles": ["**/node_modules/**"],
       "sourceMaps": true,
       "internalConsoleOptions": "openOnSessionStart"
     },
     {
-      "name": "Next.js: Debug Full Stack",
+      "name": "Attach: Running Chrome",
+      "type": "chrome",
+      "request": "attach",
+      "port": 9222,
+      "webRoot": "${workspaceFolder}",
+      "sourceMapPathOverrides": {
+        "../*": "${webRoot}/*",
+        "../app/*": "${webRoot}/app/*",
+        "../components/*": "${webRoot}/components/*",
+        "../lib/*": "${webRoot}/lib/*",
+        "../config/*": "${webRoot}/config/*",
+        "../types/*": "${webRoot}/types/*",
+        "../data/*": "${webRoot}/data/*"
+      },
+      "skipFiles": ["**/node_modules/**"],
+      "sourceMaps": true
+    },
+    {
+      "name": "Attach: Node Process",
       "type": "node",
-      "request": "launch",
-      "runtimeExecutable": "node",
-      "runtimeArgs": ["--inspect"],
-      "program": "${workspaceFolder}/node_modules/.bin/next",
-      "args": ["dev"],
-      "cwd": "${workspaceFolder}",
-      "console": "integratedTerminal",
-      "serverReadyAction": {
-        "pattern": "- Local:.+(https?://.+)",
-        "uriFormat": "%s",
-        "action": "debugWithChrome"
-      },
-      "env": {
-        "NODE_OPTIONS": "--inspect"
-      },
+      "request": "attach",
+      "port": 9229,
       "skipFiles": ["<node_internals>/**"],
       "sourceMaps": true,
       "outFiles": ["${workspaceFolder}/.next/**"]
-    }
-  ],
-  "compounds": [
-    {
-      "name": "Next.js: Full Stack Debug (Server + Chrome)",
-      "configurations": [
-        "Next.js: Debug Server-Side",
-        "Next.js: Debug Client-Side (Chrome)"
-      ],
-      "stopAll": true,
-      "preLaunchTask": ""
     }
   ]
 }

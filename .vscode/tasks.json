@@ -2,6 +2,20 @@
   "version": "2.0.0",
   "tasks": [
     {
+      "label": "pnpm: Install Dependencies",
+      "type": "shell",
+      "command": "pnpm",
+      "args": ["install"],
+      "isBackground": false,
+      "problemMatcher": [],
+      "group": "build",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      }
+    },
+    {
       "label": "Next.js: Dev Server",
       "type": "shell",
       "command": "pnpm",
@@ -25,7 +39,12 @@
       "args": ["typecheck"],
       "isBackground": false,
       "problemMatcher": "$tsc",
-      "group": "test"
+      "group": "test",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      }
     },
     {
       "label": "ESLint: Lint",
@@ -34,7 +53,12 @@
       "args": ["lint"],
       "isBackground": false,
       "problemMatcher": [],
-      "group": "test"
+      "group": "test",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      }
     },
     {
       "label": "Next.js: Build",
@@ -43,7 +67,12 @@
       "args": ["build"],
       "isBackground": false,
       "problemMatcher": [],
-      "group": "build"
+      "group": "build",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      }
     }
   ]
 }
