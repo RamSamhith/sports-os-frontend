@@ -59,7 +59,7 @@ export function ImageWithFallback({
         role="img"
         aria-label={alt}
         className={cn(
-          'from-primary/15 via-accent/10 to-primary/5 text-foreground/70 grid place-items-center bg-gradient-to-br',
+          'bg-muted text-muted-foreground grid place-items-center',
           className,
         )}
       >

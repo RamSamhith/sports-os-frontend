@@ -2,13 +2,13 @@
 
 import * as React from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { motion, useReducedMotion } from 'framer-motion';
 import { Bookmark, BookmarkCheck, GitCompare, MapPin, Star } from 'lucide-react';
 import { toast } from 'sonner';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { AcademyImage } from '@/components/ui/academy-image';
 import { VerifiedBadge } from '@/components/trust/verified-badge';
 import { useShortlist } from '@/lib/hooks/use-shortlist';
 import { useCompare } from '@/lib/hooks/use-compare';
@@ -22,7 +22,58 @@ interface AcademyCardPlaceholderProps {
   distance?: number;
 }
 
-export const AcademyCardPlaceholder = React.memo(function AcademyCardPlaceholder({ academy, priority = false }: AcademyCardPlaceholderProps) {
+const SPORT_ACCENT: Record<string, string> = {
+  football: 'bg-green-500/10 text-green-600 dark:text-green-400',
+  basketball: 'bg-orange-500/10 text-orange-600 dark:text-orange-400',
+  swimming: 'bg-blue-500/10 text-blue-600 dark:text-blue-400',
+  athletics: 'bg-amber-500/10 text-amber-600 dark:text-amber-400',
+  badminton: 'bg-teal-500/10 text-teal-600 dark:text-teal-400',
+  cricket: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400',
+  tennis: 'bg-lime-500/10 text-lime-600 dark:text-lime-400',
+  'table-tennis': 'bg-cyan-500/10 text-cyan-600 dark:text-cyan-400',
+  wrestling: 'bg-red-500/10 text-red-600 dark:text-red-400',
+  boxing: 'bg-red-500/10 text-red-600 dark:text-red-400',
+  karate: 'bg-red-500/10 text-red-600 dark:text-red-400',
+  judo: 'bg-red-500/10 text-red-600 dark:text-red-400',
+  kabaddi: 'bg-orange-500/10 text-orange-600 dark:text-orange-400',
+  hockey: 'bg-blue-500/10 text-blue-600 dark:text-blue-400',
+  chess: 'bg-violet-500/10 text-violet-600 dark:text-violet-400',
+  skating: 'bg-sky-500/10 text-sky-600 dark:text-sky-400',
+  archery: 'bg-amber-500/10 text-amber-600 dark:text-amber-400',
+  shooting: 'bg-slate-500/10 text-slate-600 dark:text-slate-400',
+  yoga: 'bg-purple-500/10 text-purple-600 dark:text-purple-400',
+  gymnastics: 'bg-pink-500/10 text-pink-600 dark:text-pink-400',
+  volleyball: 'bg-orange-500/10 text-orange-600 dark:text-orange-400',
+};
+
+const SPORT_DISPLAY: Record<string, string> = {
+  cricket: 'Cricket',
+  football: 'Football',
+  basketball: 'Basketball',
+  badminton: 'Badminton',
+  tennis: 'Tennis',
+  'table-tennis': 'Table Tennis',
+  swimming: 'Swimming',
+  athletics: 'Athletics',
+  wrestling: 'Wrestling',
+  boxing: 'Boxing',
+  karate: 'Karate',
+  judo: 'Judo',
+  kabaddi: 'Kabaddi',
+  hockey: 'Hockey',
+  chess: 'Chess',
+  skating: 'Skating',
+  archery: 'Archery',
+  shooting: 'Shooting',
+  yoga: 'Yoga',
+  gymnastics: 'Gymnastics',
+  volleyball: 'Volleyball',
+};
+
+export const AcademyCardPlaceholder = React.memo(function AcademyCardPlaceholder({
+  academy,
+  priority = false,
+}: AcademyCardPlaceholderProps) {
   const reduced = useReducedMotion();
   const {
     id,
@@ -34,6 +85,7 @@ export const AcademyCardPlaceholder = React.memo(function AcademyCardPlaceholder
     verificationStatus,
     coverImage,
   } = academy;
+
   const avg = typeof rating === 'number' ? rating : (rating?.average ?? 0);
   const cnt = typeof rating === 'number' ? 0 : (rating?.count ?? 0);
   const primarySport = sportsOffered?.[0];
@@ -51,122 +103,145 @@ export const AcademyCardPlaceholder = React.memo(function AcademyCardPlaceholder
   } = useCompare();
   const isCompared = hasCompare('academy', slug);
 
+  const hasCover = Boolean(coverImage);
+  const accent = primarySport ? (SPORT_ACCENT[primarySport] ?? 'bg-muted text-muted-foreground') : 'bg-muted text-muted-foreground';
+  const sportLabel = primarySport ? (SPORT_DISPLAY[primarySport] ?? primarySport.replace(/-/g, ' ')) : '';
+
   return (
     <motion.div
-      whileHover={reduced ? undefined : { y: -4, scale: 1.008 }}
-      whileTap={reduced ? undefined : { scale: 0.995 }}
+      whileHover={reduced ? undefined : { y: -2 }}
+      whileTap={reduced ? undefined : { scale: 0.998 }}
       transition={{ duration: duration.fast, ease: ease.athletic }}
       className="w-full"
     >
-      <Card className="group overflow-hidden border-border/40 hover:border-foreground/20 hover:shadow-xl transition-all duration-300">
-        <Link
-          href={`/academies/${slug}`}
-          className="bg-muted/40 relative block aspect-[16/9] w-full overflow-hidden focus-visible:ring-ring focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
-          aria-label={`${name}, ${location?.city ?? 'Unknown'}`}
-        >
-          <AcademyImage
-            coverImage={coverImage}
-            slug={slug}
-            sportsOffered={sportsOffered}
-            name={name}
-            alt={`${name} cover image`}
-            fill
-            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-            priority={priority}
-            className="object-cover transition-transform duration-500 ease-out group-hover:scale-[1.06]"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
-
-          <div className="absolute top-3 left-3 flex gap-2">
-            <VerifiedBadge status={verificationStatus} />
-          </div>
-
-          <div className="absolute top-3 right-3 flex gap-1.5">
-            <Button
-              size="icon-touch"
-              variant={isSaved ? 'default' : 'secondary'}
-              className="bg-background/80 backdrop-blur-sm hover:bg-background/95 shadow-sm"
-              aria-label={isSaved ? `Remove ${name} from shortlist` : `Save ${name}`}
-              aria-pressed={isSaved}
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                if (isSaved) {
-                  removeFromShortlist('academy', id);
-                  toast(`Removed ${name} from shortlist`);
-                } else {
-                  addWithMeta('academy', id, {
-                    label: name,
-                    sublabel: `${location?.city ?? 'Unknown'}, ${location?.state ?? ''}`,
-                    href: `/academies/${slug}`,
-                  });
-                  toast.success(`Saved ${name}`);
-                }
-              }}
-            >
-              {isSaved ? <BookmarkCheck className="h-4 w-4" /> : <Bookmark className="h-4 w-4" />}
-            </Button>
-            <Button
-              size="icon-touch"
-              variant={isCompared ? 'default' : 'secondary'}
-              className="bg-background/80 backdrop-blur-sm hover:bg-background/95 shadow-sm"
-              aria-label={isCompared ? `Remove ${name} from compare` : `Compare ${name}`}
-              aria-pressed={isCompared}
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                if (isCompared) {
-                  removeFromCompare('academy', slug);
-                  toast(`Removed ${name} from compare`);
-                } else if (canAddToCompare('academy', slug)) {
-                  addToCompare('academy', slug, {
-                    label: name,
-                    sublabel: `${location?.city ?? 'Unknown'}, ${location?.state ?? ''}`,
-                    href: `/academies/${slug}`,
-                  });
-                  toast.success(`Added ${name} to compare`);
-                } else {
-                  toast.error(`You can compare up to ${maxItems} items.`);
-                }
-              }}
-            >
-              <GitCompare aria-hidden className="h-4 w-4" />
-            </Button>
-          </div>
-
-          <div className="absolute bottom-3 left-3 right-3">
-            <h3 className="text-base font-bold text-white drop-shadow-sm line-clamp-1">{name}</h3>
-            <div className="flex items-center gap-2 mt-0.5">
-              <div className="flex items-center gap-1 text-white/90">
-                <Star aria-hidden className="h-3.5 w-3.5 fill-amber-400 text-amber-400 drop-shadow-sm" />
-                <span className="text-sm font-semibold">{avg.toFixed(1)}</span>
-              </div>
-              <span className="flex items-center gap-1 text-white/70 text-xs">
-                <MapPin aria-hidden className="h-3 w-3" />
-                {location?.city ?? 'Unknown'}
-              </span>
-            </div>
-          </div>
-        </Link>
+      <Card className="group overflow-hidden border border-border/60 bg-card transition-colors duration-200 hover:border-border">
+        {hasCover && (
+          <Link
+            href={`/academies/${slug}`}
+            className="relative block aspect-[16/9] w-full overflow-hidden focus-visible:ring-ring focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
+            aria-label={`${name} cover photo`}
+          >
+            <Image
+              src={coverImage!}
+              alt={`${name} cover`}
+              fill
+              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+              priority={priority}
+              className="object-cover transition-transform duration-500 ease-out group-hover:scale-[1.03]"
+            />
+          </Link>
+        )}
 
         <div className="flex flex-col gap-3 p-4">
-          {primarySport && (
-            <Badge variant="secondary" className="w-fit capitalize text-xs">
-              {primarySport.replace(/-/g, ' ')}
-              {sportCount > 1 && <span className="ml-1 text-muted-foreground">+{sportCount - 1}</span>}
-            </Badge>
-          )}
+          <div className="flex items-start justify-between gap-3">
+            <div className="flex items-center gap-2.5 min-w-0">
+              {primarySport && (
+                <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-md ${accent}`}>
+                  <Image
+                    src={`/images/sports/${primarySport}.svg`}
+                    alt=""
+                    width={16}
+                    height={16}
+                    className="h-4 w-4 opacity-80"
+                    aria-hidden
+                  />
+                </div>
+              )}
+              <div className="min-w-0">
+                <h3 className="text-sm font-semibold leading-snug text-foreground line-clamp-1">
+                  {name}
+                </h3>
+                {sportLabel && (
+                  <p className="text-xs text-muted-foreground line-clamp-1">
+                    {sportLabel}
+                    {location?.city ? ` · ${location.city}` : ''}
+                  </p>
+                )}
+              </div>
+            </div>
 
-          <div className="flex items-center gap-1 text-xs text-muted-foreground">
-            <Star className="h-3 w-3 fill-amber-400 text-amber-400" />
-            <span className="font-medium text-foreground">{avg.toFixed(1)}</span>
-            <span>({cnt})</span>
-            <span className="mx-1.5">&middot;</span>
-            <MapPin className="h-3 w-3" />
-            <span>{location?.city ?? 'Unknown'}{location?.state ? `, ${location.state}` : ''}</span>
+            <div className="flex shrink-0 items-center gap-1">
+              <VerifiedBadge status={verificationStatus} className="text-xs" />
+              <button
+                type="button"
+                className="flex h-8 w-8 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                aria-label={isSaved ? `Remove ${name} from saved` : `Save ${name}`}
+                aria-pressed={isSaved}
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  if (isSaved) {
+                    removeFromShortlist('academy', id);
+                    toast(`Removed ${name} from saved`);
+                  } else {
+                    addWithMeta('academy', id, {
+                      label: name,
+                      sublabel: `${location?.city ?? 'Unknown'}, ${location?.state ?? ''}`,
+                      href: `/academies/${slug}`,
+                    });
+                    toast.success(`Saved ${name}`);
+                  }
+                }}
+              >
+                {isSaved ? <BookmarkCheck className="h-4 w-4" /> : <Bookmark className="h-4 w-4" />}
+              </button>
+              <button
+                type="button"
+                className="flex h-8 w-8 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+                aria-label={isCompared ? `Remove ${name} from compare` : `Compare ${name}`}
+                aria-pressed={isCompared}
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  if (isCompared) {
+                    removeFromCompare('academy', slug);
+                    toast(`Removed ${name} from compare`);
+                  } else if (canAddToCompare('academy', slug)) {
+                    addToCompare('academy', slug, {
+                      label: name,
+                      sublabel: `${location?.city ?? 'Unknown'}, ${location?.state ?? ''}`,
+                      href: `/academies/${slug}`,
+                    });
+                    toast.success(`Added ${name} to compare`);
+                  } else {
+                    toast.error(`You can compare up to ${maxItems} items.`);
+                  }
+                }}
+              >
+                <GitCompare className="h-4 w-4" />
+              </button>
+            </div>
           </div>
 
-          <Button size="lg" className="w-full h-11 mt-1" asChild>
+          <div className="flex items-center gap-3 text-xs text-muted-foreground">
+            <span className="inline-flex items-center gap-1">
+              <Star className="h-3.5 w-3.5 fill-amber-500 text-amber-500" />
+              <span className="font-medium text-foreground">{avg > 0 ? avg.toFixed(1) : '—'}</span>
+              {cnt > 0 && <span>({cnt})</span>}
+            </span>
+            {location?.city && (
+              <span className="inline-flex items-center gap-1">
+                <MapPin className="h-3.5 w-3.5" />
+                {location.city}
+                {location.state ? `, ${location.state}` : ''}
+              </span>
+            )}
+          </div>
+
+          {sportCount > 0 && (
+            <div className="flex flex-wrap gap-1.5">
+              <Badge variant="secondary" className="capitalize text-xs font-medium">
+                {sportLabel || primarySport?.replace(/-/g, ' ')}
+              </Badge>
+              {sportCount > 1 && (
+                <Badge variant="outline" className="text-xs text-muted-foreground">
+                  +{sportCount - 1} more
+                </Badge>
+              )}
+            </div>
+          )}
+
+          <Button size="sm" className="w-full mt-0.5" asChild>
             <Link href={`/academies/${slug}`} onClick={() => trackAcademyCardClick(slug, 0, 'listing')}>
               View Details
             </Link>
