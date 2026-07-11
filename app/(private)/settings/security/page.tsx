@@ -10,7 +10,8 @@ import { PhoneInput } from '@/components/ui/phone-input';
 import { useAuth } from '@/lib/hooks/use-auth';
 import { useRouter } from 'next/navigation';
 import { changePassword, changeEmail, changePhone, deleteAccount } from '@/lib/api/auth';
-import { Lock, Mail, Phone, Trash2, Loader2, Shield, Eye, EyeOff } from 'lucide-react';
+import { Lock, Mail, Phone, Trash2, Loader2, Shield } from 'lucide-react';
+import { PasswordInput } from '@/components/ui/password-input';
 import { toast } from 'sonner';
 import * as Dialog from '@radix-ui/react-dialog';
 
@@ -22,8 +23,6 @@ export default function AccountSecurityPage() {
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
-  const [showNewPassword, setShowNewPassword] = useState(false);
   const [changingPassword, setChangingPassword] = useState(false);
 
   // Change Email
@@ -164,51 +163,30 @@ export default function AccountSecurityPage() {
             <form onSubmit={handleChangePassword} className="flex flex-col gap-4" noValidate>
               <div className="flex flex-col gap-1.5">
                 <Label htmlFor="current-password">Current Password</Label>
-                <div className="relative">
-                  <Input
-                    id="current-password"
-                    type={showCurrentPassword ? 'text' : 'password'}
-                    value={currentPassword}
-                    onChange={(e) => setCurrentPassword(e.target.value)}
-                    placeholder="Enter current password"
-                    required
-                    disabled={changingPassword}
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowCurrentPassword(!showCurrentPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-                  >
-                    {showCurrentPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                  </button>
-                </div>
+                <PasswordInput
+                  id="current-password"
+                  value={currentPassword}
+                  onChange={(e) => setCurrentPassword(e.target.value)}
+                  placeholder="Enter current password"
+                  required
+                  disabled={changingPassword}
+                />
               </div>
               <div className="flex flex-col gap-1.5">
                 <Label htmlFor="new-password">New Password</Label>
-                <div className="relative">
-                  <Input
-                    id="new-password"
-                    type={showNewPassword ? 'text' : 'password'}
-                    value={newPassword}
-                    onChange={(e) => setNewPassword(e.target.value)}
-                    placeholder="At least 8 characters"
-                    required
-                    disabled={changingPassword}
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowNewPassword(!showNewPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-                  >
-                    {showNewPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                  </button>
-                </div>
+                <PasswordInput
+                  id="new-password"
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  placeholder="At least 8 characters"
+                  required
+                  disabled={changingPassword}
+                />
               </div>
               <div className="flex flex-col gap-1.5">
                 <Label htmlFor="confirm-password">Confirm Password</Label>
-                <Input
+                <PasswordInput
                   id="confirm-password"
-                  type="password"
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   placeholder="Re-enter new password"
@@ -257,9 +235,8 @@ export default function AccountSecurityPage() {
             </div>
             <div className="flex flex-col gap-1.5">
               <Label htmlFor="email-password">Confirm Password</Label>
-              <Input
+              <PasswordInput
                 id="email-password"
-                type="password"
                 value={emailPassword}
                 onChange={(e) => setEmailPassword(e.target.value)}
                 placeholder="Enter your password"
@@ -350,9 +327,8 @@ export default function AccountSecurityPage() {
               ) : (
                 <div className="flex flex-col gap-1.5">
                   <Label htmlFor="delete-password">Enter your password to confirm</Label>
-                  <Input
+                  <PasswordInput
                     id="delete-password"
-                    type="password"
                     value={deletePassword}
                     onChange={(e) => setDeletePassword(e.target.value)}
                     placeholder="Your password"

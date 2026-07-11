@@ -7,10 +7,11 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { PhoneInput } from '@/components/ui/phone-input';
+import { PasswordInput } from '@/components/ui/password-input';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { SharedLayout } from '@/components/motion/shared-layout';
-import { Loader2, Eye, EyeOff } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 import { useAuth } from '@/lib/hooks/use-auth';
 import { register as apiRegister } from '@/lib/api/auth';
 import { useGoogleAuth, handleSocialAuth } from '@/lib/hooks/use-social-auth';
@@ -50,9 +51,6 @@ export default function RegisterPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [socialLoading, setSocialLoading] = useState<'google' | null>(null);
   const [socialError, setSocialError] = useState<string | null>(null);
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-
   const googleAuth = useGoogleAuth();
 
   useEffect(() => {
@@ -408,24 +406,18 @@ export default function RegisterPage() {
               className="flex flex-col gap-1.5"
             >
               <Label htmlFor="register-password">Password</Label>
-              <div className="relative">
-                <Input
-                  id="register-password"
-                  type={showPassword ? 'text' : 'password'}
-                  placeholder="At least 8 characters"
-                  value={password}
-                  onChange={(e) => handleChange('password', e.target.value)}
-                  onBlur={(e) => handleBlur('password', e.target.value)}
-                  required
-                  autoComplete="new-password"
-                  aria-invalid={!!errors.password}
-                  aria-describedby={errors.password ? errorId('password') : undefined}
-                  disabled={isSubmitting}
-                />
-                <button type="button" onClick={() => setShowPassword(v => !v)} className="text-muted-foreground hover:text-foreground absolute right-3 top-1/2 -translate-y-1/2" tabIndex={0} aria-label={showPassword ? 'Hide password' : 'Show password'}>
-                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                </button>
-              </div>
+              <PasswordInput
+                id="register-password"
+                placeholder="At least 8 characters"
+                value={password}
+                onChange={(e) => handleChange('password', e.target.value)}
+                onBlur={(e) => handleBlur('password', e.target.value)}
+                required
+                autoComplete="new-password"
+                aria-invalid={!!errors.password}
+                aria-describedby={errors.password ? errorId('password') : undefined}
+                disabled={isSubmitting}
+              />
               {password.length > 0 && (
                 <div className="mt-1 flex flex-col gap-1">
                   {(() => {
@@ -478,24 +470,18 @@ export default function RegisterPage() {
               className="flex flex-col gap-1.5"
             >
               <Label htmlFor="register-confirm-password">Confirm Password</Label>
-              <div className="relative">
-                <Input
-                  id="register-confirm-password"
-                  type={showConfirmPassword ? 'text' : 'password'}
-                  placeholder="Re-enter your password"
-                  value={confirmPassword}
-                  onChange={(e) => handleChange('confirmPassword', e.target.value)}
-                  onBlur={(e) => handleBlur('confirmPassword', e.target.value)}
-                  required
-                  autoComplete="new-password"
-                  aria-invalid={!!errors.confirmPassword}
-                  aria-describedby={errors.confirmPassword ? errorId('confirmPassword') : undefined}
-                  disabled={isSubmitting}
-                />
-                <button type="button" onClick={() => setShowConfirmPassword(v => !v)} className="text-muted-foreground hover:text-foreground absolute right-3 top-1/2 -translate-y-1/2" tabIndex={0} aria-label={showConfirmPassword ? 'Hide password' : 'Show password'}>
-                  {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                </button>
-              </div>
+              <PasswordInput
+                id="register-confirm-password"
+                placeholder="Re-enter your password"
+                value={confirmPassword}
+                onChange={(e) => handleChange('confirmPassword', e.target.value)}
+                onBlur={(e) => handleBlur('confirmPassword', e.target.value)}
+                required
+                autoComplete="new-password"
+                aria-invalid={!!errors.confirmPassword}
+                aria-describedby={errors.confirmPassword ? errorId('confirmPassword') : undefined}
+                disabled={isSubmitting}
+              />
               {errors.confirmPassword && (
                 <p id={errorId('confirmPassword')} role="alert" className="text-destructive text-xs">
                   {errors.confirmPassword}

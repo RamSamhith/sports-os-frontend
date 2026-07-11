@@ -75,20 +75,6 @@ export async function updateProfile(data: UpdateProfileRequest): Promise<ApiResp
   return patch<User>('/auth/profile', data);
 }
 
-export interface ResetPasswordRequest {
-  token: string;
-  password: string;
-}
-
-export interface ResetPasswordResponse {
-  message: string;
-}
-
-export async function resetPassword(data: ResetPasswordRequest): Promise<ApiResponse<ResetPasswordResponse>> {
-  const { post } = await import('./client');
-  return post<ResetPasswordResponse>('/auth/reset-password', data);
-}
-
 // ─── Sessions ────────────────────────────────────────────────
 
 export interface Session {

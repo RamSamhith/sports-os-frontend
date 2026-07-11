@@ -36,8 +36,6 @@ export type AnalyticsEventName =
   | 'guest.shortlist'
   | 'guest.compare'
   | 'guest.conversion'
-  | 'auth.forgot_password_started'
-  | 'auth.password_reset_success'
   | 'profile.child_add'
   | 'profile.child_switch'
   | 'error.client'

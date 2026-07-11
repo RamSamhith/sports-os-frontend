@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" fill="none">
+  <defs>
+    <linearGradient id="bg-judo-6" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#eff6ff"/>
+      <stop offset="100%" stop-color="#eff6ff" stop-opacity="0.5"/>
+    </linearGradient>
+    <linearGradient id="accent-judo-6" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1e3a5f"/>
+      <stop offset="100%" stop-color="#1e3a5f"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="600" fill="url(#bg-judo-6)"/>
+  
+      <rect x="80" y="50" width="640" height="500" rx="6" fill="#1e3a5f" opacity="0.08"/>
+      <rect x="100" y="70" width="600" height="460" rx="4" fill="#2563eb" opacity="0.06"/>
+      <line x1="400" y1="70" x2="400" y2="530" stroke="#3b82f6" stroke-width="1" opacity="0.15"/>
+      <line x1="100" y1="300" x2="700" y2="300" stroke="#3b82f6" stroke-width="1" opacity="0.15"/>
+      <circle cx="400" cy="300" r="50" fill="none" stroke="#3b82f6" stroke-width="1" opacity="0.15"/>
+  <circle cx="180" cy="180" r="8" fill="#60a5fa" opacity="0.6"/><circle cx="300" cy="220" r="10" fill="#60a5fa" opacity="0.6"/><circle cx="500" cy="180" r="12" fill="#60a5fa" opacity="0.6"/><circle cx="620" cy="220" r="8" fill="#60a5fa" opacity="0.6"/><circle cx="200" cy="400" r="10" fill="#93c5fd" opacity="0.6"/><circle cx="350" cy="380" r="12" fill="#93c5fd" opacity="0.6"/><circle cx="450" cy="400" r="8" fill="#93c5fd" opacity="0.6"/><circle cx="600" cy="380" r="10" fill="#93c5fd" opacity="0.6"/>
+  
+      <rect x="120" y="100" width="60" height="4" rx="2" fill="#3b82f6" opacity="0.2"/>
+      <rect x="620" y="460" width="60" height="4" rx="2" fill="#3b82f6" opacity="0.2"/>
+  <text x="400" y="575" text-anchor="middle" font-family="system-ui, sans-serif" font-size="14" font-weight="600" fill="#1e3a5f" opacity="0.25">Judo Academy</text>
+</svg>

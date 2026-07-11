@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" fill="none">
+  <defs>
+    <linearGradient id="bg-archery-6" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#d1fae5"/>
+      <stop offset="100%" stop-color="#d1fae5" stop-opacity="0.5"/>
+    </linearGradient>
+    <linearGradient id="accent-archery-6" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#064e3b"/>
+      <stop offset="100%" stop-color="#047857"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="600" fill="url(#bg-archery-6)"/>
+  
+      <rect x="80" y="50" width="640" height="500" rx="6" fill="#047857" opacity="0.08"/>
+      <rect x="100" y="70" width="600" height="460" rx="4" fill="#059669" opacity="0.06"/>
+      <line x1="400" y1="70" x2="400" y2="530" stroke="#10b981" stroke-width="1" opacity="0.15"/>
+      <line x1="100" y1="300" x2="700" y2="300" stroke="#10b981" stroke-width="1" opacity="0.15"/>
+      <circle cx="400" cy="300" r="50" fill="none" stroke="#10b981" stroke-width="1" opacity="0.15"/>
+  <circle cx="180" cy="180" r="8" fill="#34d399" opacity="0.6"/><circle cx="300" cy="220" r="10" fill="#34d399" opacity="0.6"/><circle cx="500" cy="180" r="12" fill="#34d399" opacity="0.6"/><circle cx="620" cy="220" r="8" fill="#34d399" opacity="0.6"/><circle cx="200" cy="400" r="10" fill="#6ee7b7" opacity="0.6"/><circle cx="350" cy="380" r="12" fill="#6ee7b7" opacity="0.6"/><circle cx="450" cy="400" r="8" fill="#6ee7b7" opacity="0.6"/><circle cx="600" cy="380" r="10" fill="#6ee7b7" opacity="0.6"/>
+  
+      <rect x="120" y="100" width="60" height="4" rx="2" fill="#10b981" opacity="0.2"/>
+      <rect x="620" y="460" width="60" height="4" rx="2" fill="#10b981" opacity="0.2"/>
+  <text x="400" y="575" text-anchor="middle" font-family="system-ui, sans-serif" font-size="14" font-weight="600" fill="#064e3b" opacity="0.25">Archery Academy</text>
+</svg>

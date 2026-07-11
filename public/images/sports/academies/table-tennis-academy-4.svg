@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" fill="none">
+  <defs>
+    <linearGradient id="bg-table-tennis-3" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#cffafe"/>
+      <stop offset="100%" stop-color="#cffafe" stop-opacity="0.5"/>
+    </linearGradient>
+    <linearGradient id="accent-table-tennis-3" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#155e75"/>
+      <stop offset="100%" stop-color="#0e7490"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="600" fill="url(#bg-table-tennis-3)"/>
+  
+      <polygon points="100,550 700,550 750,100 50,100" fill="#0891b2" opacity="0.08"/>
+      <line x1="400" y1="100" x2="400" y2="550" stroke="#06b6d4" stroke-width="2" opacity="0.2" stroke-dasharray="8,4"/>
+      <rect x="380" y="280" width="40" height="4" rx="2" fill="#22d3ee" opacity="0.5"/>
+  
+      <circle cx="220" cy="350" r="14" fill="#22d3ee"/>
+      <line x1="220" y1="364" x2="220" y2="400" stroke="#22d3ee" stroke-width="3"/>
+      <circle cx="580" cy="320" r="14" fill="#67e8f9"/>
+      <line x1="580" y1="334" x2="580" y2="370" stroke="#67e8f9" stroke-width="3"/>
+      <circle cx="350" cy="450" r="10" fill="#22d3ee" opacity="0.7"/>
+      <circle cx="480" cy="200" r="10" fill="#67e8f9" opacity="0.7"/>
+  
+      <rect x="100" y="520" width="80" height="6" rx="3" fill="#06b6d4" opacity="0.3"/>
+      <rect x="620" y="520" width="80" height="6" rx="3" fill="#06b6d4" opacity="0.3"/>
+  <text x="400" y="575" text-anchor="middle" font-family="system-ui, sans-serif" font-size="14" font-weight="600" fill="#155e75" opacity="0.25">Table Tennis Academy</text>
+</svg>

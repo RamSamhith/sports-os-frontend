@@ -148,16 +148,6 @@ export function trackGuestConversion(method: string) {
   track('guest_conversion', { method });
 }
 
-// ─── Auth Extra Events ──────────────────────────────────────
-
-export function trackForgotPasswordStarted() {
-  track('forgot_password_started');
-}
-
-export function trackPasswordResetSuccess() {
-  track('password_reset_success');
-}
-
 // ─── Feedback Events ────────────────────────────────────────
 
 export function trackFeedback(type: string, message: string, page?: string) {

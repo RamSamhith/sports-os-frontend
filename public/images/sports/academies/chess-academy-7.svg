@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" fill="none">
+  <defs>
+    <linearGradient id="bg-chess-6" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f3f4f6"/>
+      <stop offset="100%" stop-color="#f3f4f6" stop-opacity="0.5"/>
+    </linearGradient>
+    <linearGradient id="accent-chess-6" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#111827"/>
+      <stop offset="100%" stop-color="#1f2937"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="600" fill="url(#bg-chess-6)"/>
+  
+      <rect x="80" y="50" width="640" height="500" rx="6" fill="#1f2937" opacity="0.08"/>
+      <rect x="100" y="70" width="600" height="460" rx="4" fill="#374151" opacity="0.06"/>
+      <line x1="400" y1="70" x2="400" y2="530" stroke="#4b5563" stroke-width="1" opacity="0.15"/>
+      <line x1="100" y1="300" x2="700" y2="300" stroke="#4b5563" stroke-width="1" opacity="0.15"/>
+      <circle cx="400" cy="300" r="50" fill="none" stroke="#4b5563" stroke-width="1" opacity="0.15"/>
+  <circle cx="180" cy="180" r="8" fill="#6b7280" opacity="0.6"/><circle cx="300" cy="220" r="10" fill="#6b7280" opacity="0.6"/><circle cx="500" cy="180" r="12" fill="#6b7280" opacity="0.6"/><circle cx="620" cy="220" r="8" fill="#6b7280" opacity="0.6"/><circle cx="200" cy="400" r="10" fill="#9ca3af" opacity="0.6"/><circle cx="350" cy="380" r="12" fill="#9ca3af" opacity="0.6"/><circle cx="450" cy="400" r="8" fill="#9ca3af" opacity="0.6"/><circle cx="600" cy="380" r="10" fill="#9ca3af" opacity="0.6"/>
+  
+      <rect x="120" y="100" width="60" height="4" rx="2" fill="#4b5563" opacity="0.2"/>
+      <rect x="620" y="460" width="60" height="4" rx="2" fill="#4b5563" opacity="0.2"/>
+  <text x="400" y="575" text-anchor="middle" font-family="system-ui, sans-serif" font-size="14" font-weight="600" fill="#111827" opacity="0.25">Chess Academy</text>
+</svg>

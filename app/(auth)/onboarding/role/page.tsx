@@ -10,7 +10,6 @@ import { SharedLayout } from '@/components/motion/shared-layout';
 import { cn } from '@/lib/utils/cn';
 import { Check, ArrowRight, User, Users } from 'lucide-react';
 import { useAuth, type OnboardingRole } from '@/lib/hooks/use-auth';
-import { saveOnboarding } from '@/lib/api/auth';
 
 type Role = OnboardingRole;
 
@@ -117,9 +116,8 @@ export default function RoleSelectionPage() {
   function handleContinue() {
     if (!selected) return;
     setRole(selected);
-    // Persist role to backend (non-blocking)
-    saveOnboarding({ role: selected }).catch(() => {});
-    // Pass role via URL so wizard doesn't depend on React state commit timing
+    // Role is persisted to backend when the wizard completes (saveOnboarding in wizard).
+    // Pass role via URL so wizard doesn't depend on React state commit timing.
     router.push(`/onboarding/wizard?role=${selected}`);
   }
 

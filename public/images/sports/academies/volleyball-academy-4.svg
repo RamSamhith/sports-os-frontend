@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600" fill="none">
+  <defs>
+    <linearGradient id="bg-volleyball-3" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fff7ed"/>
+      <stop offset="100%" stop-color="#fff7ed" stop-opacity="0.5"/>
+    </linearGradient>
+    <linearGradient id="accent-volleyball-3" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#9a3412"/>
+      <stop offset="100%" stop-color="#ea580c"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="600" fill="url(#bg-volleyball-3)"/>
+  
+      <polygon points="100,550 700,550 750,100 50,100" fill="#f97316" opacity="0.08"/>
+      <line x1="400" y1="100" x2="400" y2="550" stroke="#fb923c" stroke-width="2" opacity="0.2" stroke-dasharray="8,4"/>
+      <rect x="380" y="280" width="40" height="4" rx="2" fill="#fdba74" opacity="0.5"/>
+  
+      <circle cx="220" cy="350" r="14" fill="#fdba74"/>
+      <line x1="220" y1="364" x2="220" y2="400" stroke="#fdba74" stroke-width="3"/>
+      <circle cx="580" cy="320" r="14" fill="#fed7aa"/>
+      <line x1="580" y1="334" x2="580" y2="370" stroke="#fed7aa" stroke-width="3"/>
+      <circle cx="350" cy="450" r="10" fill="#fdba74" opacity="0.7"/>
+      <circle cx="480" cy="200" r="10" fill="#fed7aa" opacity="0.7"/>
+  
+      <rect x="100" y="520" width="80" height="6" rx="3" fill="#fb923c" opacity="0.3"/>
+      <rect x="620" y="520" width="80" height="6" rx="3" fill="#fb923c" opacity="0.3"/>
+  <text x="400" y="575" text-anchor="middle" font-family="system-ui, sans-serif" font-size="14" font-weight="600" fill="#9a3412" opacity="0.25">Volleyball Academy</text>
+</svg>

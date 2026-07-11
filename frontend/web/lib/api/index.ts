@@ -6,7 +6,6 @@ export {
   getMe,
   saveOnboarding,
   updateProfile,
-  resetPassword,
   getSessions,
   revokeSession,
   revokeAllSessions,
