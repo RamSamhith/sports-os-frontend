@@ -83,7 +83,6 @@ export const AcademyCardPlaceholder = React.memo(function AcademyCardPlaceholder
     sportsOffered,
     rating,
     verificationStatus,
-    coverImage,
   } = academy;
 
   const avg = typeof rating === 'number' ? rating : (rating?.average ?? 0);
@@ -103,7 +102,6 @@ export const AcademyCardPlaceholder = React.memo(function AcademyCardPlaceholder
   } = useCompare();
   const isCompared = hasCompare('academy', slug);
 
-  const hasCover = Boolean(coverImage);
   const accent = primarySport ? (SPORT_ACCENT[primarySport] ?? 'bg-muted text-muted-foreground') : 'bg-muted text-muted-foreground';
   const sportLabel = primarySport ? (SPORT_DISPLAY[primarySport] ?? primarySport.replace(/-/g, ' ')) : '';
 
@@ -115,102 +113,32 @@ export const AcademyCardPlaceholder = React.memo(function AcademyCardPlaceholder
       className="w-full"
     >
       <Card className="group overflow-hidden border border-border/60 bg-card transition-colors duration-200 hover:border-border">
-        {hasCover && (
-          <Link
-            href={`/academies/${slug}`}
-            className="relative block aspect-[16/9] w-full overflow-hidden focus-visible:ring-ring focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
-            aria-label={`${name} cover photo`}
-          >
-            <Image
-              src={coverImage!}
-              alt={`${name} cover`}
-              fill
-              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-              priority={priority}
-              className="object-cover transition-transform duration-500 ease-out group-hover:scale-[1.03]"
-            />
-          </Link>
-        )}
-
         <div className="flex flex-col gap-3 p-4">
-          <div className="flex items-start justify-between gap-3">
-            <div className="flex items-center gap-2.5 min-w-0">
-              {primarySport && (
-                <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-md ${accent}`}>
-                  <Image
-                    src={`/images/sports/${primarySport}.svg`}
-                    alt=""
-                    width={16}
-                    height={16}
-                    className="h-4 w-4 opacity-80"
-                    aria-hidden
-                  />
-                </div>
-              )}
-              <div className="min-w-0">
-                <h3 className="text-sm font-semibold leading-snug text-foreground line-clamp-1">
-                  {name}
-                </h3>
-                {sportLabel && (
-                  <p className="text-xs text-muted-foreground line-clamp-1">
-                    {sportLabel}
-                    {location?.city ? ` · ${location.city}` : ''}
-                  </p>
-                )}
+          <div className="flex items-center gap-3">
+            {primarySport && (
+              <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg ${accent}`}>
+                <Image
+                  src={`/images/sports/${primarySport}.svg`}
+                  alt=""
+                  width={20}
+                  height={20}
+                  className="h-5 w-5 opacity-80"
+                  aria-hidden
+                />
               </div>
+            )}
+            <div className="min-w-0 flex-1">
+              <h3 className="text-sm font-semibold leading-snug text-foreground line-clamp-1">
+                {name}
+              </h3>
+              {sportLabel && (
+                <p className="text-xs text-muted-foreground line-clamp-1">
+                  {sportLabel}
+                  {location?.city ? ` · ${location.city}` : ''}
+                </p>
+              )}
             </div>
-
-            <div className="flex shrink-0 items-center gap-1">
-              <VerifiedBadge status={verificationStatus} className="text-xs" />
-              <button
-                type="button"
-                className="flex h-8 w-8 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-                aria-label={isSaved ? `Remove ${name} from saved` : `Save ${name}`}
-                aria-pressed={isSaved}
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  if (isSaved) {
-                    removeFromShortlist('academy', id);
-                    toast(`Removed ${name} from saved`);
-                  } else {
-                    addWithMeta('academy', id, {
-                      label: name,
-                      sublabel: `${location?.city ?? 'Unknown'}, ${location?.state ?? ''}`,
-                      href: `/academies/${slug}`,
-                    });
-                    toast.success(`Saved ${name}`);
-                  }
-                }}
-              >
-                {isSaved ? <BookmarkCheck className="h-4 w-4" /> : <Bookmark className="h-4 w-4" />}
-              </button>
-              <button
-                type="button"
-                className="flex h-8 w-8 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-                aria-label={isCompared ? `Remove ${name} from compare` : `Compare ${name}`}
-                aria-pressed={isCompared}
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  if (isCompared) {
-                    removeFromCompare('academy', slug);
-                    toast(`Removed ${name} from compare`);
-                  } else if (canAddToCompare('academy', slug)) {
-                    addToCompare('academy', slug, {
-                      label: name,
-                      sublabel: `${location?.city ?? 'Unknown'}, ${location?.state ?? ''}`,
-                      href: `/academies/${slug}`,
-                    });
-                    toast.success(`Added ${name} to compare`);
-                  } else {
-                    toast.error(`You can compare up to ${maxItems} items.`);
-                  }
-                }}
-              >
-                <GitCompare className="h-4 w-4" />
-              </button>
-            </div>
+            <VerifiedBadge status={verificationStatus} className="text-xs" />
           </div>
 
           <div className="flex items-center gap-3 text-xs text-muted-foreground">
@@ -241,11 +169,61 @@ export const AcademyCardPlaceholder = React.memo(function AcademyCardPlaceholder
             </div>
           )}
 
-          <Button size="sm" className="w-full mt-0.5" asChild>
-            <Link href={`/academies/${slug}`} onClick={() => trackAcademyCardClick(slug, 0, 'listing')}>
-              View Details
-            </Link>
-          </Button>
+          <div className="flex items-center gap-2 mt-0.5">
+            <Button size="sm" className="flex-1" asChild>
+              <Link href={`/academies/${slug}`} onClick={() => trackAcademyCardClick(slug, 0, 'listing')}>
+                View Details
+              </Link>
+            </Button>
+            <button
+              type="button"
+              className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md border border-border/60 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+              aria-label={isSaved ? `Remove ${name} from saved` : `Save ${name}`}
+              aria-pressed={isSaved}
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                if (isSaved) {
+                  removeFromShortlist('academy', id);
+                  toast(`Removed ${name} from saved`);
+                } else {
+                  addWithMeta('academy', id, {
+                    label: name,
+                    sublabel: `${location?.city ?? 'Unknown'}, ${location?.state ?? ''}`,
+                    href: `/academies/${slug}`,
+                  });
+                  toast.success(`Saved ${name}`);
+                }
+              }}
+            >
+              {isSaved ? <BookmarkCheck className="h-4 w-4" /> : <Bookmark className="h-4 w-4" />}
+            </button>
+            <button
+              type="button"
+              className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md border border-border/60 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+              aria-label={isCompared ? `Remove ${name} from compare` : `Compare ${name}`}
+              aria-pressed={isCompared}
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                if (isCompared) {
+                  removeFromCompare('academy', slug);
+                  toast(`Removed ${name} from compare`);
+                } else if (canAddToCompare('academy', slug)) {
+                  addToCompare('academy', slug, {
+                    label: name,
+                    sublabel: `${location?.city ?? 'Unknown'}, ${location?.state ?? ''}`,
+                    href: `/academies/${slug}`,
+                  });
+                  toast.success(`Added ${name} to compare`);
+                } else {
+                  toast.error(`You can compare up to ${maxItems} items.`);
+                }
+              }}
+            >
+              <GitCompare className="h-4 w-4" />
+            </button>
+          </div>
         </div>
       </Card>
     </motion.div>
