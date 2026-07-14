@@ -72,17 +72,56 @@ function writeActiveChild(id: string | null) {
 }
 
 export function useChildren() {
-  const { isAuthenticated, isGuest } = useAuth();
+  const { isAuthenticated, isGuest, onboarding } = useAuth();
   const [children, setChildren] = useState<Child[]>([]);
   const [activeChildId, setActiveChildId] = useState<string | null>(null);
   const [hydrated, setHydrated] = useState(false);
 
-  // Hydrate from localStorage on mount
+  // Hydrate from localStorage on mount, fallback to auth context children
   useEffect(() => {
-    setChildren(readChildren());
+    const stored = readChildren();
+    if (stored.length > 0) {
+      setChildren(stored);
+    } else if (onboarding.children.length > 0) {
+      const authChildren: Child[] = onboarding.children.map((c) => ({
+        id: c.id,
+        parentId: c.parentId,
+        name: c.name,
+        age: c.age,
+        gender: c.gender,
+        skillLevel: c.skillLevel,
+        sportInterests: c.sportInterests || [],
+        createdAt: c.createdAt,
+        updatedAt: c.updatedAt,
+      }));
+      setChildren(authChildren);
+      writeChildren(authChildren);
+    }
     setActiveChildId(readActiveChild());
     setHydrated(true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // If children are empty after hydration, try to load from auth context
+  // (handles case where getMe() returns after initial mount)
+  useEffect(() => {
+    if (!hydrated) return;
+    if (children.length === 0 && onboarding.children.length > 0) {
+      const authChildren: Child[] = onboarding.children.map((c) => ({
+        id: c.id,
+        parentId: c.parentId,
+        name: c.name,
+        age: c.age,
+        gender: c.gender,
+        skillLevel: c.skillLevel,
+        sportInterests: c.sportInterests || [],
+        createdAt: c.createdAt,
+        updatedAt: c.updatedAt,
+      }));
+      setChildren(authChildren);
+      writeChildren(authChildren);
+    }
+  }, [hydrated, onboarding.children, children.length]);
 
   // Load from backend when authenticated (non-guest)
   useEffect(() => {
@@ -107,12 +146,26 @@ export function useChildren() {
       if (backendChildren.length > 0) {
         setChildren(backendChildren);
         writeChildren(backendChildren);
+      } else if (onboarding.children.length > 0) {
+        const authChildren: Child[] = onboarding.children.map((c) => ({
+          id: c.id,
+          parentId: c.parentId,
+          name: c.name,
+          age: c.age,
+          gender: c.gender,
+          skillLevel: c.skillLevel,
+          sportInterests: c.sportInterests || [],
+          createdAt: c.createdAt,
+          updatedAt: c.updatedAt,
+        }));
+        setChildren(authChildren);
+        writeChildren(authChildren);
       }
     }).catch(() => {
       // Non-critical — localStorage fallback is already hydrated
     });
     return () => { cancelled = true; };
-  }, [hydrated, isAuthenticated, isGuest]);
+  }, [hydrated, isAuthenticated, isGuest, onboarding.children]);
 
   // Sync active child if it was removed
   useEffect(() => {

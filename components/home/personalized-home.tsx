@@ -35,14 +35,26 @@ export function PersonalizedHome() {
 
   const effectiveOnboarding = useMemo<OnboardingData | null>(() => {
     if (!onboarding || !completed) return null
-    if (role !== 'parent' || !activeChild || !onboarding.parent) return onboarding
+    if (role !== 'parent') return onboarding
+    if (!onboarding.parent) return onboarding
+    if (activeChild) {
+      return {
+        parent: {
+          ...onboarding.parent,
+          childName: activeChild.name,
+          childAge: activeChild.age,
+          sportInterests: activeChild.sportInterests,
+          skillLevel: (activeChild.skillLevel as SkillLevel) ?? onboarding.parent.skillLevel,
+        },
+      }
+    }
     return {
       parent: {
         ...onboarding.parent,
-        childName: activeChild.name,
-        childAge: activeChild.age,
-        sportInterests: activeChild.sportInterests,
-        skillLevel: (activeChild.skillLevel as SkillLevel) ?? onboarding.parent.skillLevel,
+        childName: onboarding.parent.childName,
+        childAge: onboarding.parent.childAge,
+        sportInterests: onboarding.parent.sportInterests,
+        skillLevel: onboarding.parent.skillLevel,
       },
     }
   }, [onboarding, completed, role, activeChild])

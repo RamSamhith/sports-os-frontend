@@ -68,7 +68,7 @@ function writePreferences(state: PreferencesState) {
 }
 
 export default function PreferencesPage() {
-  const { role } = useAuth();
+  const { role, onboarding: authOnboarding } = useAuth();
   const { athleteData, parentData } = useOnboarding();
   const [city, setCity] = useState('');
   const [radius, setRadius] = useState(5);
@@ -83,14 +83,24 @@ export default function PreferencesPage() {
 
   useEffect(() => {
     const stored = readPreferences();
+    const effectiveAthlete = authOnboarding.age ? {
+      location: authOnboarding.location,
+      sportInterests: authOnboarding.sportInterests,
+      skillLevel: authOnboarding.skillLevel,
+    } : athleteData;
+    const effectiveParent = authOnboarding.children.length > 0 ? {
+      location: authOnboarding.location,
+      sportInterests: authOnboarding.children[0]?.sportInterests ?? [],
+      skillLevel: authOnboarding.children[0]?.skillLevel,
+    } : parentData;
     // Merge onboarding data as defaults if preferences are empty
     const merged = {
-      city: stored.city || athleteData?.location || parentData?.location || '',
+      city: stored.city || effectiveAthlete?.location || effectiveParent?.location || '',
       radius: stored.radius,
       sports: stored.sports.length > 0
         ? stored.sports
-        : athleteData?.sportInterests || parentData?.sportInterests || [],
-      skillLevel: stored.skillLevel || athleteData?.skillLevel || parentData?.skillLevel || '',
+        : effectiveAthlete?.sportInterests || effectiveParent?.sportInterests || [],
+      skillLevel: stored.skillLevel || effectiveAthlete?.skillLevel || effectiveParent?.skillLevel || '',
       goals: stored.goals || '',
     };
     setCity(merged.city);
@@ -99,7 +109,7 @@ export default function PreferencesPage() {
     setSkillLevel(merged.skillLevel);
     setGoals(merged.goals);
     setHydrated(true);
-  }, [athleteData, parentData]);
+  }, [athleteData, parentData, authOnboarding]);
 
   function validate(): PreferencesErrors {
     const e: PreferencesErrors = {};

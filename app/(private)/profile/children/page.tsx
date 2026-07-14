@@ -13,7 +13,7 @@ import { useOnboarding } from '@/lib/hooks/use-onboarding';
 import { Plus, UserRoundPlus } from 'lucide-react';
 
 export default function ChildrenPage() {
-  const { role, isLoading } = useAuth();
+  const { role, isLoading, onboarding: authOnboarding } = useAuth();
   const router = useRouter();
   const { children, activeChildId, addChild, updateChild, removeChild } = useChildren();
   const { parentData } = useOnboarding();
@@ -51,12 +51,21 @@ export default function ChildrenPage() {
     }
   }
 
-  const childDefaults = parentData
+  const effectiveParentData = (authOnboarding.children.length > 0 || authOnboarding.location)
     ? {
-        name: parentData.childName,
-        age: parentData.childAge,
-        sportInterests: parentData.sportInterests.length > 0 ? [parentData.sportInterests[0]] : [],
-        skillLevel: parentData.skillLevel,
+        childName: authOnboarding.children[0]?.name ?? parentData?.childName ?? '',
+        childAge: authOnboarding.children[0]?.age ?? parentData?.childAge ?? 0,
+        sportInterests: authOnboarding.children[0]?.sportInterests ?? parentData?.sportInterests ?? [],
+        skillLevel: authOnboarding.children[0]?.skillLevel ?? parentData?.skillLevel ?? '',
+      }
+    : parentData;
+
+  const childDefaults = effectiveParentData
+    ? {
+        name: effectiveParentData.childName,
+        age: effectiveParentData.childAge,
+        sportInterests: effectiveParentData.sportInterests.length > 0 ? [effectiveParentData.sportInterests[0]] : [],
+        skillLevel: effectiveParentData.skillLevel,
       }
     : undefined;
 
