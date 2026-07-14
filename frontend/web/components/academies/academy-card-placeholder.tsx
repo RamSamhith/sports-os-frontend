@@ -2,12 +2,10 @@
 
 import * as React from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
 import { motion, useReducedMotion } from 'framer-motion';
 import { Bookmark, BookmarkCheck, GitCompare, MapPin, Star } from 'lucide-react';
 import { toast } from 'sonner';
 import { Card } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { VerifiedBadge } from '@/components/trust/verified-badge';
 import { useShortlist } from '@/lib/hooks/use-shortlist';
@@ -19,7 +17,6 @@ import type { Academy } from '@/types/domain/academy';
 interface AcademyCardPlaceholderProps {
   academy: Academy;
   priority?: boolean;
-  distance?: number;
 }
 
 const SPORT_ACCENT: Record<string, string> = {
@@ -70,6 +67,54 @@ const SPORT_DISPLAY: Record<string, string> = {
   volleyball: 'Volleyball',
 };
 
+const SPORT_EMOJI: Record<string, string> = {
+  football: '⚽',
+  basketball: '🏀',
+  swimming: '🏊',
+  athletics: '🏃',
+  badminton: '🏸',
+  cricket: '🏏',
+  tennis: '🎾',
+  'table-tennis': '🏓',
+  wrestling: '🤼',
+  boxing: '🥊',
+  karate: '🥋',
+  judo: '🥋',
+  kabaddi: '🏋️',
+  hockey: '🏑',
+  chess: '♟️',
+  skating: '⛸️',
+  archery: '🏹',
+  shooting: '🎯',
+  yoga: '🧘',
+  gymnastics: '🤸',
+  volleyball: '🏐',
+};
+
+const SPORT_ACCENT_BORDER: Record<string, string> = {
+  football: 'border-t-green-500',
+  basketball: 'border-t-orange-500',
+  swimming: 'border-t-blue-500',
+  athletics: 'border-t-amber-500',
+  badminton: 'border-t-teal-500',
+  cricket: 'border-t-emerald-500',
+  tennis: 'border-t-lime-500',
+  'table-tennis': 'border-t-cyan-500',
+  wrestling: 'border-t-red-500',
+  boxing: 'border-t-red-500',
+  karate: 'border-t-red-500',
+  judo: 'border-t-red-500',
+  kabaddi: 'border-t-orange-500',
+  hockey: 'border-t-blue-500',
+  chess: 'border-t-violet-500',
+  skating: 'border-t-sky-500',
+  archery: 'border-t-amber-500',
+  shooting: 'border-t-slate-500',
+  yoga: 'border-t-purple-500',
+  gymnastics: 'border-t-pink-500',
+  volleyball: 'border-t-orange-500',
+};
+
 export const AcademyCardPlaceholder = React.memo(function AcademyCardPlaceholder({
   academy,
   priority = false,
@@ -103,7 +148,9 @@ export const AcademyCardPlaceholder = React.memo(function AcademyCardPlaceholder
   const isCompared = hasCompare('academy', slug);
 
   const accent = primarySport ? (SPORT_ACCENT[primarySport] ?? 'bg-muted text-muted-foreground') : 'bg-muted text-muted-foreground';
+  const accentBorder = primarySport ? (SPORT_ACCENT_BORDER[primarySport] ?? 'border-t-border') : 'border-t-border';
   const sportLabel = primarySport ? (SPORT_DISPLAY[primarySport] ?? primarySport.replace(/-/g, ' ')) : '';
+  const sportEmoji = primarySport ? (SPORT_EMOJI[primarySport] ?? '🏅') : null;
 
   return (
     <motion.div
@@ -112,40 +159,42 @@ export const AcademyCardPlaceholder = React.memo(function AcademyCardPlaceholder
       transition={{ duration: duration.fast, ease: ease.athletic }}
       className="w-full"
     >
-      <Card className="group overflow-hidden border border-border/60 bg-card transition-colors duration-200 hover:border-border">
+      <Card className={`group overflow-hidden border border-border/60 bg-card transition-all duration-200 hover:border-border hover:shadow-md hover:shadow-black/5 dark:hover:shadow-black/20 border-t-[2px] ${accentBorder}`}>
         <div className="flex flex-col gap-3 p-4">
-          <div className="flex items-center gap-3">
+          <div className="flex items-start gap-3">
             {primarySport && (
-              <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg ${accent}`}>
-                <Image
-                  src={`/images/sports/${primarySport}.svg`}
-                  alt=""
-                  width={20}
-                  height={20}
-                  className="h-5 w-5 opacity-80"
-                  aria-hidden
-                />
+              <div className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-xl ${accent}`}>
+                <span className="text-2xl leading-none" aria-hidden>
+                  {sportEmoji}
+                </span>
               </div>
             )}
-            <div className="min-w-0 flex-1">
-              <h3 className="text-sm font-semibold leading-snug text-foreground line-clamp-1">
-                {name}
-              </h3>
+            <div className="min-w-0 flex-1 pt-0.5">
+              <div className="flex items-center gap-1.5">
+                <h3 className="text-[15px] font-semibold leading-snug text-foreground line-clamp-1">
+                  {name}
+                </h3>
+                {sportCount > 1 && (
+                  <span className="inline-flex items-center rounded-full bg-muted px-1.5 py-0.5 text-[10px] font-medium text-muted-foreground tabular-nums">
+                    {sportCount} sports
+                  </span>
+                )}
+              </div>
               {sportLabel && (
-                <p className="text-xs text-muted-foreground line-clamp-1">
+                <p className="mt-0.5 text-xs text-muted-foreground line-clamp-1">
                   {sportLabel}
                   {location?.city ? ` · ${location.city}` : ''}
                 </p>
               )}
             </div>
-            <VerifiedBadge status={verificationStatus} className="text-xs" />
+            <VerifiedBadge status={verificationStatus} className="text-xs shrink-0" />
           </div>
 
           <div className="flex items-center gap-3 text-xs text-muted-foreground">
             <span className="inline-flex items-center gap-1">
               <Star className="h-3.5 w-3.5 fill-amber-500 text-amber-500" />
               <span className="font-medium text-foreground">{avg > 0 ? avg.toFixed(1) : '—'}</span>
-              {cnt > 0 && <span>({cnt})</span>}
+              {cnt > 0 && <span className="text-muted-foreground">({cnt})</span>}
             </span>
             {location?.city && (
               <span className="inline-flex items-center gap-1">
@@ -156,20 +205,7 @@ export const AcademyCardPlaceholder = React.memo(function AcademyCardPlaceholder
             )}
           </div>
 
-          {sportCount > 0 && (
-            <div className="flex flex-wrap gap-1.5">
-              <Badge variant="secondary" className="capitalize text-xs font-medium">
-                {sportLabel || primarySport?.replace(/-/g, ' ')}
-              </Badge>
-              {sportCount > 1 && (
-                <Badge variant="outline" className="text-xs text-muted-foreground">
-                  +{sportCount - 1} more
-                </Badge>
-              )}
-            </div>
-          )}
-
-          <div className="flex items-center gap-2 mt-0.5">
+          <div className="flex items-center gap-2 pt-0.5">
             <Button size="sm" className="flex-1" asChild>
               <Link href={`/academies/${slug}`} onClick={() => trackAcademyCardClick(slug, 0, 'listing')}>
                 View Details

@@ -11,6 +11,7 @@ export interface FilterDrawerProps {
   appliedCount?: number;
   onApply?: () => void;
   onClear?: () => void;
+  onReset?: () => void;
   title?: string;
 }
 
@@ -19,6 +20,7 @@ export function FilterDrawer({
   appliedCount = 0,
   onApply,
   onClear,
+  onReset,
   title = 'Filters',
 }: FilterDrawerProps) {
   return (
@@ -38,9 +40,10 @@ export function FilterDrawer({
           {appliedCount > 0 ? (
             <span
               className={cn(
-                'ml-1 inline-flex h-5 min-w-5 items-center justify-center rounded-full px-1.5 text-[10px] font-semibold',
-                appliedCount > 0 ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground',
+                'ml-1 inline-flex h-6 min-w-6 items-center justify-center rounded-full px-2 text-xs font-bold',
+                'bg-primary text-primary-foreground',
               )}
+              aria-label={`${appliedCount} filters applied`}
               aria-hidden
             >
               {appliedCount}
@@ -53,7 +56,7 @@ export function FilterDrawer({
           <SheetTitle>{title}</SheetTitle>
         </SheetHeader>
         <div className="flex-1 overflow-y-auto px-4 py-2">{children}</div>
-        {(onApply || onClear) && (
+        {(onApply || onClear || onReset) && (
           <SheetFooter className="border-border/60 border-t p-4 pb-safe">
             {onClear ? (
               <Button
@@ -63,6 +66,15 @@ export function FilterDrawer({
                 disabled={appliedCount === 0}
               >
                 Clear filters
+              </Button>
+            ) : null}
+            {onReset ? (
+              <Button
+                variant="ghost"
+                className="min-h-[44px] min-w-[44px]"
+                onClick={onReset}
+              >
+                Reset
               </Button>
             ) : null}
             {onApply ? (

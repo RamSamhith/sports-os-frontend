@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { Mail, MapPin, RefreshCw, Unlink, Loader2 } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -58,14 +58,16 @@ export function GmailConnectCard() {
   }, [gmail.accessToken]);
 
   // Auto-scan when token is first obtained
-  const prevToken = gmail.accessToken;
   const [hasScanned, setHasScanned] = useState(false);
+  const hasScannedRef = useRef(false);
 
-  if (prevToken && !hasScanned && !loading && emailResults.length === 0) {
-    setHasScanned(true);
-    // Trigger scan on next render cycle
-    setTimeout(() => handleScan(), 0);
-  }
+  useEffect(() => {
+    if (gmail.accessToken && !hasScannedRef.current && !loading && emailResults.length === 0) {
+      hasScannedRef.current = true;
+      setHasScanned(true);
+      handleScan();
+    }
+  }, [gmail.accessToken, loading, emailResults.length, handleScan]);
 
   return (
     <Card>

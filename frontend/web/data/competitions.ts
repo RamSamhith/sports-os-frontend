@@ -97,6 +97,58 @@ export const competitions: Competition[] = [
     progression:
       'Medal winners receive annual training grants and are tracked by national federations.',
   },
+  {
+    id: 'cricket_icc_world_cup',
+    sportSlug: 'cricket',
+    name: 'ICC Cricket World Cup',
+    level: 'international',
+    organiser: 'International Cricket Council (ICC)',
+    whatIs:
+      'The premier quadrennial ODI cricket tournament contested by national teams.',
+    whyImportant:
+      'The pinnacle event in 50-over cricket; winning it is the highest honour in the format.',
+    progression:
+      'World Cup qualification is determined through ICC ODI Super League standings.',
+  },
+  {
+    id: 'cricket_icc_t20_world_cup',
+    sportSlug: 'cricket',
+    name: 'ICC T20 World Cup',
+    level: 'international',
+    organiser: 'ICC',
+    whatIs:
+      'The premier biennial T20I cricket tournament for national teams.',
+    whyImportant:
+      'The biggest T20I event globally; drives the format’s global growth.',
+    progression:
+      'T20 World Cup qualification is based on ICC T20I rankings and regional qualifiers.',
+  },
+  {
+    id: 'cricket_asia_cup',
+    sportSlug: 'cricket',
+    name: 'Asia Cup',
+    level: 'international',
+    organiser: 'Asian Cricket Council (ACC)',
+    whatIs:
+      'Biennial cricket tournament contested by Asian national teams.',
+    whyImportant:
+      'Key continental competition; historically alternates between ODI and T20I formats.',
+    progression:
+      'Top Asian performers are scouted for ICC events and bilateral series.',
+  },
+  {
+    id: 'cricket_icc_champions_trophy',
+    sportSlug: 'cricket',
+    name: 'ICC Champions Trophy',
+    level: 'international',
+    organiser: 'ICC',
+    whatIs:
+      'Premier ODI tournament featuring the top-ranked ICC member nations.',
+    whyImportant:
+      'Second-most prestigious ODI event after the World Cup; limited to top 8 teams.',
+    progression:
+      'Champions Trophy qualification is based on ICC ODI rankings.',
+  },
 
   // ---------------- FOOTBALL ----------------
   {
@@ -167,6 +219,45 @@ export const competitions: Competition[] = [
     progression:
       'Medal winners receive annual training grants and AIFF talent-tracking.',
   },
+  {
+    id: 'football_super_cup',
+    sportSlug: 'football',
+    name: 'Super Cup',
+    level: 'national',
+    organiser: 'AIFF',
+    whatIs:
+      'National knockout cup competition contested by ISL and I-League clubs.',
+    whyImportant:
+      'Offers a direct qualification route to the AFC Champions League Two.',
+    progression:
+      'Super Cup winners earn a spot in Asian continental competition.',
+  },
+  {
+    id: 'football_fifa_world_cup',
+    sportSlug: 'football',
+    name: 'FIFA World Cup',
+    level: 'international',
+    organiser: 'FIFA',
+    whatIs:
+      'The premier quadrennial international football tournament contested by national teams.',
+    whyImportant:
+      'The most-watched sporting event globally; the ultimate goal for every national team.',
+    progression:
+      'World Cup qualification is determined through AFC preliminary rounds.',
+  },
+  {
+    id: 'football_afc_asian_cup',
+    sportSlug: 'football',
+    name: 'AFC Asian Cup',
+    level: 'international',
+    organiser: 'Asian Football Confederation (AFC)',
+    whatIs:
+      'Premier quadrennial continental football championship for Asian national teams.',
+    whyImportant:
+      'Asia’s top international tournament; key for FIFA World Cup qualification rankings.',
+    progression:
+      'Asian Cup performance is the primary pathway to FIFA World Cup qualification.',
+  },
 
   // ---------------- BADMINTON ----------------
   {
@@ -222,6 +313,32 @@ export const competitions: Competition[] = [
     whyImportant: 'Flagship annual platform for Under-17 and Under-21 shuttlers.',
     progression: 'Medal winners receive annual training grants and BAI talent-tracking.',
   },
+  {
+    id: 'badminton_bwf_world_championships',
+    sportSlug: 'badminton',
+    name: 'BWF World Championships',
+    level: 'international',
+    organiser: 'Badminton World Federation (BWF)',
+    whatIs:
+      'Annual global badminton championships for singles, doubles, and mixed events.',
+    whyImportant:
+      'The most prestigious non-Olympic world title in badminton.',
+    progression:
+      'World Championship results directly impact BWF World Rankings and Olympic seeding.',
+  },
+  {
+    id: 'badminton_commonwealth_games',
+    sportSlug: 'badminton',
+    name: 'Commonwealth Games (Badminton)',
+    level: 'international',
+    organiser: 'Commonwealth Games Federation',
+    whatIs:
+      'Quadrennial multi-sport event featuring badminton among Commonwealth nations.',
+    whyImportant:
+      'Key medal opportunity for Indian shuttlers on the international stage.',
+    progression:
+      'Commonwealth Games medals boost BWF rankings and national team selection.',
+  },
 
   // ---------------- TENNIS ----------------
   {
@@ -256,6 +373,32 @@ export const competitions: Competition[] = [
       'Flagship team event; selection reflects senior national-team status.',
     progression: 'Davis Cup performance is a key marker of senior international pedigree.',
   },
+  {
+    id: 'tennis_grand_slams',
+    sportSlug: 'tennis',
+    name: 'Grand Slam Tournaments',
+    level: 'international',
+    organiser: 'ITF',
+    whatIs:
+      'The four most prestigious tennis tournaments: Australian Open, French Open, Wimbledon, and US Open.',
+    whyImportant:
+      'The pinnacle of professional tennis; Grand Slam titles define legends.',
+    progression:
+      'Grand Slam rankings determine direct entry and seeding into all major events.',
+  },
+  {
+    id: 'tennis_billie_jean_king_cup',
+    sportSlug: 'tennis',
+    name: 'Billie Jean King Cup',
+    level: 'international',
+    organiser: 'ITF',
+    whatIs:
+      'Premier international women’s team tennis competition, formerly known as Fed Cup.',
+    whyImportant:
+      'The women’s equivalent of Davis Cup; flagship team event for female players.',
+    progression:
+      'Billie Jean King Cup selection reflects senior women’s national-team status.',
+  },
 
   // ---------------- SWIMMING ----------------
   {
@@ -289,6 +432,32 @@ export const competitions: Competition[] = [
     whyImportant: 'The highest level of international competition outside the Olympics.',
     progression:
       'Strong World Aquatics results lead to Olympic qualification and global ranking.',
+  },
+  {
+    id: 'swimming_asian_games',
+    sportSlug: 'swimming',
+    name: 'Asian Games (Swimming)',
+    level: 'international',
+    organiser: 'Olympic Council of Asia',
+    whatIs:
+      'Quadrennial multi-sport event featuring swimming among Asian nations.',
+    whyImportant:
+      'The top multi-sport event for Indian swimmers; key medal opportunity.',
+    progression:
+      'Asian Games performances are a direct pathway to Olympic qualification.',
+  },
+  {
+    id: 'swimming_olympics',
+    sportSlug: 'swimming',
+    name: 'Olympic Games (Swimming)',
+    level: 'international',
+    organiser: 'International Olympic Committee (IOC)',
+    whatIs:
+      'The premier quadrennial multi-sport event featuring Olympic swimming events.',
+    whyImportant:
+      'The ultimate goal for every competitive swimmer; global pinnacle.',
+    progression:
+      'Olympic qualification is achieved through A qualification times set by World Aquatics.',
   },
 
   // ---------------- ATHLETICS ----------------
@@ -333,6 +502,31 @@ export const competitions: Competition[] = [
     progression:
       'Diamond League performance is a direct path to Olympic qualification.',
   },
+  {
+    id: 'athletics_world_championships',
+    sportSlug: 'athletics',
+    name: 'World Athletics Championships',
+    level: 'international',
+    organiser: 'World Athletics',
+    whatIs: 'Biennial global athletics championships for track and field events.',
+    whyImportant:
+      'The highest level of international athletics competition outside the Olympics.',
+    progression:
+      'World Championship performances lead to Olympic qualification and global ranking.',
+  },
+  {
+    id: 'athletics_asian_games',
+    sportSlug: 'athletics',
+    name: 'Asian Games (Athletics)',
+    level: 'international',
+    organiser: 'Olympic Council of Asia',
+    whatIs:
+      'Quadrennial multi-sport event featuring athletics among Asian nations.',
+    whyImportant:
+      'The top multi-sport event for Indian athletes; key medal opportunity.',
+    progression:
+      'Asian Games performances are a direct pathway to Olympic qualification.',
+  },
 
   // ---------------- HOCKEY ----------------
   {
@@ -375,6 +569,45 @@ export const competitions: Competition[] = [
     whyImportant: 'Flagship annual platform for Under-17 and Under-21 players.',
     progression: 'Medal winners receive annual training grants.',
   },
+  {
+    id: 'hockey_sultan_azlan_shah_cup',
+    sportSlug: 'hockey',
+    name: 'Sultan Azlan Shah Cup',
+    level: 'international',
+    organiser: 'International Hockey Federation (FIH)',
+    whatIs:
+      'Annual international men\'s hockey tournament held in Malaysia.',
+    whyImportant:
+      'Prestigious invitational tournament featuring top hockey nations.',
+    progression:
+      'Sultan Azlan Shah Cup performances are key for World Cup and Olympic selection.',
+  },
+  {
+    id: 'hockey_asian_champions_trophy',
+    sportSlug: 'hockey',
+    name: 'Asian Champions Trophy',
+    level: 'international',
+    organiser: 'Asian Hockey Federation',
+    whatIs:
+      'Premier biennial continental hockey championship for Asian national teams.',
+    whyImportant:
+      'Asia’s top team competition; critical for FIH ranking and World Cup qualification.',
+    progression:
+      'Asian Champions Trophy results directly affect FIH World Rankings.',
+  },
+  {
+    id: 'hockey_fih_world_cup',
+    sportSlug: 'hockey',
+    name: 'FIH Hockey World Cup',
+    level: 'international',
+    organiser: 'FIH',
+    whatIs:
+      'Quadrennial global field hockey championship for national teams.',
+    whyImportant:
+      'The pinnacle event in international field hockey.',
+    progression:
+      'World Cup qualification is determined through continental championships and FIH rankings.',
+  },
 
   // ---------------- CHESS ----------------
   {
@@ -407,6 +640,32 @@ export const competitions: Competition[] = [
     whyImportant: 'Flagship international team event for national federations.',
     progression: 'Olympiad selection is a marker of elite national-team status.',
   },
+  {
+    id: 'chess_world_championship',
+    sportSlug: 'chess',
+    name: 'FIDE World Chess Championship',
+    level: 'international',
+    organiser: 'FIDE',
+    whatIs:
+      'The premier individual chess title, contested to determine the reigning World Champion.',
+    whyImportant:
+      'The ultimate achievement in chess; the title defines the strongest player in the world.',
+    progression:
+      'World Championship qualification is earned through the Candidates Tournament.',
+  },
+  {
+    id: 'chess_candidates_tournament',
+    sportSlug: 'chess',
+    name: 'Candidates Tournament',
+    level: 'international',
+    organiser: 'FIDE',
+    whatIs:
+      'Eight-player round-robin tournament to determine the World Championship challenger.',
+    whyImportant:
+      'The final qualifying step before the World Chess Championship match.',
+    progression:
+      'Candidates winner earns the right to challenge the reigning World Champion.',
+  },
 
   // ---------------- WRESTLING ----------------
   {
@@ -430,6 +689,32 @@ export const competitions: Competition[] = [
     whyImportant: 'Top continental competition for senior wrestlers.',
     progression: 'Asian medals are a key step to World and Olympic selection.',
   },
+  {
+    id: 'wrestling_olympics',
+    sportSlug: 'wrestling',
+    name: 'Olympic Games (Wrestling)',
+    level: 'international',
+    organiser: 'International Olympic Committee (IOC)',
+    whatIs:
+      'The premier quadrennial multi-sport event featuring freestyle and Greco-Roman wrestling.',
+    whyImportant:
+      'The pinnacle of wrestling achievement; India has a proud Olympic wrestling medal tradition.',
+    progression:
+      'Olympic qualification is achieved through World Championship rankings and continental qualifiers.',
+  },
+  {
+    id: 'wrestling_commonwealth_games',
+    sportSlug: 'wrestling',
+    name: 'Commonwealth Games (Wrestling)',
+    level: 'international',
+    organiser: 'Commonwealth Games Federation',
+    whatIs:
+      'Quadrennial multi-sport event featuring wrestling among Commonwealth nations.',
+    whyImportant:
+      'Key medal opportunity for Indian wrestlers on the international stage.',
+    progression:
+      'Commonwealth Games medals boost world rankings and national team selection.',
+  },
 
   // ---------------- BOXING ----------------
   {
@@ -451,6 +736,45 @@ export const competitions: Competition[] = [
     whatIs: 'International boxing tournament held in India.',
     whyImportant: 'Top-tier competition on home soil.',
     progression: 'India Open results feed World Boxing Championships and Olympic selection.',
+  },
+  {
+    id: 'boxing_asian_games',
+    sportSlug: 'boxing',
+    name: 'Asian Games (Boxing)',
+    level: 'international',
+    organiser: 'Olympic Council of Asia',
+    whatIs:
+      'Quadrennial multi-sport event featuring boxing among Asian nations.',
+    whyImportant:
+      'The top multi-sport event for Indian boxers; key medal opportunity.',
+    progression:
+      'Asian Games performances are a direct pathway to Olympic qualification.',
+  },
+  {
+    id: 'boxing_commonwealth_games',
+    sportSlug: 'boxing',
+    name: 'Commonwealth Games (Boxing)',
+    level: 'international',
+    organiser: 'Commonwealth Games Federation',
+    whatIs:
+      'Quadrennial multi-sport event featuring boxing among Commonwealth nations.',
+    whyImportant:
+      'Major medal opportunity; India has strong boxing pedigree in the Games.',
+    progression:
+      'Commonwealth Games medals boost IBA world rankings and Olympic selection.',
+  },
+  {
+    id: 'boxing_olympics',
+    sportSlug: 'boxing',
+    name: 'Olympic Games (Boxing)',
+    level: 'international',
+    organiser: 'International Olympic Committee (IOC)',
+    whatIs:
+      'The premier quadrennial multi-sport event featuring Olympic boxing.',
+    whyImportant:
+      'The pinnacle of amateur boxing achievement; India has Olympic boxing medals.',
+    progression:
+      'Olympic qualification is achieved through continental and world qualifying events.',
   },
 
   // ---------------- TABLE TENNIS ----------------
@@ -483,6 +807,45 @@ export const competitions: Competition[] = [
     whatIs: 'Annual global circuit of professional table tennis events.',
     whyImportant: 'Top international circuit for senior players.',
     progression: 'WTT performance is a path to World Championships and Olympic qualification.',
+  },
+  {
+    id: 'tt_world_championships',
+    sportSlug: 'table-tennis',
+    name: 'World Table Tennis Championships',
+    level: 'international',
+    organiser: 'World Table Tennis (WTT)',
+    whatIs:
+      'Premier global table tennis championships held annually (individual events biennial).',
+    whyImportant:
+      'The most prestigious non-Olympic world title in table tennis.',
+    progression:
+      'World Championship results directly impact WTT world rankings and Olympic seeding.',
+  },
+  {
+    id: 'tt_commonwealth_games',
+    sportSlug: 'table-tennis',
+    name: 'Commonwealth Games (Table Tennis)',
+    level: 'international',
+    organiser: 'Commonwealth Games Federation',
+    whatIs:
+      'Quadrennial multi-sport event featuring table tennis among Commonwealth nations.',
+    whyImportant:
+      'Key medal opportunity for Indian paddlers on the international stage.',
+    progression:
+      'Commonwealth Games medals boost WTT rankings and national team selection.',
+  },
+  {
+    id: 'tt_olympics',
+    sportSlug: 'table-tennis',
+    name: 'Olympic Games (Table Tennis)',
+    level: 'international',
+    organiser: 'International Olympic Committee (IOC)',
+    whatIs:
+      'The premier quadrennial multi-sport event featuring Olympic table tennis.',
+    whyImportant:
+      'The pinnacle of table tennis achievement; India won a mixed doubles medal in 2020.',
+    progression:
+      'Olympic qualification is achieved through ITTF world rankings and continental qualifiers.',
   },
 
   // ---------------- KABADDI ----------------
@@ -605,6 +968,69 @@ export const competitions: Competition[] = [
     whatIs: 'India’s premier domestic judo championship.',
     whyImportant: 'Top domestic selection event for the India camp.',
     progression: 'Strong National Championship runs lead to Asian and World Judo Championships.',
+  },
+
+  // ---------------- VOLLEYBALL ----------------
+  {
+    id: 'volleyball_senior_nationals',
+    sportSlug: 'volleyball',
+    name: 'Senior National Volleyball Championship',
+    level: 'national',
+    organiser: 'Volleyball Federation of India (VFI)',
+    whatIs: 'India’s premier domestic volleyball championship.',
+    whyImportant: 'Top domestic selection event for the India team.',
+    progression:
+      'Strong Senior Nationals performances lead to national camp and Pro Volleyball League selection.',
+  },
+  {
+    id: 'volleyball_pro_volleyball_league',
+    sportSlug: 'volleyball',
+    name: 'Pro Volleyball League',
+    level: 'national',
+    organiser: 'VFI',
+    whatIs: 'India’s premier franchise volleyball league launched in 2019.',
+    whyImportant: 'The highest-profile professional volleyball platform in India.',
+    progression: 'Pro Volleyball League performance is the main route to the India volleyball team.',
+  },
+  {
+    id: 'volleyball_fivb_world_championship',
+    sportSlug: 'volleyball',
+    name: 'FIVB Volleyball World Championship',
+    level: 'international',
+    organiser: 'Fédération Internationale de Volleyball (FIVB)',
+    whatIs:
+      'Quadrennial global volleyball championship for national teams.',
+    whyImportant:
+      'The pinnacle event in international volleyball.',
+    progression:
+      'World Championship qualification is determined through AVC qualifiers and FIVB rankings.',
+  },
+  {
+    id: 'volleyball_avc_championship',
+    sportSlug: 'volleyball',
+    name: 'AVC Asian Volleyball Championship',
+    level: 'international',
+    organiser: 'Asian Volleyball Confederation (AVC)',
+    whatIs:
+      'Biennial continental volleyball championship for Asian national teams.',
+    whyImportant:
+      'Asia’s top volleyball competition; key for FIVB World Ranking and World Cup qualification.',
+    progression:
+      'AVC Championship results directly affect FIVB world rankings.',
+  },
+
+  // ---------------- SKATING ----------------
+  {
+    id: 'skating_asian_roller_skating_championship',
+    sportSlug: 'skating',
+    name: 'Asian Roller Skating Championship',
+    level: 'international',
+    organiser: 'World Skate Asia',
+    whatIs: 'Premier continental skating championship for Asian nations.',
+    whyImportant:
+      'Top continental competition; India has won over 100 medals in this event.',
+    progression:
+      'Asian Championship performance is a pathway to World Skate Games selection.',
   },
 ];
 

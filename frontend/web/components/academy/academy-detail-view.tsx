@@ -27,7 +27,7 @@ import { get as apiGet } from '@/lib/api/client';
 import type { Academy } from '@/types/domain/academy';
 import {
   Globe, Mail, Phone, AlertTriangle, Star, MapPin,
-  Clock, Award, ChevronRight, Users, ArrowLeft,
+  Users, ArrowLeft,
   Shield, CheckCircle2, Building2, PhoneCall, Dumbbell, MessageCircle,
   Info, Trophy, MapPinned, MessageSquareText,
 } from 'lucide-react';

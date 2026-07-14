@@ -1,13 +1,14 @@
 'use client';
 
 import * as React from 'react';
-import { Star, ThumbsUp, Loader2, User } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Star, ThumbsUp, Loader2, User, ChevronDown } from 'lucide-react';
+import { Card, CardContent, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { getReviews, createReview, type Review, type ReviewStats } from '@/lib/api/reviews';
 import { useAuth } from '@/lib/hooks/use-auth';
 import { ConversionModal } from '@/components/auth/conversion-modal';
@@ -34,6 +35,7 @@ export function ReviewsSection({ targetType, targetId }: ReviewsSectionProps) {
   const [showForm, setShowForm] = React.useState(false);
   const [submitting, setSubmitting] = React.useState(false);
   const [showConversion, setShowConversion] = React.useState(false);
+  const [isOpen, setIsOpen] = React.useState(false);
 
   const [formRating, setFormRating] = React.useState(0);
   const [formTitle, setFormTitle] = React.useState('');
@@ -108,19 +110,55 @@ export function ReviewsSection({ targetType, targetId }: ReviewsSectionProps) {
 
   return (
     <Card className="mt-4">
-      <CardHeader className="pb-3">
-        <div className="flex items-center justify-between">
+      <button
+        type="button"
+        onClick={() => setIsOpen((o) => !o)}
+        className="flex w-full items-center justify-between px-6 py-4 text-left transition-colors hover:bg-muted/30"
+        aria-expanded={isOpen}
+        aria-controls="reviews-content"
+      >
+        <div className="flex items-center gap-3">
           <CardTitle className="text-lg">
             Reviews {stats ? `(${stats.totalReviews})` : ''}
           </CardTitle>
-          {!showForm && (
-            <Button size="sm" onClick={handleOpenForm}>
+          {stats && stats.totalReviews > 0 && (
+            <div className="flex items-center gap-1">
+              {Array.from({ length: 5 }).map((_, i) => (
+                <Star
+                  key={i}
+                  className={`h-3.5 w-3.5 ${
+                    i < Math.round(stats.averageRating)
+                      ? 'fill-amber-400 text-amber-400'
+                      : 'text-muted-foreground/30'
+                  }`}
+                />
+              ))}
+              <span className="text-muted-foreground ml-1 text-xs">{stats.averageRating}</span>
+            </div>
+          )}
+        </div>
+        <div className="flex items-center gap-2">
+          {!showForm && isOpen && (
+            <Button
+              size="sm"
+              onClick={(e) => {
+                e.stopPropagation();
+                handleOpenForm();
+              }}
+            >
               Write a Review
             </Button>
           )}
+          <ChevronDown
+            className={`h-5 w-5 text-muted-foreground transition-transform duration-200 ${
+              isOpen ? 'rotate-180' : ''
+            }`}
+          />
         </div>
-      </CardHeader>
-      <CardContent className="pt-0">
+      </button>
+
+      {isOpen && (
+        <CardContent className="pt-0" id="reviews-content">
         {/* Stats Summary */}
         {stats && stats.totalReviews > 0 && (
           <div className="mb-4 flex flex-col gap-4 sm:flex-row sm:items-start">
@@ -163,16 +201,18 @@ export function ReviewsSection({ targetType, targetId }: ReviewsSectionProps) {
 
         {/* Sort */}
         <div className="mb-3 flex items-center gap-2">
-          <select
-            value={sortBy}
-            onChange={(e) => setSortBy(e.target.value)}
-            aria-label="Sort reviews"
-            className="border-border/60 bg-card/40 rounded-md border px-2 py-1.5 text-xs"
-          >
-            {sortOptions.map((opt) => (
-              <option key={opt.value} value={opt.value}>{opt.label}</option>
-            ))}
-          </select>
+          <Select value={sortBy} onValueChange={setSortBy}>
+            <SelectTrigger className="w-[180px] h-8 text-xs" aria-label="Sort reviews">
+              <SelectValue placeholder="Sort by" />
+            </SelectTrigger>
+            <SelectContent>
+              {sortOptions.map((opt) => (
+                <SelectItem key={opt.value} value={opt.value}>
+                  {opt.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
 
         {/* Review Form */}
@@ -296,16 +336,21 @@ export function ReviewsSection({ targetType, targetId }: ReviewsSectionProps) {
                   <Badge variant="outline" className="text-[10px] mt-2 capitalize">{review.sport}</Badge>
                 )}
                 <div className="flex items-center gap-3 mt-2 text-[10px] text-muted-foreground">
-                  <button disabled className="flex items-center gap-1 cursor-default text-muted-foreground">
+                  <span
+                    title="Coming soon — helpful voting is not yet available"
+                    className="flex items-center gap-1 cursor-default text-muted-foreground opacity-60"
+                  >
                     <ThumbsUp className="h-3 w-3" />
                     Helpful ({review.helpfulCount})
-                  </button>
+                    <span className="text-[9px] italic">(coming soon)</span>
+                  </span>
                 </div>
               </div>
             ))}
           </div>
         )}
       </CardContent>
+      )}
 
       <ConversionModal
         open={showConversion}

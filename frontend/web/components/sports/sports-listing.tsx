@@ -14,6 +14,51 @@ import { SportComparison } from '@/components/sports/sport-comparison';
 import { SportCard } from '@/components/sports/sport-card';
 import type { Sport } from '@/types/domain/sport';
 
+function catalogSportToSport(sport: CatalogSport): Sport {
+  return {
+    id: sport.slug,
+    slug: sport.slug,
+    name: sport.name,
+    category: sport.category,
+    sportType: sport.sportType,
+    shortDescription: sport.shortDescription,
+    fullDescription: sport.shortDescription,
+    origin: '',
+    popularityInIndia: '',
+    popularityWorldwide: '',
+    icon: `/images/sports/${sport.slug}.svg`,
+    coverImage: `/images/sports/${sport.slug}.svg`,
+    howToPlay: '',
+    objectiveOfGame: '',
+    teamSize: '',
+    matchDuration: '',
+    scoringSystem: '',
+    playingSurface: '',
+    requiredEquipment: [],
+    ageGroups: sport.suitableFor.join(', '),
+    beginnerFriendly: sport.beginnerFriendly,
+    olympicSport: sport.olympicSport,
+    estimatedMonthlyCost: '',
+    playingSeason: 'All Year' as const,
+    trainingFrequency: '',
+    averageLearningTime: '',
+    injuryRisk: 'Medium' as const,
+    fitnessLevelRequired: sport.fitnessLevelRequired,
+    suitableFor: sport.suitableFor as ('Kids' | 'Teens' | 'Adults' | 'Seniors')[],
+    individualOrTeam: (sport.sportType === 'both' ? 'Both' : sport.sportType === 'team' ? 'Team' : 'Individual') as 'Individual' | 'Team' | 'Both',
+    indoorOutdoor: sport.category as 'Indoor' | 'Outdoor' | 'Both',
+    physicalBenefits: [],
+    mentalBenefits: [],
+    skillsDeveloped: [],
+    careerOpportunities: [],
+    scholarships: [],
+    professionalLeagues: [],
+    tournaments: [],
+    competitionPathway: { levels: [] },
+    status: 'published' as const,
+  };
+}
+
 export function SportsListing({ hideSearch = false }: { hideSearch?: boolean } = {}) {
   const { query, setQuery } = useSearchQuery();
   const [allSports, setAllSports] = React.useState<Sport[]>([]);
@@ -94,48 +139,7 @@ export function SportsListing({ hideSearch = false }: { hideSearch?: boolean } =
         </p>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {filteredCatalog.map((sport) => (
-            <SportCard key={sport.slug} sport={{
-              id: sport.slug,
-              slug: sport.slug,
-              name: sport.name,
-              category: sport.category,
-              sportType: sport.sportType,
-              shortDescription: sport.shortDescription,
-              fullDescription: sport.shortDescription,
-              origin: '',
-              popularityInIndia: '',
-              popularityWorldwide: '',
-              icon: `/images/sports/${sport.slug}.svg`,
-              coverImage: `/images/sports/${sport.slug}.svg`,
-              howToPlay: '',
-              objectiveOfGame: '',
-              teamSize: '',
-              matchDuration: '',
-              scoringSystem: '',
-              playingSurface: '',
-              requiredEquipment: [],
-              ageGroups: sport.suitableFor.join(', '),
-              beginnerFriendly: sport.beginnerFriendly,
-              olympicSport: sport.olympicSport,
-              estimatedMonthlyCost: '',
-              playingSeason: 'All Year' as const,
-              trainingFrequency: '',
-              averageLearningTime: '',
-              injuryRisk: 'Medium' as const,
-              fitnessLevelRequired: sport.fitnessLevelRequired,
-              suitableFor: sport.suitableFor as ('Kids' | 'Teens' | 'Adults' | 'Seniors')[],
-              individualOrTeam: (sport.sportType === 'both' ? 'Both' : sport.sportType === 'team' ? 'Team' : 'Individual') as 'Individual' | 'Team' | 'Both',
-              indoorOutdoor: sport.category as 'Indoor' | 'Outdoor' | 'Both',
-              physicalBenefits: [],
-              mentalBenefits: [],
-              skillsDeveloped: [],
-              careerOpportunities: [],
-              scholarships: [],
-              professionalLeagues: [],
-              tournaments: [],
-              competitionPathway: { levels: [] },
-              status: 'published' as const,
-            }} />
+            <SportCard key={sport.slug} sport={catalogSportToSport(sport)} />
           ))}
         </div>
       </div>
@@ -187,48 +191,7 @@ export function SportsListing({ hideSearch = false }: { hideSearch?: boolean } =
       ) : (
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {filteredCatalog.map((sport) => (
-            <SportCard key={sport.slug} sport={{
-              id: sport.slug,
-              slug: sport.slug,
-              name: sport.name,
-              category: sport.category,
-              sportType: sport.sportType,
-              shortDescription: sport.shortDescription,
-              fullDescription: sport.shortDescription,
-              origin: '',
-              popularityInIndia: '',
-              popularityWorldwide: '',
-              icon: `/images/sports/${sport.slug}.svg`,
-              coverImage: `/images/sports/${sport.slug}.svg`,
-              howToPlay: '',
-              objectiveOfGame: '',
-              teamSize: '',
-              matchDuration: '',
-              scoringSystem: '',
-              playingSurface: '',
-              requiredEquipment: [],
-              ageGroups: sport.suitableFor.join(', '),
-              beginnerFriendly: sport.beginnerFriendly,
-              olympicSport: sport.olympicSport,
-              estimatedMonthlyCost: '',
-              playingSeason: 'All Year' as const,
-              trainingFrequency: '',
-              averageLearningTime: '',
-              injuryRisk: 'Medium' as const,
-              fitnessLevelRequired: sport.fitnessLevelRequired,
-              suitableFor: sport.suitableFor as ('Kids' | 'Teens' | 'Adults' | 'Seniors')[],
-              individualOrTeam: (sport.sportType === 'both' ? 'Both' : sport.sportType === 'team' ? 'Team' : 'Individual') as 'Individual' | 'Team' | 'Both',
-              indoorOutdoor: sport.category as 'Indoor' | 'Outdoor' | 'Both',
-              physicalBenefits: [],
-              mentalBenefits: [],
-              skillsDeveloped: [],
-              careerOpportunities: [],
-              scholarships: [],
-              professionalLeagues: [],
-              tournaments: [],
-              competitionPathway: { levels: [] },
-              status: 'published' as const,
-            }} />
+            <SportCard key={sport.slug} sport={catalogSportToSport(sport)} />
           ))}
         </div>
       )}

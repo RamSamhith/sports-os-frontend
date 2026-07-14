@@ -416,7 +416,7 @@ export function AcademyListing({ hideSearch = false }: { hideSearch?: boolean } 
           ))}
           {appliedCount > 0 ? (
             <Button size="sm" variant="outline" className="min-h-[44px]" onClick={clearAll}>
-              <X className="h-3.5 h-3.5" /> Clear all
+              <X className="h-3.5" /> Clear all
             </Button>
           ) : null}
         </div>
